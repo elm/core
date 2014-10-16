@@ -1,20 +1,27 @@
-Elm.Native.Graphics.Input = {};
-Elm.Native.Graphics.Input.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Graphics = elm.Native.Graphics || {};
-    elm.Native.Graphics.Input = elm.Native.Graphics.Input || {};
-    if (elm.Native.Graphics.Input.values) return elm.Native.Graphics.Input.values;
+// setup
+Elm.Native = Elm.Native || {};
+Elm.Native.Graphics = Elm.Native.Graphics || {};
+Elm.Native.Graphics.Input = Elm.Native.Graphics.Input || {};
 
-    var Render = ElmRuntime.use(ElmRuntime.Render.Element);
-    var newNode = ElmRuntime.use(ElmRuntime.Render.Utils).newElement;
+// definition
+Elm.Native.Graphics.Input.make = function(localRuntime) {
+    'use strict';
 
-    var toCss = Elm.Native.Color.make(elm).toCss;
-    var Text = Elm.Native.Text.make(elm);
-    var Signal = Elm.Signal.make(elm);
-    var newElement = Elm.Graphics.Element.make(elm).newElement;
-    var List = Elm.Native.List.make(elm);
-    var Utils = Elm.Native.Utils.make(elm);
+    // attempt to short-circuit
+    if ('values' in Elm.Native.Graphics.Input) {
+        return Elm.Native.Graphics.Input.values;
+    }
+
+    var Color = Elm.Native.Color.make(localRuntime);
+    var List = Elm.Native.List.make(localRuntime);
+    var Signal = Elm.Signal.make(localRuntime);
+    var Text = Elm.Native.Text.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
     var Tuple2 = Utils.Tuple2;
+
+    var Element = Elm.Graphics.Element.make(localRuntime);
+    var NativeElement = Elm.Native.Graphics.Element(localRuntime);
+
 
     function input(initialValue) {
         var signal = Signal.constant(initialValue);
@@ -22,7 +29,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
     }
 
     function renderDropDown(model) {
-        var drop = newNode('select');
+        var drop = NativeElement.createNode('select');
         drop.style.border = '0 solid';
         drop.style.pointerEvents = 'auto';
         drop.style.display = 'block';
@@ -32,7 +39,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
         var values = drop.elm_values;
 
         for (var i = 0; i < values.length; ++i) {
-            var option = newNode('option');
+            var option = NativeElement.createNode('option');
             var name = values[i]._0;
             option.value = name;
             option.innerHTML = name;
@@ -64,7 +71,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
             node.removeChild(node.lastChild);
         }
         for (; i < values.length; ++i) {
-            var option = newNode('option');
+            var option = NativeElement.createNode('option');
             var name = values[i]._0;
             option.value = name;
             option.innerHTML = name;
@@ -86,7 +93,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
     }
 
     function renderButton(model) {
-        var node = newNode('button');
+        var node = NativeElement.createNode('button');
         node.style.display = 'block';
         node.style.pointerEvents = 'auto';
         node.elm_signal = model.signal;
@@ -117,14 +124,14 @@ Elm.Native.Graphics.Input.make = function(elm) {
     }
 
     function renderCustomButton(model) {
-        var btn = newNode('div');
+        var btn = NativeElement.createNode('div');
         btn.style.pointerEvents = 'auto';
         btn.elm_signal = model.signal;
         btn.elm_value = model.value;
 
-        btn.elm_up    = Render.render(model.up);
-        btn.elm_hover = Render.render(model.hover);
-        btn.elm_down  = Render.render(model.down);
+        btn.elm_up    = NativeElement.render(model.up);
+        btn.elm_hover = NativeElement.render(model.hover);
+        btn.elm_down  = NativeElement.render(model.down);
 
         btn.elm_up.style.display = 'block';
         btn.elm_hover.style.display = 'none';
@@ -175,9 +182,9 @@ Elm.Native.Graphics.Input.make = function(elm) {
         var styleHover = kids[1].style.display;
         var styleDown  = kids[2].style.display;
 
-        Render.update(kids[0], oldModel.up, newModel.up);
-        Render.update(kids[1], oldModel.hover, newModel.hover);
-        Render.update(kids[2], oldModel.down, newModel.down);
+        NativeElement.update(kids[0], oldModel.up, newModel.up);
+        NativeElement.update(kids[1], oldModel.hover, newModel.hover);
+        NativeElement.update(kids[2], oldModel.down, newModel.down);
 
         var kids = node.childNodes;
         kids[0].style.display = styleUp;
@@ -203,7 +210,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
     }
 
     function renderCheckbox(model) {
-        var node = newNode('input');
+        var node = NativeElement.createNode('input');
         node.type = 'checkbox';
         node.checked = model.checked;
         node.style.display = 'block';
@@ -258,7 +265,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
 
         var outline = style.outline;
         updateIfNeeded(css, 'border-width', cssDimensions(outline.width));
-        updateIfNeeded(css, 'border-color', toCss(outline.color));
+        updateIfNeeded(css, 'border-color', Color.toCss(outline.color));
         updateIfNeeded(css, 'border-radius', outline.radius + 'px');
 
         var highlight = style.highlight;
@@ -266,11 +273,11 @@ Elm.Native.Graphics.Input.make = function(elm) {
             css.outline = 'none';
         } else {
             updateIfNeeded(css, 'outline-width', highlight.width + 'px');
-            updateIfNeeded(css, 'outline-color', toCss(highlight.color));
+            updateIfNeeded(css, 'outline-color', Color.toCss(highlight.color));
         }
 
         var textStyle = style.style;
-        updateIfNeeded(css, 'color', toCss(textStyle.color));
+        updateIfNeeded(css, 'color', Color.toCss(textStyle.color));
         if (textStyle.typeface.ctor !== '[]') {
             updateIfNeeded(css, 'font-family', Text.toTypefaces(textStyle.typeface));
         }
@@ -285,7 +292,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
     }
 
     function renderField(model) {
-        var field = newNode('input');
+        var field = NativeElement.createNode('input');
         updateFieldStyle(field.style, model.style);
         field.style.borderStyle = 'solid';
         field.style.pointerEvents = 'auto';
@@ -394,7 +401,7 @@ Elm.Native.Graphics.Input.make = function(elm) {
         return { props:props, element:elem.element };
     }
 
-    return elm.Native.Graphics.Input.values = {
+    return Elm.Native.Graphics.Input.values = {
         input:input,
         button:F3(button),
         customButton:F5(customButton),
