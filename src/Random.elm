@@ -1,9 +1,8 @@
 module Random
     ( Generator, Seed
-    , int, intRange
-    , float, floatRange
+    , int, float
     , listOf, pairOf
-    , minInt32, maxInt32
+    , minInt, maxInt
     , generate, initialSeed
     )
   where
@@ -17,13 +16,9 @@ L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 [System.Random](http://hackage.haskell.org/package/random-1.0.1.1/docs/System-Random.html)
 module. It has a period of roughly 2.30584e18.
 
-# Generators for Numbers
+# Generators
 
-@docs int, float, intRange, floatRange
-
-# Generators for Data Structures
-
-@docs pairOf, listOf
+@docs int, float, pairOf, listOf
 
 # Running a Generator
 
@@ -31,7 +26,7 @@ module. It has a period of roughly 2.30584e18.
 
 # Constants
 
-@docs maxInt32, minInt32
+@docs maxInt, minInt
 
 # Creating Custom Generators
 
@@ -42,19 +37,17 @@ import Basics (..)
 import List ((::), reverse)
 
 
-{-| Generate a 32-bit integer in range [minInt32,maxInt32] inclusive.
--}
-int : Generator Int
-int =
-    intRange minInt32 maxInt32
-
-
-{-| Generate an integer in a given range. This function will continue to
-produce values outside of the range [minInt32, maxInt32] but sufficient
+{-| Generate a 32-bit integer in a given range. This function will continue to
+produce values outside of the range [minInt, maxInt] but sufficient
 randomness is not guaranteed.
+
+      int 0 10   -- an integer between zero and ten
+      int -5 5   -- an integer between -5 and 5
+
+      int minInt maxInt  -- an integer in the widest range feasible
 -}
-intRange : Int -> Int -> Generator Int
-intRange a b seed =
+int : Int -> Int -> Generator Int
+int a b seed =
     let (lo,hi) = if a < b then (a,b) else (b,a)
 
         k = hi - lo + 1
@@ -79,35 +72,26 @@ iLogBase b i =
 
 
 {-| The maximum value for randomly generated for 32-bit ints. -}
-maxInt32 : Int
-maxInt32 = 2147483647
+maxInt : Int
+maxInt = 2147483647
 
 
 {-| The minimum value for randomly generated for 32-bit ints. -}
-minInt32 : Int
-minInt32 = -2147483648
-
-
-{-| Generate a float between 0 and 1 inclusive.
--}
-float : Generator Float
-float seed =
-    let (number, seed') =
-            intRange minInt32 maxInt32 seed
-
-        zeroToOne =
-            toFloat number / toFloat (maxInt32 - minInt32)
-    in
-        (zeroToOne, seed')
+minInt : Int
+minInt = -2147483648
 
 
 {-| Generate a float in a given range.
 -}
-floatRange : Float -> Float -> Generator Float
-floatRange a b seed =
+float : Float -> Float -> Generator Float
+float a b seed =
     let (lo, hi) = if a < b then (a,b) else (b,a)
 
-        (zeroToOne, seed') = float seed
+        (number, seed') =
+            int minInt maxInt seed
+
+        zeroToOne =
+            toFloat number / toFloat (maxInt - minInt)
 
         scaled = lo + ((hi-lo) * zeroToOne)
     in
@@ -122,7 +106,7 @@ wide and 200 pixels tall.
 
       randomPoint : Generator (Int,Int)
       randomPoint =
-          pairOf (intRange -200 200) (intRange -100 100)
+          pairOf (int -200 200) (int -100 100)
 
 -}
 pairOf : Generator a -> Generator b -> Generator (a,b)
@@ -136,14 +120,14 @@ pairOf genLeft genRight seed =
 {-| Create a list of random values using a generator function.
 
       floatList : Generator [Float]
-      floatList = listOf 10 float
+      floatList = listOf 10 (float 0 1)
 
       intList : Generator [Int]
-      intList = listOf 42 (intRange (0,3))
+      intList = listOf 5 (int 0 100)
 
-      intPairs : Generator [(Int,Int)]
+      intPairs : Generator [[Int]]
       intPairs =
-          listOf 10 (pairOf int int)
+          listOf 10 intList
 -}
 listOf : Int -> Generator a -> Generator [a]
 listOf n gen =
