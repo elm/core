@@ -189,7 +189,8 @@ generate generator seed =
 
 {-| Create a &ldquo;seed&rdquo; of randomness which makes it possible to
 generate random values. If you use the same seed many times, it will result
-in the same thing every time!
+in the same thing every time! A good way to get an unexpected seed is to use
+the current time.
 -}
 initialSeed : Int -> Seed
 initialSeed n =
