@@ -105,39 +105,72 @@ count = Native.Signal.count
 countIf : (a -> Bool) -> Signal a -> Signal Int
 countIf = Native.Signal.countIf
 
-{-| Keep only events that satisfy the given predicate. Elm does not allow
-undefined signals, so a base case must be provided in case the predicate is
-not satisfied initially. -}
+{-| Filter out some updates. The given function decides whether we should
+keep an update. If no updates ever flow through, we use the default value
+provided. The following example only keeps even numbers and has an initial
+value of zero.
+
+      numbers : Signal Int
+
+      isEven : Int -> Bool
+
+      evens : Signal Int
+      evens =
+          keepIf isEven 0 numbers
+-}
 keepIf : (a -> Bool) -> a -> Signal a -> Signal a
-keepIf = Native.Signal.keepIf
+keepIf =
+    Native.Signal.keepIf
 
-{-| Drop events that satisfy the given predicate. Elm does not allow undefined
-signals, so a base case must be provided in case the predicate is satisfied
-initially. -}
+
+{-| Filter out some updates. The given function decides whether we should
+drop an update. If we drop all updates, we use the default value provided.
+The following example drops all even numbers and has an initial value of
+one.
+
+      numbers : Signal Int
+
+      isEven : Int -> Bool
+
+      odds : Signal Int
+      odds =
+          dropIf isEven 1 numbers
+-}
 dropIf : (a -> Bool) -> a -> Signal a -> Signal a
-dropIf = Native.Signal.dropIf
+dropIf =
+    Native.Signal.dropIf
 
-{-| Keep events only when the first signal is true. Elm does not allow undefined
-signals, so a base case must be provided in case the first signal is not true
-initially.
+
+{-| Keep updates when the first signal is true. You provide a default value
+just in case that signal is *never* true and no updates make it through. For
+example, here is how you would capture mouse drags.
+
+      dragPosition : Signal (Int,Int)
+      dragPosition =
+          keepWhen Mouse.isDown (0,0) Mouse.position
 -}
 keepWhen : Signal Bool -> a -> Signal a -> Signal a
 keepWhen bs def sig = 
-  snd <~ (keepIf fst (False, def) ((,) <~ (sampleOn sig bs) ~ sig))
+    snd <~ (keepIf fst (False, def) ((,) <~ (sampleOn sig bs) ~ sig))
 
-{-| Drop events when the first signal is true. Elm does not allow undefined
-signals, so a base case must be provided in case the first signal is true
-initially.
+{-| Drop events when the first signal is true. You provide a default value
+just in case that signal is *always* true and we drop all updates.
 -}
 dropWhen : Signal Bool -> a -> Signal a -> Signal a
 dropWhen bs = keepWhen (not <~ bs)
 
+
 {-| Drop updates that repeat the current value of the signal.
 
-Imagine a signal `numbers` has initial value
-0 and then updates with values 0, 0, 1, 1, and 2. `dropRepeats numbers`
-is a signal that has initial value 0 and updates as follows: ignore 0,
-ignore 0, update to 1, ignore 1, update to 2. -}
+      numbers : Signal Int
+
+      noDups : Signal Int
+      noDups =
+          dropRepeats numbers
+
+      --  numbers => 0 0 3 3 5 5 5 4 ...
+      --  noDups  => 0   3   5     4 ...
+-}
 dropRepeats : Signal a -> Signal a
 dropRepeats = Native.Signal.dropRepeats
 
