@@ -430,14 +430,14 @@ redden t =
 
 
 {-| Apply a function to all values in a dictionary. -}
-map : (a -> b) -> Dict comparable a -> Dict comparable b
+map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
 map f dict =
     case dict of
       RBEmpty LBlack ->
           RBEmpty LBlack
 
       RBNode clr key value left right ->
-          RBNode clr key (f value) (map f left) (map f right)
+          RBNode clr key (f key value) (map f left) (map f right)
 
 
 {-| Fold over the key-value pairs in a dictionary, in order from lowest
