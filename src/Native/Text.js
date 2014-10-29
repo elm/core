@@ -122,8 +122,7 @@ Elm.Native.Text.make = function(elm) {
                 ctor :'RawHtml',
                 html : Utils.makeText(text),
                 align: align,
-                guid : null,
-                args : []
+                guid : null
             };
             var pos = A2(Utils.htmlHeight, 0, raw);
             return A3(Element.newElement, pos._0, pos._1, raw);
@@ -135,8 +134,7 @@ Elm.Native.Text.make = function(elm) {
             ctor:'RawHtml',
             html: text,
             align: null,
-            guid: guid,
-            args: []
+            guid: guid
         };
         var pos = A2(Utils.htmlHeight, 0, raw);
         return A3(Element.newElement, pos._0, pos._1, raw);
