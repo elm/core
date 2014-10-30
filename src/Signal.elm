@@ -1,6 +1,6 @@
 module Signal where
 {-| The library for general signal manipulation. Includes lift functions up to
-`lift8` and infix lift operators `<~` and `~`, combinations, filters, and
+`lift11` and infix lift operators `<~` and `~`, combinations, filters, and
 past-dependence.
 
 Signals are time-varying values. Lifted functions are reevaluated whenever any of
@@ -25,7 +25,7 @@ the `Time` library.
 @docs (<~), (~)
 
 # Do you even lift?
-@docs lift3, lift4, lift5, lift6, lift7, lift8
+@docs lift3, lift4, lift5, lift6, lift7, lift8, lift9, lift10, lift11
 
 -}
 
@@ -68,6 +68,17 @@ lift8 : (a -> b -> c -> d -> e -> f -> g -> h -> i)
       -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i
 lift8 = Native.Signal.lift8
 
+lift9 : (a -> b -> c -> d -> e -> f -> g -> h -> i -> j)
+      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i -> Signal j
+lift9 = Native.Signal.lift9
+
+lift10 : (a -> b -> c -> d -> e -> f -> g -> h -> i -> j -> k)
+      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i -> Signal j -> Signal k
+lift10 = Native.Signal.lift10
+
+lift11 : (a -> b -> c -> d -> e -> f -> g -> h -> i -> j -> k -> l)
+      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i -> Signal j -> Signal k -> Signal l
+lift11 = Native.Signal.lift11
 
 {-| Create a past-dependent signal. Each value given on the input signal will
 be accumulated, producing a new output value.
