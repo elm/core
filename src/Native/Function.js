@@ -73,6 +73,38 @@ function F9(fun) {
   wrapper.func = fun;
   return wrapper;
 }
+function F10(fun) {
+  function wrapper(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+	return function(g) { return function(h) { return function(i) {
+	return function(j) { return fun(a,b,c,d,e,f,g,h,i,j) }}}}}}}}}
+  }
+  wrapper.arity = 10;
+  wrapper.func = fun;
+  return wrapper;
+}
+function F11(fun) {
+  function wrapper(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+	return function(g) { return function(h) { return function(i) {
+	return function(j) { return function(k) {
+        return fun(a,b,c,d,e,f,g,h,i,j,k) }}}}}}}}}}
+  }
+  wrapper.arity = 11;
+  wrapper.func = fun;
+  return wrapper;
+}
+function F12(fun) {
+  function wrapper(a) { return function(b) { return function(c) {
+    return function(d) { return function(e) { return function(f) {
+	return function(g) { return function(h) { return function(i) {
+	return function(j) { return function(k) { return function(l) {
+        return fun(a,b,c,d,e,f,g,h,i,j,k,l) }}}}}}}}
+  }
+  wrapper.arity = 12;
+  wrapper.func = fun;
+  return wrapper;
+}
 
 function A2(fun,a,b) {
   return fun.arity === 2 ? fun.func(a,b) : fun(a)(b);
@@ -98,4 +130,12 @@ function A8(fun,a,b,c,d,e,f,g,h) {
 function A9(fun,a,b,c,d,e,f,g,h,i) {
   return fun.arity === 9 ? fun.func(a,b,c,d,e,f,g,h,i)
                          : fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
+}
+function A10(fun,a,b,c,d,e,f,g,h,i,j) {
+  return fun.arity === 10 ? fun.func(a,b,c,d,e,f,g,h,i,j)
+                         : fun(a)(b)(c)(d)(e)(f)(g)(h)(i)(j);
+}
+function A11(fun,a,b,c,d,e,f,g,h,i,j,k) {
+  return fun.arity === 11 ? fun.func(a,b,c,d,e,f,g,h,i,j,k)
+                         : fun(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k);
 }

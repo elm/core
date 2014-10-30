@@ -84,6 +84,18 @@ Elm.Native.Signal.make = function(elm) {
     function update() { return A8( func, a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value ); }
     return new LiftN(update, [a,b,c,d,e,f,g,h]);
   }
+  function lift9(func, a, b, c, d, e, f, g, h, i) {
+    function update() { return A9( func, a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value ); }
+    return new LiftN(update, [a,b,c,d,e,f,g,h,i]);
+  }
+  function lift10(func, a, b, c, d, e, f, g, h, i, j) {
+    function update() { return A10( func, a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value ); }
+    return new LiftN(update, [a,b,c,d,e,f,g,h,i,j]);
+  }
+  function lift11(func, a, b, c, d, e, f, g, h, i, j, k) {
+    function update() { return A11( func, a.value, b.value, c.value, d.value, e.value, f.value, g.value, h.value, i.value, j.value, k.value ); }
+    return new LiftN(update, [a,b,c,d,e,f,g,h,i,j,k]);
+  }
 
   function Foldp(step, state, input) {
     this.id = Utils.guid();
@@ -209,6 +221,9 @@ Elm.Native.Signal.make = function(elm) {
     lift6 : F7(lift6),
     lift7 : F8(lift7),
     lift8 : F9(lift8),
+    lift9 : F10(lift9),
+    lift10 : F11(lift10),
+    lift11 : F12(lift11),
     foldp : F3(foldp),
     delay : F2(delay),
     merge : F2(merge),
