@@ -10,7 +10,7 @@ list must have the same type.
 @docs head, tail, last, filter, take, drop
 
 # Putting Lists Together
-@docs concat, join, intersperse, zip, zipWith, repeat
+@docs concat, join, intersperse, zip, repeat
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -28,13 +28,12 @@ list must have the same type.
 @docs sort, sortBy, sortWith
 
 # Additional Zips
-@docs zip3, zip4, zip5, zipWith3, zipWith4, zipWith5
+@docs zip3, zip4, zip5
 
-If you can think of a legitimate use of `zipN` or `zipWithN` where `N` is 6 or
-more, please let us know on [the
-list](https://groups.google.com/forum/#!forum/elm-discuss). The current
-sentiment is that it is already quite error prone once you get to 4 and
-possibly should be approached another way.
+If you can think of a legitimate use of `zipN` where `N` is 6 or more, please
+let us know on [the list](https://groups.google.com/forum/#!forum/elm-discuss).
+The current sentiment is that it is already quite error prone once you get to
+4 and possibly should be approached another way.
 -}
 
 import Basics (..)
@@ -105,7 +104,7 @@ element (starting at zero).
 -}
 indexedMap : (Int -> a -> b) -> [a] -> [b]
 indexedMap f xs =
-    zipWith f [ 0 .. length xs - 1 ] xs
+    zip f [ 0 .. length xs - 1 ] xs
 
 {-| Reduce a list from the left.
 
@@ -252,40 +251,29 @@ partition pred =
                           else (ts, x::fs)
     in foldr step ([],[])
 
-{-| Combine two lists, combining them into tuples pairwise.
-If one list is longer, the extra elements are dropped.
-
-      zip [1,2,3] [6,7] == [(1,6),(2,7)]
-      zip == zipWith (,)
--}
-zip : [a] -> [b] -> [(a,b)]
-zip = Native.List.zip
-
-zip3 : [a] -> [b] -> [c] -> [(a,b,c)]
-zip3 = Native.List.zipWith3 (,,)
-
-zip4 : [a] -> [b] -> [c] -> [d] -> [(a,b,c,d)]
-zip4 = Native.List.zipWith4 (,,,)
-
-zip5 : [a] -> [b] -> [c] -> [d] -> [e] -> [(a,b,c,d,e)]
-zip5 = Native.List.zipWith5 (,,,,)
 
 {-| Combine two lists, combining them with the given function.
 If one list is longer, the extra elements are dropped.
 
-      zipWith (+) [1,2,3] [1,2,3,4] == [2,4,6]
+      zip (+) [1,2,3] [1,2,3,4] == [2,4,6]
+
+      zip (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
+
+      pairs : [a] -> [b] -> [(a,b)]
+      pairs lefts rights =
+          zip (,) lefts rights
 -}
-zipWith : (a -> b -> c) -> [a] -> [b] -> [c]
-zipWith = Native.List.zipWith
+zip : (a -> b -> x) -> [a] -> [b] -> [x]
+zip = Native.List.zip
 
-zipWith3 : (a -> b -> c -> x) -> [a] -> [b] -> [c] -> [x]
-zipWith3 = Native.List.zipWith3
+zip3 : (a -> b -> c -> x) -> [a] -> [b] -> [c] -> [x]
+zip3 = Native.List.zip3
 
-zipWith4 : (a -> b -> c -> d -> x) -> [a] -> [b] -> [c] -> [d] -> [x]
-zipWith4 = Native.List.zipWith4
+zip4 : (a -> b -> c -> d -> x) -> [a] -> [b] -> [c] -> [d] -> [x]
+zip4 = Native.List.zip4
 
-zipWith5 : (a -> b -> c -> d -> e -> x) -> [a] -> [b] -> [c] -> [d] -> [e] -> [x]
-zipWith5 = Native.List.zipWith5
+zip5 : (a -> b -> c -> d -> e -> x) -> [a] -> [b] -> [c] -> [d] -> [e] -> [x]
+zip5 = Native.List.zip5
 
 {-| Decompose a list of tuples into a tuple of lists.
 
