@@ -13,7 +13,7 @@ signals and time (e.g.  delaying updates, getting timestamps) can be found in
 the `Time` library.
 
 # Combine
-@docs constant, lift, lift2, merge, mergeMany, combine
+@docs constant, map, lift2, merge, mergeMany, combine
 
 # Past-Dependence
 @docs foldp
@@ -41,8 +41,8 @@ constant : a -> Signal a
 constant = Native.Signal.constant
 
 {-| Transform a signal with a given function. -}
-lift  : (a -> b) -> Signal a -> Signal b
-lift = Native.Signal.lift
+map  : (a -> b) -> Signal a -> Signal b
+map = Native.Signal.lift
 
 {-| Combine two signals with a given function. -}
 lift2 : (a -> b -> c) -> Signal a -> Signal b -> Signal c
