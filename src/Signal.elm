@@ -18,8 +18,11 @@ the `Time` library.
 # Past-Dependence
 @docs foldp, count, countIf
 
-#Filters
+# Filters
 @docs keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
+
+# Inputs
+@docs input, send, subscribe
 
 # Pretty Lift
 @docs (<~), (~)
@@ -168,3 +171,70 @@ sf ~ s = Native.Signal.lift2 (\f x -> f x) sf s
 
 infixl 4 <~
 infixl 4 ~
+
+
+---- INPUTS ----
+
+type Input a = Input -- Signal a
+
+type Message = Message -- () -> ()
+
+
+{-| Create a signal input that you can `send` messages to. To receive these
+messages, `subscribe` to the input and turn it into a normal signal. The
+primary use case is receiving updates from UI elements such as buttons and
+text fields. The argument is a default value for the custom signal.
+
+Note: This is an inherently impure function, so `(input ())`
+and `(input ())` produce two different signals.
+-}
+input : a -> Input a
+input =
+    Native.Signal.input
+
+
+{-| Create a `Message` that can be sent to an `Input` through a handler like
+`Html.onclick` or `Html.onblur`.
+
+      import Html
+
+      type Update = NoOp | Add Int | Remove Int
+
+      updates : Input Update
+      updates = input NoOp
+
+      addButton : Html.Html
+      addButton =
+          Html.button
+              [ onclick (send updates (Add 1)) ]
+              [ Html.text "Add 1" ]
+-}
+send : Input a -> a -> Message
+send =
+    Native.Signal.send
+
+
+{-| Receive all the messages sent to an `Input` as a `Signal`. The following
+example shows how you would set up a system that uses an `Input`.
+
+      -- initialState : Model
+      -- type Update = NoOp | ...
+      -- step : Update -> Model -> Model
+      -- view : Input Update -> Model -> Element
+
+      updates : Input Update
+      updates = input NoOp
+
+      main : Signal Element
+      main =
+        lift
+          (view updates)
+          (foldp step initialState (subscribe updates))
+
+The `updates` input appears twice in `main` because it serves as a bridge
+between your view and your signals. In the view you `send` to it, and in signal
+world you `subscribe` to it.
+-}
+subscribe : Input a -> Signal a
+subscribe =
+    Native.Signal.subscribe

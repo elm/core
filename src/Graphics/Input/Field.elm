@@ -17,8 +17,8 @@ text fields programmatically.
 import Color (Color)
 import Color
 import Graphics.Element (Element)
-import Graphics.Input (Input, Handle)
 import Native.Graphics.Input
+import Signal
 import Text
 
 {-| Create uniform dimensions:
@@ -171,19 +171,19 @@ place-holder message to use when no input has been provided yet. Finally,
 we give the current `Content` of the field. This argument is last because
 it is most likely to change frequently, making function composition easier.
 -}
-field : Style -> Handle a -> (Content -> a) -> String -> Content -> Element
+field : Style -> (Content -> Signal.Message) -> String -> Content -> Element
 field = Native.Graphics.Input.field
 
 {-| Same as `field` but the UI element blocks out each characters. -}
-password : Style -> Handle a -> (Content -> a) -> String -> Content -> Element
+password : Style -> (Content -> Signal.Message) -> String -> Content -> Element
 password = Native.Graphics.Input.password
 
 {-| Same as `field` but it adds an annotation that this field is for email
 addresses. This is helpful for auto-complete and for mobile users who may
 get a custom keyboard with an `@` and `.com` button.
 -}
-email : Style -> Handle a -> (Content -> a) -> String -> Content -> Element
+email : Style -> (Content -> Signal.Message) -> String -> Content -> Element
 email = Native.Graphics.Input.email
 
--- area : Handle a -> (Content -> a) -> Handle b -> ((Int,Int) -> b) -> (Int,Int) -> String -> Content -> Element
+-- area : (Content -> Signal.Message) -> Handle b -> ((Int,Int) -> b) -> (Int,Int) -> String -> Content -> Element
 -- area = Native.Graphics.Input.area
