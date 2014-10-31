@@ -88,13 +88,39 @@ is the time the program has been running, updated 40 times a second.
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp = Native.Signal.foldp
 
-{-| Merge two signals into one, biased towards the first signal if both signals
-update at the same time. -}
+
+{-| Merge two signals into one. This function is extremely useful for bringing
+together lots of different signals to feed into a `foldp`.
+
+      type Update = MouseMove (Int,Int) | TimeDelta Float
+
+      updates : Signal Update
+      updates =
+          merge
+              (map MouseMove Mouse.position)
+              (map TimeDelta (fps 40))
+
+If an update comes from either of the incoming signals, it updates the outgoing
+signal. If an update comes on both signals at the same time, the left update
+wins.
+-}
 merge : Signal a -> Signal a -> Signal a
 merge = Native.Signal.merge
 
-{-| Merge many signals into one, biased towards the left-most signal if multiple
-signals update simultaneously. -}
+{-| Merge many signals into one. This is useful when you are merging more than
+two signals. When multiple updates come in at the same time, the left-most
+update wins, just like with `merge`.
+
+      type Update = MouseMove (Int,Int) | TimeDelta Float | Click
+
+      updates : Signal Update
+      updates =
+          mergeMany
+              [ map MouseMove Mouse.position
+              , map TimeDelta (fps 40)
+              , map (always Click) Mouse.clicks
+              ]
+-}
 mergeMany : [Signal a] -> Signal a
 mergeMany =
     List.foldr1 merge signals
