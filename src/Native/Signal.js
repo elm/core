@@ -213,10 +213,6 @@ Elm.Native.Signal.make = function(elm) {
     delay : F2(delay),
     merge : F2(merge),
     merges : merges,
-    count : function(s) { return foldp(F2(function(_,c) { return c+1; }), 0, s); },
-    countIf : F2(function(pred,s) {
-      return foldp(F2(function(x,c){
-        return pred(x) ? c+1 : c; }), 0, s)}),
     keepIf : F3(function(pred,base,sig) {
       return new DropIf(function(x) {return !pred(x);},base,sig); }),
     dropIf : F3(function(pred,base,sig) { return new DropIf(pred,base,sig); }),
