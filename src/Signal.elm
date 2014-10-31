@@ -45,29 +45,29 @@ map  : (a -> b) -> Signal a -> Signal b
 map = Native.Signal.lift
 
 {-| Combine two signals with a given function. -}
-lift2 : (a -> b -> c) -> Signal a -> Signal b -> Signal c
-lift2 = Native.Signal.lift2
+zip : (a -> b -> result) -> Signal a -> Signal b -> Signal result
+zip = Native.Signal.lift2
 
-lift3 : (a -> b -> c -> d) -> Signal a -> Signal b -> Signal c -> Signal d
-lift3 = Native.Signal.lift3
+zip3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
+zip3 = Native.Signal.lift3
 
-lift4 : (a -> b -> c -> d -> e) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e
-lift4 = Native.Signal.lift4
+zip4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
+zip4 = Native.Signal.lift4
 
-lift5 : (a -> b -> c -> d -> e -> f) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f
-lift5 = Native.Signal.lift5
+zip5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
+zip5 = Native.Signal.lift5
 
-lift6 : (a -> b -> c -> d -> e -> f -> g)
-      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g
-lift6 = Native.Signal.lift6
+zip6 : (a -> b -> c -> d -> e -> f -> result)
+    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal result
+zip6 = Native.Signal.lift6
 
-lift7 : (a -> b -> c -> d -> e -> f -> g -> h)
-      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h
-lift7 = Native.Signal.lift7
+zip7 : (a -> b -> c -> d -> e -> f -> g -> result)
+    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal result
+zip7 = Native.Signal.lift7
 
-lift8 : (a -> b -> c -> d -> e -> f -> g -> h -> i)
-      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i
-lift8 = Native.Signal.lift8
+zip8 : (a -> b -> c -> d -> e -> f -> g -> h -> result)
+    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal result
+zip8 = Native.Signal.lift8
 
 
 {-| Create a past-dependent signal. Each value given on the input signal will
