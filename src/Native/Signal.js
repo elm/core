@@ -7,7 +7,6 @@ Elm.Native.Signal.make = function(elm) {
   if (elm.Native.Signal.values) return elm.Native.Signal.values;
 
   var Utils = Elm.Native.Utils.make(elm);
-  var foldr1 = Elm.List.make(elm).foldr1;
 
   function send(node, timestep, changed) {
     var kids = node.kids;
@@ -195,8 +194,9 @@ Elm.Native.Signal.make = function(elm) {
       s2.kids.push(this);
   }
 
-  function merge(s1,s2) { return new Merge(s1,s2); }
-  function merges(ss) { return A2(foldr1, F2(merge), ss); }
+  function merge(s1,s2) {
+      return new Merge(s1,s2);
+  }
 
   return elm.Native.Signal.values = {
     input: function(v) { return new Input(v); },
@@ -212,7 +212,6 @@ Elm.Native.Signal.make = function(elm) {
     foldp : F3(foldp),
     delay : F2(delay),
     merge : F2(merge),
-    merges : merges,
     keepIf : F3(function(pred,base,sig) {
       return new DropIf(function(x) {return !pred(x);},base,sig); }),
     dropIf : F3(function(pred,base,sig) { return new DropIf(pred,base,sig); }),

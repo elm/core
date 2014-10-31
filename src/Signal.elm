@@ -30,7 +30,8 @@ the `Time` library.
 -}
 
 import Native.Signal
-import List (foldr, (::))
+import List
+import List ((::))
 import Basics (fst, snd, not)
 
 type Signal a = Signal
@@ -85,11 +86,14 @@ merge = Native.Signal.merge
 {-| Merge many signals into one, biased towards the left-most signal if multiple
 signals update simultaneously. -}
 merges : [Signal a] -> Signal a
-merges = Native.Signal.merges
+merges =
+    List.foldr1 merge signals
+
 
 {-| Combine a list of signals into a signal of lists. -}
 combine : [Signal a] -> Signal [a]
-combine = foldr (Native.Signal.lift2 (::)) (Native.Signal.constant [])
+combine =
+    List.foldr (Native.Signal.lift2 (::)) (Native.Signal.constant [])
 
  -- Merge two signals into one, but distinguishing the values by marking the first
  -- signal as `Left` and the second signal as `Right`. This allows you to easily
