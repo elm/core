@@ -263,16 +263,16 @@ If one list is longer, the extra elements are dropped.
       pairs lefts rights =
           zip (,) lefts rights
 -}
-zip : (a -> b -> x) -> [a] -> [b] -> [x]
+zip : (a -> b -> result) -> [a] -> [b] -> [result]
 zip = Native.List.zip
 
-zip3 : (a -> b -> c -> x) -> [a] -> [b] -> [c] -> [x]
+zip3 : (a -> b -> c -> result) -> [a] -> [b] -> [c] -> [result]
 zip3 = Native.List.zip3
 
-zip4 : (a -> b -> c -> d -> x) -> [a] -> [b] -> [c] -> [d] -> [x]
+zip4 : (a -> b -> c -> d -> result) -> [a] -> [b] -> [c] -> [d] -> [result]
 zip4 = Native.List.zip4
 
-zip5 : (a -> b -> c -> d -> e -> x) -> [a] -> [b] -> [c] -> [d] -> [e] -> [x]
+zip5 : (a -> b -> c -> d -> e -> result) -> [a] -> [b] -> [c] -> [d] -> [e] -> [result]
 zip5 = Native.List.zip5
 
 {-| Decompose a list of tuples into a tuple of lists.
