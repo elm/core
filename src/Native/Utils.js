@@ -194,20 +194,6 @@ Elm.Native.Utils.make = function(elm) {
 
         document.body.appendChild(t);
 
-        // insert interpolated values
-        var args = rawHtml.args;
-        var guid = rawHtml.guid;
-        for (var i = args.length; i--; ) {
-            var arg = args[i];
-            var span = document.getElementById('md-' + guid + '-' + i);
-            if (arg.isElement) {
-                span.style.width = arg.props.width + 'px';
-                span.style.height = arg.props.height + 'px';
-            } else {
-                span.innerHTML = arg;
-            }
-        }
-
         // get dimensions
         var style = window.getComputedStyle(t, null);
         var w = Math.ceil(style.getPropertyValue("width").slice(0,-2) - 0);

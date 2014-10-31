@@ -327,27 +327,6 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
                 node.parentNode.replaceChild(render(next),node);
                 return true;
             }
-            var nargs = nextE.args;
-            var cargs = currE.args;
-            for (var i = nargs.length; i--; ) {
-                var narg = nargs[i];
-                var carg = cargs[i]
-                if (narg == carg) continue;
-                var span = document.getElementById('md-' + currE.guid + '-' + i);
-                if (narg.isElement) {
-                    if (carg.isElement) {
-                        update(span, carg, narg);
-                    } else {
-                        span.style.display = 'block';
-                        var e = render(narg);
-                        span.innerHTML = '';
-                        span.appendChild(e);
-                    }
-                } else {
-                    span.style.display = 'inline';
-                    span.innerHTML = narg;
-                }
-            }
             break;
         case "Image":
             if (nextE._0.ctor === 'Plain') {

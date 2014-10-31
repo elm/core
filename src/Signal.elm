@@ -70,12 +70,22 @@ zip8 : (a -> b -> c -> d -> e -> f -> g -> h -> result)
 zip8 = Native.Signal.lift8
 
 
-{-| Create a past-dependent signal. Each value given on the input signal will
-be accumulated, producing a new output value.
+{-| Create a past-dependent signal. Each update from the incoming signals will
+be used to step the stat forward. The outgoing signal represents the current
+state.
 
-For instance, `foldp (+) 0 (fps 40)` is the time the program has been running,
-updated 40 times a second. -}
-foldp : (a -> b -> b) -> b -> Signal a -> Signal b
+      clickCount : Signal Int
+      clickCount =
+          foldp (\click total -> total + 1) 0 Mouse.clicks
+
+      timeSoFar : Signal Time
+      timeSoFar =
+          foldp (+) 0 (fps 40)
+
+So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
+is the time the program has been running, updated 40 times a second.
+-}
+foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp = Native.Signal.foldp
 
 {-| Merge two signals into one, biased towards the first signal if both signals
@@ -101,39 +111,72 @@ combine =
  -- mergeEither : Signal a -> Signal b -> Signal (Either a b)
 
 
-{-| Keep only events that satisfy the given predicate. Elm does not allow
-undefined signals, so a base case must be provided in case the predicate is
-not satisfied initially. -}
+{-| Filter out some updates. The given function decides whether we should
+keep an update. If no updates ever flow through, we use the default value
+provided. The following example only keeps even numbers and has an initial
+value of zero.
+
+      numbers : Signal Int
+
+      isEven : Int -> Bool
+
+      evens : Signal Int
+      evens =
+          keepIf isEven 0 numbers
+-}
 keepIf : (a -> Bool) -> a -> Signal a -> Signal a
-keepIf = Native.Signal.keepIf
+keepIf =
+    Native.Signal.keepIf
 
-{-| Drop events that satisfy the given predicate. Elm does not allow undefined
-signals, so a base case must be provided in case the predicate is satisfied
-initially. -}
+
+{-| Filter out some updates. The given function decides whether we should
+drop an update. If we drop all updates, we use the default value provided.
+The following example drops all even numbers and has an initial value of
+one.
+
+      numbers : Signal Int
+
+      isEven : Int -> Bool
+
+      odds : Signal Int
+      odds =
+          dropIf isEven 1 numbers
+-}
 dropIf : (a -> Bool) -> a -> Signal a -> Signal a
-dropIf = Native.Signal.dropIf
+dropIf =
+    Native.Signal.dropIf
 
-{-| Keep events only when the first signal is true. Elm does not allow undefined
-signals, so a base case must be provided in case the first signal is not true
-initially.
+
+{-| Keep updates when the first signal is true. You provide a default value
+just in case that signal is *never* true and no updates make it through. For
+example, here is how you would capture mouse drags.
+
+      dragPosition : Signal (Int,Int)
+      dragPosition =
+          keepWhen Mouse.isDown (0,0) Mouse.position
 -}
 keepWhen : Signal Bool -> a -> Signal a -> Signal a
 keepWhen bs def sig = 
-  snd <~ (keepIf fst (False, def) ((,) <~ (sampleOn sig bs) ~ sig))
+    snd <~ (keepIf fst (False, def) ((,) <~ (sampleOn sig bs) ~ sig))
 
-{-| Drop events when the first signal is true. Elm does not allow undefined
-signals, so a base case must be provided in case the first signal is true
-initially.
+{-| Drop events when the first signal is true. You provide a default value
+just in case that signal is *always* true and we drop all updates.
 -}
 dropWhen : Signal Bool -> a -> Signal a -> Signal a
 dropWhen bs = keepWhen (not <~ bs)
 
+
 {-| Drop updates that repeat the current value of the signal.
 
-Imagine a signal `numbers` has initial value
-0 and then updates with values 0, 0, 1, 1, and 2. `dropRepeats numbers`
-is a signal that has initial value 0 and updates as follows: ignore 0,
-ignore 0, update to 1, ignore 1, update to 2. -}
+      numbers : Signal Int
+
+      noDups : Signal Int
+      noDups =
+          dropRepeats numbers
+
+      --  numbers => 0 0 3 3 5 5 5 4 ...
+      --  noDups  => 0   3   5     4 ...
+-}
 dropRepeats : Signal a -> Signal a
 dropRepeats = Native.Signal.dropRepeats
 
