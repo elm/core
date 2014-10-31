@@ -69,12 +69,22 @@ lift8 : (a -> b -> c -> d -> e -> f -> g -> h -> i)
 lift8 = Native.Signal.lift8
 
 
-{-| Create a past-dependent signal. Each value given on the input signal will
-be accumulated, producing a new output value.
+{-| Create a past-dependent signal. Each update from the incoming signals will
+be used to step the stat forward. The outgoing signal represents the current
+state.
 
-For instance, `foldp (+) 0 (fps 40)` is the time the program has been running,
-updated 40 times a second. -}
-foldp : (a -> b -> b) -> b -> Signal a -> Signal b
+      clickCount : Signal Int
+      clickCount =
+          foldp (\click total -> total + 1) 0 Mouse.clicks
+
+      timeSoFar : Signal Time
+      timeSoFar =
+          foldp (+) 0 (fps 40)
+
+So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
+is the time the program has been running, updated 40 times a second.
+-}
+foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp = Native.Signal.foldp
 
 {-| Merge two signals into one, biased towards the first signal if both signals
