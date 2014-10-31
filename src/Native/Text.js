@@ -30,7 +30,7 @@ Elm.Native.Text.make = function(elm) {
         }
         arr = arr.join('');
         if (arr[arr.length-1] === " ") {
-	    return arr.slice(0,-1) + '&nbsp;';
+            return arr.slice(0,-1) + '&nbsp;';
         }
         return arr;
     }
@@ -38,14 +38,14 @@ Elm.Native.Text.make = function(elm) {
     function properEscape(str) {
         if (str.length == 0) return str;
         str = str //.replace(/&/g,  "&#38;")
-	    .replace(/"/g,  '&#34;')
-	    .replace(/'/g,  "&#39;")
-	    .replace(/</g,  "&#60;")
-	    .replace(/>/g,  "&#62;")
-	    .replace(/\n/g, "<br/>");
+            .replace(/"/g,  '&#34;')
+            .replace(/'/g,  "&#39;")
+            .replace(/</g,  "&#60;")
+            .replace(/>/g,  "&#62;")
+            .replace(/\n/g, "<br/>");
         var arr = str.split('<br/>');
         for (var i = arr.length; i--; ) {
-	    arr[i] = makeSpaces(arr[i]);
+            arr[i] = makeSpaces(arr[i]);
         }
         return arr.join('<br/>');
     }
@@ -122,8 +122,7 @@ Elm.Native.Text.make = function(elm) {
                 ctor :'RawHtml',
                 html : Utils.makeText(text),
                 align: align,
-                guid : null,
-                args : []
+                guid : null
             };
             var pos = A2(Utils.htmlHeight, 0, raw);
             return A3(Element.newElement, pos._0, pos._1, raw);
@@ -135,8 +134,7 @@ Elm.Native.Text.make = function(elm) {
             ctor:'RawHtml',
             html: text,
             align: null,
-            guid: guid,
-            args: []
+            guid: guid
         };
         var pos = A2(Utils.htmlHeight, 0, raw);
         return A3(Element.newElement, pos._0, pos._1, raw);

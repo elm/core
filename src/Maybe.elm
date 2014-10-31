@@ -1,4 +1,4 @@
-module Maybe (Maybe(..), maybe, isJust, isNothing, map) where
+module Maybe (Maybe(..), maybe, isJust, isNothing, map, andThen) where
 
 {-| Represents an optional value. Maybe it is there, maybe it is not.
 
@@ -8,8 +8,8 @@ module Maybe (Maybe(..), maybe, isJust, isNothing, map) where
 # Taking Maybes apart
 @docs maybe, isJust, isNothing
 
-# Map
-@docs map
+# Convenience Functions
+@docs map, andThen
 -}
 
 {-| The Maybe datatype. Useful when a computation may or may not
@@ -59,3 +59,37 @@ map f maybe =
     case maybe of
       Just v  -> Just (f v)
       Nothing -> Nothing
+
+
+{-| Chain together many computations that may fail. It is helpful to see its
+definition:
+
+      andThen : Maybe a -> (a -> Maybe b) -> Maybe b
+      andThen maybe callback =
+          case maybe of
+            Just value -> callback value
+            Nothing    -> Nothing
+
+This means we only continue with the callback if things are going well. For
+example, say you need to use (`toInt : String -> Maybe Int`) to parse a month
+and make sure it is between 1 and 12:
+
+      validMonth : Int -> Maybe Int
+      validMonth month =
+          if month >= 1 && month <= 12
+              then Just month
+              else Nothing
+
+      toMonth : String -> Maybe Int
+      toMonth rawString =
+          toInt rawString `andThen` validMonth
+
+If `toInt` fails and results in `Nothing` this entire chain of operations will
+short-circuit and result in `Nothing`. If `validMonth` results in `Nothing`,
+again the chain of computations will result in `Nothing`.
+-}
+andThen : Maybe a -> (a -> Maybe b) -> Maybe b
+andThen maybeValue callback =
+    case maybeValue of
+        Just value -> callback value
+        Nothing    -> Nothing
