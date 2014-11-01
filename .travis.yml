@@ -10,7 +10,7 @@ install:
   - cabal install
   - sudo ln -s ~/.cabal/bin/elm-io /usr/local/bin/elm-io
   - cd ../tests
-  - echo "y" | elm-get install deadfoxygrandpa/Elm-Test
+  - echo "y\ny\n" | elm-get install deadfoxygrandpa/Elm-Test
   - npm install jsdom
 
 before_script:
