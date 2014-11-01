@@ -13,10 +13,10 @@ signals and time (e.g.  delaying updates, getting timestamps) can be found in
 the `Time` library.
 
 # Combine
-@docs constant, lift, lift2, merge, merges, combine
+@docs constant, map, lift2, merge, mergeMany, combine
 
 # Past-Dependence
-@docs foldp, count, countIf
+@docs foldp
 
 # Filters
 @docs keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
@@ -33,7 +33,8 @@ the `Time` library.
 -}
 
 import Native.Signal
-import List (foldr, (::))
+import List
+import List ((::))
 import Basics (fst, snd, not)
 
 type Signal a = Signal
@@ -43,33 +44,33 @@ constant : a -> Signal a
 constant = Native.Signal.constant
 
 {-| Transform a signal with a given function. -}
-lift  : (a -> b) -> Signal a -> Signal b
-lift = Native.Signal.lift
+map  : (a -> b) -> Signal a -> Signal b
+map = Native.Signal.lift
 
 {-| Combine two signals with a given function. -}
-lift2 : (a -> b -> c) -> Signal a -> Signal b -> Signal c
-lift2 = Native.Signal.lift2
+zip : (a -> b -> result) -> Signal a -> Signal b -> Signal result
+zip = Native.Signal.lift2
 
-lift3 : (a -> b -> c -> d) -> Signal a -> Signal b -> Signal c -> Signal d
-lift3 = Native.Signal.lift3
+zip3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
+zip3 = Native.Signal.lift3
 
-lift4 : (a -> b -> c -> d -> e) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e
-lift4 = Native.Signal.lift4
+zip4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
+zip4 = Native.Signal.lift4
 
-lift5 : (a -> b -> c -> d -> e -> f) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f
-lift5 = Native.Signal.lift5
+zip5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
+zip5 = Native.Signal.lift5
 
-lift6 : (a -> b -> c -> d -> e -> f -> g)
-      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g
-lift6 = Native.Signal.lift6
+zip6 : (a -> b -> c -> d -> e -> f -> result)
+    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal result
+zip6 = Native.Signal.lift6
 
-lift7 : (a -> b -> c -> d -> e -> f -> g -> h)
-      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h
-lift7 = Native.Signal.lift7
+zip7 : (a -> b -> c -> d -> e -> f -> g -> result)
+    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal result
+zip7 = Native.Signal.lift7
 
-lift8 : (a -> b -> c -> d -> e -> f -> g -> h -> i)
-      -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal i
-lift8 = Native.Signal.lift8
+zip8 : (a -> b -> c -> d -> e -> f -> g -> h -> result)
+    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal result
+zip8 = Native.Signal.lift8
 
 
 {-| Create a past-dependent signal. Each update from the incoming signals will
@@ -90,33 +91,54 @@ is the time the program has been running, updated 40 times a second.
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp = Native.Signal.foldp
 
-{-| Merge two signals into one, biased towards the first signal if both signals
-update at the same time. -}
+
+{-| Merge two signals into one. This function is extremely useful for bringing
+together lots of different signals to feed into a `foldp`.
+
+      type Update = MouseMove (Int,Int) | TimeDelta Float
+
+      updates : Signal Update
+      updates =
+          merge
+              (map MouseMove Mouse.position)
+              (map TimeDelta (fps 40))
+
+If an update comes from either of the incoming signals, it updates the outgoing
+signal. If an update comes on both signals at the same time, the left update
+wins.
+-}
 merge : Signal a -> Signal a -> Signal a
 merge = Native.Signal.merge
 
-{-| Merge many signals into one, biased towards the left-most signal if multiple
-signals update simultaneously. -}
-merges : [Signal a] -> Signal a
-merges = Native.Signal.merges
+{-| Merge many signals into one. This is useful when you are merging more than
+two signals. When multiple updates come in at the same time, the left-most
+update wins, just like with `merge`.
+
+      type Update = MouseMove (Int,Int) | TimeDelta Float | Click
+
+      updates : Signal Update
+      updates =
+          mergeMany
+              [ map MouseMove Mouse.position
+              , map TimeDelta (fps 40)
+              , map (always Click) Mouse.clicks
+              ]
+-}
+mergeMany : [Signal a] -> Signal a
+mergeMany =
+    List.foldr1 merge signals
+
 
 {-| Combine a list of signals into a signal of lists. -}
 combine : [Signal a] -> Signal [a]
-combine = foldr (Native.Signal.lift2 (::)) (Native.Signal.constant [])
+combine =
+    List.foldr (Native.Signal.lift2 (::)) (Native.Signal.constant [])
 
  -- Merge two signals into one, but distinguishing the values by marking the first
  -- signal as `Left` and the second signal as `Right`. This allows you to easily
  -- fold over non-homogeneous inputs.
  -- mergeEither : Signal a -> Signal b -> Signal (Either a b)
 
-{-| Count the number of events that have occurred. -}
-count : Signal a -> Signal Int
-count = Native.Signal.count
-
-{-| Count the number of events that have occurred that satisfy a given predicate.
--}
-countIf : (a -> Bool) -> Signal a -> Signal Int
-countIf = Native.Signal.countIf
 
 {-| Filter out some updates. The given function decides whether we should
 keep an update. If no updates ever flow through, we use the default value

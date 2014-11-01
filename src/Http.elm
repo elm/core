@@ -12,7 +12,8 @@ library if you have very strict latency requirements.
 @docs Response
 -}
 
-import Signal (..)
+import Signal (Signal)
+import Signal
 import Native.Http
 
 {-| The datatype for responses. Success contains only the returned message.
@@ -54,4 +55,5 @@ send = Native.Http.send
 that carries the responses.
 -}
 sendGet : Signal String -> Signal (Response String)
-sendGet reqs = send (lift get reqs)
+sendGet requestStrings =
+    send (Signal.map get requestStrings)
