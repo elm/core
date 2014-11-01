@@ -32,7 +32,6 @@ Insert, remove, and query operations all take *O(log n)* time.
 
 -}
 
-import Maybe (Maybe)
 import Dict as Dict
 import List as List
 
