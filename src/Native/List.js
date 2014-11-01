@@ -199,7 +199,7 @@ Elm.Native.List.make = function(elm) {
         return false;
     }
 
-    function zip(f, xs, ys) {
+    function map2(f, xs, ys) {
         var arr = [];
         while (xs.ctor !== '[]' && ys.ctor !== '[]') {
             arr.push(A2(f, xs._0, ys._0));
@@ -209,7 +209,7 @@ Elm.Native.List.make = function(elm) {
         return fromArray(arr);
     }
 
-    function zip3(f, xs, ys, zs) {
+    function map3(f, xs, ys, zs) {
         var arr = [];
         while (xs.ctor !== '[]' && ys.ctor !== '[]' && zs.ctor !== '[]') {
             arr.push(A3(f, xs._0, ys._0, zs._0));
@@ -220,7 +220,7 @@ Elm.Native.List.make = function(elm) {
         return fromArray(arr);
     }
 
-    function zip4(f, ws, xs, ys, zs) {
+    function map4(f, ws, xs, ys, zs) {
         var arr = [];
         while (   ws.ctor !== '[]'
                && xs.ctor !== '[]'
@@ -236,7 +236,7 @@ Elm.Native.List.make = function(elm) {
         return fromArray(arr);
     }
 
-    function zip5(f, vs, ws, xs, ys, zs) {
+    function map5(f, vs, ws, xs, ys, zs) {
         var arr = [];
         while (   vs.ctor !== '[]'
                && ws.ctor !== '[]'
@@ -363,10 +363,10 @@ Elm.Native.List.make = function(elm) {
 
         all:F2(all),
         any:F2(any),
-        zip :F3(zip ),
-        zip3:F4(zip3),
-        zip4:F5(zip4),
-        zip5:F6(zip5),
+        map2:F3(map2),
+        map3:F4(map3),
+        map4:F5(map4),
+        map5:F6(map5),
         sort:sort,
         sortBy:F2(sortBy),
         sortWith:F2(sortWith),
