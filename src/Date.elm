@@ -14,7 +14,7 @@ issues with internationalization or locale formatting.
 
 import Native.Date
 import Time (Time)
-import Maybe (Maybe)
+import Result (Result)
 
 type Date = Date
 
@@ -28,8 +28,8 @@ type Month
     | Sep | Oct | Nov | Dec
 
 {-| Attempt to read a date from a string. -}
-read : String -> Maybe Date
-read = Native.Date.read
+fromString : String -> Result String Date
+fromString = Native.Date.read
 
 {-| Convert a date into a time since midnight (UTC) of 1 January 1990 (i.e.
 [UNIX time](http://en.wikipedia.org/wiki/Unix_time)). Given the date 23 June
