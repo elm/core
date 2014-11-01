@@ -1,22 +1,6 @@
 module Graphics.Input where
-{-| This module is for creating standard input widgets such as buttons and
-text fields. All functions in this library follow a general pattern in which
-you create an `Input` that many elements can report to:
-
-```haskell
-clicks : Input ()
-clicks = input ()
-
-clickableYogi : Element
-clickableYogi = clickable clicks.handle () (image 40 40 "/yogi.jpg")
-```
-
-Whenever the user clicks on the resulting `clickableYogi` element, it sends an
-update to the `clicks` input. You will see this pattern again and again in
-examples in this library, so just read on to get a better idea of how it works!
-
-# Creating Inputs
-@docs Input, input
+{-| This module is for creating input widgets such as buttons and text fields.
+All functions in this library report to a [`Signal.Input`](Signal#customSignal).
 
 # Basic Input Elements
 
@@ -30,36 +14,10 @@ To learn about text fields, see the
 
 -}
 
-import Signal (Signal)
+import Signal
 import Graphics.Element (Element)
 import Native.Graphics.Input
 
-{-| This is the key abstraction of this library. An `Input` is a record
-of two fields:
-
-  1. `signal` &mdash; all values coming to this input from &ldquo;the world&rdquo;
-  2. `handle` &mdash; a way to refer to this particular input and send it values
-
-This will make more sense as you see more examples.
--}
-type alias Input a = { signal : Signal a, handle : Handle a }
-
-type Handle a = Handle
-
-{-| This creates a new `Input`. You provide a single argument that will serve
-as the initial value of the input&rsquo;s `signal`. For example:
-
-      numbers : Input Int
-      numbers = input 42
-
-The initial value of `numbers.signal` is 42, and you will be able
-to pipe updates to the input using `numbers.handle`.
-
-Note: This is an inherently impure function. Specifically, `(input ())` and
-`(input ())` are actually two different inputs with different signals and handles.
--}
-input : a -> Input a
-input = Native.Graphics.Input.input
 
 {-| Create a standard button. The following example begins making a basic
 calculator:
@@ -79,7 +37,7 @@ calculator:
 If the user presses the "+" button, `keys.signal` will update to `Plus`. If the
 users presses "2", `keys.signal` will update to `(Number 2)`.
 -}
-button : Handle a -> a -> String -> Element
+button : Signal.Message -> String -> Element
 button = Native.Graphics.Input.button
 
 {-| Same as `button` but lets you customize buttons to look however you want.
@@ -94,7 +52,7 @@ button = Native.Graphics.Input.button
               (image 100 40 "/button_hover.jpg")
               (image 100 40 "/button_down.jpg")
 -}
-customButton : Handle a -> a -> Element -> Element -> Element -> Element
+customButton : Signal.Message -> Element -> Element -> Element -> Element
 customButton = Native.Graphics.Input.customButton
 
 {-| Create a checkbox. The following example creates three synced checkboxes:
@@ -110,7 +68,7 @@ customButton = Native.Graphics.Input.customButton
       main : Signal Element
       main = boxes <~ check.signal
 -}
-checkbox : Handle a -> (Bool -> a) -> Bool -> Element
+checkbox : (Bool -> Signal.Message) -> Bool -> Element
 checkbox = Native.Graphics.Input.checkbox
 
 {-| Create a drop-down menu.  The following drop-down lets you choose your
@@ -133,7 +91,7 @@ favorite British sport:
 If the user selects "Football" from the drop down menue, `sport.signal`
 will update to `Just Football`.
 -}
-dropDown : Handle a -> [(String,a)] -> Element
+dropDown : [(String, Signal.Message)] -> Element
 dropDown = Native.Graphics.Input.dropDown
 
 {-| Detect mouse hovers over a specific `Element`. In the following example,
@@ -149,7 +107,7 @@ we will create a hoverable picture called `cat`.
 When the mouse hovers above the `cat` element, `hover.signal` will become
 `True`. When the mouse leaves it, `hover.signal` will become `False`.
 -}
-hoverable : Handle a -> (Bool -> a) -> Element -> Element
+hoverable : (Bool -> Signal.Message) -> Element -> Element
 hoverable = Native.Graphics.Input.hoverable
 
 {-| Detect mouse clicks on a specific `Element`. In the following example,
@@ -174,5 +132,5 @@ an update containing the value `Cat`. When the user clicks on the `hat` element,
 distinguish which element was clicked. In a more complex example, they could be
 distinguished with IDs or more complex data structures.
 -}
-clickable : Handle a -> a -> Element -> Element
+clickable : Signal.Message -> Element -> Element
 clickable = Native.Graphics.Input.clickable

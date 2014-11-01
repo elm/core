@@ -14,7 +14,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
     var Color = Elm.Native.Color.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
-    var Signal = Elm.Signal.make(localRuntime);
     var Text = Elm.Native.Text.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
     var Tuple2 = Utils.Tuple2;
@@ -22,11 +21,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     var Element = Elm.Graphics.Element.make(localRuntime);
     var NativeElement = Elm.Native.Graphics.Element(localRuntime);
 
-
-    function input(initialValue) {
-        var signal = Signal.constant(initialValue);
-        return { _:{}, signal:signal, handle:signal };
-    }
 
     function renderDropDown(model) {
         var drop = NativeElement.createNode('select');
@@ -402,7 +396,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     return Elm.Native.Graphics.Input.values = {
-        input:input,
         button:F3(button),
         customButton:F5(customButton),
         checkbox:F3(checkbox),

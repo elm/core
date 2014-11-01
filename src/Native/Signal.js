@@ -198,8 +198,25 @@ Elm.Native.Signal.make = function(elm) {
   function merge(s1,s2) { return new Merge(s1,s2); }
   function merges(ss) { return A2(foldr1, F2(merge), ss); }
 
+
+    // SIGNAL INPUTS
+
+    function input(initialValue) {
+        return new Input(initialValue);
+    }
+
+    function send(input, value) {
+        return function() {
+            localRuntime.notify(input.id, value);
+        };
+    }
+
+    function subscribe(input) {
+        return input;
+    }
+
+
   return elm.Native.Signal.values = {
-    input: function(v) { return new Input(v); },
     constant : function(v) { return new Input(v); },
     lift  : F2(lift ),
     lift2 : F3(lift2),
@@ -222,6 +239,9 @@ Elm.Native.Signal.make = function(elm) {
     dropIf : F3(function(pred,base,sig) { return new DropIf(pred,base,sig); }),
     dropRepeats : function(s) { return new DropRepeats(s);},
     sampleOn : F2(sampleOn),
-    timestamp : timestamp
+    timestamp : timestamp,
+    input: input,
+    send: F2(send),
+    subscribe: subscribe
   };
 };
