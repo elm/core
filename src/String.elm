@@ -31,6 +31,8 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 import Native.Show
 import Native.String
 import Maybe (Maybe)
+import Result (Result)
+
 
 {-| Determine if a string is empty.
 
@@ -305,22 +307,22 @@ show = Native.Show.show
 
 {-| Try to convert a string into an int, failing on improperly formatted strings.
 
-      toInt "123" == Just 123
-      toInt "-42" == Just -42
-      toInt "3.1" == Nothing
-      toInt "31a" == Nothing
+      toInt "123" == Ok 123
+      toInt "-42" == Ok -42
+      toInt "3.1" == Err "could not convert string '3.1' to an Int"
+      toInt "31a" == Err "could not convert string '31a' to an Int"
 -}
-toInt : String -> Maybe Int
+toInt : String -> Result String Int
 toInt = Native.String.toInt
 
 {-| Try to convert a string into a float, failing on improperly formatted strings.
 
-      toFloat "123" == Just 123.0
-      toFloat "-42" == Just -42.0
-      toFloat "3.1" == Just 3.1
-      toFloat "31a" == Nothing
+      toFloat "123" == Ok 123.0
+      toFloat "-42" == Ok -42.0
+      toFloat "3.1" == Ok 3.1
+      toFloat "31a" == Err "could not convert string '31a' to a Float"
 -}
-toFloat : String -> Maybe Float
+toFloat : String -> Result String Float
 toFloat = Native.String.toFloat
 
 {-| Convert a string to a list of characters.

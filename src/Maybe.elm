@@ -1,63 +1,67 @@
-module Maybe (Maybe(..), maybe, isJust, isNothing, map, andThen) where
+module Maybe (Maybe(Just,Nothing), andThen, map, withDefault) where
 
-{-| Represents an optional value. Maybe it is there, maybe it is not.
+{-| This library fills a bunch of important niches in Elm. A `Maybe` can help
+you with optional arguments, error handling, and records with optional fields.
 
-# Type and Constructors
+# Definition
 @docs Maybe
 
-# Taking Maybes apart
-@docs maybe, isJust, isNothing
+# Extracting Values
+@docs withDefault
 
-# Convenience Functions
+# Chaining Maybes
 @docs map, andThen
+
 -}
 
-{-| The Maybe datatype. Useful when a computation may or may not
-result in a value (e.g. logarithm is defined only for positive
-numbers). 
+{-| Represent values that may or may not exist. It can be useful if you have a
+record field that is only filled in sometimes. Or if a function takes a value
+sometimes, but does not absolutely need it. It can also be used to represent
+functions that can fail.
+
+      -- A person, but maybe we do not know their age.
+      type alias Person =
+          { name : String
+          , age : Maybe Int
+          }
+
+          -- tom = { name = "Tom", age = Just 42 }
+          -- sue = { name = "Sue", age = Nothing }
+
+      -- a function that might not succeed
+      String.toInt : String -> Maybe Int
+
+          -- String.toInt "hats" == Nothing
+          -- String.toInt "123" == Just 123
 -}
 type Maybe a = Just a | Nothing
 
-{-| Provide a default value and a function to extract the contents of a `Maybe`.
-When given `Nothing` you get the default, when given a `Just` you apply the
-function to the associated value.
 
-      isPositive : Maybe Int -> Bool
-      isPositive maybeInt = maybe False (\n -> n > 0) maybeInt
+{-| Provide a default value, turning an optional value into a normal value.
+This comes in handy when paired with functions like `Dict.get` which gives back
+a `Maybe`.
+
+      withDefault 100 (Just 42) == 42
+      withDefault 100 Nothing == 100
+
+      withDefault "plumber" (Dict.get "Tom" Dict.empty) == "plumber"
 -}
-maybe : b -> (a -> b) -> Maybe a -> b
-maybe b f m =
-    case m of
-      Just v  -> f v
-      Nothing -> b
+withDefault : a -> Maybe a -> a
+withDefault default optional =
+    case optional of
+      Just value -> value
+      Nothing -> default
 
-{-| Check if a maybe happens to be a `Just`.
 
-      isJust (Just 42) == True
-      isJust (Just []) == True
-      isJust Nothing   == False
--}
-isJust : Maybe a -> Bool
-isJust = maybe False (\_ -> True)
-
-{-| Check if constructed with `Nothing`.
-
-      isNothing (Just 42) == False
-      isNothing (Just []) == False
-      isNothing Nothing   == True
--}
-isNothing : Maybe a -> Bool
-isNothing = maybe True (\_ -> False)
-
-{-| Transform the contents of a `Maybe` with a given function:
+{-| Transform an `Maybe` value with a given function:
 
       map sqrt (Just 9) == Just 3
-      map sqrt Nothing  == Nothing
+      map sqrt Nothing == Nothing
 -}
 map : (a -> b) -> Maybe a -> Maybe b
 map f maybe =
     case maybe of
-      Just v  -> Just (f v)
+      Just value -> Just (f value)
       Nothing -> Nothing
 
 
@@ -68,7 +72,7 @@ definition:
       andThen maybe callback =
           case maybe of
             Just value -> callback value
-            Nothing    -> Nothing
+            Nothing -> Nothing
 
 This means we only continue with the callback if things are going well. For
 example, say you need to use (`toInt : String -> Maybe Int`) to parse a month
@@ -92,4 +96,4 @@ andThen : Maybe a -> (a -> Maybe b) -> Maybe b
 andThen maybeValue callback =
     case maybeValue of
         Just value -> callback value
-        Nothing    -> Nothing
+        Nothing -> Nothing

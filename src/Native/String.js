@@ -3,12 +3,14 @@ Elm.Native.String.make = function(elm) {
     elm.Native = elm.Native || {};
     elm.Native.String = elm.Native.String || {};
     if (elm.Native.String.values) return elm.Native.String.values;
-    if ('values' in Elm.Native.String)
+    if ('values' in Elm.Native.String) {
         return elm.Native.String.values = Elm.Native.String.values;
+    }
 
     var Char = Elm.Char.make(elm);
-    var Maybe = Elm.Maybe.make(elm);
     var List = Elm.Native.List.make(elm);
+    var Maybe = Elm.Maybe.make(elm);
+    var Result = Elm.Result.make(elm);
     var Utils = Elm.Native.Utils.make(elm);
 
     function isEmpty(str) {
@@ -19,8 +21,9 @@ Elm.Native.String.make = function(elm) {
     }
     function uncons(str) {
         var hd;
-        return (hd = str[0]) ? Maybe.Just(Utils.Tuple2(Utils.chr(hd), str.slice(1)))
-                              : Maybe.Nothing;
+        return (hd = str[0])
+            ? Maybe.Just(Utils.Tuple2(Utils.chr(hd), str.slice(1)))
+            : Maybe.Nothing;
     }
     function append(a,b) {
         return a + b;
@@ -160,36 +163,50 @@ Elm.Native.String.make = function(elm) {
 
     function toInt(s) {
         var len = s.length;
-        if (len === 0) { return Maybe.Nothing; }
+        if (len === 0) {
+            return Result.Err("could not convert string '" + s + "' to an Int" );
+        }
         var start = 0;
         if (s[0] == '-') {
-            if (len === 1) { return Maybe.Nothing; }
+            if (len === 1) {
+                return Result.Err("could not convert string '" + s + "' to an Int" );
+            }
             start = 1;
         }
         for (var i = start; i < len; ++i) {
-            if (!Char.isDigit(s[i])) { return Maybe.Nothing; }
+            if (!Char.isDigit(s[i])) {
+                return Result.Err("could not convert string '" + s + "' to an Int" );
+            }
         }
-        return Maybe.Just(parseInt(s, 10));
+        return Result.Ok(parseInt(s, 10));
     }
 
     function toFloat(s) {
         var len = s.length;
-        if (len === 0) { return Maybe.Nothing; }
+        if (len === 0) {
+            return Result.Err("could not convert string '" + s + "' to a Float" );
+        }
         var start = 0;
         if (s[0] == '-') {
-            if (len === 1) { return Maybe.Nothing; }
+            if (len === 1) {
+                return Result.Err("could not convert string '" + s + "' to a Float" );
+            }
             start = 1;
         }
         var dotCount = 0;
         for (var i = start; i < len; ++i) {
-            if (Char.isDigit(s[i])) { continue; }
+            if (Char.isDigit(s[i])) {
+                continue;
+            }
             if (s[i] === '.') {
                 dotCount += 1;
-                if (dotCount <= 1) { continue; }
+                if (dotCount <= 1) {
+                    continue;
+                }
             }
-            return Maybe.Nothing;
+            return Result.Err("could not convert string '" + s + "' to a Float" );
         }
-        return Maybe.Just(parseFloat(s));
+        return Result.Ok(parseFloat(s));
     }
 
     function toList(str) {

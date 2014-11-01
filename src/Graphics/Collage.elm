@@ -32,13 +32,12 @@ it as a single unit.
 
 import Basics (..)
 import List
-import Either (Either(Left, Right))
 import Transform2D (Transform2D)
 import Transform2D as T
 import Native.Graphics.Collage
 import Graphics.Element (Element)
 import Color (Color, black, Gradient)
-import Maybe (Maybe)
+
 
 type alias Form =
     { theta : Float
@@ -105,15 +104,20 @@ dotted clr = { defaultLine | color <- clr, dashing <- [3,3] }
 
 type BasicForm
     = FPath LineStyle Path
-    | FShape (Either LineStyle FillStyle) Shape
+    | FShape ShapeStyle Shape
     | FImage Int Int (Int,Int) String
     | FElement Element
     | FGroup Transform2D [Form]
 
+type ShapeStyle
+    = Line LineStyle
+    | Fill FillStyle
+
+
 form : BasicForm -> Form
 form f = { theta=0, scale=1, x=0, y=0, alpha=1, form=f }
 
-fill style shape = form (FShape (Right style) shape)
+fill style shape = form (FShape (Fill style) shape)
 
 {-| Create a filled in shape. -}
 filled : Color -> Shape -> Form
@@ -131,7 +135,7 @@ gradient grad shape = fill (Grad grad) shape
 
 {-| Outline a shape with a given line style. -}
 outlined : LineStyle -> Shape -> Form
-outlined style shape = form (FShape (Left style) shape)
+outlined style shape = form (FShape (Line style) shape)
 
 {-| Trace a path with a given line style. -}
 traced : LineStyle -> Path -> Form

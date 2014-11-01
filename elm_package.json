@@ -16,7 +16,6 @@
         "Date",
         "Debug",
         "Dict",
-        "Either",
         "Graphics.Element",
         "Graphics.Collage",
         "Graphics.Input",
