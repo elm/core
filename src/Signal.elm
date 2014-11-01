@@ -125,7 +125,7 @@ update wins, just like with `merge`.
               ]
 -}
 mergeMany : [Signal a] -> Signal a
-mergeMany =
+mergeMany signals =
     List.foldr1 merge signals
 
 
