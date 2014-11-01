@@ -181,7 +181,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         case 'FPath' : drawLine(ctx, f._0, f._1); break;
         case 'FImage': drawImage(redo, ctx, f); break;
         case 'FShape':
-          if (f._0.ctor === 'Left') {
+          if (f._0.ctor === 'Line') {
             f._1.closed = true;
             drawLine(ctx, f._0._0, f._1);
           } else {
