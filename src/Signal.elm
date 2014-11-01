@@ -13,7 +13,7 @@ signals and time (e.g.  delaying updates, getting timestamps) can be found in
 the `Time` library.
 
 # Combine
-@docs constant, map, lift2, merge, mergeMany
+@docs constant, map, map2, merge, mergeMany
 
 # Past-Dependence
 @docs foldp
@@ -24,11 +24,11 @@ the `Time` library.
 # Inputs
 @docs input, send, subscribe
 
-# Pretty Lift
+# Fancy Mapping
 @docs (<~), (~)
 
-# Do you even lift?
-@docs lift3, lift4, lift5, lift6, lift7, lift8
+# Even more Mapping
+@docs map3, map4, map5, map6, map7, map8
 
 -}
 
@@ -48,29 +48,29 @@ map  : (a -> b) -> Signal a -> Signal b
 map = Native.Signal.lift
 
 {-| Combine two signals with a given function. -}
-zip : (a -> b -> result) -> Signal a -> Signal b -> Signal result
-zip = Native.Signal.lift2
+map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result
+map2 = Native.Signal.lift2
 
-zip3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
-zip3 = Native.Signal.lift3
+map3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
+map3 = Native.Signal.lift3
 
-zip4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
-zip4 = Native.Signal.lift4
+map4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
+map4 = Native.Signal.lift4
 
-zip5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
-zip5 = Native.Signal.lift5
+map5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
+map5 = Native.Signal.lift5
 
-zip6 : (a -> b -> c -> d -> e -> f -> result)
+map6 : (a -> b -> c -> d -> e -> f -> result)
     -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal result
-zip6 = Native.Signal.lift6
+map6 = Native.Signal.lift6
 
-zip7 : (a -> b -> c -> d -> e -> f -> g -> result)
+map7 : (a -> b -> c -> d -> e -> f -> g -> result)
     -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal result
-zip7 = Native.Signal.lift7
+map7 = Native.Signal.lift7
 
-zip8 : (a -> b -> c -> d -> e -> f -> g -> h -> result)
+map8 : (a -> b -> c -> d -> e -> f -> g -> h -> result)
     -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal result
-zip8 = Native.Signal.lift8
+map8 = Native.Signal.lift8
 
 
 {-| Create a past-dependent signal. Each update from the incoming signals will
