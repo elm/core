@@ -245,11 +245,13 @@ not.
       partition isEven        [0..5] == ([0,2,4], [1,3,5])
 -}
 partition : (a -> Bool) -> [a] -> ([a],[a])
-partition pred =
-    let step x (ts, fs) = if pred x
-                          then (x::ts, fs)
-                          else (ts, x::fs)
-    in foldr step ([],[])
+partition pred list =
+    let step x (trues, falses) =
+            if pred x
+                then (x::trues, falses)
+                else (trues, x::falses)
+    in
+        foldr step ([],[]) list
 
 
 {-| Combine two lists, combining them with the given function.
