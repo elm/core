@@ -8,7 +8,7 @@ module Json where
 -}
 
 import Dict
-import Maybe (Maybe)
+import Result (Result)
 import Native.Json
 
 {-| This datatype can represent all valid JSON values. A `Value` can be sent
@@ -41,9 +41,9 @@ toString sep value = Native.Json.toString sep value
 {-| Parse a string representation of a proper JSON object into
 its Elm representation.
 
-      fromString "null"      == Just Null
-      fromString "[true,3]"  == Just (Array [Boolean True, Number 3])
-      fromString "{'abc':4}" == Just (Object (Dict.fromList [("abc", Number 4)]))
+      fromString "null"      == Ok Null
+      fromString "[true,3]"  == Ok (Array [Boolean True, Number 3])
+      fromString "{'abc':4}" == Ok (Object (Dict.fromList [("abc", Number 4)]))
 -}
-fromString : String -> Maybe Value
+fromString : String -> Result String Value
 fromString str = Native.Json.fromString str

@@ -5,7 +5,7 @@ Elm.Native.Json.make = function(elm) {
     elm.Native.Json = elm.Native.Json || {};
     if (elm.Native.Json.values) return elm.Native.Json.values;
 
-    var Maybe = Elm.Maybe.make(elm);
+    var Result = Elm.Result.make(elm);
     var Dict = Elm.Dict.make(elm);
     var List = Elm.Native.List.make(elm);
     var Utils = Elm.Native.Utils.make(elm);
@@ -27,7 +27,7 @@ Elm.Native.Json.make = function(elm) {
         case 'Array'  :
             var array = List.toArray(v._0);
             for (var i = array.length; i--; ) {
-	        array[i] = toJS(array[i]);
+                array[i] = toJS(array[i]);
             }
             return array;
         }
@@ -49,7 +49,7 @@ Elm.Native.Json.make = function(elm) {
                 for (var i = v.length; i--; ) {
                     array[i] = fromJS(v[i]);
                 }
-	        return {
+                return {
                     ctor:"Array",
                     _0: List.fromArray(array)
                 };
@@ -69,9 +69,9 @@ Elm.Native.Json.make = function(elm) {
 
     function fromString(str) {
         try {
-	    return Maybe.Just(fromJS(JSON.parse(str)));
-        } catch (e) {
-	    return Maybe.Nothing;
+            return Result.Ok(fromJS(JSON.parse(str)));
+        } catch (err) {
+            return Result.Err(err.message + ' when parsing JSON: ' ++ str);
         }
     }
 
