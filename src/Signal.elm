@@ -13,7 +13,7 @@ signals and time (e.g.  delaying updates, getting timestamps) can be found in
 the `Time` library.
 
 # Combine
-@docs constant, map, lift2, merge, mergeMany, combine
+@docs constant, map, lift2, merge, mergeMany
 
 # Past-Dependence
 @docs foldp
@@ -128,11 +128,6 @@ mergeMany : [Signal a] -> Signal a
 mergeMany signals =
     List.foldr1 merge signals
 
-
-{-| Combine a list of signals into a signal of lists. -}
-combine : [Signal a] -> Signal [a]
-combine =
-    List.foldr (Native.Signal.lift2 (::)) (Native.Signal.constant [])
 
  -- Merge two signals into one, but distinguishing the values by marking the first
  -- signal as `Left` and the second signal as `Right`. This allows you to easily
