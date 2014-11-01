@@ -129,12 +129,6 @@ mergeMany signals =
     List.foldr1 merge signals
 
 
- -- Merge two signals into one, but distinguishing the values by marking the first
- -- signal as `Left` and the second signal as `Right`. This allows you to easily
- -- fold over non-homogeneous inputs.
- -- mergeEither : Signal a -> Signal b -> Signal (Either a b)
-
-
 {-| Filter out some updates. The given function decides whether we should
 keep an update. If no updates ever flow through, we use the default value
 provided. The following example only keeps even numbers and has an initial
