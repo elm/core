@@ -10,7 +10,7 @@ list must have the same type.
 @docs head, tail, last, filter, take, drop
 
 # Putting Lists Together
-@docs concat, join, intersperse, zip, repeat
+@docs concat, join, intersperse, map2, repeat
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -28,9 +28,9 @@ list must have the same type.
 @docs sort, sortBy, sortWith
 
 # Additional Zips
-@docs zip3, zip4, zip5
+@docs map3, map4, map5
 
-If you can think of a legitimate use of `zipN` where `N` is 6 or more, please
+If you can think of a legitimate use of `mapN` where `N` is 6 or more, please
 let us know on [the list](https://groups.google.com/forum/#!forum/elm-discuss).
 The current sentiment is that it is already quite error prone once you get to
 4 and possibly should be approached another way.
@@ -104,7 +104,7 @@ element (starting at zero).
 -}
 indexedMap : (Int -> a -> b) -> [a] -> [b]
 indexedMap f xs =
-    zip f [ 0 .. length xs - 1 ] xs
+    map2 f [ 0 .. length xs - 1 ] xs
 
 {-| Reduce a list from the left.
 
@@ -245,35 +245,37 @@ not.
       partition isEven        [0..5] == ([0,2,4], [1,3,5])
 -}
 partition : (a -> Bool) -> [a] -> ([a],[a])
-partition pred =
-    let step x (ts, fs) = if pred x
-                          then (x::ts, fs)
-                          else (ts, x::fs)
-    in foldr step ([],[])
+partition pred list =
+    let step x (trues, falses) =
+            if pred x
+                then (x::trues, falses)
+                else (trues, x::falses)
+    in
+        foldr step ([],[]) list
 
 
 {-| Combine two lists, combining them with the given function.
 If one list is longer, the extra elements are dropped.
 
-      zip (+) [1,2,3] [1,2,3,4] == [2,4,6]
+      map2 (+) [1,2,3] [1,2,3,4] == [2,4,6]
 
-      zip (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
+      map2 (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
 
       pairs : [a] -> [b] -> [(a,b)]
       pairs lefts rights =
-          zip (,) lefts rights
+          map2 (,) lefts rights
 -}
-zip : (a -> b -> result) -> [a] -> [b] -> [result]
-zip = Native.List.zip
+map2 : (a -> b -> result) -> [a] -> [b] -> [result]
+map2 = Native.List.map2
 
-zip3 : (a -> b -> c -> result) -> [a] -> [b] -> [c] -> [result]
-zip3 = Native.List.zip3
+map3 : (a -> b -> c -> result) -> [a] -> [b] -> [c] -> [result]
+map3 = Native.List.map3
 
-zip4 : (a -> b -> c -> d -> result) -> [a] -> [b] -> [c] -> [d] -> [result]
-zip4 = Native.List.zip4
+map4 : (a -> b -> c -> d -> result) -> [a] -> [b] -> [c] -> [d] -> [result]
+map4 = Native.List.map4
 
-zip5 : (a -> b -> c -> d -> e -> result) -> [a] -> [b] -> [c] -> [d] -> [e] -> [result]
-zip5 = Native.List.zip5
+map5 : (a -> b -> c -> d -> e -> result) -> [a] -> [b] -> [c] -> [d] -> [e] -> [result]
+map5 = Native.List.map5
 
 {-| Decompose a list of tuples into a tuple of lists.
 
