@@ -36,10 +36,10 @@ Insert, remove, and query operations all take *O(log n)* time.
 
 
 import Basics (..)
-import Debug
 import Maybe (..)
 import List
 import List ((::))
+import Native.Error
 import Native.Utils
 
 
@@ -93,7 +93,7 @@ min dict =
           min left
 
       RBEmpty LBlack ->
-          Debug.crash "(min Empty) is not defined"
+          Native.Error.raise "(min Empty) is not defined"
 
 
 max : Dict k v -> (k, v)
@@ -106,7 +106,7 @@ max dict =
           max right
 
       RBEmpty _ ->
-          Debug.crash "(max Empty) is not defined"
+          Native.Error.raise "(max Empty) is not defined"
 
 
 {-| Get the value associated with a key. If the key is not found, return
@@ -173,7 +173,7 @@ getOrFail : comparable -> Dict comparable v -> v
 getOrFail targetKey dict =
     case dict of
       RBEmpty LBlack ->
-          Debug.crash "key not found when using 'getOrFail'"
+          Native.Error.raise "key not found when using 'getOrFail'"
 
       RBNode _ key value left right ->
           case Native.Utils.compare targetKey key of
@@ -286,7 +286,7 @@ moreBlack color =
       Black  -> BBlack
       Red    -> Black
       NBlack -> Red
-      BBlack -> Debug.crash "Can't make a double black node more black!"
+      BBlack -> Native.Error.raise "Can't make a double black node more black!"
 
 
 lessBlack : NColor -> NColor
@@ -295,7 +295,7 @@ lessBlack color =
       BBlack -> Black
       Black  -> Red
       Red    -> NBlack
-      NBlack -> Debug.crash "Can't make a negative black node less black!"
+      NBlack -> Native.Error.raise "Can't make a negative black node less black!"
 
 
 lessBlackTree : Dict k v -> Dict k v
@@ -307,7 +307,7 @@ lessBlackTree dict =
 
 reportRemBug : String -> NColor -> String -> String -> a
 reportRemBug msg c lgot rgot =
-  Debug.crash <|
+  Native.Error.raise <|
     List.concat
     [ "Internal red-black tree invariant violated, expected "
     , msg, " and got ", showNColor c, "/", lgot, "/", rgot
@@ -425,7 +425,7 @@ blacken t =
 redden : Dict k v -> Dict k v
 redden t =
     case t of
-      RBEmpty _ -> Debug.crash "can't make a Leaf red"
+      RBEmpty _ -> Native.Error.raise "can't make a Leaf red"
       RBNode _ k v l r -> RBNode Red k v l r
 
 
