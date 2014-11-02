@@ -15,7 +15,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs contains, startsWith, endsWith, indexes, indices
 
 # Conversions
-@docs show, toInt, toFloat, toList, fromList
+@docs toString, toInt, toFloat, toList, fromList
 
 # Formatting
 Cosmetic operations such as padding with extra characters or trimming whitespace.
@@ -299,11 +299,11 @@ indices = Native.String.indexes
 
 {-| Turn any kind of value into a string.
 
-      show 42    == "42"
-      show [1,2] == "[1,2]"
+      toString 42    == "42"
+      toString [1,2] == "[1,2]"
 -}
-show : a -> String
-show = Native.Show.show
+toString : a -> String
+toString = Native.Show.toString
 
 {-| Try to convert a string into an int, failing on improperly formatted strings.
 

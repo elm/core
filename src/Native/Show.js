@@ -112,21 +112,32 @@ Elm.Native.Show.make = function(elm) {
         var len = keys.length;
         if (len === 3
             && 'props' in v
-            && 'element' in v) return false;
-        if (len === 5
+            && 'element' in v)
+        {
+            return false;
+        }
+        else if (len === 5
             && 'horizontal' in v
             && 'vertical' in v
             && 'x' in v
-            && 'y' in v) return false;
-        if (len === 7
+            && 'y' in v)
+        {
+            return false;
+        }
+        else if (len === 7
             && 'theta' in v
             && 'scale' in v
             && 'x' in v
             && 'y' in v
             && 'alpha' in v
-            && 'form' in v) return false;
+            && 'form' in v)
+        {
+            return false;
+        }
         return true;
     }
 
-    return elm.Native.Show.values = { show:toString };
+    return elm.Native.Show.values = {
+        toString: toString
+    };
 };

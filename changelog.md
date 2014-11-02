@@ -20,3 +20,5 @@
   * Remove `List.zip`
   * Rename `List.zipWith` to `List.zip`
 
+  * Rename `String.show` to `String.toString`
+
