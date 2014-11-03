@@ -4,22 +4,30 @@ module List where
 list must have the same type.
 
 # Basics
-@docs (::), (++), isEmpty, length, reverse, map
+@docs (::), (++), isEmpty, length, reverse
 
 # Sub-lists
 @docs head, tail, last, filter, take, drop
 
 # Putting Lists Together
-@docs concat, join, intersperse, map2, repeat
+@docs repeat, concat, join, intersperse
 
 # Taking Lists Apart
 @docs partition, unzip
 
-# Folds
-@docs foldr, foldl
+# Mapping
+@docs map, map2, map3, map4, map5
+
+If you can think of a legitimate use of `mapN` where `N` is 6 or more, please
+let us know on [the list](https://groups.google.com/forum/#!forum/elm-discuss).
+The current sentiment is that it is already quite error prone once you get to
+4 and possibly should be approached another way.
 
 # Special Maps
 @docs filterMap, concatMap, indexedMap
+
+# Folding
+@docs foldr, foldl
 
 # Special Folds
 @docs sum, product, maximum, minimum, all, any, foldr1, foldl1, scanl, scanl1
@@ -27,13 +35,6 @@ list must have the same type.
 # Sorting
 @docs sort, sortBy, sortWith
 
-# Additional Zips
-@docs map3, map4, map5
-
-If you can think of a legitimate use of `mapN` where `N` is 6 or more, please
-let us know on [the list](https://groups.google.com/forum/#!forum/elm-discuss).
-The current sentiment is that it is already quite error prone once you get to
-4 and possibly should be approached another way.
 -}
 
 import Basics (..)
@@ -93,6 +94,8 @@ isEmpty xs =
 {-| Apply a function to every element of a list.
 
       map sqrt [1,4,9] == [1,2,3]
+
+      map not [True,False,True] == [False,True,False]
 -}
 map : (a -> b) -> [a] -> [b]
 map = Native.List.map
