@@ -1,19 +1,19 @@
 module Signal where
-{-| The library for general signal manipulation. Includes lift functions up to
-`lift8` and infix lift operators `<~` and `~`, combinations, filters, and
-past-dependence.
-
-Signals are time-varying values. Lifted functions are reevaluated whenever any of
-their input signals has an event. Signal events may be of the same value as the
-previous value of the signal. Such signals are useful for timing and
-past-dependence.
+{-| The library for general signal manipulation. Includes mapping, merging,
+filters, past-dependence, and helpers for handling inputs from the UI.
 
 Some useful functions for working with time (e.g. setting FPS) and combining
 signals and time (e.g.  delaying updates, getting timestamps) can be found in
-the `Time` library.
+the [`Time`](Time) library.
 
-# Combine
-@docs constant, map, map2, merge, mergeMany
+# Merging
+@docs merge, mergeMany
+
+# Mapping
+@docs map, map2, map3, map4, map5
+
+# Fancy Mapping
+@docs (<~), (~)
 
 # Past-Dependence
 @docs foldp
@@ -24,11 +24,8 @@ the `Time` library.
 # Inputs
 @docs input, send, subscribe
 
-# Fancy Mapping
-@docs (<~), (~)
-
-# Even more Mapping
-@docs map3, map4, map5, map6, map7, map8
+# Constants
+@docs constant
 
 -}
 
@@ -43,11 +40,31 @@ type Signal a = Signal
 constant : a -> Signal a
 constant = Native.Signal.constant
 
-{-| Transform a signal with a given function. -}
-map  : (a -> b) -> Signal a -> Signal b
+{-| Apply a function to the current value of a signal.
+
+      mouseIsUp : Signal Bool
+      mouseIsUp =
+          map not Mouse.isDown
+
+      main : Signal Element
+      main =
+          map toElement Mouse.position
+-}
+map  : (a -> result) -> Signal a -> Signal result
 map = Native.Signal.lift
 
-{-| Combine two signals with a given function. -}
+{-| Apply a function to the current value of two signals. In the following
+example, we figure out the `aspectRatio` of the window by combining the
+current width and height.
+
+      ratio : Int -> Int -> Float
+      ratio width height =
+          toFloat width / toFloat height
+
+      aspectRatio : Signal Float
+      aspectRatio =
+          map2 ratio Window.width Window.height
+-}
 map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result
 map2 = Native.Signal.lift2
 
@@ -59,18 +76,6 @@ map4 = Native.Signal.lift4
 
 map5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
 map5 = Native.Signal.lift5
-
-map6 : (a -> b -> c -> d -> e -> f -> result)
-    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal result
-map6 = Native.Signal.lift6
-
-map7 : (a -> b -> c -> d -> e -> f -> g -> result)
-    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal result
-map7 = Native.Signal.lift7
-
-map8 : (a -> b -> c -> d -> e -> f -> g -> h -> result)
-    -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal f -> Signal g -> Signal h -> Signal result
-map8 = Native.Signal.lift8
 
 
 {-| Create a past-dependent signal. Each update from the incoming signals will
@@ -204,21 +209,28 @@ of the latest click. -}
 sampleOn : Signal a -> Signal b -> Signal b
 sampleOn = Native.Signal.sampleOn
 
-{-| An alias for `lift`. A prettier way to apply a function to the current value
-of a signal. -}
+
+{-| An alias for `map`. A prettier way to apply a function to the current value
+of a signal.
+-}
 (<~) : (a -> b) -> Signal a -> Signal b
 f <~ s = Native.Signal.lift f s
 
-{-| Informally, an alias for `liftN`. Intersperse it between additional signal
-arguments of the lifted function.
 
-Formally, signal application. This takes two signals, holding a function and
-a value. It applies the current function to the current value.
+{-| Intended to be paired with the `(<~)` operator, this makes it possible for
+many signals to flow into a function. Think of it as a fancy alias for `mapN`.
+For example, the following declarations are equivalent:
 
-The following expressions are equivalent:
+      main : Signal Element
+      main =
+        scene <~ Window.dimensions ~ Mouse.position
 
-         scene <~ Window.dimensions ~ Mouse.position
-         lift2 scene Window.dimensions Mouse.position
+      main : Signal ELement
+      main =
+        map2 scene Window.dimensions Mouse.position
+
+You can use this pattern for as many signals as you want by using `(~)` a bunch
+of times, so you can go higher than `map5` if you need to.
 -}
 (~) : Signal (a -> b) -> Signal a -> Signal b
 sf ~ s = Native.Signal.lift2 (\f x -> f x) sf s
