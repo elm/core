@@ -1,9 +1,12 @@
+Elm.Native = Elm.Native || {};
 Elm.Native.Utils = {};
-Elm.Native.Utils.make = function(elm) {
+Elm.Native.Utils.make = function(localRuntime) {
 
-    elm.Native = elm.Native || {};
-    elm.Native.Utils = elm.Native.Utils || {};
-    if (elm.Native.Utils.values) return elm.Native.Utils.values;
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Utils = localRuntime.Native.Utils || {};
+    if (localRuntime.Native.Utils.values) {
+        return localRuntime.Native.Utils.values;
+    }
 
     function eq(l,r) {
         var stack = [{'x': l, 'y': r}]
@@ -86,7 +89,13 @@ Elm.Native.Utils.make = function(elm) {
 
 
     var Tuple0 = { ctor: "_Tuple0" };
-    function Tuple2(x,y) { return { ctor:"_Tuple2", _0:x, _1:y } }
+    function Tuple2(x,y) {
+        return {
+            ctor: "_Tuple2",
+            _0: x,
+            _1: y
+        };
+    }
 
     function chr(c) {
         var x = new String(c);
@@ -121,7 +130,9 @@ Elm.Native.Utils.make = function(elm) {
     }
 
     var count = 0;
-    function guid(_) { return count++ }
+    function guid(_) {
+        return count++
+    }
 
     function copy(oldRecord) {
         var newRecord = {};
@@ -169,19 +180,6 @@ Elm.Native.Utils.make = function(elm) {
         return newRecord;
     }
 
-    function max(a,b) { return a > b ? a : b }
-    function min(a,b) { return a < b ? a : b }
-
-    function mod(a,b) {
-        if (b === 0) {
-            throw new Error("Cannot perform mod 0. Division by zero error.");
-        }
-        var r = a % b;
-        var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r+b) : -mod(-a,-b));
-
-        return m === b ? 0 : m;
-    }
-
     function htmlHeight(width, rawHtml) {
         // create dummy node
         var html = rawHtml.html;
@@ -213,13 +211,13 @@ Elm.Native.Utils.make = function(elm) {
             posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
 
-        if (elm.display === ElmRuntime.Display.COMPONENT) {
-            var rect = elm.node.getBoundingClientRect();
+        if (localRuntime.display === ElmRuntime.Display.COMPONENT) {
+            var rect = localRuntime.node.getBoundingClientRect();
             var relx = rect.left + document.body.scrollLeft + document.documentElement.scrollLeft;
             var rely = rect.top + document.body.scrollTop + document.documentElement.scrollTop;
             // TODO: figure out if there is a way to avoid rounding here
-            posx = posx - Math.round(relx) - elm.node.clientLeft;
-            posy = posy - Math.round(rely) - elm.node.clientTop;
+            posx = posx - Math.round(relx) - localRuntime.node.clientLeft;
+            posy = posy - Math.round(rely) - localRuntime.node.clientTop;
         }
         return Tuple2(posx, posy);
     }
@@ -228,7 +226,7 @@ Elm.Native.Utils.make = function(elm) {
         return a instanceof Array;
     }
 
-    return elm.Native.Utils.values = {
+    return localRuntime.Native.Utils.values = {
         eq:eq,
         cmp:cmp,
         compare:F2(compare),
@@ -242,9 +240,6 @@ Elm.Native.Utils.make = function(elm) {
         replace: replace,
         insert: insert,
         guid: guid,
-        max : F2(max),
-        min : F2(min),
-        mod : F2(mod),
         htmlHeight: F2(htmlHeight),
         getXY: getXY,
         isJSArray: isJSArray,

@@ -14,7 +14,15 @@ Elm.Native.Basics.make = function(elm) {
   function rem(a, b) {
       return a % b;
   }
-  var mod = Utils.mod;
+  function mod(a, b) {
+        if (b === 0) {
+            throw new Error("Cannot perform mod 0. Division by zero error.");
+        }
+        var r = a % b;
+        var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r+b) : -mod(-a,-b));
+
+        return m === b ? 0 : m;
+  }
   function logBase(base, n) {
       return Math.log(n) / Math.log(base);
   }
@@ -69,7 +77,7 @@ Elm.Native.Basics.make = function(elm) {
   var basics = {
       div: F2(div),
       rem: F2(rem),
-      mod: mod,
+      mod: F2(mod),
 
       pi: Math.PI,
       e: Math.E,
