@@ -21,8 +21,8 @@ the [`Time`](Time) library.
 # Filters
 @docs keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
 
-# Inputs
-@docs input, send, subscribe
+# Channels
+@docs channel, send, subscribe
 
 # Constants
 @docs constant
@@ -241,33 +241,33 @@ infixl 4 ~
 
 ---- INPUTS ----
 
-type Input a = Input -- Signal a
+type Channel a = Channel -- Signal a
 
 type Message = Message -- () -> ()
 
 
-{-| Create a signal input that you can `send` messages to. To receive these
-messages, `subscribe` to the input and turn it into a normal signal. The
+{-| Create a signal channel that you can `send` messages to. To receive these
+messages, `subscribe` to the channel and turn it into a normal signal. The
 primary use case is receiving updates from UI elements such as buttons and
 text fields. The argument is a default value for the custom signal.
 
-Note: This is an inherently impure function, so `(input ())`
-and `(input ())` produce two different signals.
+Note: This is an inherently impure function, so `(channel ())`
+and `(channel ())` produce two different signals.
 -}
-input : a -> Input a
-input =
+channel : a -> Channel a
+channel =
     Native.Signal.input
 
 
-{-| Create a `Message` that can be sent to an `Input` through a handler like
+{-| Create a `Message` that can be sent to an `Channel` with a handler like
 `Html.onclick` or `Html.onblur`.
 
       import Html
 
       type Update = NoOp | Add Int | Remove Int
 
-      updates : Input Update
-      updates = input NoOp
+      updates : Channel Update
+      updates = channel NoOp
 
       addButton : Html.Html
       addButton =
@@ -275,21 +275,21 @@ input =
               [ onclick (send updates (Add 1)) ]
               [ Html.text "Add 1" ]
 -}
-send : Input a -> a -> Message
+send : Channel a -> a -> Message
 send =
     Native.Signal.send
 
 
-{-| Receive all the messages sent to an `Input` as a `Signal`. The following
-example shows how you would set up a system that uses an `Input`.
+{-| Receive all the messages sent to an `Channel` as a `Signal`. The following
+example shows how you would set up a system that uses an `Channel`.
 
       -- initialState : Model
       -- type Update = NoOp | ...
       -- step : Update -> Model -> Model
-      -- view : Input Update -> Model -> Element
+      -- view : Channel Update -> Model -> Element
 
-      updates : Input Update
-      updates = input NoOp
+      updates : Channel Update
+      updates = channel NoOp
 
       main : Signal Element
       main =
@@ -297,10 +297,10 @@ example shows how you would set up a system that uses an `Input`.
           (view updates)
           (foldp step initialState (subscribe updates))
 
-The `updates` input appears twice in `main` because it serves as a bridge
+The `updates` channel appears twice in `main` because it serves as a bridge
 between your view and your signals. In the view you `send` to it, and in signal
 world you `subscribe` to it.
 -}
-subscribe : Input a -> Signal a
+subscribe : Channel a -> Signal a
 subscribe =
     Native.Signal.subscribe
