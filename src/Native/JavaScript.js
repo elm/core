@@ -5,7 +5,6 @@ Elm.Native.JavaScript.make = function(elm) {
     if (elm.Native.JavaScript.values) return elm.Native.JavaScript.values;
 
     var List = Elm.Native.List.make(elm);
-    var Render = ElmRuntime.use(ElmRuntime.Render.Element);
 
     function fromJS(v) {
         var type = typeof v;
