@@ -51,6 +51,8 @@ which happen to be radians.
 -}
 
 import Native.Basics
+import Native.Utils
+
 
 {-| Convert radians to standard Elm angles (radians). -}
 radians : Float -> Float
