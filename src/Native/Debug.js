@@ -6,11 +6,11 @@ Elm.Native.Debug.make = function(elm) {
     if ('values' in Elm.Native.Debug)
         return elm.Native.Debug.values = Elm.Native.Debug.values;
 
-    var show = Elm.Native.Show.make(elm).show;
+    var toString = Elm.Native.Show.make(elm).toString;
     var replace = Elm.Native.Utils.make(elm).replace;
 
     function log(tag, value) {
-        var msg = tag + ': ' + show(value);
+        var msg = tag + ': ' + toString(value);
         var process = process || {};
         if (process.stdout) {
             process.stdout.write(msg);
