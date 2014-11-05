@@ -11,7 +11,7 @@ module Debug where
 
 import Graphics.Collage (Form)
 import Native.Debug
-import Native.Error
+
 
 {-| Log a tagged value on the developer console, and then return the value.
 
@@ -48,7 +48,7 @@ writing a function.
 Use the `Maybe` or `Either` libraries instead.
 -}
 crash : String -> a
-crash = Native.Error.raise
+crash = Native.Debug.crash
 
 {-| Watch a particular value in the debugger. Say we want to know the value of
 a variable called `velocity` because it may not be updated correctly. Adding

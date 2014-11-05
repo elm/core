@@ -20,6 +20,10 @@ Elm.Native.Debug.make = function(elm) {
         return value;
     }
 
+    function crash(message) {
+        throw new Error(message);
+    }
+
     function tracePath(debugId, form) {
         return replace([["debugTracePathId",debugId]], form);
     }
@@ -50,6 +54,7 @@ Elm.Native.Debug.make = function(elm) {
     }
 
     Elm.Native.Debug.values = {
+        crash: crash,
         tracePath: F2(tracePath),
         log: F2(log),
         watch: F2(watch),
