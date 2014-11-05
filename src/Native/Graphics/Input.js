@@ -16,7 +16,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     var List = Elm.Native.List.make(localRuntime);
     var Text = Elm.Native.Text.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
-    var Tuple2 = Utils.Tuple2;
 
     var Element = Elm.Graphics.Element.make(localRuntime);
     var NativeElement = Elm.Native.Graphics.Element(localRuntime);
