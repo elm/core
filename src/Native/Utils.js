@@ -211,7 +211,7 @@ Elm.Native.Utils.make = function(localRuntime) {
             posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
 
-        if (localRuntime.display === ElmRuntime.Display.COMPONENT) {
+        if (localRuntime.isEmbed()) {
             var rect = localRuntime.node.getBoundingClientRect();
             var relx = rect.left + document.body.scrollLeft + document.documentElement.scrollLeft;
             var rely = rect.top + document.body.scrollTop + document.documentElement.scrollTop;

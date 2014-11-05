@@ -58,7 +58,9 @@ Elm.Native.Touch.make = function(localRuntime) {
          };
     }
 
-    var node = localRuntime.display === ElmRuntime.Display.FULLSCREEN ? document : localRuntime.node;
+    var node = localRuntime.isFullscreen()
+        ? document
+        : localRuntime.node;
 
     function start(e) {
         var point = Utils.getXY(e);

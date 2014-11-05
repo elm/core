@@ -33,7 +33,7 @@ Elm.Native.Mouse.make = function(localRuntime) {
     var isDown = Signal.constant(false);
     var clicks = Signal.constant(Utils.Tuple0);
 
-    var node = localRuntime.display === ElmRuntime.Display.FULLSCREEN
+    var node = localRuntime.isFullscreen()
         ? document
         : localRuntime.node;
 
