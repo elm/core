@@ -1,10 +1,12 @@
 Elm.Native.Ports = {};
-Elm.Native.Ports.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Ports = elm.Native.Ports || {};
-    if (elm.Native.Ports.values) return elm.Native.Ports.values;
+Elm.Native.Ports.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Ports = localRuntime.Native.Ports || {};
+    if (localRuntime.Native.Ports.values) {
+        return localRuntime.Native.Ports.values;
+    }
 
-    var Signal = Elm.Signal.make(elm);
+    var Signal = Elm.Signal.make(localRuntime);
 
     function incomingSignal(converter) {
         converter.isSignal = true;
@@ -32,12 +34,12 @@ Elm.Native.Ports.make = function(elm) {
     }
 
     function portIn(name, converter) {
-        var jsValue = elm.ports.incoming[name];
+        var jsValue = localRuntime.ports.incoming[name];
         if (jsValue === undefined) {
             throw new Error("Initialization Error: port '" + name +
                             "' was not given an input!");
         }
-        elm.ports.uses[name] += 1;
+        localRuntime.ports.uses[name] += 1;
         try {
             var elmValue = converter(jsValue);
         } catch(e) {
@@ -58,26 +60,27 @@ Elm.Native.Ports.make = function(elm) {
                 throw new Error("Error sending to port '" + name + "': \n" + e.message);
             }
             setTimeout(function() {
-                elm.notify(signal.id, elmValue);
+                localRuntime.notify(signal.id, elmValue);
             }, 0);
         }
-        elm.ports.outgoing[name] = { send:send };
+        localRuntime.ports.outgoing[name] = { send:send };
         return signal;
     }
 
     function portOut(name, converter, value) {
         try {
-            elm.ports.outgoing[name] = converter(value);
+            localRuntime.ports.outgoing[name] = converter(value);
         } catch(e) {
             throw new Error("Initialization Error on port '" + name + "': \n" + e.message);
         }
         return value;
     }
 
-    return elm.Native.Ports.values = {
+    return localRuntime.Native.Ports.values = {
         incomingSignal: incomingSignal,
         outgoingSignal: outgoingSignal,
         portOut: portOut,
         portIn: portIn
     };
 };
+
