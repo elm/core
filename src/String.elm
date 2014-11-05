@@ -30,6 +30,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 
 import Native.Show
 import Native.String
+import Char
 import Maybe (Maybe)
 import Result (Result)
 
