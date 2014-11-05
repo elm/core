@@ -40,7 +40,6 @@ import Maybe (..)
 import List
 import List ((::))
 import Native.Debug
-import Native.Utils
 
 
 -- BBlack and NBlack should only be used during the deletion
@@ -129,7 +128,7 @@ get targetKey dict =
           Nothing
 
       RBNode _ key value left right ->
-          case Native.Utils.compare targetKey key of
+          case compare targetKey key of
             LT -> get targetKey left
             EQ -> Just value
             GT -> get targetKey right
@@ -151,7 +150,7 @@ getOrElse base targetKey dict =
           base
 
       RBNode _ key value left right ->
-          case Native.Utils.compare targetKey key of
+          case compare targetKey key of
             LT -> getOrElse base targetKey left
             EQ -> value
             GT -> getOrElse base targetKey right
@@ -176,7 +175,7 @@ getOrFail targetKey dict =
           Native.Debug.crash "key not found when using 'getOrFail'"
 
       RBNode _ key value left right ->
-          case Native.Utils.compare targetKey key of
+          case compare targetKey key of
             LT -> getOrFail targetKey left
             EQ -> value
             GT -> getOrFail targetKey right
@@ -237,7 +236,7 @@ update k alter dict =
                   Just v  -> (Insert, RBNode Red k v empty empty)
 
             RBNode clr key value left right ->
-                case Native.Utils.compare k key of
+                case compare k key of
                   EQ ->
                     case alter (Just value) of
                       Nothing -> (Remove, rem clr left right)
