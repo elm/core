@@ -38,7 +38,7 @@ If you need more precision, you can create custom positions.
 -}
 
 import Basics (..)
-import Native.Utils
+import Native.Graphics.Element
 import List as List
 import Color (..)
 import Maybe ( Maybe(..) )
@@ -103,7 +103,7 @@ width nw e =
 
               RawHtml ->
                   { p |
-                      height <- snd (Native.Utils.htmlHeight nw e.element)
+                      height <- snd (Native.Graphics.Element.htmlHeight nw e.element)
                   }
 
               _ -> p
@@ -180,7 +180,7 @@ link href e =
 
 
 newElement w h e =
-  { props = Properties (Native.Utils.guid ()) w h 1 Nothing "" "" () ()
+  { props = Properties (Native.Graphics.Element.guid ()) w h 1 Nothing "" "" () ()
   , element = e
   }
 

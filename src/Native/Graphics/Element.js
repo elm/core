@@ -15,7 +15,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
     var Color = Elm.Color.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
-    var eq = Elm.Native.Utils.make(localRuntime).eq;
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
 
     function createNode(elementType) {
@@ -258,29 +258,15 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
     function rawHtml(elem) {
         var html = elem.html;
-        var args = elem.args;
         var guid = elem.guid;
         var align = elem.align;
 
         var div = createNode('div');
         div.innerHTML = html;
         div.style.visibility = "hidden";
-        if (align) div.style.textAlign = align;
-        document.body.appendChild(div);
-
-        for (var i = args.length; i--; ) {
-            var arg = args[i];
-            var span = document.getElementById('md-' + guid + '-' + i);
-            if (arg.isText) {
-                span.innerHTML = arg;
-            } else {
-                span.style.display = 'block';
-                span.style.width = arg.props.width + 'px';
-                span.style.height = arg.props.height + 'px';
-                span.appendChild(render(arg));
-            }
+        if (align) {
+            div.style.textAlign = align;
         }
-        document.body.removeChild(div);
         div.style.visibility = 'visible';
         div.style.pointerEvents = 'auto';
         return div;
@@ -331,7 +317,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         case "Image":
             if (nextE._0.ctor === 'Plain') {
                 if (nextE._3 !== currE._3) node.src = nextE._3;
-            } else if (!eq(nextE,currE) ||
+            } else if (!Utils.eq(nextE,currE) ||
                        next.props.width !== curr.props.width ||
                        next.props.height !== curr.props.height) {
                 node.parentNode.replaceChild(render(next),node);
@@ -468,12 +454,36 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         }
     }
 
+
+    function htmlHeight(width, rawHtml) {
+        // create dummy node
+        var html = rawHtml.html;
+        var t = document.createElement('div');
+        t.innerHTML = html;
+        if (width > 0) { t.style.width = width + "px"; }
+        t.style.visibility = "hidden";
+        t.style.styleFloat = "left";
+        t.style.cssFloat   = "left";
+
+        document.body.appendChild(t);
+
+        // get dimensions
+        var style = window.getComputedStyle(t, null);
+        var w = Math.ceil(style.getPropertyValue("width").slice(0,-2) - 0);
+        var h = Math.ceil(style.getPropertyValue("height").slice(0,-2) - 0);
+        document.body.removeChild(t);
+        return Utils.Tuple2(w,h);
+    }
+
+
     return Elm.Native.Graphics.Element.values = {
         render: render,
         update: update,
 
         createNode: createNode,
-        addTransform: addTransform
+        addTransform: addTransform,
+        htmlHeight: F2(htmlHeight),
+        guid: Utils.guid
     };
 
 };

@@ -6,6 +6,7 @@ Elm.Native.Text.make = function(elm) {
 
     var toCss = Elm.Native.Color.make(elm).toCss;
     var Element = Elm.Graphics.Element.make(elm);
+    var NativeElement = Elm.Native.Graphics.Element.make(elm);
     var List = Elm.Native.List.make(elm);
     var Utils = Elm.Native.Utils.make(elm);
 
@@ -124,7 +125,7 @@ Elm.Native.Text.make = function(elm) {
                 align: align,
                 guid : null
             };
-            var pos = A2(Utils.htmlHeight, 0, raw);
+            var pos = A2(NativeElement.htmlHeight, 0, raw);
             return A3(Element.newElement, pos._0, pos._1, raw);
         }
     }
@@ -136,7 +137,7 @@ Elm.Native.Text.make = function(elm) {
             align: null,
             guid: guid
         };
-        var pos = A2(Utils.htmlHeight, 0, raw);
+        var pos = A2(NativeElement.htmlHeight, 0, raw);
         return A3(Element.newElement, pos._0, pos._1, raw);
     }
 
