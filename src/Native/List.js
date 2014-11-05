@@ -67,9 +67,9 @@ Elm.Native.List.make = function(elm) {
         var curr = root;
         xs = xs._1;
         while (xs.ctor !== '[]') {
-	    curr._1 = Cons(xs._0, Nil);
-	    xs = xs._1;
-	    curr = curr._1;
+            curr._1 = Cons(xs._0, Nil);
+            xs = xs._1;
+            curr = curr._1;
         }
         curr._1 = ys;
         return root;
@@ -178,7 +178,7 @@ Elm.Native.List.make = function(elm) {
         var arr = toArray(xss);
         var xs = arr[arr.length-1];
         for (var i = arr.length-1; i--; ) {
-	    xs = append(arr[i], xs);
+            xs = append(arr[i], xs);
         }
         return xs;
     }
