@@ -4,11 +4,10 @@ Elm.Native.Show.make = function(elm) {
     elm.Native.Show = elm.Native.Show || {};
     if (elm.Native.Show.values) return elm.Native.Show.values;
 
-    var NList = Elm.Native.List.make(elm);
-    var Array = Elm.Array.make(elm);
+    var _Array;
+    var Dict;
     var List = Elm.List.make(elm);
-    var Dict = Elm.Dict.make(elm);
-    var Tuple2 = Elm.Native.Utils.make(elm).Tuple2;
+    var Utils = Elm.Native.Utils.make(elm);
 
     var toString = function(v) {
         var type = typeof v;
@@ -54,7 +53,10 @@ Elm.Native.Show.make = function(elm) {
                 return "(" + output.join(",") + ")";
             }
             else if (v.ctor === "_Array") {
-                var list = Array.toList(v);
+                if (!_Array) {
+                    _Array = Elm.Dict.make(elm);
+                }
+                var list = _Array.toList(v);
                 return "Array.fromList " + toString(list);
             }
             else if (v.ctor === "::") {
@@ -70,8 +72,10 @@ Elm.Native.Show.make = function(elm) {
                 return "[]";
             }
             else if (v.ctor === "RBNode" || v.ctor === "RBEmpty") {
-                var cons = F3(function(k,v,acc){return NList.Cons(Tuple2(k,v),acc)});
-                var list = A3(Dict.foldr, cons, NList.Nil, v);
+                if (!Dict) {
+                    Dict = Elm.Dict.make(elm);
+                }
+                var list = Dict.toList(v);
                 var name = "Dict";
                 if (list.ctor === "::" && list._0._1.ctor === "_Tuple0") {
                     name = "Set";
