@@ -41,6 +41,7 @@ that has never helped me remember which one I should be writing.
 -}
 
 import Basics (..)
+import Native.Color
 
 type Color
     = RGBA Int Int Int Float
