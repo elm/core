@@ -4,8 +4,6 @@ Elm.Native.Color.make = function(elm) {
     elm.Native.Color = elm.Native.Color || {};
     if (elm.Native.Color.values) return elm.Native.Color.values;
 
-    var Utils = Elm.Native.Utils.make(elm);
-
     function toCss(c) {
         var format = '';
         var colors = '';
