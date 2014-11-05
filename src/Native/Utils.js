@@ -123,8 +123,12 @@ Elm.Native.Utils.make = function(localRuntime) {
                 text = text.text;
                 continue;
             }
-            if (href) text = '<a href="' + href + '">' + text + '</a>';
-            if (style) text = '<span style="' + style + '">' + text + '</span>';
+            if (href) {
+                text = '<a href="' + href + '">' + text + '</a>';
+            }
+            if (style) {
+                text = '<span style="' + style + '">' + text + '</span>';
+            }
             return text;
         }
     }
@@ -180,26 +184,6 @@ Elm.Native.Utils.make = function(localRuntime) {
         return newRecord;
     }
 
-    function htmlHeight(width, rawHtml) {
-        // create dummy node
-        var html = rawHtml.html;
-        var t = document.createElement('div');
-        t.innerHTML = html;
-        if (width > 0) { t.style.width = width + "px"; }
-        t.style.visibility = "hidden";
-        t.style.styleFloat = "left";
-        t.style.cssFloat   = "left";
-
-        document.body.appendChild(t);
-
-        // get dimensions
-        var style = window.getComputedStyle(t, null);
-        var w = Math.ceil(style.getPropertyValue("width").slice(0,-2) - 0);
-        var h = Math.ceil(style.getPropertyValue("height").slice(0,-2) - 0);
-        document.body.removeChild(t);
-        return Tuple2(w,h);
-    }
-
     function getXY(e) {
         var posx = 0;
         var posy = 0;
@@ -222,9 +206,33 @@ Elm.Native.Utils.make = function(localRuntime) {
         return Tuple2(posx, posy);
     }
 
-    function isJSArray(a) {
-        return a instanceof Array;
+
+    //// RUNTIME ERRORS ////
+
+    function indent(lines) {
+        var msg = '';
+        for (var i = 0; i < lines.length; ++i) {
+            msg += '<br/>&nbsp; &nbsp; ' + lines[i];
+        }
+        return msg;
     }
+
+    function badCase(moduleName, span) { 
+        var msg = indent([
+            'Non-exhaustive pattern match in case-expression.',
+            'Make sure your patterns cover every case!'
+        ]);
+        throw new Error('Runtime error in module ' + moduleName + ' (' + span + '):' + msg);
+    }
+
+    function badIf(moduleName, span) { 
+        var msg = indent([
+            'Non-exhaustive pattern match in multi-way-if expression.',
+            'It is best to use \'otherwise\' as the last branch of multi-way-if.'
+        ]);
+        throw new Error('Runtime error in module ' + moduleName + ' (' + span + '):' + msg);
+    }
+
 
     return localRuntime.Native.Utils.values = {
         eq:eq,
@@ -240,9 +248,9 @@ Elm.Native.Utils.make = function(localRuntime) {
         replace: replace,
         insert: insert,
         guid: guid,
-        htmlHeight: F2(htmlHeight),
         getXY: getXY,
-        isJSArray: isJSArray,
-        toFloat: function(x) { return +x; }
+
+        badCase: badCase,
+        badIf: badIf
     };
 };
