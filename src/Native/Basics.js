@@ -5,7 +5,6 @@ Elm.Native.Basics.make = function(elm) {
   elm.Native.Basics = elm.Native.Basics || {};
   if (elm.Native.Basics.values) return elm.Native.Basics.values;
 
-  var JS = Elm.Native.JavaScript.make(elm);
   var Utils = Elm.Native.Utils.make(elm);
 
   function div(a, b) {
