@@ -13,7 +13,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         return Elm.Native.Graphics.Element.values;
     }
 
-    var Color = Elm.Color.make(localRuntime);
+    var Color = Elm.Native.Color.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
 
