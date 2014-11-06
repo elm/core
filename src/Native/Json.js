@@ -71,7 +71,7 @@ Elm.Native.Json.make = function(elm) {
         try {
             return Result.Ok(fromJS(JSON.parse(str)));
         } catch (err) {
-            return Result.Err(err.message + ' when parsing JSON: ' ++ str);
+            return Result.Err(err.message + ' when parsing JSON: ' + str);
         }
     }
 
