@@ -29,7 +29,7 @@ Elm.Native.WebSocket.make = function(elm) {
     }
     
     function take1(x,y) { return x }
-    return A3(Signal.lift2, F2(take1), incoming, A2(Signal.lift, send, outgoing));
+    return A3(Signal.map2, F2(take1), incoming, A2(Signal.map, send, outgoing));
   }
 
   return elm.Native.WebSocket.values = { connect: F2(open) };

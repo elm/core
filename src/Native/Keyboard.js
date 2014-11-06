@@ -92,7 +92,7 @@ Elm.Native.Keyboard.make = function(elm) {
 
     // select a part of a keyMerge and dropRepeats the result
     function keySignal(f) {
-        var signal = A2(Signal.lift, f, keyMerge);
+        var signal = A2(Signal.map, f, keyMerge);
         // must set the default number of kids to make it possible to filter
         // these signals if they are not actually used.
         keyMerge.defaultNumberOfKids += 1;
@@ -137,7 +137,7 @@ Elm.Native.Keyboard.make = function(elm) {
         });
     }
 
-    var lastPressed = A2(Signal.lift, function(e) {
+    var lastPressed = A2(Signal.map, function(e) {
         return e ? e.keyCode : 0;
     }, downEvents);
     downEvents.defaultNumberOfKids += 1;

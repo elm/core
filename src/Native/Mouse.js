@@ -24,10 +24,10 @@ Elm.Native.Mouse.make = function(localRuntime) {
         return pair._0;
     }
 
-    var x = A2( Signal.lift, fst, position );
+    var x = A2( Signal.map, fst, position );
     x.defaultNumberOfKids = 0;
 
-    var y = A2( Signal.lift, snd, position );
+    var y = A2( Signal.map, snd, position );
     y.defaultNumberOfKids = 0;
 
     var isDown = Signal.constant(false);

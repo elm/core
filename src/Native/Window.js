@@ -27,10 +27,10 @@ Elm.Native.Window.make = function(localRuntime) {
 
     // Do not move width and height into Elm. By setting the default number of kids,
     // the resize listener can be detached.
-    var width  = A2(Signal.lift, function(p){return p._0;}, dimensions);
+    var width  = A2(Signal.map, function(p){return p._0;}, dimensions);
     width.defaultNumberOfKids = 0;
 
-    var height = A2(Signal.lift, function(p){return p._1;}, dimensions);
+    var height = A2(Signal.map, function(p){return p._1;}, dimensions);
     height.defaultNumberOfKids = 0;
 
     function resizeIfNeeded() {

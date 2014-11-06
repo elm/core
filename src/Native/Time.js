@@ -35,7 +35,7 @@ Elm.Native.Time.make = function(elm) {
       wasOn = isOn;
       return t;
     }
-    return A3( Signal.lift2, F2(f), isOn, ticker );
+    return A3( Signal.map2, F2(f), isOn, ticker );
   }
 
   function every(t) {
@@ -50,7 +50,7 @@ Elm.Native.Time.make = function(elm) {
   function since(t, s) {
     function cmp(a,b) { return !Utils.eq(a,b); }
     var dcount = Signal.count(A2(NS.delay, t, s));
-    return A3( Signal.lift2, F2(cmp), Signal.count(s), dcount );
+    return A3( Signal.map2, F2(cmp), Signal.count(s), dcount );
   }
   function read(s) {
       var t = Date.parse(s);

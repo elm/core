@@ -52,9 +52,9 @@ Elm.Native.Http.make = function(elm) {
 
     function send(requests) {
         var responses = Signal.constant(elm.Http.values.Waiting);
-        var sender = A2( Signal.lift, registerReq([],responses), requests );
+        var sender = A2( Signal.map, registerReq([],responses), requests );
         function f(x) { return function(y) { return x; } }
-        return A3( Signal.lift2, f, responses, sender );
+        return A3( Signal.map2, f, responses, sender );
     }
 
     return elm.Native.Http.values = {
