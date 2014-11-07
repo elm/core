@@ -8,17 +8,15 @@
 ### Breaking Changes
 
   * Revamp `Random` library, no longer signal-based
+  * Remove `Either` in favor of `Result` or custom union types
 
-  * Rename `Signal.lift` to `Signal.map`
-  * Rename `Signal.lift2` to `Signal.zip`
-  * Rename `Signal.liftN` to `Signal.zipN`
+  * Rename `Signal.liftN` to `Signal.mapN`
   * Rename `Signal.merges` to `Signal.mergeMany`
-  * Revamp `Input` concept, move it to the Signal library
+  * Revamp `Input` concept as `Signal.Channel`
   * Remove `Signal.count`
   * Remove `Signal.countIf`
 
-  * Remove `List.zip`
-  * Rename `List.zipWith` to `List.zip`
+  * Replace `List.zip` and `List.zipWith` with `List.mapN`
 
   * Rename `String.show` to `String.toString`
 
