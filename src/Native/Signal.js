@@ -8,7 +8,7 @@ Elm.Native.Signal.make = function(elm) {
 
   var Utils = Elm.Native.Utils.make(elm);
 
-  function send(node, timestep, changed) {
+  function broadcastToKids(node, timestep, changed) {
     var kids = node.kids;
     for (var i = kids.length; i--; ) {
       kids[i].recv(timestep, changed, node.id);
@@ -22,8 +22,10 @@ Elm.Native.Signal.make = function(elm) {
     this.defaultNumberOfKids = 0;
     this.recv = function(timestep, eid, v) {
       var changed = eid === this.id;
-      if (changed) { this.value = v; }
-      send(this, timestep, changed);
+      if (changed) {
+        this.value = v;
+      }
+      broadcastToKids(this, timestep, changed);
       return changed;
     };
     elm.inputs.push(this);
@@ -43,7 +45,7 @@ Elm.Native.Signal.make = function(elm) {
       if (changed) { isChanged = true; }
       if (count == n) {
         if (isChanged) { this.value = update(); }
-        send(this, timestep, isChanged);
+        broadcastToKids(this, timestep, isChanged);
         isChanged = false;
         count = 0;
       }
@@ -81,7 +83,7 @@ Elm.Native.Signal.make = function(elm) {
       if (changed) {
           this.value = A2( step, input.value, this.value );
       }
-      send(this, timestep, changed);
+      broadcastToKids(this, timestep, changed);
     };
     input.kids.push(this);
   }
@@ -97,7 +99,7 @@ Elm.Native.Signal.make = function(elm) {
     this.recv = function(timestep, changed, parentID) {
       var chng = changed && !pred(input.value);
       if (chng) { this.value = input.value; }
-      send(this, timestep, chng);
+      broadcastToKids(this, timestep, chng);
     };
     input.kids.push(this);
   }
@@ -109,7 +111,7 @@ Elm.Native.Signal.make = function(elm) {
     this.recv = function(timestep, changed, parentID) {
       var chng = changed && !Utils.eq(this.value,input.value);
       if (chng) { this.value = input.value; }
-      send(this, timestep, chng);
+      broadcastToKids(this, timestep, chng);
     };
     input.kids.push(this);
   }
@@ -132,7 +134,7 @@ Elm.Native.Signal.make = function(elm) {
       ++count;
       if (count == 2) {
         if (isChanged) { this.value = s2.value; }
-        send(this, timestep, isChanged);
+        broadcastToKids(this, timestep, isChanged);
         count = 0;
         isChanged = false;
       }
@@ -173,7 +175,7 @@ Elm.Native.Signal.make = function(elm) {
 
         if (count == 2) {
             if (isChanged) { this.value = next; next = null; }
-            send(this, timestep, isChanged);
+            broadcastToKids(this, timestep, isChanged);
             isChanged = false;
             count = 0;
         }
