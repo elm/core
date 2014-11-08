@@ -6,7 +6,7 @@ Elm.Native.Ports.make = function(localRuntime) {
         return localRuntime.Native.Ports.values;
     }
 
-    var Signal = Elm.Signal.make(localRuntime);
+    var Signal;
 
     function incomingSignal(converter) {
         converter.isSignal = true;
@@ -14,6 +14,9 @@ Elm.Native.Ports.make = function(localRuntime) {
     }
 
     function outgoingSignal(converter) {
+        if (!Signal) {
+            Signal = Elm.Signal.make(localRuntime);
+        }
         return function(signal) {
             var subscribers = []
             function subscribe(handler) {
@@ -52,6 +55,9 @@ Elm.Native.Ports.make = function(localRuntime) {
         }
 
         // create a signal if necessary
+        if (!Signal) {
+            Signal = Elm.Signal.make(localRuntime);
+        }
         var signal = Signal.constant(elmValue);
         function send(jsValue) {
             try {
