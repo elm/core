@@ -457,21 +457,22 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
     function htmlHeight(width, rawHtml) {
         // create dummy node
-        var html = rawHtml.html;
-        var t = document.createElement('div');
-        t.innerHTML = html;
-        if (width > 0) { t.style.width = width + "px"; }
-        t.style.visibility = "hidden";
-        t.style.styleFloat = "left";
-        t.style.cssFloat   = "left";
+        var temp = document.createElement('div');
+        temp.innerHTML = rawHtml.html;
+        if (width > 0) {
+            temp.style.width = width + "px";
+        }
+        temp.style.visibility = "hidden";
+        temp.style.styleFloat = "left";
+        temp.style.cssFloat   = "left";
 
-        document.body.appendChild(t);
+        document.body.appendChild(temp);
 
         // get dimensions
-        var style = window.getComputedStyle(t, null);
+        var style = window.getComputedStyle(temp, null);
         var w = Math.ceil(style.getPropertyValue("width").slice(0,-2) - 0);
         var h = Math.ceil(style.getPropertyValue("height").slice(0,-2) - 0);
-        document.body.removeChild(t);
+        document.body.removeChild(temp);
         return Utils.Tuple2(w,h);
     }
 
