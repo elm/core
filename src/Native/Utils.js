@@ -234,6 +234,15 @@ Elm.Native.Utils.make = function(localRuntime) {
     }
 
 
+    function badPort(expected, received) { 
+        var msg = indent([
+            'Expecting ' + expected + ' but was given ',
+            JSON.stringify(received)
+        ]);
+        throw new Error('Runtime error when sending values through a port:' + msg);
+    }
+
+
     return localRuntime.Native.Utils.values = {
         eq:eq,
         cmp:cmp,
@@ -251,6 +260,7 @@ Elm.Native.Utils.make = function(localRuntime) {
         getXY: getXY,
 
         badCase: badCase,
-        badIf: badIf
+        badIf: badIf,
+        badPort: badPort
     };
 };
