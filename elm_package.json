@@ -21,7 +21,7 @@
         "Graphics.Input",
         "Graphics.Input.Field",
         "Http",
-        "JavaScript.Experimental",
+        "JavaScript",
         "Json",
         "Keyboard",
         "List",

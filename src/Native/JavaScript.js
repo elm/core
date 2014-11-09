@@ -1,67 +1,344 @@
 Elm.Native.JavaScript = {};
-Elm.Native.JavaScript.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.JavaScript = elm.Native.JavaScript || {};
-    if (elm.Native.JavaScript.values) return elm.Native.JavaScript.values;
-
-    var List = Elm.Native.List.make(elm);
-
-    function fromJS(v) {
-        var type = typeof v;
-        if (type === 'number' ) return v;
-        if (type === 'boolean') return v;
-        if (type === 'string' ) return v;
-        if (v instanceof Array) {
-            var arr = [];
-            var len = v.length;
-            for (var i = 0; i < len; ++i) {
-                var x = fromJS(v[i]);
-                if (x !== null) arr.push(x);
-            }
-            return List.fromArray(arr);
-        }
-        if (type === 'object') {
-            var rec = { _:{} };
-            for (var f in v) {
-                var x = fromJS(v[f]);
-                if (x !== null) rec[f] = x;
-            }
-            return rec;
-        }
-        return null;
+Elm.Native.JavaScript.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.JavaScript = localRuntime.Native.JavaScript || {};
+    if (localRuntime.Native.JavaScript.values) {
+        return localRuntime.Native.JavaScript.values;
     }
 
-    function toJS(v) {
-        var type = typeof v;
-        if (type === 'number' || type === 'boolean' || type === 'string') return v;
-        if (type === 'object' && '_' in v) {
-            var obj = {};
-            for (var k in v) {
-                var x = toJS(v[k]);
-                if (x !== null) obj[k] = x;
-            }
-            return obj;
-        }
-        if (type === 'object' && (v.ctor === '::' || v.ctor === '[]')) {
-            var array = List.toArray(v);
-            for (var i = array.length; i--; ) {
-                array[i] = toJS(array[i]);
-            }
-            return array;
-        }
-        return null;
+    var ElmArray = Elm.Native.Array.make(localRuntime);
+    var List = Elm.Native.List.make(localRuntime);
+    var Maybe = Elm.Maybe.make(localRuntime);
+    var Result = Elm.Result.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
+
+
+    function crash(expected, actual) {
+        throw new Error(
+            'expecting ' + expected + ' but got ' + JSON.stringify(actual)
+        );
     }
 
-    function fromRecord(r) {
-        if (typeof r === 'object' && '_' in r) {
-            return toJS(r);
+
+    // PRIMITIVE VALUES
+
+    function decodeNull(value) {
+        if (value === null) {
+            return Utils.Tuple0;
         }
-        throw new Error("'fromRecord' must be called on a record.");
+        crash('null', value);
     }
 
-    return elm.Native.JavaScript.values = {
-        toRecord    : fromJS,
-        fromRecord  : fromRecord
+
+    function decodeString(value) {
+        if (typeof value === 'string' || value instanceof String) {
+            return value;
+        }
+        crash('a String', value);
+    }
+
+
+    function decodeFloat(value) {
+        if (typeof value === 'number') {
+            return value;
+        }
+        crash('a Float', value);
+    }
+
+
+    function decodeInt(value) {
+        if (typeof value === 'number') {
+            return value
+        }
+        crash('an Int', value);
+    }
+
+
+    function decodeBool(value) {
+        if (typeof value === 'boolean') {
+            return value
+        }
+        crash('a Bool', value);
+    }
+
+
+    // ARRAY
+
+    function decodeArray(decoder) {
+        return function(value) {
+            if (value instanceof Array) {
+                var len = value.length;
+                var array = new Array(len);
+                for (var i = len; i-- ; ) {
+                    array[i] = decoder(value[i]);
+                }
+                return ElmArray.fromJSArray(array);
+            }
+            crash('an Array', value);
+        };
+    }
+
+
+    // LIST
+
+    function decodeList(decoder) {
+        return function(value) {
+            if (value instanceof Array) {
+                var len = value.length;
+                var list = List.Nil;
+                for (var i = len; i-- ; ) {
+                    list = List.Cons( decoder(value[i]), list );
+                }
+                return list;
+            }
+            crash('a List', value);
+        };
+    }
+
+
+    // MAYBE
+
+    function decodeMaybe(decoder) {
+        return function(value) {
+            try {
+                return Maybe.Just(decoder(value));
+            } catch(e) {
+                return Maybe.Nothing;
+            }
+        };
+    }
+
+
+    // FIELDS
+
+    function decodeField(field, decoder) {
+        return function(value) {
+            var subValue = value[field];
+            if (subValue !== undefined) {
+                return decoder(subValue);
+            }
+            crash("an object with field '" + field + "'", value);
+        };
+    }
+
+
+    // OBJECTS
+
+    function decodeObject1(f, d1) {
+        return function(value) {
+            return f(d1(value));
+        };
+    }
+
+    function decodeObject2(f, d1, d2) {
+        return function(value) {
+            return A2( f, d1(value), d2(value) );
+        };
+    }
+
+    function decodeObject3(f, d1, d2, d3) {
+        return function(value) {
+            return A3( f, d1(value), d2(value), d3(value) );
+        };
+    }
+
+    function decodeObject4(f, d1, d2, d3, d4) {
+        return function(value) {
+            return A4( f, d1(value), d2(value), d3(value), d4(value) );
+        };
+    }
+
+    function decodeObject5(f, d1, d2, d3, d4, d5) {
+        return function(value) {
+            return A5( f, d1(value), d2(value), d3(value), d4(value), d5(value) );
+        };
+    }
+
+    function decodeObject6(f, d1, d2, d3, d4, d5, d6) {
+        return function(value) {
+            return A6( f,
+                d1(value),
+                d2(value),
+                d3(value),
+                d4(value),
+                d5(value),
+                d6(value)
+            );
+        };
+    }
+
+    function decodeObject7(f, d1, d2, d3, d4, d5, d6, d7) {
+        return function(value) {
+            return A7( f,
+                d1(value),
+                d2(value),
+                d3(value),
+                d4(value),
+                d5(value),
+                d6(value),
+                d7(value)
+            );
+        };
+    }
+
+    function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
+        return function(value) {
+            return A8( f,
+                d1(value),
+                d2(value),
+                d3(value),
+                d4(value),
+                d5(value),
+                d6(value),
+                d7(value),
+                d8(value)
+            );
+        };
+    }
+
+
+    // TUPLES
+
+    function decodeTuple1(f, d1, value) {
+        if ( !(value instanceof Array) || value.length !== 1 ) {
+            crash('a Tuple of length 1', value);
+        }
+        return f( d1(value[0]) );
+    }
+
+
+    function decodeTuple2(f, d1, d2, value) {
+        if ( !(value instanceof Array) || value.length !== 2 ) {
+            crash('a Tuple of length 2', value);
+        }
+        return A2( f,
+            d1(value[0]),
+            d2(value[1])
+        );
+    }
+
+
+    function decodeTuple3(f, d1, d2, d3, value) {
+        if ( !(value instanceof Array) || value.length !== 3 ) {
+            crash('a Tuple of length 3', value);
+        }
+        return A3( f,
+            d1(value[0]),
+            d2(value[1]),
+            d3(value[2])
+        );
+    }
+
+
+    function decodeTuple4(f, d1, d2, d3, d4, value) {
+        if ( !(value instanceof Array) || value.length !== 4 ) {
+            crash('a Tuple of length 4', value);
+        }
+        return A4( f,
+            d1(value[0]),
+            d2(value[1]),
+            d3(value[2]),
+            d4(value[3])
+        );
+    }
+
+
+    function decodeTuple5(f, d1, d2, d3, d4, d5, value) {
+        if ( !(value instanceof Array) || value.length !== 5 ) {
+            crash('a Tuple of length 5', value);
+        }
+        return A5( f,
+            d1(value[0]),
+            d2(value[1]),
+            d3(value[2]),
+            d4(value[3]),
+            d5(value[4])
+        );
+    }
+
+
+    function decodeTuple6(f, d1, d2, d3, d4, d5, d6, value) {
+        if ( !(value instanceof Array) || value.length !== 6 ) {
+            crash('a Tuple of length 6', value);
+        }
+        return A6( f,
+            d1(value[0]),
+            d2(value[1]),
+            d3(value[2]),
+            d4(value[3]),
+            d5(value[4]),
+            d6(value[5])
+        );
+    }
+
+
+    function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7, value) {
+        if ( !(value instanceof Array) || value.length !== 7 ) {
+            crash('a Tuple of length 7', value);
+        }
+        return A7( f,
+            d1(value[0]),
+            d2(value[1]),
+            d3(value[2]),
+            d4(value[3]),
+            d5(value[4]),
+            d6(value[5]),
+            d7(value[6])
+        );
+    }
+
+
+    function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8, value) {
+        if ( !(value instanceof Array) || value.length !== 8 ) {
+            crash('a Tuple of length 8', value);
+        }
+        return A8( f,
+            d1(value[0]),
+            d2(value[1]),
+            d3(value[2]),
+            d4(value[3]),
+            d5(value[4]),
+            d6(value[5]),
+            d7(value[6]),
+            d8(value[7])
+        );
+    }
+
+
+    function run(decoder, value) {
+        try {
+            return Result.Ok(decoder(value));
+        } catch(e) {
+            return Result.Err(e.message);
+        }
+    }
+
+
+    return localRuntime.Native.JavaScript.values = {
+        run: F2(run),
+
+        decodeNull: decodeNull,
+        decodeInt: decodeInt,
+        decodeFloat: decodeFloat,
+        decodeString: decodeString,
+        decodeBool: decodeBool,
+
+        decodeMaybe: decodeMaybe,
+
+        decodeList: decodeList,
+        decodeArray: decodeArray,
+
+        decodeField: F2(decodeField),
+
+        decodeObject1: F2(decodeObject1),
+        decodeObject2: F3(decodeObject2),
+        decodeObject3: F4(decodeObject3),
+        decodeObject4: F5(decodeObject4),
+        decodeObject5: F6(decodeObject5),
+        decodeObject6: F7(decodeObject6),
+        decodeObject7: F8(decodeObject7),
+        decodeObject8: F9(decodeObject8)
+
     };
 
 };
