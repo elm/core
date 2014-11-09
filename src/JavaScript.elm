@@ -148,9 +148,9 @@ jsonValue =
     Native.JavaScript.decodeValue
 
 
-customGetter : (Value -> Result String a) -> Get a
-customGetter =
-    Native.JavaScript.customGetter
+andThen : Get a -> (a -> Get b) -> Get b
+andThen =
+    Native.JavaScript.andThen
 
 
 -- TUPLES

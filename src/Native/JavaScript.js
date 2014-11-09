@@ -312,14 +312,10 @@ Elm.Native.JavaScript.make = function(localRuntime) {
         return value;
     }
 
-    function customGetter(get) {
+    function andThen(decode, callback) {
         return function(value) {
-            var result = get(value);
-            if (result.ctor === 'Ok') {
-                return result._0;
-            } else {
-                throw new Error('custom getter failed on ' + JSON.stringify(value));
-            }
+            var result = decode(value);
+            return callback(result)(value);
         }
     }
 
@@ -404,7 +400,7 @@ Elm.Native.JavaScript.make = function(localRuntime) {
         decodeTuple8: F9(decodeTuple8),
 
         decodeValue: decodeValue,
-        customGetter: customGetter
+        andThen: F2(andThen)
 
     };
 
