@@ -366,7 +366,7 @@ Elm.Native.JavaScript.make = function(localRuntime) {
 
 
     return localRuntime.Native.JavaScript.values = {
-        toString: toString,
+        toString: F2(toString),
         fromString: fromString,
 
         get: F2(get),

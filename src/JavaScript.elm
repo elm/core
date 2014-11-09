@@ -21,6 +21,16 @@ map =
     Native.JavaScript.decodeObject1
 
 
+toString : String -> Value a -> String
+toString =
+    Native.JavaScript.toString
+
+
+fromString : String -> Result String Value
+fromString =
+    Native.JavaScript.fromString
+
+
 -- OBJECTS
 
 at : [String] -> Get a -> Get a
