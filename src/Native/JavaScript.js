@@ -47,8 +47,8 @@ Elm.Native.JavaScript.make = function(localRuntime) {
 
 
     function decodeInt(value) {
-        if (typeof value === 'number') {
-            return value
+        if (typeof value === 'number' && (value|0) === value) {
+            return value;
         }
         crash('an Int', value);
     }
@@ -56,7 +56,7 @@ Elm.Native.JavaScript.make = function(localRuntime) {
 
     function decodeBool(value) {
         if (typeof value === 'boolean') {
-            return value
+            return value;
         }
         crash('a Bool', value);
     }
@@ -199,113 +199,149 @@ Elm.Native.JavaScript.make = function(localRuntime) {
 
     // TUPLES
 
-    function decodeTuple1(f, d1, value) {
-        if ( !(value instanceof Array) || value.length !== 1 ) {
-            crash('a Tuple of length 1', value);
-        }
-        return f( d1(value[0]) );
+    function decodeTuple1(f, d1) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 1 ) {
+                crash('a Tuple of length 1', value);
+            }
+            return f( d1(value[0]) );
+        };
+    }
+
+    function decodeTuple2(f, d1, d2) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 2 ) {
+                crash('a Tuple of length 2', value);
+            }
+            return A2( f, d1(value[0]), d2(value[1]) );
+        };
+    }
+
+    function decodeTuple3(f, d1, d2, d3) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 3 ) {
+                crash('a Tuple of length 3', value);
+            }
+            return A3( f, d1(value[0]), d2(value[1]), d3(value[2]) );
+        };
     }
 
 
-    function decodeTuple2(f, d1, d2, value) {
-        if ( !(value instanceof Array) || value.length !== 2 ) {
-            crash('a Tuple of length 2', value);
-        }
-        return A2( f,
-            d1(value[0]),
-            d2(value[1])
-        );
+    function decodeTuple4(f, d1, d2, d3, d4) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 4 ) {
+                crash('a Tuple of length 4', value);
+            }
+            return A4( f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]) );
+        };
     }
 
 
-    function decodeTuple3(f, d1, d2, d3, value) {
-        if ( !(value instanceof Array) || value.length !== 3 ) {
-            crash('a Tuple of length 3', value);
-        }
-        return A3( f,
-            d1(value[0]),
-            d2(value[1]),
-            d3(value[2])
-        );
+    function decodeTuple5(f, d1, d2, d3, d4, d5) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 5 ) {
+                crash('a Tuple of length 5', value);
+            }
+            return A5( f,
+                d1(value[0]),
+                d2(value[1]),
+                d3(value[2]),
+                d4(value[3]),
+                d5(value[4])
+            );
+        };
     }
 
 
-    function decodeTuple4(f, d1, d2, d3, d4, value) {
-        if ( !(value instanceof Array) || value.length !== 4 ) {
-            crash('a Tuple of length 4', value);
-        }
-        return A4( f,
-            d1(value[0]),
-            d2(value[1]),
-            d3(value[2]),
-            d4(value[3])
-        );
+    function decodeTuple6(f, d1, d2, d3, d4, d5, d6) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 6 ) {
+                crash('a Tuple of length 6', value);
+            }
+            return A6( f,
+                d1(value[0]),
+                d2(value[1]),
+                d3(value[2]),
+                d4(value[3]),
+                d5(value[4]),
+                d6(value[5])
+            );
+        };
+    }
+
+    function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 7 ) {
+                crash('a Tuple of length 7', value);
+            }
+            return A7( f,
+                d1(value[0]),
+                d2(value[1]),
+                d3(value[2]),
+                d4(value[3]),
+                d5(value[4]),
+                d6(value[5]),
+                d7(value[6])
+            );
+        };
     }
 
 
-    function decodeTuple5(f, d1, d2, d3, d4, d5, value) {
-        if ( !(value instanceof Array) || value.length !== 5 ) {
-            crash('a Tuple of length 5', value);
-        }
-        return A5( f,
-            d1(value[0]),
-            d2(value[1]),
-            d3(value[2]),
-            d4(value[3]),
-            d5(value[4])
-        );
+    function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
+        return function(value) {
+            if ( !(value instanceof Array) || value.length !== 8 ) {
+                crash('a Tuple of length 8', value);
+            }
+            return A8( f,
+                d1(value[0]),
+                d2(value[1]),
+                d3(value[2]),
+                d4(value[3]),
+                d5(value[4]),
+                d6(value[5]),
+                d7(value[6]),
+                d8(value[7])
+            );
+        };
     }
 
 
-    function decodeTuple6(f, d1, d2, d3, d4, d5, d6, value) {
-        if ( !(value instanceof Array) || value.length !== 6 ) {
-            crash('a Tuple of length 6', value);
+    // CUSTOM DECODERS
+
+    function decodeValue(value) {
+        return value;
+    }
+
+    function customGetter(get) {
+        return function(value) {
+            var result = get(value);
+            if (result.ctor === 'Ok') {
+                return result._0;
+            } else {
+                throw new Error('custom getter failed on ' + JSON.stringify(value));
+            }
         }
-        return A6( f,
-            d1(value[0]),
-            d2(value[1]),
-            d3(value[2]),
-            d4(value[3]),
-            d5(value[4]),
-            d6(value[5])
-        );
     }
 
 
-    function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7, value) {
-        if ( !(value instanceof Array) || value.length !== 7 ) {
-            crash('a Tuple of length 7', value);
+    // ONE OF MANY
+
+    function oneOf(decoders) {
+        return function(value) {
+            var errors = [];
+            while (decoders.ctor !== '[]') {
+                try {
+                    return decoders._0(value);
+                } catch(e) {
+                    errors.push(e.message);
+                }
+                decoders = decoders._1;
+            }
+            throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
         }
-        return A7( f,
-            d1(value[0]),
-            d2(value[1]),
-            d3(value[2]),
-            d4(value[3]),
-            d5(value[4]),
-            d6(value[5]),
-            d7(value[6])
-        );
     }
 
-
-    function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8, value) {
-        if ( !(value instanceof Array) || value.length !== 8 ) {
-            crash('a Tuple of length 8', value);
-        }
-        return A8( f,
-            d1(value[0]),
-            d2(value[1]),
-            d3(value[2]),
-            d4(value[3]),
-            d5(value[4]),
-            d6(value[5]),
-            d7(value[6]),
-            d8(value[7])
-        );
-    }
-
-
-    function run(decoder, value) {
+    function get(decoder, value) {
         try {
             return Result.Ok(decoder(value));
         } catch(e) {
@@ -314,8 +350,27 @@ Elm.Native.JavaScript.make = function(localRuntime) {
     }
 
 
+    // ENCODE / DECODE
+
+    function fromString(string) {
+        try {
+            return Result.Ok(JSON.parse(string));
+        } catch(e) {
+            return Result.Err(e.message);
+        }
+    }
+
+    function toString(sep, value) {
+        return JSON.stringify(value, sep);
+    }
+
+
     return localRuntime.Native.JavaScript.values = {
-        run: F2(run),
+        toString: toString,
+        fromString: fromString,
+
+        get: F2(get),
+        oneOf: oneOf,
 
         decodeNull: decodeNull,
         decodeInt: decodeInt,
@@ -337,7 +392,19 @@ Elm.Native.JavaScript.make = function(localRuntime) {
         decodeObject5: F6(decodeObject5),
         decodeObject6: F7(decodeObject6),
         decodeObject7: F8(decodeObject7),
-        decodeObject8: F9(decodeObject8)
+        decodeObject8: F9(decodeObject8),
+
+        decodeTuple1: F2(decodeTuple1),
+        decodeTuple2: F3(decodeTuple2),
+        decodeTuple3: F4(decodeTuple3),
+        decodeTuple4: F5(decodeTuple4),
+        decodeTuple5: F6(decodeTuple5),
+        decodeTuple6: F7(decodeTuple6),
+        decodeTuple7: F8(decodeTuple7),
+        decodeTuple8: F9(decodeTuple8),
+
+        decodeValue: decodeValue,
+        customGetter: customGetter
 
     };
 

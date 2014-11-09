@@ -8,119 +8,178 @@ import Result (Result)
 
 type Value = Value
 
-type Decoder a = Decoder
+type Get a = Get
 
 
-run : Decoder a -> Value -> Result String a
-run =
-    Native.JavaScript.run
+get : Get a -> Value -> Result String a
+get =
+    Native.JavaScript.get
 
---decodeWithNiceErrors : Decoder a -> Value -> Result String a
 
---map : (a -> b) -> Decoder a -> Decoder b
+map : (a -> b) -> Get a -> Get b
+map =
+    Native.JavaScript.decodeObject1
 
-at : [String] -> Decoder a -> Decoder a
+
+-- OBJECTS
+
+at : [String] -> Get a -> Get a
 at fields decoder =
     List.foldr (:=) decoder fields
 
 
-(:=) : String -> Decoder a -> Decoder a
+(:=) : String -> Get a -> Get a
 (:=) key value =
     Native.JavaScript.decodeField key value
 
 
-object1 : (a -> value) -> Decoder a -> Decoder value
+object1 : (a -> value) -> Get a -> Get value
 object1 =
     Native.JavaScript.decodeObject1
 
 
-object2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
+object2 : (a -> b -> value) -> Get a -> Get b -> Get value
 object2 =
     Native.JavaScript.decodeObject2
 
 
-object3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
+object3 : (a -> b -> c -> value) -> Get a -> Get b -> Get c -> Get value
 object3 =
     Native.JavaScript.decodeObject3
 
 
-object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
+object4 : (a -> b -> c -> d -> value) -> Get a -> Get b -> Get c -> Get d -> Get value
 object4 =
     Native.JavaScript.decodeObject4
 
 
-object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
+object5 : (a -> b -> c -> d -> e -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get value
 object5 =
     Native.JavaScript.decodeObject5
 
 
-object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
+object6 : (a -> b -> c -> d -> e -> f -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get value
 object6 =
     Native.JavaScript.decodeObject6
 
 
-object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
+object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get value
 object7 =
     Native.JavaScript.decodeObject7
 
 
-object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
+object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get h -> Get value
 object8 =
     Native.JavaScript.decodeObject8
 
 
 
---oneOf : [Decoder a] -> Decoder a
+oneOf : [Get a] -> Get a
+oneOf =
+    Native.JavaScript.oneOf
 
 
-string : Decoder String
+string : Get String
 string =
     Native.JavaScript.decodeString
 
 
-float : Decoder Float
+float : Get Float
 float =
     Native.JavaScript.decodeFloat
 
 
-int : Decoder Int
+int : Get Int
 int =
     Native.JavaScript.decodeInt
 
 
-bool : Decoder Bool
+bool : Get Bool
 bool =
     Native.JavaScript.decodeBool
 
 
-list : Decoder a -> Decoder [a]
+list : Get a -> Get [a]
 list =
     Native.JavaScript.decodeList
 
 
-array : Decoder a -> Decoder (Array a)
+array : Get a -> Get (Array a)
 array =
     Native.JavaScript.decodeArray
 
 
-null : Decoder ()
+null : Get ()
 null =
     Native.JavaScript.decodeNull
 
 
-maybe : Decoder a -> Decoder (Maybe a)
+maybe : Get a -> Get (Maybe a)
 maybe =
     Native.JavaScript.decodeMaybe
-{-
-  
-value : Decoder Value
 
-tuple1 : (a -> value) -> Decoder a -> Decoder value
-tuple2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
-tuple3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
-tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
-tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
-tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
-tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
-tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
+  
+{-| Useful when you need to do some more advanced extraction on arrays. Say
+you have an array that starts with a string and then an unknown amount of
+numbers.
+
+    -- [ "Callisto", 1, 2, 3, 4 ]
+
+    extract : Json -> Result String (String, [Int])
+    extract json =
+        case get (list jsonValue) json of
+          str :: numbers ->
+              get string str
+              get (list int) numbers
+
 -}
+jsonValue : Get Value
+jsonValue =
+    Native.JavaScript.decodeValue
+
+
+customGetter : (Value -> Result String a) -> Get a
+customGetter =
+    Native.JavaScript.customGetter
+
+
+-- TUPLES
+
+tuple1 : (a -> value) -> Get a -> Get value
+tuple1 =
+    Native.JavaScript.decodeTuple1
+
+
+tuple2 : (a -> b -> value) -> Get a -> Get b -> Get value
+tuple2 =
+    Native.JavaScript.decodeTuple2
+
+
+tuple3 : (a -> b -> c -> value) -> Get a -> Get b -> Get c -> Get value
+tuple3 =
+    Native.JavaScript.decodeTuple3
+
+
+tuple4 : (a -> b -> c -> d -> value) -> Get a -> Get b -> Get c -> Get d -> Get value
+tuple4 =
+    Native.JavaScript.decodeTuple4
+
+
+tuple5 : (a -> b -> c -> d -> e -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get value
+tuple5 =
+    Native.JavaScript.decodeTuple5
+
+
+tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get value
+tuple6 =
+    Native.JavaScript.decodeTuple6
+
+
+tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get value
+tuple7 =
+    Native.JavaScript.decodeTuple7
+
+
+tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get h -> Get value
+tuple8 =
+    Native.JavaScript.decodeTuple8
