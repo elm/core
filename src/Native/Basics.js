@@ -85,12 +85,18 @@ Elm.Native.Basics.make = function(elm) {
       }
 
       // append Lists
-      if (xs.ctor === '[]') { return ys; }
+      if (xs.ctor === '[]') {
+          return ys;
+      }
       var root = Cons(xs._0, Nil);
       var curr = root;
       xs = xs._1;
       while (xs.ctor !== '[]') {
-          curr._1 = Cons(xs._0, Nil);
+          curr._1 = {
+              ctor: 'Cons',
+              _0: xs._0,
+              _1: { ctor: 'Nil' }
+          };
           xs = xs._1;
           curr = curr._1;
       }
