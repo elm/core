@@ -52,31 +52,12 @@ Elm.Native.List.make = function(elm) {
         return lst
     }
 
-    function append(xs,ys) {
-        // append Text
-        if (xs.text || ys.text) {
-            return Utils.txt(Utils.makeText(xs) + Utils.makeText(ys));
-        }
-
-        // append Strings
-        if (typeof xs === "string") return xs + ys;
-
-        // append Lists
-        if (xs.ctor === '[]') { return ys; }
-        var root = Cons(xs._0, Nil);
-        var curr = root;
-        xs = xs._1;
-        while (xs.ctor !== '[]') {
-            curr._1 = Cons(xs._0, Nil);
-            xs = xs._1;
-            curr = curr._1;
-        }
-        curr._1 = ys;
-        return root;
+    function head(v) {
+        return v.ctor === '[]' ? throwError('head') : v._0;
     }
-
-    function head(v) { return v.ctor === '[]' ? throwError('head') : v._0; }
-    function tail(v) { return v.ctor === '[]' ? throwError('tail') : v._1; }
+    function tail(v) {
+        return v.ctor === '[]' ? throwError('tail') : v._1;
+    }
 
     function last(xs) {
         if (xs.ctor === '[]') { throwError('last'); }
@@ -171,16 +152,24 @@ Elm.Native.List.make = function(elm) {
         return false;
     }
 
-    function reverse(xs) { return fromArray(toArray(xs).reverse()); }
+    function reverse(xs) {
+        return fromArray(toArray(xs).reverse());
+    }
 
-    function concat(xss) {
-        if (xss.ctor === '[]') return xss;
-        var arr = toArray(xss);
-        var xs = arr[arr.length-1];
-        for (var i = arr.length-1; i--; ) {
-            xs = append(arr[i], xs);
+    function append(xs, ys) {
+        if (xs.ctor === '[]') {
+            return ys;
         }
-        return xs;
+        var root = Cons(xs._0, Nil);
+        var curr = root;
+        xs = xs._1;
+        while (xs.ctor !== '[]') {
+            curr._1 = Cons(xs._0, Nil);
+            xs = xs._1;
+            curr = curr._1;
+        }
+        curr._1 = ys;
+        return root;
     }
 
     function all(pred, xs) {
@@ -303,26 +292,6 @@ Elm.Native.List.make = function(elm) {
         return fromArray(arr);
     }
 
-    function join(sep, xss) {
-        if (sep.text) {
-            sep = Utils.makeText(sep);
-            xss = toArray(xss);
-            for (var i = xss.length; i--; ) {
-                xss[i] = Utils.makeText(xss[i]);
-            }
-            return Utils.txt(xss.join(sep));
-        }
-        if (typeof sep === 'string') return toArray(xss).join(sep);
-        if (xss.ctor === '[]') return Nil;
-        var s = toArray(sep);
-        var out = toArray(xss._0);
-        xss = xss._1;
-        while (xss.ctor !== '[]') {
-            out = out.concat(s, toArray(xss._0));
-            xss = xss._1;
-        }
-        return fromArray(out);
-    }
 
     /*
      * Only to be used internally; do some side effects for each elem
@@ -341,7 +310,7 @@ Elm.Native.List.make = function(elm) {
         toArray:toArray,
         fromArray:fromArray,
         range:range,
-        append:append,
+        append: F2(append),
 
         head:head,
         tail:tail,
@@ -359,7 +328,6 @@ Elm.Native.List.make = function(elm) {
         length:length,
         member:F2(member),
         reverse:reverse,
-        concat:concat,
 
         all:F2(all),
         any:F2(any),
@@ -374,8 +342,6 @@ Elm.Native.List.make = function(elm) {
         take:F2(take),
         drop:F2(drop),
         repeat:F2(repeat),
-
-        join:F2(join),
 
         each:each
     };

@@ -42,6 +42,9 @@ which happen to be radians.
 # Floating Point Checks
 @docs isNaN, isInfinite
 
+# Appendables
+@docs (++)
+
 # Tuples
 @docs fst, snd
 
@@ -325,6 +328,18 @@ Notice that NaN is not infinite! For float `n` to be finite implies that
 -}
 isInfinite : Float -> Bool
 isInfinite = Native.Basics.isInfinite
+
+
+{-| Put two appendable things together. This includes strings, lists, and text.
+
+      "hello" ++ "world" == "helloworld"
+      [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
+-}
+(++) : appendable -> appendable -> appendable
+(++) = Native.Basics.append
+
+infixr 5 ++
+
 
 -- Function Helpers
 

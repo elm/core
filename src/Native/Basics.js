@@ -73,6 +73,31 @@ Elm.Native.Basics.make = function(elm) {
       return Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y,x));
   }
 
+  function append(xs,ys) {
+      // append Text
+      if (xs.text || ys.text) {
+          return Utils.txt(Utils.makeText(xs) + Utils.makeText(ys));
+      }
+
+      // append Strings
+      if (typeof xs === "string") {
+          return xs + ys;
+      }
+
+      // append Lists
+      if (xs.ctor === '[]') { return ys; }
+      var root = Cons(xs._0, Nil);
+      var curr = root;
+      xs = xs._1;
+      while (xs.ctor !== '[]') {
+          curr._1 = Cons(xs._0, Nil);
+          xs = xs._1;
+          curr = curr._1;
+      }
+      curr._1 = ys;
+      return root;
+  }
+
   var basics = {
       div: F2(div),
       rem: F2(rem),
@@ -111,7 +136,9 @@ Elm.Native.Basics.make = function(elm) {
       round: Math.round,
       toFloat: function(x) { return x; },
       isNaN: isNaN,
-      isInfinite: isInfinite
+      isInfinite: isInfinite,
+
+      append: F2(append)
   };
 
   return elm.Native.Basics.values = basics;
