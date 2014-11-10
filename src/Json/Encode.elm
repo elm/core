@@ -17,9 +17,10 @@ module Json.Encode where
 -}
 
 import Array (Array)
-import Result (Result)
-import Json.Decode (Json)
 import Native.Json
+
+
+type Json = Json
 
 
 {-| Convert a `Json` into a prettified string. The first argument specifies
@@ -31,18 +32,18 @@ the amount of indentation in the resulting string.
           , ("age", int 42)
           ]
 
-    compact = toString 0 person
+    compact = encode 0 person
     -- {"name":"Tom","age":42}
 
-    readable = toString 4 person
+    readable = encode 4 person
     -- {
     --     "name": "Tom",
     --     "age": 42
     -- }
 -}
-toString : Int -> Json -> String
-toString =
-    Native.Json.toString
+encode : Int -> Json -> String
+encode =
+    Native.Json.encode
 
 
 string : String -> Json

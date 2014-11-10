@@ -348,15 +348,15 @@ Elm.Native.Json.make = function(localRuntime) {
 
     // ENCODE / DECODE
 
-    function fromString(string) {
+    function decode(decoder, string) {
         try {
-            return Result.Ok(JSON.parse(string));
+            return Result.Ok(decoder(JSON.parse(string)));
         } catch(e) {
             return Result.Err(e.message);
         }
     }
 
-    function toString(indentLevel, value) {
+    function encode(indentLevel, value) {
         return JSON.stringify(value, null, indentLevel);
     }
 
@@ -375,8 +375,8 @@ Elm.Native.Json.make = function(localRuntime) {
     }
 
     return localRuntime.Native.Json.values = {
-        toString: F2(toString),
-        fromString: fromString,
+        encode: F2(encode),
+        decode: F2(decode),
 
         get: F2(get),
         oneOf: oneOf,

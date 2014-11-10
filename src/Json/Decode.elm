@@ -2,18 +2,13 @@ module Json.Decode where
 
 import Native.Json
 import Array (Array)
+import Json.Encode (Json)
 import List
 import Maybe (Maybe)
 import Result (Result)
 
-type Json = Json
 
 type Get a = Get
-
-
-get : Get a -> Json -> Result String a
-get =
-    Native.Json.get
 
 
 map : (a -> b) -> Get a -> Get b
@@ -21,9 +16,9 @@ map =
     Native.Json.decodeObject1
 
 
-fromString : String -> Result String Json
-fromString =
-    Native.Json.fromString
+decode : Get a -> String -> Result String a
+decode =
+    Native.Json.decode
 
 
 -- OBJECTS
