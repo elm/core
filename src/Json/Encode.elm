@@ -16,7 +16,7 @@ module Json.Encode where
 @docs object
 -}
 
-import Dict
+import Array (Array)
 import Result (Result)
 import Json.Decode (Json)
 import Native.Json
