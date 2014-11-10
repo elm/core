@@ -51,7 +51,13 @@ Elm.Native.Text.make = function(elm) {
         return arr.join('<br/>');
     }
 
-    function toText(str) { return Utils.txt(properEscape(str)); }
+    function fromString(str) {
+        return Utils.txt(properEscape(str));
+    }
+
+    function append(xs, ys) {
+        return Utils.txt(Utils.makeText(xs) + Utils.makeText(ys));
+    }
 
     // conversions from Elm values to CSS
     function toTypefaces(list) {
@@ -107,7 +113,7 @@ Elm.Native.Text.make = function(elm) {
         return { style: 'font-weight:bold;', text:text }
     }
     function link(href, text) {
-        return { href: toText(href), text:text };
+        return { href: fromString(href), text:text };
     }
     function line(line, text) {
         return { style: 'text-decoration:' + toLine(line) + ';', text:text };
@@ -142,7 +148,8 @@ Elm.Native.Text.make = function(elm) {
     }
 
     return elm.Native.Text.values = {
-        toText: toText,
+        fromString: fromString,
+        append: append,
 
         height : F2(height),
         italic : italic,

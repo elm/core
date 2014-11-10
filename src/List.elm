@@ -4,13 +4,13 @@ module List where
 list must have the same type.
 
 # Basics
-@docs (::), (++), isEmpty, length, reverse
+@docs isEmpty, length, reverse, member
 
 # Sub-lists
 @docs head, tail, last, filter, take, drop
 
 # Putting Lists Together
-@docs repeat, concat, join, intersperse
+@docs repeat, (::), append, concat, join, intersperse
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -49,16 +49,8 @@ import Native.List
 (::) : a -> [a] -> [a]
 (::) = Native.List.cons
 
-{-| Put two appendable things together.
-
-      [1,1] ++ [2,3] == [1,1,2,3]
-      "abc" ++ "123" == "abc123"
--}
-(++) : appendable -> appendable -> appendable
-(++) = Native.List.append
-
 infixr 5 ::
-infixr 5 ++
+
 
 {-| Extract the first element of a list. List must be non-empty.
 
@@ -90,6 +82,12 @@ isEmpty xs =
     case xs of
       [] -> True
       _  -> False
+
+
+member : a -> [a] -> Bool
+member =
+  Native.List.member
+
 
 {-| Apply a function to every element of a list.
 
@@ -200,33 +198,50 @@ all = Native.List.all
 any : (a -> Bool) -> [a] -> Bool
 any = Native.List.any
 
-{-| Concatenate a list of appendable things:
+
+{-| Put two lists together.
+
+      append [1,1,2] [3,5,8] == [1,1,2,3,5,8]
+      append ['a','b'] ['c'] == ['a','b','c']
+-}
+append : [a] -> [a] -> [a]
+append = Native.List.append
+
+
+{-| Concatenate a bunch of lists into a single list:
 
       concat [[1,2],[3],[4,5]] == [1,2,3,4,5]
-      concat ["tree","house"]  == "treehouse"
 -}
-concat : [appendable] -> appendable
-concat = Native.List.concat
+concat : [[a]] -> [a]
+concat lists =
+    foldr append [] lists
+
 
 {-| Map a given function onto a list and flatten the resulting lists.
 
       concatMap f xs == concat (map f xs)
 -}
-concatMap : (a -> appendable) -> [a] -> appendable
-concatMap f list = concat (map f list)
+concatMap : (a -> [b]) -> [a] -> [b]
+concatMap f list =
+    concat (map f list)
+
 
 {-| Get the sum of the list elements.
 
       sum [1..4] == 10
 -}
 sum : [number] -> number
-sum = foldl (+) 0
+sum numbers =
+    foldl (+) 0 numbers
+
 
 {-| Get the product of the list elements.
       product [1..4] == 24
 -}
 product : [number] -> number
-product = foldl (*) 1
+product numbers =
+    foldl (*) 1 numbers
+
 
 {-| Find the maximum element in a non-empty list.
       maximum [1,4,2] == 4
@@ -234,11 +249,13 @@ product = foldl (*) 1
 maximum : [comparable] -> comparable
 maximum = foldl1 max
 
+
 {-| Find the minimum element in a non-empty list.
       minimum [3,2,1] == 1
 -}
 minimum : [comparable] -> comparable
 minimum = foldl1 min
+
 
 {-| Partition a list based on a predicate. The first list contains all values
 that satisfy the predicate, and the second list contains all the value that do
@@ -280,6 +297,7 @@ map4 = Native.List.map4
 map5 : (a -> b -> c -> d -> e -> result) -> [a] -> [b] -> [c] -> [d] -> [e] -> [result]
 map5 = Native.List.map5
 
+
 {-| Decompose a list of tuples into a tuple of lists.
 
       unzip [(0, True), (17, False), (1337, True)] == ([0,17,1337], [True,False,True])
@@ -289,12 +307,6 @@ unzip =
     let step (x,y) (xs, ys) = (x::xs, y::ys)
     in foldr step ([], [])
 
-{-| Place a value between all elements in a list and concatenates the result.
-
-      join "a" ["H","w","ii","n"] == "Hawaiian"
--}
-join : appendable -> [appendable] -> appendable
-join = Native.List.join
 
 {-| Places the given value between all members of the given list.
 
@@ -307,7 +319,8 @@ intersperse sep xs =
       hd::tl ->
           let step x rest = sep :: x :: rest
               spersed = foldr step [] tl
-          in hd :: spersed
+          in
+              hd :: spersed
 
 {-| Take the first *n* members of a list.
 
