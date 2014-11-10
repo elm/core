@@ -8,113 +8,113 @@ import Maybe (Maybe)
 import Result (Result)
 
 
-type Get a = Get
+type Decoder a = Decoder
 
 
-map : (a -> b) -> Get a -> Get b
+map : (a -> b) -> Decoder a -> Decoder b
 map =
     Native.Json.decodeObject1
 
 
-decode : Get a -> String -> Result String a
+decode : Decoder a -> String -> Result String a
 decode =
     Native.Json.decode
 
 
 -- OBJECTS
 
-at : [String] -> Get a -> Get a
+at : [String] -> Decoder a -> Decoder a
 at fields decoder =
     List.foldr (:=) decoder fields
 
 
-(:=) : String -> Get a -> Get a
+(:=) : String -> Decoder a -> Decoder a
 (:=) key value =
     Native.Json.decodeField key value
 
 
-object1 : (a -> value) -> Get a -> Get value
+object1 : (a -> value) -> Decoder a -> Decoder value
 object1 =
     Native.Json.decodeObject1
 
 
-object2 : (a -> b -> value) -> Get a -> Get b -> Get value
+object2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 object2 =
     Native.Json.decodeObject2
 
 
-object3 : (a -> b -> c -> value) -> Get a -> Get b -> Get c -> Get value
+object3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 object3 =
     Native.Json.decodeObject3
 
 
-object4 : (a -> b -> c -> d -> value) -> Get a -> Get b -> Get c -> Get d -> Get value
+object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 object4 =
     Native.Json.decodeObject4
 
 
-object5 : (a -> b -> c -> d -> e -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get value
+object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 object5 =
     Native.Json.decodeObject5
 
 
-object6 : (a -> b -> c -> d -> e -> f -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get value
+object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 object6 =
     Native.Json.decodeObject6
 
 
-object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get value
+object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 object7 =
     Native.Json.decodeObject7
 
 
-object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get h -> Get value
+object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 object8 =
     Native.Json.decodeObject8
 
 
 
-oneOf : [Get a] -> Get a
+oneOf : [Decoder a] -> Decoder a
 oneOf =
     Native.Json.oneOf
 
 
-string : Get String
+string : Decoder String
 string =
     Native.Json.decodeString
 
 
-float : Get Float
+float : Decoder Float
 float =
     Native.Json.decodeFloat
 
 
-int : Get Int
+int : Decoder Int
 int =
     Native.Json.decodeInt
 
 
-bool : Get Bool
+bool : Decoder Bool
 bool =
     Native.Json.decodeBool
 
 
-list : Get a -> Get [a]
+list : Decoder a -> Decoder [a]
 list =
     Native.Json.decodeList
 
 
-array : Get a -> Get (Array a)
+array : Decoder a -> Decoder (Array a)
 array =
     Native.Json.decodeArray
 
 
-null : Get ()
+null : Decoder ()
 null =
     Native.Json.decodeNull
 
 
-maybe : Get a -> Get (Maybe a)
+maybe : Decoder a -> Decoder (Maybe a)
 maybe =
     Native.Json.decodeMaybe
 
@@ -123,67 +123,75 @@ maybe =
 lets you create a parser for "variadic" lists where the first few types are
 different, followed by 0 or more of the same type.
 
-    variadic1 : (a -> [b] -> value) -> Get a -> Get [b] -> Get value
-    variadic1 f getFirst getRest =
-        list raw `andThen`
+    variadic2 : (a -> b -> [c] -> value) -> Decoder a -> Decoder b -> Decoder [c] -> Decoder value
+    variadic2 f a b cs =
+        customDecoder (list raw) \jsonList ->
+            case jsonList of
+              one :: two :: rest ->
+                  Result.map3 f
+                    (decodeRaw a one)
+                    (decodeRaw b two)
+                    (decodeRaw cs rest)
 
-    variadicHelp1 : (a -> [b] -> value) -> Get a -> Get [b] -> [Json] -> Get value
-    variadicHelp1 f getFirst getRest jsonList =
-        case jsonList of
-          [] -> fail "Expecting a non-empty array"
-          x :: xs ->
-              chain result
-                let x' <- get getFirst x
-                let xs' <- get getRest xs
-                Ok (f x' xs')
+              _ -> Result.Err "expecting at least two elements in the array"
 -}
-raw : Get Json
+raw : Decoder Json
 raw =
-    Native.Json.decodeValue
+    Native.Json.decodeJson
 
 
-andThen : Get a -> (a -> Get b) -> Get b
+decodeRaw : Decoder a -> Json -> Result String a
+decodeRaw =
+    Native.Json.decodeRaw
+
+
+customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
+customDecoder =
+    Native.Json.customDecoder
+
+
+andThen : Decoder a -> (a -> Decoder b) -> Decoder b
 andThen =
     Native.Json.andThen
 
 
 -- TUPLES
 
-tuple1 : (a -> value) -> Get a -> Get value
+tuple1 : (a -> value) -> Decoder a -> Decoder value
 tuple1 =
     Native.Json.decodeTuple1
 
 
-tuple2 : (a -> b -> value) -> Get a -> Get b -> Get value
+tuple2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 tuple2 =
     Native.Json.decodeTuple2
 
 
-tuple3 : (a -> b -> c -> value) -> Get a -> Get b -> Get c -> Get value
+tuple3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 tuple3 =
     Native.Json.decodeTuple3
 
 
-tuple4 : (a -> b -> c -> d -> value) -> Get a -> Get b -> Get c -> Get d -> Get value
+tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 tuple4 =
     Native.Json.decodeTuple4
 
 
-tuple5 : (a -> b -> c -> d -> e -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get value
+tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 tuple5 =
     Native.Json.decodeTuple5
 
 
-tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get value
+tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 tuple6 =
     Native.Json.decodeTuple6
 
 
-tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get value
+tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 tuple7 =
     Native.Json.decodeTuple7
 
 
-tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get h -> Get value
+tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 tuple8 =
     Native.Json.decodeTuple8
