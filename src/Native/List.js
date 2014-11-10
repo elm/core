@@ -281,16 +281,6 @@ Elm.Native.List.make = function(elm) {
     }
 
 
-    /*
-     * Only to be used internally; do some side effects for each elem
-     */
-    function each(action, xs) {
-        while(xs.ctor !== '[]') {
-            action(xs._0);
-            xs = xs._1;
-        }
-    }
-
     Elm.Native.List.values = {
         Nil:Nil,
         Cons:Cons,
@@ -329,9 +319,7 @@ Elm.Native.List.make = function(elm) {
         nth:F2(nth),
         take:F2(take),
         drop:F2(drop),
-        repeat:F2(repeat),
-
-        each:each
+        repeat:F2(repeat)
     };
     return elm.Native.List.values = Elm.Native.List.values;
 
