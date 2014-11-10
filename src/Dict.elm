@@ -40,6 +40,7 @@ import Maybe (..)
 import List
 import List ((::))
 import Native.Debug
+import String
 
 
 -- BBlack and NBlack should only be used during the deletion
@@ -307,7 +308,7 @@ lessBlackTree dict =
 reportRemBug : String -> NColor -> String -> String -> a
 reportRemBug msg c lgot rgot =
   Native.Debug.crash <|
-    List.concat
+    String.concat
     [ "Internal red-black tree invariant violated, expected "
     , msg, " and got ", showNColor c, "/", lgot, "/", rgot
     , "\nPlease report this bug to <https://github.com/elm-lang/Elm/issues>"
