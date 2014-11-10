@@ -1,34 +1,29 @@
-module JavaScript where
+module Json.Decode where
 
-import Native.JavaScript
+import Native.Json
 import Array (Array)
 import List
 import Maybe (Maybe)
 import Result (Result)
 
-type Value = Value
+type Json = Json
 
 type Get a = Get
 
 
-get : Get a -> Value -> Result String a
+get : Get a -> Json -> Result String a
 get =
-    Native.JavaScript.get
+    Native.Json.get
 
 
 map : (a -> b) -> Get a -> Get b
 map =
-    Native.JavaScript.decodeObject1
+    Native.Json.decodeObject1
 
 
-toString : String -> Value a -> String
-toString =
-    Native.JavaScript.toString
-
-
-fromString : String -> Result String Value
+fromString : String -> Result String Json
 fromString =
-    Native.JavaScript.fromString
+    Native.Json.fromString
 
 
 -- OBJECTS
@@ -40,156 +35,160 @@ at fields decoder =
 
 (:=) : String -> Get a -> Get a
 (:=) key value =
-    Native.JavaScript.decodeField key value
+    Native.Json.decodeField key value
 
 
 object1 : (a -> value) -> Get a -> Get value
 object1 =
-    Native.JavaScript.decodeObject1
+    Native.Json.decodeObject1
 
 
 object2 : (a -> b -> value) -> Get a -> Get b -> Get value
 object2 =
-    Native.JavaScript.decodeObject2
+    Native.Json.decodeObject2
 
 
 object3 : (a -> b -> c -> value) -> Get a -> Get b -> Get c -> Get value
 object3 =
-    Native.JavaScript.decodeObject3
+    Native.Json.decodeObject3
 
 
 object4 : (a -> b -> c -> d -> value) -> Get a -> Get b -> Get c -> Get d -> Get value
 object4 =
-    Native.JavaScript.decodeObject4
+    Native.Json.decodeObject4
 
 
 object5 : (a -> b -> c -> d -> e -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get value
 object5 =
-    Native.JavaScript.decodeObject5
+    Native.Json.decodeObject5
 
 
 object6 : (a -> b -> c -> d -> e -> f -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get value
 object6 =
-    Native.JavaScript.decodeObject6
+    Native.Json.decodeObject6
 
 
 object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get value
 object7 =
-    Native.JavaScript.decodeObject7
+    Native.Json.decodeObject7
 
 
 object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get h -> Get value
 object8 =
-    Native.JavaScript.decodeObject8
+    Native.Json.decodeObject8
 
 
 
 oneOf : [Get a] -> Get a
 oneOf =
-    Native.JavaScript.oneOf
+    Native.Json.oneOf
 
 
 string : Get String
 string =
-    Native.JavaScript.decodeString
+    Native.Json.decodeString
 
 
 float : Get Float
 float =
-    Native.JavaScript.decodeFloat
+    Native.Json.decodeFloat
 
 
 int : Get Int
 int =
-    Native.JavaScript.decodeInt
+    Native.Json.decodeInt
 
 
 bool : Get Bool
 bool =
-    Native.JavaScript.decodeBool
+    Native.Json.decodeBool
 
 
 list : Get a -> Get [a]
 list =
-    Native.JavaScript.decodeList
+    Native.Json.decodeList
 
 
 array : Get a -> Get (Array a)
 array =
-    Native.JavaScript.decodeArray
+    Native.Json.decodeArray
 
 
 null : Get ()
 null =
-    Native.JavaScript.decodeNull
+    Native.Json.decodeNull
 
 
 maybe : Get a -> Get (Maybe a)
 maybe =
-    Native.JavaScript.decodeMaybe
+    Native.Json.decodeMaybe
 
   
-{-| Useful when you need to do some more advanced extraction on arrays. Say
-you have an array that starts with a string and then an unknown amount of
-numbers.
+{-| Useful if you need to work with crazily formatted data. For example, this
+lets you create a parser for "variadic" lists where the first few types are
+different, followed by 0 or more of the same type.
 
-    -- [ "Callisto", 1, 2, 3, 4 ]
+    variadic1 : (a -> [b] -> value) -> Get a -> Get [b] -> Get value
+    variadic1 f getFirst getRest =
+        list raw `andThen`
 
-    extract : Json -> Result String (String, [Int])
-    extract json =
-        case get (list jsonValue) json of
-          str :: numbers ->
-              get string str
-              get (list int) numbers
-
+    variadicHelp1 : (a -> [b] -> value) -> Get a -> Get [b] -> [Json] -> Get value
+    variadicHelp1 f getFirst getRest jsonList =
+        case jsonList of
+          [] -> fail "Expecting a non-empty array"
+          x :: xs ->
+              chain result
+                let x' <- get getFirst x
+                let xs' <- get getRest xs
+                Ok (f x' xs')
 -}
-jsonValue : Get Value
-jsonValue =
-    Native.JavaScript.decodeValue
+raw : Get Json
+raw =
+    Native.Json.decodeValue
 
 
 andThen : Get a -> (a -> Get b) -> Get b
 andThen =
-    Native.JavaScript.andThen
+    Native.Json.andThen
 
 
 -- TUPLES
 
 tuple1 : (a -> value) -> Get a -> Get value
 tuple1 =
-    Native.JavaScript.decodeTuple1
+    Native.Json.decodeTuple1
 
 
 tuple2 : (a -> b -> value) -> Get a -> Get b -> Get value
 tuple2 =
-    Native.JavaScript.decodeTuple2
+    Native.Json.decodeTuple2
 
 
 tuple3 : (a -> b -> c -> value) -> Get a -> Get b -> Get c -> Get value
 tuple3 =
-    Native.JavaScript.decodeTuple3
+    Native.Json.decodeTuple3
 
 
 tuple4 : (a -> b -> c -> d -> value) -> Get a -> Get b -> Get c -> Get d -> Get value
 tuple4 =
-    Native.JavaScript.decodeTuple4
+    Native.Json.decodeTuple4
 
 
 tuple5 : (a -> b -> c -> d -> e -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get value
 tuple5 =
-    Native.JavaScript.decodeTuple5
+    Native.Json.decodeTuple5
 
 
 tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get value
 tuple6 =
-    Native.JavaScript.decodeTuple6
+    Native.Json.decodeTuple6
 
 
 tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get value
 tuple7 =
-    Native.JavaScript.decodeTuple7
+    Native.Json.decodeTuple7
 
 
 tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Get a -> Get b -> Get c -> Get d -> Get e -> Get f -> Get g -> Get h -> Get value
 tuple8 =
-    Native.JavaScript.decodeTuple8
+    Native.Json.decodeTuple8

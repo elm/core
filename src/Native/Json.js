@@ -1,9 +1,9 @@
-Elm.Native.JavaScript = {};
-Elm.Native.JavaScript.make = function(localRuntime) {
+Elm.Native.Json = {};
+Elm.Native.Json.make = function(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
-    localRuntime.Native.JavaScript = localRuntime.Native.JavaScript || {};
-    if (localRuntime.Native.JavaScript.values) {
-        return localRuntime.Native.JavaScript.values;
+    localRuntime.Native.Json = localRuntime.Native.Json || {};
+    if (localRuntime.Native.Json.values) {
+        return localRuntime.Native.Json.values;
     }
 
     var ElmArray = Elm.Native.Array.make(localRuntime);
@@ -356,12 +356,25 @@ Elm.Native.JavaScript.make = function(localRuntime) {
         }
     }
 
-    function toString(sep, value) {
-        return JSON.stringify(value, sep);
+    function toString(indentLevel, value) {
+        return JSON.stringify(value, null, indentLevel);
     }
 
+    function identity(value) {
+        return value;
+    }
 
-    return localRuntime.Native.JavaScript.values = {
+    function encodeObject(keyValuePairs) {
+        var obj = {};
+        while (keyValuePairs.ctor !== '[]') {
+            var pair = keyValuePairs._0;
+            obj[pair._0] = pair._1;
+            keyValuePairs = keyValuePairs._1;
+        }
+        return obj;
+    }
+
+    return localRuntime.Native.Json.values = {
         toString: F2(toString),
         fromString: fromString,
 
@@ -400,7 +413,13 @@ Elm.Native.JavaScript.make = function(localRuntime) {
         decodeTuple8: F9(decodeTuple8),
 
         decodeValue: decodeValue,
-        andThen: F2(andThen)
+        andThen: F2(andThen),
+
+        identity: identity,
+        encodeNull: null,
+        encodeArray: ElmArray.toJSArray,
+        encodeList: List.toArray,
+        encodeObject: encodeObject
 
     };
 
