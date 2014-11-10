@@ -336,7 +336,7 @@ isInfinite = Native.Basics.isInfinite
       [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
 -}
 (++) : appendable -> appendable -> appendable
-(++) = Native.Basics.append
+(++) = Native.Utils.append
 
 infixr 5 ++
 

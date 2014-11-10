@@ -8,20 +8,8 @@ Elm.Native.List.make = function(elm) {
 
     var Utils = Elm.Native.Utils.make(elm);
 
-    // TODO: Improve Nil handling
-    // We can change places like:  if (xs.ctor === '[]') ... to if (xs === Nil) ...
-    // but only if we're confident Nil can only be defined once.
-    // Currently (27Mar2013) each module can have different instantiations, so multiple Nil objects can exist
-    // (and if they're used interchangeably then direct object comparison fails where ctor doesn't).
-    // So, this can only be fixed when modules initialisation is also fixed.
-    // The performance overhead of the .ctor calls is 5-10% according to jsperf (depending on fn + list size)
-    // (on firefox 19)
-
-    var Nil = { ctor:'[]' };
-
-    // using freeze for every cons would be nice but is a huge (9x on firefox 19)
-    // performance penalty
-    function Cons(hd,tl) { return { ctor:"::", _0:hd, _1:tl }; }
+    var Nil = Utils.Nil;
+    var Cons = Utils.Cons;
 
     function throwError(f) {
         throw new Error("Function '" + f + "' expects a non-empty list!");
