@@ -6,7 +6,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs isEmpty, length, reverse, repeat
 
 # Building and Splitting
-@docs cons, uncons, append, concat, split, join, words, lines
+@docs cons, uncons, fromChar, append, concat, split, join, words, lines
 
 # Get Substrings
 @docs slice, left, right, dropLeft, dropRight
@@ -46,6 +46,16 @@ isEmpty = Native.String.isEmpty
 {-| Add a character to the beginning of a string. -}
 cons : Char -> String -> String
 cons = Native.String.cons
+
+
+{-| Create a string from a given character.
+
+    fromChar 'a' == "a"
+-}
+fromChar : Char -> String
+fromChar char =
+    cons char ""
+
 
 {-| Split a non-empty string into its head and tail. This lets you
 pattern match on strings exactly as you would with lists.
