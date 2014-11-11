@@ -31,7 +31,6 @@ There are also a bunch of functions to set parts of a `Style` individually:
 -}
 
 import Basics (..)
-import String
 import Color (Color, black)
 import Graphics.Element (Element, Three, Pos, ElementPrim, Properties)
 import List
@@ -259,4 +258,4 @@ the browser. Excellent for debugging.
 -}
 asText : a -> Element
 asText value =
-    leftAligned (monospace (fromString (String.toString value)))
+    leftAligned (monospace (fromString (toString value)))
