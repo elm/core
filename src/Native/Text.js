@@ -149,7 +149,7 @@ Elm.Native.Text.make = function(elm) {
 
     return elm.Native.Text.values = {
         fromString: fromString,
-        append: append,
+        append: F2(append),
 
         height : F2(height),
         italic : italic,

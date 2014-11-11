@@ -6,7 +6,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs isEmpty, length, reverse, repeat
 
 # Building and Splitting
-@docs cons, uncons, append, concat, split, join, words, lines
+@docs cons, uncons, fromChar, append, concat, split, join, words, lines
 
 # Get Substrings
 @docs slice, left, right, dropLeft, dropRight
@@ -15,7 +15,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs contains, startsWith, endsWith, indexes, indices
 
 # Conversions
-@docs toString, toInt, toFloat, toList, fromList
+@docs toInt, toFloat, toList, fromList
 
 # Formatting
 Cosmetic operations such as padding with extra characters or trimming whitespace.
@@ -28,7 +28,6 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 @docs map, filter, foldl, foldr, any, all
 -}
 
-import Native.Show
 import Native.String
 import Char
 import Maybe (Maybe)
@@ -46,6 +45,16 @@ isEmpty = Native.String.isEmpty
 {-| Add a character to the beginning of a string. -}
 cons : Char -> String -> String
 cons = Native.String.cons
+
+
+{-| Create a string from a given character.
+
+    fromChar 'a' == "a"
+-}
+fromChar : Char -> String
+fromChar char =
+    cons char ""
+
 
 {-| Split a non-empty string into its head and tail. This lets you
 pattern match on strings exactly as you would with lists.
@@ -298,13 +307,6 @@ indexes = Native.String.indexes
 indices : String -> String -> [Int]
 indices = Native.String.indexes
 
-{-| Turn any kind of value into a string.
-
-      toString 42    == "42"
-      toString [1,2] == "[1,2]"
--}
-toString : a -> String
-toString = Native.Show.toString
 
 {-| Try to convert a string into an int, failing on improperly formatted strings.
 

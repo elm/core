@@ -42,8 +42,8 @@ which happen to be radians.
 # Floating Point Checks
 @docs isNaN, isInfinite
 
-# Appendables
-@docs (++)
+# Strings and Lists
+@docs toString, (++)
 
 # Tuples
 @docs fst, snd
@@ -54,8 +54,9 @@ which happen to be radians.
 -}
 
 import Native.Basics
-import Native.Utils
 import Native.Ports
+import Native.Show
+import Native.Utils
 
 
 {-| Convert radians to standard Elm angles (radians). -}
@@ -330,13 +331,22 @@ isInfinite : Float -> Bool
 isInfinite = Native.Basics.isInfinite
 
 
+{-| Turn any kind of value into a string.
+
+      toString 42    == "42"
+      toString [1,2] == "[1,2]"
+-}
+toString : a -> String
+toString = Native.Show.toString
+
+
 {-| Put two appendable things together. This includes strings, lists, and text.
 
       "hello" ++ "world" == "helloworld"
       [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
 -}
 (++) : appendable -> appendable -> appendable
-(++) = Native.Basics.append
+(++) = Native.Utils.append
 
 infixr 5 ++
 

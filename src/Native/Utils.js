@@ -207,6 +207,45 @@ Elm.Native.Utils.make = function(localRuntime) {
     }
 
 
+    //// LIST STUFF ////
+
+    var Nil = { ctor:'[]' };
+
+    function Cons(hd,tl) {
+        return {
+            ctor: "::",
+            _0: hd,
+            _1: tl
+        };
+    }
+
+    function append(xs,ys) {
+        // append Text
+        if (xs.text || ys.text) {
+            return txt(makeText(xs) + makeText(ys));
+        }
+
+        // append Strings
+        if (typeof xs === "string") {
+            return xs + ys;
+        }
+
+        // append Lists
+        if (xs.ctor === '[]') {
+            return ys;
+        }
+        var root = Cons(xs._0, Nil);
+        var curr = root;
+        xs = xs._1;
+        while (xs.ctor !== '[]') {
+            curr._1 = Cons(xs._0, Nil);
+            xs = xs._1;
+            curr = curr._1;
+        }
+        curr._1 = ys;
+        return root;
+    }
+
     //// RUNTIME ERRORS ////
 
     function indent(lines) {
@@ -258,6 +297,10 @@ Elm.Native.Utils.make = function(localRuntime) {
         insert: insert,
         guid: guid,
         getXY: getXY,
+
+        Nil: Nil,
+        Cons: Cons,
+        append: F2(append),
 
         badCase: badCase,
         badIf: badIf,
