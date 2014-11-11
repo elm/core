@@ -15,7 +15,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs contains, startsWith, endsWith, indexes, indices
 
 # Conversions
-@docs toString, toInt, toFloat, toList, fromList
+@docs toInt, toFloat, toList, fromList
 
 # Formatting
 Cosmetic operations such as padding with extra characters or trimming whitespace.
@@ -28,7 +28,6 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 @docs map, filter, foldl, foldr, any, all
 -}
 
-import Native.Show
 import Native.String
 import Char
 import Maybe (Maybe)
@@ -308,13 +307,6 @@ indexes = Native.String.indexes
 indices : String -> String -> [Int]
 indices = Native.String.indexes
 
-{-| Turn any kind of value into a string.
-
-      toString 42    == "42"
-      toString [1,2] == "[1,2]"
--}
-toString : a -> String
-toString = Native.Show.toString
 
 {-| Try to convert a string into an int, failing on improperly formatted strings.
 
