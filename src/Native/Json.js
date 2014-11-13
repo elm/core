@@ -22,11 +22,13 @@ Elm.Native.Json.make = function(localRuntime) {
 
     // PRIMITIVE VALUES
 
-    function decodeNull(value) {
-        if (value === null) {
-            return Utils.Tuple0;
-        }
-        crash('null', value);
+    function decodeNull(successValue) {
+        return function(value) {
+            if (value === null) {
+                return successValue;
+            }
+            crash('null', value);
+        };
     }
 
 
@@ -337,6 +339,18 @@ Elm.Native.Json.make = function(localRuntime) {
         }
     }
 
+    function fail(msg) {
+        return function(value) {
+            throw new Error(msg);
+        }
+    }
+
+    function succeed(successValue) {
+        return function(value) {
+            return successValue;
+        }
+    }
+
 
     // ONE OF MANY
 
@@ -434,6 +448,8 @@ Elm.Native.Json.make = function(localRuntime) {
         decodeJson: decodeJson,
         decodeRaw: F2(decodeRaw),
         customDecoder: F2(customDecoder),
+        fail: fail,
+        succeed: succeed,
 
         identity: identity,
         encodeNull: null,
