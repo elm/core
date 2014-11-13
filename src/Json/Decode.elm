@@ -105,11 +105,32 @@ object1 =
     Native.Json.decodeObject1
 
 
+{-| Use two different decoders on a JS value. This is nice for extracting
+multiple fields from an object.
+
+    point : Decoder (Float,Float)
+    point =
+        object2 (,)
+          ("x" := float)
+          ("y" := float)
+-}
 object2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 object2 =
     Native.Json.decodeObject2
 
 
+{-| Use two different decoders on a JS value. This is nice for extracting
+multiple fields from an object.
+
+    type Task = { task : String, id : Int, completed : Bool }
+
+    point : Decoder (Float,Float)
+    point =
+        object3 Task
+          ("task" := string)
+          ("id" := int)
+          ("completed" := bool)
+-}
 object3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 object3 =
     Native.Json.decodeObject3
