@@ -2,13 +2,15 @@ module Json.Decode where
 
 import Native.Json
 import Array (Array)
-import Json.Encode (Json)
+import Json.Encode as JsonEncode
 import List
 import Maybe (Maybe)
 import Result (Result)
 
 
 type Decoder a = Decoder
+
+type alias Json = JsonEncode.Json
 
 
 map : (a -> b) -> Decoder a -> Decoder b
