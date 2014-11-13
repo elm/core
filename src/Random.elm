@@ -1,7 +1,7 @@
 module Random
     ( Generator, Seed
     , int, float
-    , listOf, pairOf
+    , list, pair
     , minInt, maxInt
     , generate, initialSeed
     )
@@ -18,7 +18,7 @@ module. It has a period of roughly 2.30584e18.
 
 # Generators
 
-@docs int, float, pairOf, listOf
+@docs int, float, pair, list
 
 # Running a Generator
 
@@ -106,11 +106,11 @@ wide and 200 pixels tall.
 
       randomPoint : Generator (Int,Int)
       randomPoint =
-          pairOf (int -200 200) (int -100 100)
+          pair (int -200 200) (int -100 100)
 
 -}
-pairOf : Generator a -> Generator b -> Generator (a,b)
-pairOf genLeft genRight seed =
+pair : Generator a -> Generator b -> Generator (a,b)
+pair genLeft genRight seed =
     let (left , seed' ) = genLeft seed
         (right, seed'') = genRight seed'
     in
@@ -120,35 +120,35 @@ pairOf genLeft genRight seed =
 {-| Create a list of random values using a generator function.
 
       floatList : Generator [Float]
-      floatList = listOf 10 (float 0 1)
+      floatList = list 10 (float 0 1)
 
       intList : Generator [Int]
-      intList = listOf 5 (int 0 100)
+      intList = list 5 (int 0 100)
 
       intPairs : Generator [[Int]]
       intPairs =
-          listOf 10 intList
+          list 10 intList
 -}
-listOf : Int -> Generator a -> Generator [a]
-listOf n gen =
-    listOfHelp [] n gen
+list : Int -> Generator a -> Generator [a]
+list n gen =
+    listHelp [] n gen
 
 
-listOfHelp : [a] -> Int -> Generator a -> Generator [a]
-listOfHelp list n generate seed =
+listHelp : [a] -> Int -> Generator a -> Generator [a]
+listHelp list n generate seed =
     if n < 1
     then (reverse list, seed)
     else
         let (value, seed') = generate seed
-        in  listOfHelp (value :: list) (n-1) generate seed'
+        in  listHelp (value :: list) (n-1) generate seed'
 
 {-| A `Generator` is a function that takes a seed, and then returns a random
 value and a new seed. The new seed is used to generate new random values. You
 can use this to define Generators of your own. For example, here is how
-`pairOf` is implemented.
+`pair` is implemented.
 
-      pairOf : Generator a -> Generator b -> Generator (a,b)
-      pairOf genLeft genRight seed =
+      pair : Generator a -> Generator b -> Generator (a,b)
+      pair genLeft genRight seed =
           let (left , seed' ) = genLeft seed
               (right, seed'') = genRight seed'
           in
