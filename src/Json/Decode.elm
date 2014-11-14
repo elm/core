@@ -8,10 +8,13 @@ module Json.Decode where
 @docs string, int, float, bool, null
 
 # Arrays
-@docs list, array, tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
+@docs list, array,
+  tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
 
 # Objects
-@docs (:=), at, object1, object2, object3, object4, object5, object6, object7, object8
+@docs (:=), at,
+  object1, object2, object3, object4, object5, object6, object7, object8,
+  keyValuePairs, dict
 
 # Oddly Shaped Values
 @docs maybe, oneOf, map, fail, succeed, andThen
@@ -23,6 +26,8 @@ module Json.Decode where
 
 import Native.Json
 import Array (Array)
+import Dict
+import Dict (Dict)
 import Json.Encode as JsonEncode
 import List
 import Maybe (Maybe)
@@ -159,6 +164,31 @@ object7 =
 object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 object8 =
     Native.Json.decodeObject8
+
+
+{-| Turn any object into a list of key-value pairs.
+
+    -- { tom: 89, sue: 92, bill: 97, ... }
+    grades : Decoder [(String, Int)]
+    grades =
+        keyValuePairs int
+-}
+keyValuePairs : Decoder a -> Decoder [(String, a)]
+keyValuePairs =
+    Native.Json.decodeKeyValuePairs
+
+
+{-| Turn any object into a dictionary of key-value pairs.
+
+    -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
+    planetMasses : Decoder (Dict String Int)
+    planetMasses =
+        dict float
+-}
+dict : Decoder a -> Decoder (Dict String a)
+dict decoder =
+    map Dict.fromList (keyValuePairs decoder)
+
 
 
 {-| Try out a couple different decoders. This is helpful when you are dealing

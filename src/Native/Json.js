@@ -126,6 +126,27 @@ Elm.Native.Json.make = function(localRuntime) {
 
     // OBJECTS
 
+    function decodeKeyValuePairs(decoder) {
+        return function(value) {
+            var isObject =
+                typeof value === 'object'
+                    && value !== null
+                    && !(value instanceof Array);
+
+            if (isObject) {
+                var keyValuePairs = List.Nil;
+                for (var key in value) {
+                    var elmValue = decoder(value[key]);
+                    var pair = Utils.Tuple2(key, elmValue);
+                    keyValuePairs = List.Cons(pair, keyValuePairs);
+                }
+                return keyValuePairs;
+            }
+
+            crash("an object", value);
+        };
+    }
+
     function decodeObject1(f, d1) {
         return function(value) {
             return f(d1(value));
@@ -434,6 +455,7 @@ Elm.Native.Json.make = function(localRuntime) {
         decodeObject6: F7(decodeObject6),
         decodeObject7: F8(decodeObject7),
         decodeObject8: F9(decodeObject8),
+        decodeKeyValuePairs: decodeKeyValuePairs,
 
         decodeTuple1: F2(decodeTuple1),
         decodeTuple2: F3(decodeTuple2),
