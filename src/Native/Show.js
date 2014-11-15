@@ -6,7 +6,7 @@ Elm.Native.Show.make = function(elm) {
 
     var _Array;
     var Dict;
-    var List = Elm.List.make(elm);
+    var List;
     var Utils = Elm.Native.Utils.make(elm);
 
     var toString = function(v) {
@@ -74,6 +74,9 @@ Elm.Native.Show.make = function(elm) {
             else if (v.ctor === "RBNode" || v.ctor === "RBEmpty") {
                 if (!Dict) {
                     Dict = Elm.Dict.make(elm);
+                }
+                if (!List) {
+                    List = Elm.List.make(elm);
                 }
                 var list = Dict.toList(v);
                 var name = "Dict";
