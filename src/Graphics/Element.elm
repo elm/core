@@ -188,7 +188,7 @@ newElement w h e =
 type ElementPrim
     = Image ImageStyle Int Int String
     | Container Position Element
-    | Flow Direction [Element]
+    | Flow Direction (List Element)
     | Spacer
     | RawHtml
     | Custom -- for custom Elements implemented in JS, see collage for example
@@ -270,7 +270,7 @@ The `Direction` starts from the first element in the list.
           | a | b | c |
           +---+---+---+
 -}
-flow : Direction -> [Element] -> Element
+flow : Direction -> List Element -> Element
 flow dir es =
   let ws = List.map widthOf es
       hs = List.map heightOf es
@@ -322,7 +322,7 @@ beside lft rht =
 {-| Layer elements on top of each other, starting from the bottom:
 `layers == flow outward`
 -}
-layers : [Element] -> Element
+layers : List Element -> Element
 layers es = 
   let ws = List.map widthOf es
       hs = List.map heightOf es

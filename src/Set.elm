@@ -72,11 +72,11 @@ diff : Set comparable -> Set comparable -> Set comparable
 diff = Dict.diff
 
 {-| Convert a set into a list. -}
-toList : Set comparable -> [comparable]
+toList : Set comparable -> List comparable
 toList = Dict.keys
 
 {-| Convert a list into a set, removing any duplicates. -}
-fromList : [comparable] -> Set comparable
+fromList : List comparable -> Set comparable
 fromList xs = List.foldl insert empty xs
 
 {-| Fold over the values in a set, in order from lowest to highest. -}

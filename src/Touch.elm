@@ -31,7 +31,7 @@ type alias Touch =
     }
 
 {-| A list of ongoing touches. -}
-touches : Signal [Touch]
+touches : Signal (List Touch)
 touches = Native.Touch.touches
 
 {-| The last position that was tapped. Default value is `{x=0,y=0}`.

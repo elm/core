@@ -74,7 +74,7 @@ enter : Signal Bool
 enter = isDown 13
 
 {-| List of keys that are currently down. -}
-keysDown : Signal [KeyCode]
+keysDown : Signal (List KeyCode)
 keysDown = Native.Keyboard.keysDown
 
 {-| The latest key that has been pressed. -}

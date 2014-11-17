@@ -83,7 +83,7 @@ really a helper function so you do not need to write `(:=)` so many times.
     at fields decoder =
         List.foldr (:=) decoder fields
 -}
-at : [String] -> Decoder a -> Decoder a
+at : List String -> Decoder a -> Decoder a
 at fields decoder =
     List.foldr (:=) decoder fields
 
@@ -169,11 +169,11 @@ object8 =
 {-| Turn any object into a list of key-value pairs.
 
     -- { tom: 89, sue: 92, bill: 97, ... }
-    grades : Decoder [(String, Int)]
+    grades : Decoder (List (String, Int))
     grades =
         keyValuePairs int
 -}
-keyValuePairs : Decoder a -> Decoder [(String, a)]
+keyValuePairs : Decoder a -> Decoder (List (String, a))
 keyValuePairs =
     Native.Json.decodeKeyValuePairs
 
@@ -197,7 +197,7 @@ narrow things down so you can be more targeted.
 
     -- [ [3,4], { x:0, y:0 }, [5,12] ]
 
-    points : Decoder [(Float,Float)]
+    points : Decoder (List (Float,Float))
     points =
         list point
 
@@ -208,7 +208,7 @@ narrow things down so you can be more targeted.
         , object2 (,) ("x" := float) ("y" := float)
         ]
 -}
-oneOf : [Decoder a] -> Decoder a
+oneOf : List (Decoder a) -> Decoder a
 oneOf =
     Native.Json.oneOf
 
@@ -230,7 +230,7 @@ string =
 
     -- [ 6.022, 3.1415, 1.618 ]
 
-    numbers : Decoder [Float]
+    numbers : Decoder (List Float)
     numbers =
         list float
 -}
@@ -273,7 +273,7 @@ bool =
     numbers =
         list int
 -}
-list : Decoder a -> Decoder [a]
+list : Decoder a -> Decoder (List a)
 list =
     Native.Json.decodeList
 
@@ -339,7 +339,7 @@ formatted data. For example, this lets you create a parser for "variadic" lists
 where the first few types are different, followed by 0 or more of the same
 type.
 
-    variadic2 : (a -> b -> [c] -> value) -> Decoder a -> Decoder b -> Decoder [c] -> Decoder value
+    variadic2 : (a -> b -> List c -> value) -> Decoder a -> Decoder b -> Decoder (List c) -> Decoder value
     variadic2 f a b cs =
         customDecoder (list value) \jsonList ->
             case jsonList of

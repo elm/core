@@ -70,7 +70,7 @@ null =
     Native.Json.encodeNull
 
 
-object : [(String, Value)] -> Value
+object : List (String, Value) -> Value
 object =
     Native.Json.encodeObject
 
@@ -80,6 +80,6 @@ array =
     Native.Json.encodeArray
 
 
-list : [Value] -> Value
+list : List Value -> Value
 list =
     Native.Json.encodeList

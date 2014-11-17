@@ -75,7 +75,7 @@ Here are details on each field:
 -}
 type alias Match =
     { match : String
-    , submatches : [Maybe String]
+    , submatches : List (Maybe String)
     , index : Int
     , number : Int
     }
@@ -100,7 +100,7 @@ type HowMany = All | AtMost Int
     -- map .submatches places == [ [Just "boat"], [Just "lake"] ]
 ```
 -}
-find : HowMany -> Regex -> String -> [Match]
+find : HowMany -> Regex -> String -> List Match
 find = Native.Regex.find
 
 {-| Replace matches. The function from `Match` to `String` lets
@@ -127,5 +127,5 @@ replace = Native.Regex.replace
   split All (regex ",") "a,b,c,d" == ["a","b","c","d"]
 ```
 -}
-split : HowMany -> Regex -> String -> [String]
+split : HowMany -> Regex -> String -> List String
 split = Native.Regex.split

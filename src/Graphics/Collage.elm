@@ -70,7 +70,7 @@ type alias LineStyle =
     , width : Float
     , cap   : LineCap
     , join  : LineJoin
-    , dashing : [Int]
+    , dashing : List Int
     , dashOffset : Int
     }
 
@@ -107,7 +107,7 @@ type BasicForm
     | FShape ShapeStyle Shape
     | FImage Int Int (Int,Int) String
     | FElement Element
-    | FGroup Transform2D [Form]
+    | FGroup Transform2D (List Form)
 
 type ShapeStyle
     = Line LineStyle
@@ -157,13 +157,13 @@ toForm e = form (FElement e)
 {-| Flatten many forms into a single `Form`. This lets you move and rotate them
 as a single unit, making it possible to build small, modular components.
 -}
-group : [Form] -> Form
+group : List Form -> Form
 group fs = form (FGroup T.identity fs)
 
 {-| Flatten many forms into a single `Form` and then apply a matrix
 transformation.
 -}
-groupTransform : Transform2D -> [Form] -> Form
+groupTransform : Transform2D -> List Form -> Form
 groupTransform matrix fs = form (FGroup matrix fs)
 
 {-| Move a form by the given amount. This is a relative translation so
@@ -204,27 +204,27 @@ alpha a f = { f | alpha <- a }
 {-| A collage is a collection of 2D forms. There are no strict positioning
 relationships between forms, so you are free to do all kinds of 2D graphics.
 -}
-collage : Int -> Int -> [Form] -> Element
+collage : Int -> Int -> List Form -> Element
 collage = Native.Graphics.Collage.collage
 
 
-type alias Path = [(Float,Float)]
+type alias Path = List (Float,Float)
 
 {-| Create a path that follows a sequence of points. -}
-path : [(Float,Float)] -> Path
+path : List (Float,Float) -> Path
 path ps = ps
 
 {-| Create a path along a given line segment. -}
 segment : (Float,Float) -> (Float,Float) -> Path
 segment p1 p2 = [p1,p2]
 
-type alias Shape = [(Float,Float)]
+type alias Shape = List (Float,Float)
 
 {-| Create an arbitrary polygon by specifying its corners in order.
 `polygon` will automatically close all shapes, so the given list
 of points does not need to start and end with the same position.
 -}
-polygon : [(Float,Float)] -> Shape
+polygon : List (Float,Float) -> Shape
 polygon points = points
 
 {-| A rectangle with a given width and height. -}
