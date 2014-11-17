@@ -2,7 +2,7 @@ module Json.Decode where
 {-| A way to turn JSON strings and JS values into Elm values.
 
 # Run a Decoder
-@docs decode, decodeRaw
+@docs decodeString, decodeValue
 
 # Primatives
 @docs string, int, float, bool, null
@@ -20,7 +20,7 @@ module Json.Decode where
 @docs maybe, oneOf, map, fail, succeed, andThen
 
 # "Creative" Values
-@docs raw, customDecoder
+@docs value, customDecoder
 -}
 
 
@@ -36,7 +36,7 @@ import Result (Result)
 
 type Decoder a = Decoder
 
-type alias Json = JsonEncode.Json
+type alias Value = JsonEncode.Value
 
 
 {-| Transform the value returned by a decoder. Most useful when paired with
@@ -64,9 +64,9 @@ map =
     Native.Json.decodeObject1
 
 
-decode : Decoder a -> String -> Result String a
-decode =
-    Native.Json.decode
+decodeString : Decoder a -> String -> Result String a
+decodeString =
+    Native.Json.decodeString
 
 
 -- OBJECTS
@@ -334,30 +334,31 @@ maybe =
     Native.Json.decodeMaybe
 
   
-{-| Useful if you need to work with crazily formatted data. For example, this
-lets you create a parser for "variadic" lists where the first few types are
-different, followed by 0 or more of the same type.
+{-| Bring in an arbitrary JSON value. Useful if you need to work with crazily
+formatted data. For example, this lets you create a parser for "variadic" lists
+where the first few types are different, followed by 0 or more of the same
+type.
 
     variadic2 : (a -> b -> [c] -> value) -> Decoder a -> Decoder b -> Decoder [c] -> Decoder value
     variadic2 f a b cs =
-        customDecoder (list raw) \jsonList ->
+        customDecoder (list value) \jsonList ->
             case jsonList of
               one :: two :: rest ->
                   Result.map3 f
-                    (decodeRaw a one)
-                    (decodeRaw b two)
-                    (decodeRaw cs rest)
+                    (decodeValue a one)
+                    (decodeValue b two)
+                    (decodeValue cs rest)
 
               _ -> Result.Err "expecting at least two elements in the array"
 -}
-raw : Decoder Json
-raw =
+value : Decoder Value
+value =
     Native.Json.decodeJson
 
 
-decodeRaw : Decoder a -> Json -> Result String a
-decodeRaw =
-    Native.Json.decodeRaw
+decodeValue : Decoder a -> Value -> Result String a
+decodeValue =
+    Native.Json.decodeValue
 
 
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b

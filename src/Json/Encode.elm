@@ -20,10 +20,10 @@ import Array (Array)
 import Native.Json
 
 
-type Json = Json
+type Value = Value
 
 
-{-| Convert a `Json` into a prettified string. The first argument specifies
+{-| Convert a `Value` into a prettified string. The first argument specifies
 the amount of indentation in the resulting string.
 
     person =
@@ -41,45 +41,45 @@ the amount of indentation in the resulting string.
     --     "age": 42
     -- }
 -}
-encode : Int -> Json -> String
+encode : Int -> Value -> String
 encode =
     Native.Json.encode
 
 
-string : String -> Json
+string : String -> Value
 string =
     Native.Json.identity
 
-int : Int -> Json
+int : Int -> Value
 int =
     Native.Json.identity
 
 
-float : Float -> Json
+float : Float -> Value
 float =
     Native.Json.identity
 
 
-bool : Bool -> Json
+bool : Bool -> Value
 bool =
     Native.Json.identity
 
 
-null : Json
+null : Value
 null =
     Native.Json.encodeNull
 
 
-object : [(String, Json)] -> Json
+object : [(String, Value)] -> Value
 object =
     Native.Json.encodeObject
 
 
-array : Array Json -> Json
+array : Array Value -> Value
 array =
     Native.Json.encodeArray
 
 
-list : [Json] -> Json
+list : [Value] -> Value
 list =
     Native.Json.encodeList
