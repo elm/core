@@ -62,7 +62,7 @@ Times New Roman (assuming that typeface is available on the user's computer):
       }
 -}
 type alias Style =
-  { typeface : [String]
+  { typeface : List String
   , height   : Maybe Float
   , color    : Color
   , bold     : Bool
@@ -126,19 +126,19 @@ append =
       , fromString " = Just a | Nothing"
       ]
 -}
-concat : [Text] -> Text
+concat : List Text -> Text
 concat texts =
     List.foldr append empty texts
 
 
 {-| Put many chunks of text together with a separator.
 
-    chunks : [Text]
+    chunks : List Text
     chunks = List.map fromString ["lions","tigers","bears"]
 
     join (fromString ", ") chunks == fromString "lions, tigers, bears"
 -}
-join : Text -> [Text] -> Text
+join : Text -> List Text -> Text
 join seperator texts =
     concat (List.intersperse seperator texts)
 
@@ -161,7 +161,7 @@ first typeface in the list that is found on the user's computer. If there are
 no matches, it will use their default typeface. This works the same as the CSS
 font-family property.
 -}
-typeface : [String] -> Text -> Text
+typeface : List String -> Text -> Text
 typeface = Native.Text.typeface
 
 {-| Switch to a monospace typeface. Good for code snippets.

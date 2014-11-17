@@ -91,7 +91,7 @@ favorite British sport:
 If the user selects "Football" from the drop down menue, `sport.signal`
 will update to `Just Football`.
 -}
-dropDown : [(String, Signal.Message)] -> Element
+dropDown : List (String, Signal.Message) -> Element
 dropDown = Native.Graphics.Input.dropDown
 
 {-| Detect mouse hovers over a specific `Element`. In the following example,

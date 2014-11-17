@@ -34,7 +34,7 @@ module. It has a period of roughly 2.30584e18.
 -}
 
 import Basics (..)
-import List ((::), reverse)
+import List
 
 
 {-| Generate a 32-bit integer in a given range. This function will continue to
@@ -119,28 +119,28 @@ pair genLeft genRight seed =
 
 {-| Create a list of random values using a generator function.
 
-      floatList : Generator [Float]
+      floatList : Generator (List Float)
       floatList = list 10 (float 0 1)
 
-      intList : Generator [Int]
+      intList : Generator (List Int)
       intList = list 5 (int 0 100)
 
-      intPairs : Generator [[Int]]
+      intPairs : Generator (List (Int, Int))
       intPairs =
-          list 10 intList
+          list 10 (pair int int)
 -}
-list : Int -> Generator a -> Generator [a]
+list : Int -> Generator a -> Generator (List a)
 list n gen =
     listHelp [] n gen
 
 
-listHelp : [a] -> Int -> Generator a -> Generator [a]
+listHelp : List a -> Int -> Generator a -> Generator (List a)
 listHelp list n generate seed =
     if n < 1
-    then (reverse list, seed)
+    then (List.reverse list, seed)
     else
         let (value, seed') = generate seed
-        in  listHelp (value :: list) (n-1) generate seed'
+        in  listHelp (List.push value list) (n-1) generate seed'
 
 {-| A `Generator` is a function that takes a seed, and then returns a random
 value and a new seed. The new seed is used to generate new random values. You

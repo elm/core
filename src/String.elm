@@ -77,7 +77,7 @@ append = Native.String.append
 
       concat ["never","the","less"] == "nevertheless"
 -}
-concat : [String] -> String
+concat : List String -> String
 concat = Native.String.concat
 
 {-| Get the length of a string.
@@ -131,7 +131,7 @@ foldr = Native.String.foldr
 
 Use `Regex.split` if you need something more flexible.
 -}
-split : String -> String -> [String]
+split : String -> String -> List String
 split = Native.String.split
 
 {-| Put many strings together with a given separator.
@@ -140,7 +140,7 @@ split = Native.String.split
       join " " ["cat","dog","cow"]       == "cat dog cow"
       join "/" ["home","evan","Desktop"] == "home/evan/Desktop"
 -}
-join : String -> [String] -> String
+join : String -> List String -> String
 join = Native.String.join
 
 {-| Repeat a string *n* times.
@@ -229,14 +229,14 @@ trimRight = Native.String.trimRight
 
       words "How are \t you? \n Good?" == ["How","are","you?","Good?"]
 -}
-words : String -> [String]
+words : String -> List String
 words = Native.String.words
 
 {-| Break a string into lines, splitting on newlines.
 
       lines "How are you?\nGood?" == ["How are you?", "Good?"]
 -}
-lines : String -> [String]
+lines : String -> List String
 lines = Native.String.lines
 
 {-| Convert a string to all upper case. Useful for case insensitive comparisons
@@ -300,11 +300,11 @@ endsWith = Native.String.endsWith
       indexes "ss" "Mississippi"  == [2,5]
       indexes "needle" "haystack" == []
 -}
-indexes : String -> String -> [Int]
+indexes : String -> String -> List Int
 indexes = Native.String.indexes
 
 {-| Alias for `indexes` -}
-indices : String -> String -> [Int]
+indices : String -> String -> List Int
 indices = Native.String.indexes
 
 
@@ -332,7 +332,7 @@ toFloat = Native.String.toFloat
 
       toList "abc" == ['a','b','c']
 -}
-toList : String -> [Char]
+toList : String -> List Char
 toList = Native.String.toList
 
 {-| Convert a list of characters into a String. Can be useful if you
@@ -341,5 +341,5 @@ something.
 
       fromList ['a','b','c'] == "abc"
 -}
-fromList : [Char] -> String
+fromList : List Char -> String
 fromList = Native.String.fromList

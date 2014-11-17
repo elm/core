@@ -31,7 +31,6 @@ the [`Time`](Time) library.
 
 import Native.Signal
 import List
-import List ((::))
 import Basics (fst, snd, not)
 
 type Signal a = Signal
@@ -50,7 +49,7 @@ constant = Native.Signal.constant
       main =
           map toElement Mouse.position
 -}
-map  : (a -> result) -> Signal a -> Signal result
+map : (a -> result) -> Signal a -> Signal result
 map = Native.Signal.lift
 
 {-| Apply a function to the current value of two signals. In the following
@@ -129,7 +128,7 @@ update wins, just like with `merge`.
               , map (always Click) Mouse.clicks
               ]
 -}
-mergeMany : [Signal a] -> Signal a
+mergeMany : List (Signal a) -> Signal a
 mergeMany signals =
     List.foldr1 merge signals
 

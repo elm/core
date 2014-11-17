@@ -24,17 +24,17 @@ type Response a
     | Waiting
     | Failure Int String
 
-type alias Request a = {
-  verb : String,
-  url  : String,
-  body : a,
-  headers : [(String,String)]
- }
+type alias Request a =
+    { verb : String
+    , url  : String
+    , body : a
+    , headers : List (String,String)
+    }
 
 {-| Create a customized request. Arguments are request type (get, post, put,
 delete, etc.), target url, data, and a list of additional headers.
 -}
-request : String -> String -> String -> [(String,String)] -> Request String
+request : String -> String -> String -> List (String,String) -> Request String
 request = Request
 
 {-| Create a GET request to the given url. -}

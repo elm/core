@@ -48,14 +48,14 @@ repeat : Int -> a -> Array a
 repeat n e = initialize n (always e)
 
 {-| Create an array from a list. -}
-fromList : [a] -> Array a
+fromList : List a -> Array a
 fromList = Native.Array.fromList
 
 {-| Create a list of elements from an array.
 
       toList (fromList [3,5,8]) == [3,5,8]
 -}
-toList : Array a -> [a]
+toList : Array a -> List a
 toList = Native.Array.toList
 
 -- TODO: make this a native function.
@@ -64,7 +64,7 @@ paired with its index.
 
       toIndexedList (fromList ["cat","dog"]) == [(0,"cat"), (1,"dog")]
 -}
-toIndexedList : Array a -> [(Int, a)]
+toIndexedList : Array a -> List (Int, a)
 toIndexedList array =
     List.map2 (,) [ 0 .. Native.Array.length array - 1 ] (Native.Array.toList array)
 
