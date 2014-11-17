@@ -331,11 +331,11 @@ Elm.Native.Json.make = function(localRuntime) {
 
     // CUSTOM DECODERS
 
-    function decodeJson(value) {
+    function decodeValue(value) {
         return value;
     }
 
-    function decodeRaw(decoder, value) {
+    function runDecoderValue(decoder, value) {
         try {
             return Result.Ok(decoder(value));
         } catch(e) {
@@ -401,7 +401,7 @@ Elm.Native.Json.make = function(localRuntime) {
 
     // ENCODE / DECODE
 
-    function decode(decoder, string) {
+    function runDecoderString(decoder, string) {
         try {
             return Result.Ok(decoder(JSON.parse(string)));
         } catch(e) {
@@ -429,7 +429,8 @@ Elm.Native.Json.make = function(localRuntime) {
 
     return localRuntime.Native.Json.values = {
         encode: F2(encode),
-        decode: F2(decode),
+        runDecoderString: F2(runDecoderString),
+        runDecoderValue: F2(runDecoderValue),
 
         get: F2(get),
         oneOf: oneOf,
@@ -467,8 +468,7 @@ Elm.Native.Json.make = function(localRuntime) {
         decodeTuple8: F9(decodeTuple8),
 
         andThen: F2(andThen),
-        decodeJson: decodeJson,
-        decodeRaw: F2(decodeRaw),
+        decodeValue: decodeValue,
         customDecoder: F2(customDecoder),
         fail: fail,
         succeed: succeed,

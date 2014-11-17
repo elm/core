@@ -66,7 +66,7 @@ map =
 
 decodeString : Decoder a -> String -> Result String a
 decodeString =
-    Native.Json.decodeString
+    Native.Json.runDecoderString
 
 
 -- OBJECTS
@@ -353,12 +353,12 @@ type.
 -}
 value : Decoder Value
 value =
-    Native.Json.decodeJson
+    Native.Json.decodeValue
 
 
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
-    Native.Json.decodeValue
+    Native.Json.runDecoderValue
 
 
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
