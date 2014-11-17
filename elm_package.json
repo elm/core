@@ -40,5 +40,6 @@
         "WebSocket",
         "Window"
     ],
+    "native-modules": true,
     "dependencies": {}
 }
