@@ -1,7 +1,6 @@
 {
     "version": "1.0.0",
     "summary": "Elm's standard libraries",
-    "description": "The full set of standard libraries for Elm.",
     "repository": "http://github.com/elm-lang/core.git",
     "license": "BSD3",
     "source-directories": [
