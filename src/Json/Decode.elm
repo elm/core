@@ -101,8 +101,8 @@ at fields decoder =
         maybe ("profession" := string)
 -}
 (:=) : String -> Decoder a -> Decoder a
-(:=) key value =
-    Native.Json.decodeField key value
+(:=) =
+    Native.Json.decodeField
 
 
 object1 : (a -> value) -> Decoder a -> Decoder value
