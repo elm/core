@@ -38,6 +38,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 import Basics (..)
 import Maybe (..)
 import List
+import List (..)
 import Native.Debug
 import String
 
@@ -485,19 +486,19 @@ diff t1 t2 =
 {-| Get all of the keys in a dictionary. -}
 keys : Dict comparable v -> List comparable
 keys dict =
-    foldr (\key value keyList -> List.push key keyList) [] dict
+    foldr (\key value keyList -> key :: keyList) [] dict
 
 
 {-| Get all of the values in a dictionary. -}
 values : Dict comparable v -> List v
 values dict =
-    foldr (\key value valueList -> List.push value valueList) [] dict
+    foldr (\key value valueList -> value :: valueList) [] dict
 
 
 {-| Convert a dictionary into an association list of key-value pairs. -}
 toList : Dict comparable v -> List (comparable,v)
 toList dict =
-    foldr (\key value list -> List.push (key,value) list) [] dict
+    foldr (\key value list -> (key,value) :: list) [] dict
 
 
 {-| Convert an association list into a dictionary. -}

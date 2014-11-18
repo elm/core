@@ -35,6 +35,7 @@ module. It has a period of roughly 2.30584e18.
 
 import Basics (..)
 import List
+import List ((::))
 
 
 {-| Generate a 32-bit integer in a given range. This function will continue to
@@ -140,7 +141,7 @@ listHelp list n generate seed =
     then (List.reverse list, seed)
     else
         let (value, seed') = generate seed
-        in  listHelp (List.push value list) (n-1) generate seed'
+        in  listHelp (value :: list) (n-1) generate seed'
 
 {-| A `Generator` is a function that takes a seed, and then returns a random
 value and a new seed. The new seed is used to generate new random values. You

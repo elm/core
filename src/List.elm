@@ -160,7 +160,7 @@ filterMap f xs = foldr (maybeCons f) [] xs
 maybeCons : (a -> Maybe b) -> a -> List b -> List b
 maybeCons f mx xs =
     case f mx of
-      Just x -> push x xs
+      Just x -> x :: xs
       Nothing -> xs
 
 {-| Determine the length of a list.
@@ -265,8 +265,8 @@ partition : (a -> Bool) -> List a -> (List a, List a)
 partition pred list =
     let step x (trues, falses) =
             if pred x
-                then (push x trues, falses)
-                else (trues, push x falses)
+                then (x :: trues, falses)
+                else (trues, x :: falses)
     in
         foldr step ([],[]) list
 
@@ -302,7 +302,7 @@ map5 = Native.List.map5
 unzip : List (a,b) -> (List a, List b)
 unzip pairs =
     let step (x,y) (xs,ys) =
-          (push x xs, push y ys)
+          (x :: xs, y :: ys)
     in
         foldr step ([], []) pairs
 
@@ -313,13 +313,13 @@ unzip pairs =
 -}
 intersperse : a -> List a -> List a
 intersperse sep xs =
-    case pop xs of
-      Nothing -> []
-      Just (hd, tl) ->
-          let step x rest = push sep (push x rest)
+    case xs of
+      [] -> []
+      hd :: tl ->
+          let step x rest = sep :: x :: rest
               spersed = foldr step [] tl
           in
-              push hd spersed
+              hd :: spersed
 
 {-| Take the first *n* members of a list.
 
