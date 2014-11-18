@@ -41,22 +41,17 @@ import Basics (..)
 import Maybe ( Maybe(Just,Nothing) )
 import Native.List
 
+
 {-| Add an element to the front of a list. Pronounced *cons*.
 
-      push 1 [2,3] == [1,2,3]
-      push 1 [] == [1]
+    1 :: [2,3] == [1,2,3]
+    1 :: [] == [1]
 -}
-push : a -> List a -> List a
-push = Native.List.cons
+(::) : a -> List a -> List a
+(::) = Native.List.cons
 
 
-{-| Try to pop the first element off the list.
-
-      pop [1,2,3] == Just (1, [2,3])
-      pop [] == Nothing
--}
-pop : List a -> Maybe (a, List a)
-pop = Native.List.pop
+infixr 5 ::
 
 
 {-| Extract the first element of a list. List must be non-empty.
