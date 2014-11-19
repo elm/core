@@ -25,7 +25,7 @@ Elm.Native.Ports.make = function(localRuntime) {
             function unsubscribe(handler) {
                 subscribers.pop(subscribers.indexOf(handler));
             }
-            A2( Signal.lift, function(value) {
+            A2( Signal.map, function(value) {
                 var val = converter(value);
                 var len = subscribers.length;
                 for (var i = 0; i < len; ++i) {
