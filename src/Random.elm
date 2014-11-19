@@ -48,8 +48,8 @@ randomness is not guaranteed.
       int minInt maxInt  -- an integer in the widest range feasible
 -}
 int : Int -> Int -> Generator Int
-int a b seed =
-    let (lo,hi) = if a < b then (a,b) else (b,a)
+int l h seed =
+    let (lo,hi) = if l < h then (l,h) else (h,l)
 
         k = hi - lo + 1
         -- 2^31 - 87
@@ -85,8 +85,8 @@ minInt = -2147483648
 {-| Generate a float in a given range.
 -}
 float : Float -> Float -> Generator Float
-float a b seed =
-    let (lo, hi) = if a < b then (a,b) else (b,a)
+float l h seed =
+    let (lo, hi) = if l < h then (l,h) else (h,l)
 
         (number, seed') =
             int minInt maxInt seed
