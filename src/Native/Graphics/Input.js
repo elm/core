@@ -73,7 +73,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function dropDown(signal, values) {
-        return A3(newElement, 100, 24, {
+        return A3(Element.newElement, 100, 24, {
             ctor: 'Custom',
             type: 'DropDown',
             render: renderDropDown,
@@ -107,7 +107,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function button(signal, value, text) {
-        return A3(newElement, 100, 40, {
+        return A3(Element.newElement, 100, 40, {
             ctor: 'Custom',
             type: 'Button',
             render: renderButton,
@@ -191,7 +191,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function customButton(signal, value, up, hover, down) {
-        return A3(newElement,
+        return A3(Element.newElement,
                   max3(up.props.width, hover.props.width, down.props.width),
                   max3(up.props.height, hover.props.height, down.props.height),
                   { ctor: 'Custom',
@@ -225,7 +225,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function checkbox(signal, handler, checked) {
-        return A3(newElement, 13, 13, {
+        return A3(Element.newElement, 13, 13, {
             ctor: 'Custom',
             type: 'CheckBox',
             render: renderCheckbox,
@@ -358,7 +358,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
             var outline = style.outline.width;
             var adjustWidth = padding.left + padding.right + outline.left + outline.right;
             var adjustHeight = padding.top + padding.bottom + outline.top + outline.bottom;
-            return A3(newElement, 200, 30, {
+            return A3(Element.newElement, 200, 30, {
                 ctor: 'Custom',
                 type: type + 'Field',
                 adjustWidth: adjustWidth,
