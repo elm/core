@@ -91,10 +91,10 @@ float l h seed =
         (number, seed') =
             int minInt maxInt seed
 
-        zeroToOne =
+        negativeOneToOne =
             toFloat number / toFloat (maxInt - minInt)
 
-        scaled = lo + ((hi-lo) * zeroToOne)
+        scaled = (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
     in
         (scaled, seed')
 
