@@ -53,23 +53,23 @@ Elm.Native.Signal.make = function(elm) {
     for (var i = n; i--; ) { args[i].kids.push(this); }
   }
 
-  function lift(func, a) {
+  function map(func, a) {
     function update() { return func(a.value); }
     return new LiftN(update, [a]);
   }
-  function lift2(func, a, b) {
+  function map2(func, a, b) {
     function update() { return A2( func, a.value, b.value ); }
     return new LiftN(update, [a,b]);
   }
-  function lift3(func, a, b, c) {
+  function map3(func, a, b, c) {
     function update() { return A3( func, a.value, b.value, c.value ); }
     return new LiftN(update, [a,b,c]);
   }
-  function lift4(func, a, b, c, d) {
+  function map4(func, a, b, c, d) {
     function update() { return A4( func, a.value, b.value, c.value, d.value ); }
     return new LiftN(update, [a,b,c,d]);
   }
-  function lift5(func, a, b, c, d, e) {
+  function map5(func, a, b, c, d, e) {
     function update() { return A5( func, a.value, b.value, c.value, d.value, e.value ); }
     return new LiftN(update, [a,b,c,d,e]);
   }
@@ -153,7 +153,7 @@ Elm.Native.Signal.make = function(elm) {
         setTimeout(function() { elm.notify(delayed.id, v); }, t);
       }
       function first(a,b) { return a; }
-      return new SampleOn(delayed, lift2(F2(first), delayed, lift(update,s)));
+      return new SampleOn(delayed, map2(F2(first), delayed, map(update,s)));
   }
 
   function Merge(s1,s2) {
@@ -208,11 +208,11 @@ Elm.Native.Signal.make = function(elm) {
 
   return elm.Native.Signal.values = {
     constant : function(v) { return new Input(v); },
-    lift  : F2(lift ),
-    lift2 : F3(lift2),
-    lift3 : F4(lift3),
-    lift4 : F5(lift4),
-    lift5 : F6(lift5),
+    map  : F2(map ),
+    map2 : F3(map2),
+    map3 : F4(map3),
+    map4 : F5(map4),
+    map5 : F6(map5),
     foldp : F3(foldp),
     delay : F2(delay),
     merge : F2(merge),

@@ -50,7 +50,7 @@ constant = Native.Signal.constant
           map toElement Mouse.position
 -}
 map : (a -> result) -> Signal a -> Signal result
-map = Native.Signal.lift
+map = Native.Signal.map
 
 {-| Apply a function to the current value of two signals. In the following
 example, we figure out the `aspectRatio` of the window by combining the
@@ -65,16 +65,16 @@ current width and height.
           map2 ratio Window.width Window.height
 -}
 map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result
-map2 = Native.Signal.lift2
+map2 = Native.Signal.map2
 
 map3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
-map3 = Native.Signal.lift3
+map3 = Native.Signal.map3
 
 map4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
-map4 = Native.Signal.lift4
+map4 = Native.Signal.map4
 
 map5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
-map5 = Native.Signal.lift5
+map5 = Native.Signal.map5
 
 
 {-| Create a past-dependent signal. Each update from the incoming signals will
@@ -213,7 +213,7 @@ sampleOn = Native.Signal.sampleOn
 of a signal.
 -}
 (<~) : (a -> b) -> Signal a -> Signal b
-f <~ s = Native.Signal.lift f s
+f <~ s = Native.Signal.map f s
 
 
 {-| Intended to be paired with the `(<~)` operator, this makes it possible for
@@ -232,7 +232,7 @@ You can use this pattern for as many signals as you want by using `(~)` a bunch
 of times, so you can go higher than `map5` if you need to.
 -}
 (~) : Signal (a -> b) -> Signal a -> Signal b
-sf ~ s = Native.Signal.lift2 (\f x -> f x) sf s
+sf ~ s = Native.Signal.map2 (\f x -> f x) sf s
 
 infixl 4 <~
 infixl 4 ~
@@ -292,7 +292,7 @@ example shows how you would set up a system that uses an `Channel`.
 
       main : Signal Element
       main =
-        lift
+        map
           (view updates)
           (foldp step initialState (subscribe updates))
 
