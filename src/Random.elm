@@ -53,14 +53,14 @@ int a b seed =
 
         k = hi - lo + 1
         -- 2^31 - 87
-        b = 2147483561
-        n = iLogBase b k
+        base = 2147483561
+        n = iLogBase base k
 
         f n acc state =
             case n of
               0 -> (acc, state)
               _ -> let (x, state') = seed.next state
-                   in  f (n - 1) (x + acc * b) state'
+                   in  f (n - 1) (x + acc * base) state'
 
         (v, state') = f n 1 seed.state
     in
@@ -91,10 +91,10 @@ float a b seed =
         (number, seed') =
             int minInt maxInt seed
 
-        zeroToOne =
+        negativeOneToOne =
             toFloat number / toFloat (maxInt - minInt)
 
-        scaled = lo + ((hi-lo) * zeroToOne)
+        scaled = (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
     in
         (scaled, seed')
 
