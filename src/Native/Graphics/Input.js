@@ -18,7 +18,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     var Utils = Elm.Native.Utils.make(localRuntime);
 
     var Element = Elm.Graphics.Element.make(localRuntime);
-    var NativeElement = Elm.Native.Graphics.Element(localRuntime);
+    var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 
 
     function renderDropDown(model) {
