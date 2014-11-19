@@ -1,12 +1,14 @@
 
 Elm.Native.Signal = {};
-Elm.Native.Signal.make = function(elm) {
+Elm.Native.Signal.make = function(localRuntime) {
 
-  elm.Native = elm.Native || {};
-  elm.Native.Signal = elm.Native.Signal || {};
-  if (elm.Native.Signal.values) return elm.Native.Signal.values;
+  localRuntime.Native = localRuntime.Native || {};
+  localRuntime.Native.Signal = localRuntime.Native.Signal || {};
+  if (localRuntime.Native.Signal.values) {
+      return localRuntime.Native.Signal.values;
+  }
 
-  var Utils = Elm.Native.Utils.make(elm);
+  var Utils = Elm.Native.Utils.make(localRuntime);
 
   function broadcastToKids(node, timestep, changed) {
     var kids = node.kids;
@@ -28,7 +30,7 @@ Elm.Native.Signal.make = function(elm) {
       broadcastToKids(this, timestep, changed);
       return changed;
     };
-    elm.inputs.push(this);
+    localRuntime.inputs.push(this);
   }
 
   function LiftN(update, args) {
@@ -117,7 +119,7 @@ Elm.Native.Signal.make = function(elm) {
   }
 
   function timestamp(a) {
-    function update() { return Utils.Tuple2(elm.timer.now(), a.value); }
+    function update() { return Utils.Tuple2(localRuntime.timer.now(), a.value); }
     return new LiftN(update, [a]);
   }
 
@@ -149,8 +151,12 @@ Elm.Native.Signal.make = function(elm) {
       var delayed = new Input(s.value);
       var firstEvent = true;
       function update(v) {
-        if (firstEvent) { firstEvent = false; return; }
-        setTimeout(function() { elm.notify(delayed.id, v); }, t);
+        if (firstEvent) {
+            firstEvent = false; return;
+        }
+        setTimeout(function() {
+            localRuntime.notify(delayed.id, v);
+        }, t);
       }
       function first(a,b) { return a; }
       return new SampleOn(delayed, map2(F2(first), delayed, map(update,s)));
@@ -206,7 +212,7 @@ Elm.Native.Signal.make = function(elm) {
     }
 
 
-  return elm.Native.Signal.values = {
+  return localRuntime.Native.Signal.values = {
     constant : function(v) { return new Input(v); },
     map  : F2(map ),
     map2 : F3(map2),
