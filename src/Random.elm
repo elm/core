@@ -48,19 +48,19 @@ randomness is not guaranteed.
       int minInt maxInt  -- an integer in the widest range feasible
 -}
 int : Int -> Int -> Generator Int
-int l h seed =
-    let (lo,hi) = if l < h then (l,h) else (h,l)
+int a b seed =
+    let (lo,hi) = if a < b then (a,b) else (b,a)
 
         k = hi - lo + 1
         -- 2^31 - 87
-        b = 2147483561
-        n = iLogBase b k
+        base = 2147483561
+        n = iLogBase base k
 
         f n acc state =
             case n of
               0 -> (acc, state)
               _ -> let (x, state') = seed.next state
-                   in  f (n - 1) (x + acc * b) state'
+                   in  f (n - 1) (x + acc * base) state'
 
         (v, state') = f n 1 seed.state
     in
@@ -85,8 +85,8 @@ minInt = -2147483648
 {-| Generate a float in a given range.
 -}
 float : Float -> Float -> Generator Float
-float l h seed =
-    let (lo, hi) = if l < h then (l,h) else (h,l)
+float a b seed =
+    let (lo, hi) = if a < b then (a,b) else (b,a)
 
         (number, seed') =
             int minInt maxInt seed
