@@ -27,7 +27,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         drop.style.pointerEvents = 'auto';
         drop.style.display = 'block';
 
-        drop.elm_signal = model.signal;
         drop.elm_values = List.toArray(model.values);
         var values = drop.elm_values;
 
@@ -39,14 +38,13 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
             drop.appendChild(option);
         }
         drop.addEventListener('change', function() {
-            elm.notify(drop.elm_signal.id, drop.elm_values[drop.selectedIndex]._1);
+            drop.elm_values[drop.selectedIndex]._1();
         });
 
         return drop;
     }
 
     function updateDropDown(node, oldModel, newModel) {
-        node.elm_signal = newModel.signal;
         node.elm_values = List.toArray(newModel.values);
 
         var values = node.elm_values;
@@ -72,14 +70,13 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         }
     }
 
-    function dropDown(signal, values) {
+    function dropDown(values) {
         return A3(Element.newElement, 100, 24, {
             ctor: 'Custom',
             type: 'DropDown',
             render: renderDropDown,
             update: updateDropDown,
             model: {
-                signal: signal,
                 values: values
             }
         });
@@ -89,10 +86,9 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         var node = NativeElement.createNode('button');
         node.style.display = 'block';
         node.style.pointerEvents = 'auto';
-        node.elm_signal = model.signal;
-        node.elm_value = model.value;
+        node.elm_message = model.message;
         function click() {
-            elm.notify(node.elm_signal.id, node.elm_value);
+            node.elm_message();
         }
         node.addEventListener('click', click);
         node.innerHTML = model.text;
@@ -100,27 +96,30 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function updateButton(node, oldModel, newModel) {
-        node.elm_signal = newModel.signal;
-        node.elm_value = newModel.value;
+        node.elm_message = newModel.message;
         var txt = newModel.text;
-        if (oldModel.text !== txt) node.innerHTML = txt;
+        if (oldModel.text !== txt) {
+            node.innerHTML = txt;
+        }
     }
 
-    function button(signal, value, text) {
+    function button(message, text) {
         return A3(Element.newElement, 100, 40, {
             ctor: 'Custom',
             type: 'Button',
             render: renderButton,
             update: updateButton,
-            model: { signal:signal, value:value, text:text }
+            model: {
+                message: message,
+                text:text
+            }
         });
     }
 
     function renderCustomButton(model) {
         var btn = NativeElement.createNode('div');
         btn.style.pointerEvents = 'auto';
-        btn.elm_signal = model.signal;
-        btn.elm_value = model.value;
+        btn.elm_message = model.message;
 
         btn.elm_up    = NativeElement.render(model.up);
         btn.elm_hover = NativeElement.render(model.hover);
@@ -152,7 +151,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         }
         function up() {
             swap(btn.elm_hover, btn.elm_down, btn.elm_up);
-            elm.notify(btn.elm_signal.id, btn.elm_value);
+            btn.elm_message();
         }
         function down() {
             swap(btn.elm_down, btn.elm_hover, btn.elm_up);
@@ -167,8 +166,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function updateCustomButton(node, oldModel, newModel) {
-        node.elm_signal = newModel.signal;
-        node.elm_value = newModel.value;
+        node.elm_message = newModel.message;
 
         var kids = node.childNodes;
         var styleUp    = kids[0].style.display;
@@ -190,7 +188,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         return ab > c ? ab : c;
     }
 
-    function customButton(signal, value, up, hover, down) {
+    function customButton(message, up, hover, down) {
         return A3(Element.newElement,
                   max3(up.props.width, hover.props.width, down.props.width),
                   max3(up.props.height, hover.props.height, down.props.height),
@@ -198,7 +196,12 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
                     type: 'CustomButton',
                     render: renderCustomButton,
                     update: updateCustomButton,
-                    model: { signal:signal, value:value, up:up, hover:hover, down:down }
+                    model: {
+                        message: message,
+                        up: up,
+                        hover: hover,
+                        down: down
+                    }
                   });
     }
 
@@ -208,29 +211,27 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         node.checked = model.checked;
         node.style.display = 'block';
         node.style.pointerEvents = 'auto';
-        node.elm_signal = model.signal;
         node.elm_handler = model.handler;
         function change() {
-            elm.notify(node.elm_signal.id, node.elm_handler(node.checked));
+            node.elm_handler(node.checked)();
         }
         node.addEventListener('change', change);
         return node;
     }
 
     function updateCheckbox(node, oldModel, newModel) {
-        node.elm_signal = newModel.signal;
         node.elm_handler = newModel.handler;
         node.checked = newModel.checked;
         return true;
     }
 
-    function checkbox(signal, handler, checked) {
+    function checkbox(handler, checked) {
         return A3(Element.newElement, 13, 13, {
             ctor: 'Custom',
             type: 'CheckBox',
             render: renderCheckbox,
             update: updateCheckbox,
-            model: { signal:signal, handler:handler, checked:checked }
+            model: { handler:handler, checked:checked }
         });
     }
 
@@ -294,7 +295,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         field.placeholder = model.placeHolder;
         field.value = model.content.string;
 
-        field.elm_signal = model.signal;
         field.elm_handler = model.handler;
         field.elm_old_value = field.value;
 
@@ -310,7 +310,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
             var end = field.selectionEnd;
             field.value = field.elm_old_value;
 
-            elm.notify(field.elm_signal.id, field.elm_handler({
+            field.elm_handler({
                 _:{},
                 string: next,
                 selection: {
@@ -319,7 +319,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
                     end: end,
                     direction: { ctor: direction }
                 }
-            }));
+            })();
         }
 
         field.addEventListener('input', inputUpdate);
@@ -337,7 +337,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         if (oldModel.style !== newModel.style) {
             updateFieldStyle(field.style, newModel.style);
         }
-        field.elm_signal = newModel.signal;
         field.elm_handler = newModel.handler;
 
         field.type = newModel.type;
@@ -353,7 +352,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     }
 
     function mkField(type) {
-        function field(style, signal, handler, placeHolder, content) {
+        function field(style, handler, placeHolder, content) {
             var padding = style.padding;
             var outline = style.outline.width;
             var adjustWidth = padding.left + padding.right + outline.left + outline.right;
@@ -366,7 +365,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
                 render: renderField,
                 update: updateField,
                 model: {
-                    signal:signal,
                     handler:handler,
                     placeHolder:placeHolder,
                     content:content,
@@ -375,35 +373,35 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
                 }
             });
         }
-        return F5(field);
+        return F4(field);
     }
 
-    function hoverable(signal, handler, elem) {
+    function hoverable(handler, elem) {
         function onHover(bool) {
-            elm.notify(signal.id, handler(bool));
+            handler(bool)();
         }
         var props = Utils.replace([['hover',onHover]], elem.props);
         return { props:props, element:elem.element };
     }
 
-    function clickable(signal, value, elem) {
-        function onClick(bool) {
-            elm.notify(signal.id, value);
+    function clickable(message, elem) {
+        function onClick() {
+            message();
         }
         var props = Utils.replace([['click',onClick]], elem.props);
         return { props:props, element:elem.element };
     }
 
     return Elm.Native.Graphics.Input.values = {
-        button:F3(button),
-        customButton:F5(customButton),
-        checkbox:F3(checkbox),
-        dropDown:F2(dropDown),
-        field:mkField('text'),
-        email:mkField('email'),
-        password:mkField('password'),
-        hoverable:F3(hoverable),
-        clickable:F3(clickable)
+        button: F2(button),
+        customButton: F4(customButton),
+        checkbox: F2(checkbox),
+        dropDown: dropDown,
+        field: mkField('text'),
+        email: mkField('email'),
+        password: mkField('password'),
+        hoverable: F2(hoverable),
+        clickable: F2(clickable)
     };
 
 };
