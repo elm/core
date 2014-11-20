@@ -68,6 +68,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
             option.innerHTML = name;
             node.appendChild(option);
         }
+        return node;
     }
 
     function dropDown(values) {
@@ -101,6 +102,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         if (oldModel.text !== txt) {
             node.innerHTML = txt;
         }
+        return node;
     }
 
     function button(message, text) {
@@ -173,14 +175,16 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
         var styleHover = kids[1].style.display;
         var styleDown  = kids[2].style.display;
 
-        NativeElement.update(kids[0], oldModel.up, newModel.up);
-        NativeElement.update(kids[1], oldModel.hover, newModel.hover);
-        NativeElement.update(kids[2], oldModel.down, newModel.down);
+        NativeElement.updateAndReplace(kids[0], oldModel.up, newModel.up);
+        NativeElement.updateAndReplace(kids[1], oldModel.hover, newModel.hover);
+        NativeElement.updateAndReplace(kids[2], oldModel.down, newModel.down);
 
         var kids = node.childNodes;
         kids[0].style.display = styleUp;
         kids[1].style.display = styleHover;
         kids[2].style.display = styleDown;
+
+        return node;
     }
 
     function max3(a,b,c) {
@@ -222,7 +226,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     function updateCheckbox(node, oldModel, newModel) {
         node.elm_handler = newModel.handler;
         node.checked = newModel.checked;
-        return true;
+        return node;
     }
 
     function checkbox(handler, checked) {
@@ -349,6 +353,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
             var direction = selection.direction.ctor === 'Forward' ? 'forward' : 'backward';
             setRange(field, selection.start, selection.end, direction);
         }
+        return field;
     }
 
     function mkField(type) {

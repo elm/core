@@ -287,55 +287,73 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         }
     }
 
+    function updateAndReplace(node, curr, next) {
+        var newNode = update(node, curr, next);
+        if (newNode !== node) {
+            node.parentNode.replaceChild(newNode, node);
+        }
+        return newNode;
+    }
+
     function update(node, curr, next) {
+        var rootNode = node;
         if (node.tagName === 'A') {
             node = node.firstChild;
         }
         if (curr.props.id === next.props.id) {
-            return updateProps(node, curr, next);
+            updateProps(node, curr, next);
+            return rootNode;
         }
         if (curr.element.ctor !== next.element.ctor) {
-            node.parentNode.replaceChild(render(next),node);
-            return true;
+            return render(next);
         }
-        var nextE = next.element, currE = curr.element;
+        var nextE = next.element;
+        var currE = curr.element;
         switch(nextE.ctor) {
-        case "Spacer": break;
+        case "Spacer":
+            updateProps(node, curr, next);
+            return rootNode;
+
         case "RawHtml":
             // only markdown blocks have guids, so this must be a text block
             if (nextE.guid === null) {
                 if(currE.html.valueOf() !== nextE.html.valueOf()) {
                     node.innerHTML = nextE.html;
                 }
-                break;
+                updateProps(node, curr, next);
+                return rootNode;
             }
             if (nextE.guid !== currE.guid) {
-                node.parentNode.replaceChild(render(next),node);
-                return true;
+                return render(next);
             }
-            break;
+            updateProps(node, curr, next);
+            return rootNode;
+
         case "Image":
             if (nextE._0.ctor === 'Plain') {
-                if (nextE._3 !== currE._3) node.src = nextE._3;
+                if (nextE._3 !== currE._3) {
+                    node.src = nextE._3;
+                }
             } else if (!Utils.eq(nextE,currE) ||
                        next.props.width !== curr.props.width ||
                        next.props.height !== curr.props.height) {
-                node.parentNode.replaceChild(render(next),node);
-                return true;
+                return render(next);
             }
-            break;
+            updateProps(node, curr, next);
+            return rootNode;
+
         case "Flow":
             var arr = List.toArray(nextE._1);
-            for (var i = arr.length; i--; ) { arr[i] = arr[i].element.ctor; }
+            for (var i = arr.length; i--; ) {
+                arr[i] = arr[i].element.ctor;
+            }
             if (nextE._0.ctor !== currE._0.ctor) {
-                node.parentNode.replaceChild(render(next),node);
-                return true;
+                return render(next);
             }
             var nexts = List.toArray(nextE._1);
             var kids = node.childNodes;
             if (nexts.length !== kids.length) {
-                node.parentNode.replaceChild(render(next),node);
-                return true;
+                return render(next);
             }
             var currs = List.toArray(currE._1);
             var dir = nextE._0.ctor;
@@ -343,23 +361,29 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             var toReverse = needsReversal(dir);
             var len = kids.length;
             for (var i = len; i-- ;) {
-                update(kids[toReverse ? len - i - 1 : i],currs[i],nexts[i]);
-                goDir(kids[i]);
+                var subNode = kids[toReverse ? len - i - 1 : i];
+                updateAndReplace(subNode, currs[i], nexts[i]);
+                goDir(newSubNode);
             }
-            break;
+            updateProps(node, curr, next);
+            return rootNode;
+
         case "Container":
-            update(node.firstChild, currE._1, nextE._1);
-            setPos(nextE._0, nextE._1, node.firstChild);
-            break;
+            var subNode = node.firstChild;
+            var newSubNode = updateAndReplace(subNode, currE._1, nextE._1);
+            setPos(nextE._0, nextE._1, newSubNode);
+            updateProps(node);
+            return rootNode;
+
         case "Custom":
             if (currE.type === nextE.type) {
-                var done = nextE.update(node, currE.model, nextE.model);
-                if (done) return;
+                var updatedNode = nextE.update(node, currE.model, nextE.model);
+                updateProps(updatedNode);
+                return updatedNode;
             } else {
-                return node.parentNode.replaceChild(render(next), node);
+                return render(next);
             }
         }
-        updateProps(node, curr, next);
     }
 
     function updateProps(node, curr, next) {
@@ -480,6 +504,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
     return Elm.Native.Graphics.Element.values = {
         render: render,
         update: update,
+        updateAndReplace: updateAndReplace,
 
         createNode: createNode,
         addTransform: addTransform,

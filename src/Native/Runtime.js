@@ -294,7 +294,7 @@ if (!Elm.fullscreen) {
           var previousDrawId = 0;
           function domUpdate(newScene) {
               previousDrawId = draw(previousDrawId, function(_) {
-                  Element.update(elm.node.firstChild, savedScene, newScene);
+                  Element.updateAndReplace(elm.node.firstChild, savedScene, newScene);
                   if (elm.Native.Window) {
                       elm.Native.Window.values.resizeIfNeeded();
                   }

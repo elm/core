@@ -346,7 +346,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
             var node = (!kid || kid.getContext)
                 ? NativeElement.render(elem)
-                : (NativeElement.update(kid, kid.oldElement, elem), kids[i]);
+                : NativeElement.update(kid, kid.oldElement, elem);
 
             node.style.position = 'absolute';
             node.style.opacity = alpha * form.alpha * elem.props.opacity;
@@ -395,7 +395,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             }
         }
         nodes.clearRest();
-        return false;
+        return node;
     }
 
 
