@@ -3,6 +3,8 @@ module Graphics.Collage where
 {-| The collage API is for freeform graphics. You can move, rotate, scale, etc.
 all sorts of forms including lines, shapes, images, and elements.
 
+Unlike the HTML canvas, the origin (0,0) is at the center of the collage, and the y-axis points up. 
+
 # Unstructured Graphics
 @docs collage
  
