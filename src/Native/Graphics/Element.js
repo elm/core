@@ -363,7 +363,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             for (var i = len; i-- ;) {
                 var subNode = kids[toReverse ? len - i - 1 : i];
                 updateAndReplace(subNode, currs[i], nexts[i]);
-                goDir(newSubNode);
+                goDir(subNode);
             }
             updateProps(node, curr, next);
             return rootNode;
