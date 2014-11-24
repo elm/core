@@ -11,7 +11,7 @@ reads, updates, and appends.
 @docs length, push, append
 
 # Get and Set
-@docs get, getOrElse, getOrFail, set
+@docs get, set
 
 # Taking Arrays Apart
 @docs slice, toList, toIndexedList
@@ -120,23 +120,15 @@ empty = Native.Array.empty
 push : a -> Array a -> Array a
 push = Native.Array.push
 
-{-| Get the element at a particular index.
-
-      getOrFail 0 (A.fromList [0,1,2]) == 0
-
-Warning: this function will result in a runtime error if the index is not found,
-so it is best to use `get` or `getOrElse` unless you are sure the index will be
-found.
--}
-getOrFail : Int -> Array a -> a
-getOrFail = Native.Array.get
-
 {-| Return Just the element at the index or Nothing if the index is out of range.
 
       get  0 (fromList [0,1,2]) == Just 0
       get  2 (fromList [0,1,2]) == Just 2
       get  5 (fromList [0,1,2]) == Nothing
       get -1 (fromList [0,1,2]) == Nothing
+
+The `(?)` operator from the `Maybe` library makes it easy to give a default
+value.
 -}
 get : Int -> Array a -> Maybe a
 get i array =
@@ -144,17 +136,6 @@ get i array =
       then Just (Native.Array.get i array)
       else Nothing
 
-{-| Get the element at the index. Or if the index is out of range, a default
-value is returned.
-
-      getOrElse 0 2 (fromList [0,1,2]) == 2
-      getOrElse 0 5 (fromList [0,1,2]) == 0
--}
-getOrElse : a -> Int -> Array a -> a
-getOrElse default i array =
-    if 0 <= i && i < Native.Array.length array
-      then Native.Array.get i array
-      else default
 
 {-| Set the element at a particular index. Returns an updated array.
 If the index is out of range, the array is unaltered.
@@ -163,6 +144,7 @@ If the index is out of range, the array is unaltered.
 -}
 set : Int -> a -> Array a -> Array a
 set = Native.Array.set
+
 
 {-| Get a sub-section of an array: `(slice start end array)`. The `start` is a
 zero-based index where we will start our slice. The `end` is a zero-based index

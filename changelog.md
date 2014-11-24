@@ -23,6 +23,8 @@
 
   * Remove `Dict.getOrElse` and `Dict.getOrFail` in favor of `Dict.get key dict ? 0`
 
+  * Remove `Array.getOrElse` and `Array.getOrFail` in favor of `Array.get index array ? 0`
+
   * Add the following functions to `Text`:
       
         empty : Text
