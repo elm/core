@@ -17,7 +17,6 @@ module Time where
 import Basics (..)
 import Native.Time
 import Signal (Signal)
-import Signal
 
 {-| Type alias to make it clearer when you are working with time values.
 Using the `Time` constants instead of raw numbers is very highly recommended.
