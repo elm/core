@@ -80,12 +80,12 @@ each mouse click and false otherwise.
 -}
 since : Time -> Signal a -> Signal Bool
 since t s =
-  let
-    start = map (always 1) s
-    stop = map (always -1) (delay t s)
-    delaydiff = foldp (+) 0 (merge start stop)
-  in
-    map ((/=) 0) delaydiff
+    let
+        start = map (always 1) s
+        stop = map (always -1) (delay t s)
+        delaydiff = foldp (+) 0 (merge start stop)
+    in
+        map ((/=) 0) delaydiff
 
 {-| Add a timestamp to any signal. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
