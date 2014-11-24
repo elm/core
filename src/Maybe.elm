@@ -16,8 +16,7 @@ you with optional arguments, error handling, and records with optional fields.
 
 {-| Represent values that may or may not exist. It can be useful if you have a
 record field that is only filled in sometimes. Or if a function takes a value
-sometimes, but does not absolutely need it. It can also be used to represent
-functions that can fail.
+sometimes, but does not absolutely need it.
 
       -- A person, but maybe we do not know their age.
       type alias Person =
@@ -25,14 +24,8 @@ functions that can fail.
           , age : Maybe Int
           }
 
-          -- tom = { name = "Tom", age = Just 42 }
-          -- sue = { name = "Sue", age = Nothing }
-
-      -- a function that might not succeed
-      String.toInt : String -> Maybe Int
-
-          -- String.toInt "hats" == Nothing
-          -- String.toInt "123" == Just 123
+      tom = { name = "Tom", age = Just 42 }
+      sue = { name = "Sue", age = Nothing }
 -}
 type Maybe a = Just a | Nothing
 
