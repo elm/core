@@ -79,11 +79,7 @@ Mouse.clicks)`` would result in a signal that is true for one second after
 each mouse click and false otherwise.
 -}
 since : Time -> Signal a -> Signal Bool
-since t s =
-  let initial = Signal.constant False
-      start = Signal.map (always True) s
-      stop = Signal.map (always False) (delay t s)
-  in Signal.mergeMany [initial, start, stop]
+since = Native.Time.since
 
 {-| Add a timestamp to any signal. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
