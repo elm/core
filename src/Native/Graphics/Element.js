@@ -372,13 +372,13 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             var subNode = node.firstChild;
             var newSubNode = updateAndReplace(subNode, currE._1, nextE._1);
             setPos(nextE._0, nextE._1, newSubNode);
-            updateProps(node);
+            updateProps(node, curr, next);
             return rootNode;
 
         case "Custom":
             if (currE.type === nextE.type) {
                 var updatedNode = nextE.update(node, currE.model, nextE.model);
-                updateProps(updatedNode);
+                updateProps(updatedNode, curr, next);
                 return updatedNode;
             } else {
                 return render(next);
