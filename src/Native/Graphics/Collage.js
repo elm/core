@@ -395,7 +395,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             }
         }
         nodes.clearRest();
-        return node;
+        return div;
     }
 
 
