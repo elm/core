@@ -403,7 +403,7 @@ avoiding parenthesis. Consider the following code to create a text element:
 
 This can also be written as:
 
-        text . monospace <| toText "code"
+        text << monospace <| toText "code"
 -}
 (<|) : (a -> b) -> a -> b
 f <| x = f x
