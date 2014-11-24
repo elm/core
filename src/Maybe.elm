@@ -44,12 +44,16 @@ a `Maybe`.
     Just 42 ? 100   -- 42
     Nothing ? 100   -- 100
 
-    Dict.get "Tom" Dict.empty ? "plumber"   -- "plumber"
+    Dict.get "Tom" Dict.empty ? "unknown"   -- "unknown"
 
 It is defined so you can try a bunch of different things before getting to
 the default.
 
     Nothing ? Just 42 ? 100   -- 42
+
+    Dict.get "Tom" occupations
+      ? Dict.get "Tom" jobs
+      ? "unknown"
 -}
 (?) : Maybe a -> a -> a
 (?) maybe default =
@@ -57,7 +61,7 @@ the default.
       Just value -> value
       Nothing -> default
 
-infixr ? 2
+infixr 2 ?
 
 
 {-| Pick the first `Maybe` that actually has a value. Useful when you want to
@@ -73,10 +77,10 @@ oneOf maybes =
     [] ->
         Nothing
 
-    maybe : rest ->
-      case maybe of
-        Nothing -> oneOf rest
-        Just _ -> maybe
+    maybe :: rest ->
+        case maybe of
+          Nothing -> oneOf rest
+          Just _ -> maybe
 
 
 {-| Transform an `Maybe` value with a given function:
