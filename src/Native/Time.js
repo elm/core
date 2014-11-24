@@ -47,11 +47,6 @@ Elm.Native.Time.make = function(elm) {
     return clock;
   }
 
-  function since(t, s) {
-    function cmp(a,b) { return !Utils.eq(a,b); }
-    var dcount = Signal.count(A2(NS.delay, t, s));
-    return A3( Signal.map2, F2(cmp), Signal.count(s), dcount );
-  }
   function read(s) {
       var t = Date.parse(s);
       return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
@@ -62,7 +57,6 @@ Elm.Native.Time.make = function(elm) {
       every : every,
       delay : NS.delay,
       timestamp : NS.timestamp,
-      since : F2(since),
       toDate : function(t) { return new window.Date(t); },
       read   : read
   };
