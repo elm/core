@@ -4,6 +4,7 @@ module Random
     , list, pair
     , minInt, maxInt
     , generate, initialSeed
+    , split
     )
   where
 
@@ -167,6 +168,18 @@ type alias Seed =
     , range : State -> (Int,Int)
     }
 
+{-|The split operation allows one to obtain two distinct random number generators. 
+This is very useful in functional programs (for example, when passing a random 
+number generator down to recursive calls), but very little work has been done on 
+statistically robust implementations of split.
+ -}
+split : Seed -> (Seed, Seed)
+split seed =
+    let (state0, state1) = seed.split seed.state
+        seed0 = { seed | state <- state0 }
+        seed1 = { seed | state <- state1 }
+    in (seed0, seed1)
+
 {-| Run a random value generator with a given seed. It will give you back a
 random value and a new seed.
 
@@ -195,7 +208,7 @@ the current time.
 -}
 initialSeed : Int -> Seed
 initialSeed n =
-    Seed (initState n) next split range
+    Seed (initState n) next stateSplit range
 
 
 {-| Produce the initial generator state. Distinct arguments should be likely
@@ -241,8 +254,8 @@ next (State s1 s2) =
         (z', State s1'' s2'')
 
 
-split : State -> (State, State)
-split (State s1 s2 as std) =
+stateSplit : State -> (State, State)
+stateSplit (State s1 s2 as std) =
     let new_s1 = if s1 == magicNum6-1 then 1 else s1 + 1
         new_s2 = if s2 == 1 then magicNum7-1 else s2 - 1
         (State t1 t2) = snd (next std)
