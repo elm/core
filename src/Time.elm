@@ -82,11 +82,9 @@ each mouse click and false otherwise.
 since : Time -> Signal a -> Signal Bool
 since t s =
   let
-    start = Signal.map (always 1) s
-    stop = Signal.map (always -1) (delay t s)
-    delaydiff = Signal.foldp (+) 0 (Signal.merge start stop)
-  in
-    Signal.map ((==) 0) delaydiff
+    start = Signal.map (always True) s
+    stop = Signal.map (always False) (delay t s)
+  in Signal.foldp (\ n _ -> n) False (Signal.merge start stop)
 
 {-| Add a timestamp to any signal. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
