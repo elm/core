@@ -17,6 +17,7 @@ module Time where
 import Basics (..)
 import Native.Time
 import Signal (Signal)
+import Signal
 
 {-| Type alias to make it clearer when you are working with time values.
 Using the `Time` constants instead of raw numbers is very highly recommended.
@@ -79,7 +80,13 @@ Mouse.clicks)`` would result in a signal that is true for one second after
 each mouse click and false otherwise.
 -}
 since : Time -> Signal a -> Signal Bool
-since = Native.Time.since
+since t s =
+  let
+    start = Signal.map (always 1) s
+    stop = Signal.map (always -1) (delay t s)
+    delaydiff = Signal.foldp (+) 0 (Signal.merge start stop)
+  in
+    Signal.map ((==) 0) delaydiff
 
 {-| Add a timestamp to any signal. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
