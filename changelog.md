@@ -21,6 +21,8 @@
 
   * Remove `Either` in favor of `Result` or custom union types
 
+  * Remove `Dict.getOrElse` and `Dict.getOrFail` in favor of `Dict.get key dict ? 0`
+
   * Add the following functions to `Text`:
       
         empty : Text

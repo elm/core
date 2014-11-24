@@ -1,8 +1,7 @@
 module Dict
     ( Dict
     , empty, singleton, insert, update
-    , get, getOrElse, getOrFail
-    , remove, member
+    , get, remove, member
     , filter
     , partition
     , foldl, foldr, map
@@ -21,7 +20,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs empty, singleton, insert, update, remove
 
 # Query
-@docs member, get, getOrElse, getOrFail
+@docs member, get
 
 # Combine
 @docs union, intersect, diff
@@ -119,8 +118,8 @@ dictionary.
       get "Mouse" animals == Just Mouse
       get "Spike" animals == Nothing
 
-The `getOrElse` and `getOrFail` are built-in ways to handle common ways of
-using the resulting `Maybe`.
+The `(?)` operator from the `Maybe` library makes it easy to give a default
+value.
 -}
 get : comparable -> Dict comparable v -> Maybe v
 get targetKey dict =
@@ -133,53 +132,6 @@ get targetKey dict =
             LT -> get targetKey left
             EQ -> Just value
             GT -> get targetKey right
-
-
-{-| Get the value associated with a key. If the key is not found,
-return a default value.
-
-      animals = fromList [ ("Tom", Cat), ("Jerry", Mouse) ]
-
-      getOrElse Dog "Tom"   animals == Cat
-      getOrElse Dog "Mouse" animals == Mouse
-      getOrElse Dog "Spike" animals == Dog
--}
-getOrElse : v -> comparable -> Dict comparable v -> v
-getOrElse base targetKey dict =
-    case dict of
-      RBEmpty LBlack ->
-          base
-
-      RBNode _ key value left right ->
-          case compare targetKey key of
-            LT -> getOrElse base targetKey left
-            EQ -> value
-            GT -> getOrElse base targetKey right
-
-
-{-| Get the value associated with a key.
-
-      animals = fromList [ ("Tom", Cat), ("Jerry", Mouse) ]
-
-      getOrFail "Tom"   animals == Cat
-      getOrFail "Mouse" animals == Mouse
-      getOrFail "Spike" animals == -- Runtime Error!
-
-Warning: this function will result in a runtime error if the key is not found,
-so it is best to use `get` or `getOrElse` unless you are sure the key will be
-found.
--}
-getOrFail : comparable -> Dict comparable v -> v
-getOrFail targetKey dict =
-    case dict of
-      RBEmpty LBlack ->
-          Native.Debug.crash "key not found when using 'getOrFail'"
-
-      RBNode _ key value left right ->
-          case compare targetKey key of
-            LT -> getOrFail targetKey left
-            EQ -> value
-            GT -> getOrFail targetKey right
 
 
 {-| Determine if a key is in a dictionary. -}
