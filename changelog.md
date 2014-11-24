@@ -8,7 +8,14 @@
 
 ### Libraries
 
-  * Add `Maybe.andThen`
+  * Add the following functions to `Maybe`
+
+        (?) : Maybe a -> a -> a
+        oneOf : List (Maybe a) -> Maybe a
+        map : (a -> b) -> Maybe a -> Maybe b
+        andThen : Maybe a -> (a -> Maybe b) -> Maybe b
+
+  * Remove `Maybe.maybe` so `maybe 0 sqrt Nothing` becomes `map sqrt Nothing ? 0`
 
   * Add `Result` library
 
@@ -36,5 +43,3 @@
       - Rename `Signal.merges` to `Signal.mergeMany`
       - Remove `Signal.count`
       - Remove `Signal.countIf`
-
-
