@@ -31,6 +31,7 @@
   * Revamp `Random` library, no longer signal-based
 
   * Make the following changes in `List`:
+      - Change type signatures from `[a]` to `List a`
       - Replace `List.zip` and `List.zipWith` with `List.mapN`
       - Replace `(++)` with `append`
       - Remove `join`
