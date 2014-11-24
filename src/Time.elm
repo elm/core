@@ -79,7 +79,13 @@ Mouse.clicks)`` would result in a signal that is true for one second after
 each mouse click and false otherwise.
 -}
 since : Time -> Signal a -> Signal Bool
-since = Native.Time.since
+since t s = 
+  let
+    start = Signal.lift (always 1) s
+    stop = Signal.lift (always -1) (delay t s)
+    delaydiff = foldp (+) 0 (merge start stop)
+  in
+    lift ((/=) 0) delaydiff
 
 {-| Add a timestamp to any signal. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
