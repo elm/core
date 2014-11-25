@@ -119,14 +119,18 @@ if (!Elm.fullscreen) {
           }
 
           var Module = {};
-          var reportAnyErrors = function() {};
           try {
               Module = module.make(elm);
               checkPorts(elm);
           } catch(e) {
-              var directions = "<br/>&nbsp; &nbsp; Open the developer console for more details."
-              Module.main = Elm.Text.make(elm).leftAligned('<code>' + e.message + directions + '</code>');
-              reportAnyErrors = function() { throw e; }
+              var directions = "Open the developer console for more details."
+              var code = document.createElement('code');
+              code.appendChild(document.createTextNode(e.message));
+              code.appendChild(document.createElement('br'));
+              code.appendChild(document.createElement('br'));
+              code.appendChild(document.createTextNode(directions));
+              container.appendChild(code);
+              throw e;
           }
           inputs = filterDeadInputs(inputs);
           filterListeners(inputs, listeners);
@@ -143,7 +147,6 @@ if (!Elm.fullscreen) {
               }
           }
 
-          reportAnyErrors();
           return {
             swap:swap,
             ports:elm.ports.outgoing,
