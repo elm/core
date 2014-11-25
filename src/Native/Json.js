@@ -345,7 +345,7 @@ Elm.Native.Json.make = function(localRuntime) {
 
     function customDecoder(decoder, callback) {
         return function(value) {
-            var result = callback(decode(value));
+            var result = callback(decoder(value));
             if (result.ctor === 'Err') {
                 throw new Error('custom decoder failed: ' + result._0);
             }
