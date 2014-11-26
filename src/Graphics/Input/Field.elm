@@ -165,7 +165,7 @@ When we use the `field` function, we first give it a visual style. This is
 the first argument so that it is easier to define your own custom field
 (`myField = field myStyle`). The next two arguments are a `Handle` and a
 handler function that processes or augments events before sending them along
-to the associated `Input`. In the example above we use the `id` function to
+to the associated `Input`. In the example above we use the `identity` function to
 pass events along unchanged to the `name` `Input`. We then provide the
 place-holder message to use when no input has been provided yet. Finally,
 we give the current `Content` of the field. This argument is last because
