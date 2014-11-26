@@ -249,11 +249,7 @@ Elm.Native.Utils.make = function(localRuntime) {
     //// RUNTIME ERRORS ////
 
     function indent(lines) {
-        var msg = '';
-        for (var i = 0; i < lines.length; ++i) {
-            msg += '<br/>&nbsp; &nbsp; ' + lines[i];
-        }
-        return msg;
+        return '\n' + lines.join('\n');
     }
 
     function badCase(moduleName, span) { 
@@ -261,7 +257,7 @@ Elm.Native.Utils.make = function(localRuntime) {
             'Non-exhaustive pattern match in case-expression.',
             'Make sure your patterns cover every case!'
         ]);
-        throw new Error('Runtime error in module ' + moduleName + ' (' + span + '):' + msg);
+        throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
     }
 
     function badIf(moduleName, span) { 
@@ -269,7 +265,7 @@ Elm.Native.Utils.make = function(localRuntime) {
             'Non-exhaustive pattern match in multi-way-if expression.',
             'It is best to use \'otherwise\' as the last branch of multi-way-if.'
         ]);
-        throw new Error('Runtime error in module ' + moduleName + ' (' + span + '):' + msg);
+        throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
     }
 
 
@@ -278,7 +274,7 @@ Elm.Native.Utils.make = function(localRuntime) {
             'Expecting ' + expected + ' but was given ',
             JSON.stringify(received)
         ]);
-        throw new Error('Runtime error when sending values through a port:' + msg);
+        throw new Error('Runtime error when sending values through a port.' + msg);
     }
 
 

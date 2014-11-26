@@ -123,12 +123,19 @@ if (!Elm.fullscreen) {
               Module = module.make(elm);
               checkPorts(elm);
           } catch(e) {
-              var directions = "Open the developer console for more details."
               var code = document.createElement('code');
-              code.appendChild(document.createTextNode(e.message));
+
+              var lines = e.message.split('\n');
+              code.appendChild(document.createTextNode(lines[0]));
               code.appendChild(document.createElement('br'));
               code.appendChild(document.createElement('br'));
-              code.appendChild(document.createTextNode(directions));
+              for (var i = 1; i < lines.length; ++i) {
+                  code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i]));
+                  code.appendChild(document.createElement('br'));
+              }
+              code.appendChild(document.createElement('br'));
+              code.appendChild(document.createTextNode("Open the developer console for more details."));
+
               container.appendChild(code);
               throw e;
           }
