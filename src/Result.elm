@@ -5,7 +5,7 @@ way to manage errors in Elm.
 # Type and Constructors
 @docs Result
 
-# Convenience Functions
+# Common Helpers
 @docs map, andThen
 
 # Formatting Errors
@@ -47,15 +47,15 @@ This means we only continue with the callback if things are going well. For
 example, say you need to use (`toInt : String -> Result String Int`) to parse
 a month and make sure it is between 1 and 12:
 
-      validMonth : Int -> Result String Int
-      validMonth month =
+      toValidMonth : Int -> Result String Int
+      toValidMonth month =
           if month >= 1 && month <= 12
               then Ok month
               else Err "months must be between 1 and 12"
 
       toMonth : String -> Result String Int
       toMonth rawString =
-          toInt rawString `andThen` validMonth
+          toInt rawString `andThen` toValidMonth
 
       -- toMonth "4" == Ok 4
       -- toMonth "9" == Ok 9
