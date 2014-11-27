@@ -171,9 +171,18 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         return e;
     }
 
-    function goOut(e) { e.style.position = 'absolute'; return e; }
-    function goDown(e) { return e }
-    function goRight(e) { e.style.styleFloat = e.style.cssFloat = "left"; return e; }
+    function goOut(node) {
+        node.style.position = 'absolute';
+        return node;
+    }
+    function goDown(node) {
+        return node;
+    }
+    function goRight(node) {
+        node.style.styleFloat = 'left';
+        node.style.cssFloat = 'left';
+        return node;
+    }
 
     var directionTable = {
         DUp    : goDown,
@@ -362,8 +371,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             var len = kids.length;
             for (var i = len; i-- ;) {
                 var subNode = kids[toReverse ? len - i - 1 : i];
-                updateAndReplace(subNode, currs[i], nexts[i]);
-                goDir(subNode);
+                goDir(updateAndReplace(subNode, currs[i], nexts[i]));
             }
             updateProps(node, curr, next);
             return rootNode;
