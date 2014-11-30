@@ -23,12 +23,12 @@ import Text
 
 {-| Create uniform dimensions:
 
-      uniformly 4 == { left=4, right=4, top=4, bottom=4 }
+    uniformly 4 == { left=4, right=4, top=4, bottom=4 }
 
 The following example creates an outline where the left, right, top, and bottom
 edges all have width 1:
 
-      Outline grey (uniformly 1) 4
+    Outline grey (uniformly 1) 4
 -}
 uniformly : Int -> Dimensions
 uniformly n = Dimensions n n n n
@@ -37,8 +37,13 @@ uniformly n = Dimensions n n n n
 top, and bottom may all have different sizes. The following example creates
 dimensions such that the left and right are twice as wide as the top and bottom:
 
-      myDimensions : Int -> Dimensions
-      myDimensions n = { left = 2 * n, right = 2 * n, top = n, bottom = n }
+    myDimensions : Int -> Dimensions
+    myDimensions n =
+        { left = 2 * n
+        , right = 2 * n
+        , top = n
+        , bottom = n
+        }
 -}
 type alias Dimensions =
     { left:Int
@@ -52,7 +57,7 @@ and radius. The radius allows you to round the corners of your field. Set the
 width to zero to make it invisible. Here is an example outline that is grey
 and thin with slightly rounded corners:
 
-      { color = grey, width = uniformly 1, radius = 4 }
+    { color = grey, width = uniformly 1, radius = 4 }
 -}
 type alias Outline =
     { color:Color
@@ -69,7 +74,7 @@ noOutline = Outline Color.grey (uniformly 0) 0
 `width` to zero to turn the highlight off. Here is an example highlight that
 is blue and thin:
 
-      { color = blue, width = 1 }
+    { color = blue, width = 1 }
 -}
 type alias Highlight =
     { color:Color
@@ -114,7 +119,7 @@ defaultStyle =
 
 {-| Represents the current content of a text field. For example:
 
-      content = Content "She sells sea shells" (Selection 0 3 Backward)
+    content = Content "She sells sea shells" (Selection 0 3 Backward)
 
 This means the user highlighted the substring `"She"` backwards. The value of
 `content.string` is `"She sells sea shells"`.
@@ -126,10 +131,10 @@ type alias Content =
 
 {-| The selection within a text field. `start` is never greater than `end`:
 
-      Selection 0 0 Forward  -- cursor precedes all characters
+    Selection 0 0 Forward  -- cursor precedes all characters
 
-      Selection 5 9 Backward -- highlighting characters starting after
-                             -- the 5th and ending after the 9th
+    Selection 5 9 Backward -- highlighting characters starting after
+                           -- the 5th and ending after the 9th
 -}
 type alias Selection =
     { start:Int
@@ -146,7 +151,7 @@ type Direction = Forward | Backward
 
 {-| A field with no content:
 
-      Content "" (Selection 0 0 Forward)
+    Content "" (Selection 0 0 Forward)
 -}
 noContent : Content
 noContent = Content "" (Selection 0 0 Forward)
@@ -155,11 +160,12 @@ noContent = Content "" (Selection 0 0 Forward)
 called `nameField`. As the user types their name, the field will be updated
 to match what they have entered.
 
-      name : Input Content
-      name = input noContent
+    name : Signal.Channel Content
+    name = Signal.channel noContent
 
-      nameField : Signal Element
-      nameField = field defaultStyle name.handle identity "Name" <~ name.signal
+    nameField : Signal Element
+    nameField =
+        field defaultStyle (Signal.send name) "Name" <~ Signal.subscribe name
 
 When we use the `field` function, we first give it a visual style. This is
 the first argument so that it is easier to define your own custom field

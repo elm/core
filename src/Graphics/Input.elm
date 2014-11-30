@@ -22,71 +22,79 @@ import Native.Graphics.Input
 {-| Create a standard button. The following example begins making a basic
 calculator:
 
-      data Keys = Number Int | Plus | Minus | Clear
+    type Keys = Number Int | Plus | Minus | Clear
 
-      keys : Input Keys
-      keys = input Clear
+    keys : Signal.Channel Keys
+    keys = Signal.channel Clear
 
-      calculator : Element
-      calculator =
-          flow right [ button keys.handle (Number 1) "1"
-                     , button keys.handle (Number 2) "2"
-                     , button keys.handle    Plus    "+"
-                     ]
+    calculator : Element
+    calculator =
+        flow right
+          [ button (Signal.send keys (Number 1)) "1"
+          , button (Signal.send keys (Number 2)) "2"
+          , button (Signal.send keys    Plus   ) "+"
+          ]
 
 If the user presses the "+" button, `keys.signal` will update to `Plus`. If the
 users presses "2", `keys.signal` will update to `(Number 2)`.
 -}
 button : Signal.Message -> String -> Element
-button = Native.Graphics.Input.button
+button =
+  Native.Graphics.Input.button
+
 
 {-| Same as `button` but lets you customize buttons to look however you want.
 
-      click : Input ()
-      click = input ()
+    click : Signal.Channel
+    click = Signal.channel ()
 
-      prettyButton : Element
-      prettyButton =
-          customButton click.handle ()
-              (image 100 40 "/button_up.jpg")
-              (image 100 40 "/button_hover.jpg")
-              (image 100 40 "/button_down.jpg")
+    prettyButton : Element
+    prettyButton =
+        customButton (Signal.send click ())
+            (image 100 40 "/button_up.jpg")
+            (image 100 40 "/button_hover.jpg")
+            (image 100 40 "/button_down.jpg")
 -}
 customButton : Signal.Message -> Element -> Element -> Element -> Element
-customButton = Native.Graphics.Input.customButton
+customButton =
+  Native.Graphics.Input.customButton
+
 
 {-| Create a checkbox. The following example creates three synced checkboxes:
 
-      check : Input Bool
-      check = input False
+    check : Signal.Channel Bool
+    check = Signal.channel False
 
-      boxes : Bool -> Element
-      boxes checked =
-          let box = container 40 40 middle (checkbox check.handle identity checked)
-          in  flow right [ box, box, box ]
+    boxes : Bool -> Element
+    boxes checked =
+        let box = container 40 40 middle (checkbox (Signal.send check) checked)
+        in
+            flow right [ box, box, box ]
 
-      main : Signal Element
-      main = boxes <~ check.signal
+    main : Signal Element
+    main = boxes <~ Signal.subscribe check
 -}
 checkbox : (Bool -> Signal.Message) -> Bool -> Element
-checkbox = Native.Graphics.Input.checkbox
+checkbox =
+  Native.Graphics.Input.checkbox
+
 
 {-| Create a drop-down menu.  The following drop-down lets you choose your
 favorite British sport:
 
-      data Sport = Football | Cricket | Snooker
+    type Sport = Football | Cricket | Snooker
 
-      sport : Input (Maybe Sport)
-      sport = input Nothing
+    sport : Signal.Channel (Maybe Sport)
+    sport = Signal.channel Nothing
 
-      sportDropDown : Element
-      sportDropDown =
-          dropDown sport.handle
-            [ (""        , Nothing)
-            , ("Football", Just Football)
-            , ("Cricket" , Just Cricket)
-            , ("Snooker" , Just Snooker)
-            ]
+    sportDropDown : Element
+    sportDropDown =
+        dropDown
+          [ (""        , Signal.send sport Nothing)
+          , ("Football", Signal.send sport (Just Football))
+          , ("Cricket" , Signal.send sport (Just Cricket))
+          , ("Snooker" , Signal.send sport (Just Snooker))
+          ]
 
 If the user selects "Football" from the drop down menue, `sport.signal`
 will update to `Just Football`.
@@ -94,37 +102,43 @@ will update to `Just Football`.
 dropDown : List (String, Signal.Message) -> Element
 dropDown = Native.Graphics.Input.dropDown
 
+
 {-| Detect mouse hovers over a specific `Element`. In the following example,
 we will create a hoverable picture called `cat`.
 
-      hover : Input Bool
-      hover = input False
+    hover : Signal.Channel Bool
+    hover = Signal.channel False
 
-      cat : Element
-      cat = image 30 30 "/cat.jpg"
-              |> hoverable hover.handle id
+    cat : Element
+    cat =
+      image 30 30 "/cat.jpg"
+        |> hoverable (Signal.send hover)
 
 When the mouse hovers above the `cat` element, `hover.signal` will become
 `True`. When the mouse leaves it, `hover.signal` will become `False`.
 -}
 hoverable : (Bool -> Signal.Message) -> Element -> Element
-hoverable = Native.Graphics.Input.hoverable
+hoverable =
+  Native.Graphics.Input.hoverable
+
 
 {-| Detect mouse clicks on a specific `Element`. In the following example,
 we will create a clickable picture called `cat`.
 
-      data Picture = Cat | Hat
+    type Picture = Cat | Hat
 
-      picture : Input Picture
-      picture = input Cat
+    picture : Signal.Channel Picture
+    picture = Signal.channel Cat
 
-      cat : Element
-      cat = image 30 30 "/cat.jpg"
-               |> clickable picture.handle Cat
+    cat : Element
+    cat =
+      image 30 30 "/cat.jpg"
+        |> clickable (Signal.send picture Cat)
 
-      hat : Element
-      hat = image 30 30 "/hat.jpg"
-               |> clickable picture.handle Hat
+    hat : Element
+    hat =
+      image 30 30 "/hat.jpg"
+        |> clickable (Signal.send picture Hat)
 
 When the user clicks on the `cat` element, `picture.signal` receives
 an update containing the value `Cat`. When the user clicks on the `hat` element,
@@ -133,4 +147,5 @@ distinguish which element was clicked. In a more complex example, they could be
 distinguished with IDs or more complex data structures.
 -}
 clickable : Signal.Message -> Element -> Element
-clickable = Native.Graphics.Input.clickable
+clickable =
+  Native.Graphics.Input.clickable
