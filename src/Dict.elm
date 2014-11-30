@@ -112,11 +112,11 @@ max dict =
 `Nothing`. This is useful when you are not sure if a key will be in the
 dictionary.
 
-      animals = fromList [ ("Tom", Cat), ("Jerry", Mouse) ]
+    animals = fromList [ ("Tom", Cat), ("Jerry", Mouse) ]
 
-      get "Tom"   animals == Just Cat
-      get "Mouse" animals == Just Mouse
-      get "Spike" animals == Nothing
+    get "Tom"   animals == Just Cat
+    get "Mouse" animals == Just Mouse
+    get "Spike" animals == Nothing
 
 The `(?)` operator from the `Maybe` library makes it easy to give a default
 value.

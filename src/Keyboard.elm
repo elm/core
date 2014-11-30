@@ -35,10 +35,10 @@ directions = Native.Keyboard.directions
 
 {-| A signal of records indicating which arrow keys are pressed.
 
-`{ x = 0, y = 0 }` when pressing no arrows.<br>
-`{ x =-1, y = 0 }` when pressing the left arrow.<br>
-`{ x = 1, y = 1 }` when pressing the up and right arrows.<br>
-`{ x = 0, y =-1 }` when pressing the down, left, and right arrows.
+  * `{ x = 0, y = 0 }` when pressing no arrows.
+  * `{ x =-1, y = 0 }` when pressing the left arrow.
+  * `{ x = 1, y = 1 }` when pressing the up and right arrows.
+  * `{ x = 0, y =-1 }` when pressing the down, left, and right arrows.
 -}
 arrows : Signal { x:Int, y:Int }
 arrows = directions 38 40 37 39

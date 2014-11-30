@@ -10,7 +10,7 @@ list must have the same type.
 @docs head, tail, last, filter, take, drop
 
 # Putting Lists Together
-@docs repeat, (::), append, concat, join, intersperse
+@docs repeat, (::), append, concat, intersperse
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -56,7 +56,7 @@ infixr 5 ::
 
 {-| Extract the first element of a list. List must be non-empty.
 
-      head [1,2,3] == 1
+    head [1,2,3] == 1
 -}
 head : List a -> a
 head = Native.List.head
@@ -64,7 +64,7 @@ head = Native.List.head
 
 {-| Extract the elements after the head of the list. List must be non-empty.
 
-      tail [1,2,3] == [2,3]
+    tail [1,2,3] == [2,3]
 -}
 tail : List a -> List a
 tail = Native.List.tail
@@ -72,7 +72,7 @@ tail = Native.List.tail
 
 {-| Determine if a list is empty.
 
-      isEmpty [] == True
+    isEmpty [] == True
 -}
 isEmpty : List a -> Bool
 isEmpty xs =
@@ -88,9 +88,9 @@ member =
 
 {-| Apply a function to every element of a list.
 
-      map sqrt [1,4,9] == [1,2,3]
+    map sqrt [1,4,9] == [1,2,3]
 
-      map not [True,False,True] == [False,True,False]
+    map not [True,False,True] == [False,True,False]
 -}
 map : (a -> b) -> List a -> List b
 map = Native.List.map
@@ -98,7 +98,7 @@ map = Native.List.map
 {-| Same as `map` but the function is also applied to the index of each
 element (starting at zero).
 
-      indexedMap (,) ["Tom","Sue","Bob"] == [ (0,"Tom"), (1,"Sue"), (2,"Bob") ]
+    indexedMap (,) ["Tom","Sue","Bob"] == [ (0,"Tom"), (1,"Sue"), (2,"Bob") ]
 -}
 indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
@@ -106,14 +106,14 @@ indexedMap f xs =
 
 {-| Reduce a list from the left.
 
-      foldl (::) [] [1,2,3] == [3,2,1]
+    foldl (::) [] [1,2,3] == [3,2,1]
 -}
 foldl : (a -> b -> b) -> b -> List a -> b
 foldl = Native.List.foldl
 
 {-| Reduce a list from the right.
 
-      foldr (+) 0 [1,2,3] == 6
+    foldr (+) 0 [1,2,3] == 6
 -}
 foldr : (a -> b -> b) -> b -> List a -> b
 foldr = Native.List.foldr
@@ -128,21 +128,21 @@ foldr1 = Native.List.foldr1
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
 
-      scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
+    scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
 -}
 scanl : (a -> b -> b) -> b -> List a -> List b
 scanl = Native.List.scanl
 
 {-| Same as scanl but it doesn't require a base case. List must be non-empty.
 
-      scanl1 (+) [1,2,3,4] == [1,3,6,10]
+    scanl1 (+) [1,2,3,4] == [1,3,6,10]
 -}
 scanl1 : (a -> a -> a) -> List a -> List a
 scanl1 = Native.List.scanl1
 
 {-| Keep only elements that satisfy the predicate.
 
-      filter isEven [1..6] == [2,4,6]
+    filter isEven [1..6] == [2,4,6]
 -}
 filter : (a -> Bool) -> List a -> List a
 filter = Native.List.filter
@@ -150,9 +150,9 @@ filter = Native.List.filter
 {-| Apply a function that may succeed to all values in the list, but only keep
 the successes.
 
-      String.toInt : String -> Maybe Int
+    String.toInt : String -> Maybe Int
 
-      filterMap String.toInt ["3", "4.0", "5", "hats"] == [3,5]
+    filterMap String.toInt ["3", "4.0", "5", "hats"] == [3,5]
 -}
 filterMap : (a -> Maybe b) -> List a -> List b
 filterMap f xs = foldr (maybeCons f) [] xs
@@ -165,32 +165,32 @@ maybeCons f mx xs =
 
 {-| Determine the length of a list.
 
-      length [1,2,3] == 3
+    length [1,2,3] == 3
 -}
 length : List a -> Int
 length = Native.List.length
 
 {-| Reverse a list.
 
-      reverse [1..4] == [4,3,2,1]
+    reverse [1..4] == [4,3,2,1]
 -}
 reverse : List a -> List a
 reverse = Native.List.reverse
 
 {-| Determine if all elements satisfy the predicate.
 
-      all isEven [2,4] == True
-      all isEven [2,3] == False
-      all isEven [] == True
+    all isEven [2,4] == True
+    all isEven [2,3] == False
+    all isEven [] == True
 -}
 all : (a -> Bool) -> List a -> Bool
 all = Native.List.all
 
 {-| Determine if any elements satisfy the predicate.
 
-      any isEven [2,3] == True
-      any isEven [1,3] == False
-      any isEven [] == False
+    any isEven [2,3] == True
+    any isEven [1,3] == False
+    any isEven [] == False
 -}
 any : (a -> Bool) -> List a -> Bool
 any = Native.List.any
@@ -198,8 +198,8 @@ any = Native.List.any
 
 {-| Put two lists together.
 
-      append [1,1,2] [3,5,8] == [1,1,2,3,5,8]
-      append ['a','b'] ['c'] == ['a','b','c']
+    append [1,1,2] [3,5,8] == [1,1,2,3,5,8]
+    append ['a','b'] ['c'] == ['a','b','c']
 -}
 append : List a -> List a -> List a
 append = Native.List.append
@@ -207,7 +207,7 @@ append = Native.List.append
 
 {-| Concatenate a bunch of lists into a single list:
 
-      concat [[1,2],[3],[4,5]] == [1,2,3,4,5]
+    concat [[1,2],[3],[4,5]] == [1,2,3,4,5]
 -}
 concat : List (List a) -> List a
 concat lists =
@@ -216,7 +216,7 @@ concat lists =
 
 {-| Map a given function onto a list and flatten the resulting lists.
 
-      concatMap f xs == concat (map f xs)
+    concatMap f xs == concat (map f xs)
 -}
 concatMap : (a -> List b) -> List a -> List b
 concatMap f list =
@@ -225,7 +225,7 @@ concatMap f list =
 
 {-| Get the sum of the list elements.
 
-      sum [1..4] == 10
+    sum [1..4] == 10
 -}
 sum : List number -> number
 sum numbers =
@@ -233,7 +233,8 @@ sum numbers =
 
 
 {-| Get the product of the list elements.
-      product [1..4] == 24
+
+    product [1..4] == 24
 -}
 product : List number -> number
 product numbers =
@@ -241,14 +242,16 @@ product numbers =
 
 
 {-| Find the maximum element in a non-empty list.
-      maximum [1,4,2] == 4
+
+    maximum [1,4,2] == 4
 -}
 maximum : List comparable -> comparable
 maximum = foldl1 max
 
 
 {-| Find the minimum element in a non-empty list.
-      minimum [3,2,1] == 1
+
+    minimum [3,2,1] == 1
 -}
 minimum : List comparable -> comparable
 minimum = foldl1 min
@@ -258,8 +261,8 @@ minimum = foldl1 min
 that satisfy the predicate, and the second list contains all the value that do
 not.
 
-      partition (\x -> x < 3) [0..5] == ([0,1,2], [3,4,5])
-      partition isEven        [0..5] == ([0,2,4], [1,3,5])
+    partition (\x -> x < 3) [0..5] == ([0,1,2], [3,4,5])
+    partition isEven        [0..5] == ([0,2,4], [1,3,5])
 -}
 partition : (a -> Bool) -> List a -> (List a, List a)
 partition pred list =
@@ -274,13 +277,13 @@ partition pred list =
 {-| Combine two lists, combining them with the given function.
 If one list is longer, the extra elements are dropped.
 
-      map2 (+) [1,2,3] [1,2,3,4] == [2,4,6]
+    map2 (+) [1,2,3] [1,2,3,4] == [2,4,6]
 
-      map2 (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
+    map2 (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
 
-      pairs : List a -> List b -> [(a,b)]
-      pairs lefts rights =
-          map2 (,) lefts rights
+    pairs : List a -> List b -> [(a,b)]
+    pairs lefts rights =
+        map2 (,) lefts rights
 -}
 map2 : (a -> b -> result) -> List a -> List b -> List result
 map2 = Native.List.map2
@@ -297,7 +300,7 @@ map5 = Native.List.map5
 
 {-| Decompose a list of tuples into a tuple of lists.
 
-      unzip [(0, True), (17, False), (1337, True)] == ([0,17,1337], [True,False,True])
+    unzip [(0, True), (17, False), (1337, True)] == ([0,17,1337], [True,False,True])
 -}
 unzip : List (a,b) -> (List a, List b)
 unzip pairs =
@@ -309,7 +312,7 @@ unzip pairs =
 
 {-| Places the given value between all members of the given list.
 
-      intersperse "on" ["turtles","turtles","turtles"] == ["turtles","on","turtles","on","turtles"]
+    intersperse "on" ["turtles","turtles","turtles"] == ["turtles","on","turtles","on","turtles"]
 -}
 intersperse : a -> List a -> List a
 intersperse sep xs =
@@ -323,59 +326,55 @@ intersperse sep xs =
 
 {-| Take the first *n* members of a list.
 
-      take 2 [1,2,3,4] == [1,2]
+    take 2 [1,2,3,4] == [1,2]
 -}
 take : Int -> List a -> List a
 take = Native.List.take
 
 {-| Drop the first *n* members of a list.
 
-      drop 2 [1,2,3,4] == [3,4]
+    drop 2 [1,2,3,4] == [3,4]
 -}
 drop : Int -> List a -> List a
 drop = Native.List.drop
 
 {-| Create a list with *n* copies of a value:
 
-      repeat 3 (0,0) == [(0,0),(0,0),(0,0)]
+    repeat 3 (0,0) == [(0,0),(0,0),(0,0)]
 -}
 repeat : Int -> a -> List a
 repeat = Native.List.repeat
 
 {-| Sort values from lowest to highest
 
-      sort [3,1,5] == [1,3,5]
+    sort [3,1,5] == [1,3,5]
 -}
 sort : List comparable -> List comparable
 sort = Native.List.sort
 
 {-| Sort values by a derived property.
 
-```haskell
-alice = { name="Alice", height=1.62 }
-bob   = { name="Bob"  , height=1.85 }
-chuck = { name="Chuck", height=1.76 }
+    alice = { name="Alice", height=1.62 }
+    bob   = { name="Bob"  , height=1.85 }
+    chuck = { name="Chuck", height=1.76 }
 
-sortBy .name   [chuck,alice,bob] == [alice,bob,chuck]
-sortBy .height [chuck,alice,bob] == [alice,chuck,bob]
+    sortBy .name   [chuck,alice,bob] == [alice,bob,chuck]
+    sortBy .height [chuck,alice,bob] == [alice,chuck,bob]
 
-sortBy String.length ["mouse","cat"] == ["cat","mouse"]
-```
+    sortBy String.length ["mouse","cat"] == ["cat","mouse"]
 -}
 sortBy : (a -> comparable) ->  List a -> List a
 sortBy = Native.List.sortBy
 
 {-| Sort values with a custom comparison function.
 
-```haskell
-sortWith flippedComparison [1..5] == [5,4,3,2,1]
+    sortWith flippedComparison [1..5] == [5,4,3,2,1]
 
-flippedComparison a b =
-     case compare a b of
-       LT -> GT
-       EQ -> EQ
-       GT -> LT
-```
+    flippedComparison a b =
+        case compare a b of
+          LT -> GT
+          EQ -> EQ
+          GT -> LT
 
 This is also the most general sort function, allowing you
 to define any other: `sort == sortWith compare`
