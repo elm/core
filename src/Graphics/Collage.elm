@@ -78,7 +78,7 @@ type alias LineStyle =
 You can use record updates to build the line style you
 want. For example, to make a thicker line, you could say:
 
-        { defaultLine | width <- 10 }
+    { defaultLine | width <- 10 }
 -}
 defaultLine : LineStyle
 defaultLine =
@@ -255,7 +255,7 @@ circle r = oval (2*r) (2*r)
 of sides and the second is the radius. So to create a pentagon with radius
 30 you would say:
 
-        ngon 5 30
+    ngon 5 30
 -}
 ngon : Int -> Float -> Shape
 ngon n r =

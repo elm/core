@@ -18,14 +18,14 @@ you with optional arguments, error handling, and records with optional fields.
 record field that is only filled in sometimes. Or if a function takes a value
 sometimes, but does not absolutely need it.
 
-      -- A person, but maybe we do not know their age.
-      type alias Person =
-          { name : String
-          , age : Maybe Int
-          }
+    -- A person, but maybe we do not know their age.
+    type alias Person =
+        { name : String
+        , age : Maybe Int
+        }
 
-      tom = { name = "Tom", age = Just 42 }
-      sue = { name = "Sue", age = Nothing }
+    tom = { name = "Tom", age = Just 42 }
+    sue = { name = "Sue", age = Nothing }
 -}
 type Maybe a = Just a | Nothing
 
@@ -78,8 +78,8 @@ oneOf maybes =
 
 {-| Transform an `Maybe` value with a given function:
 
-      map sqrt (Just 9) == Just 3
-      map sqrt Nothing == Nothing
+    map sqrt (Just 9) == Just 3
+    map sqrt Nothing == Nothing
 -}
 map : (a -> b) -> Maybe a -> Maybe b
 map f maybe =
@@ -91,25 +91,25 @@ map f maybe =
 {-| Chain together many computations that may fail. It is helpful to see its
 definition:
 
-      andThen : Maybe a -> (a -> Maybe b) -> Maybe b
-      andThen maybe callback =
-          case maybe of
-            Just value -> callback value
-            Nothing -> Nothing
+    andThen : Maybe a -> (a -> Maybe b) -> Maybe b
+    andThen maybe callback =
+        case maybe of
+          Just value -> callback value
+          Nothing -> Nothing
 
 This means we only continue with the callback if things are going well. For
 example, say you need to use (`toInt : String -> Maybe Int`) to parse a month
 and make sure it is between 1 and 12:
 
-      toValidMonth : Int -> Maybe Int
-      toValidMonth month =
-          if month >= 1 && month <= 12
-              then Just month
-              else Nothing
+    toValidMonth : Int -> Maybe Int
+    toValidMonth month =
+        if month >= 1 && month <= 12
+            then Just month
+            else Nothing
 
-      toMonth : String -> Maybe Int
-      toMonth rawString =
-          toInt rawString `andThen` toValidMonth
+    toMonth : String -> Maybe Int
+    toMonth rawString =
+        toInt rawString `andThen` toValidMonth
 
 If `toInt` fails and results in `Nothing` this entire chain of operations will
 short-circuit and result in `Nothing`. If `toValidMonth` results in `Nothing`,

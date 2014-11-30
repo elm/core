@@ -41,13 +41,13 @@ constant = Native.Signal.constant
 
 {-| Apply a function to the current value of a signal.
 
-      mouseIsUp : Signal Bool
-      mouseIsUp =
-          map not Mouse.isDown
+    mouseIsUp : Signal Bool
+    mouseIsUp =
+        map not Mouse.isDown
 
-      main : Signal Element
-      main =
-          map toElement Mouse.position
+    main : Signal Element
+    main =
+        map toElement Mouse.position
 -}
 map : (a -> result) -> Signal a -> Signal result
 map = Native.Signal.map
@@ -56,13 +56,13 @@ map = Native.Signal.map
 example, we figure out the `aspectRatio` of the window by combining the
 current width and height.
 
-      ratio : Int -> Int -> Float
-      ratio width height =
-          toFloat width / toFloat height
+    ratio : Int -> Int -> Float
+    ratio width height =
+        toFloat width / toFloat height
 
-      aspectRatio : Signal Float
-      aspectRatio =
-          map2 ratio Window.width Window.height
+    aspectRatio : Signal Float
+    aspectRatio =
+        map2 ratio Window.width Window.height
 -}
 map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result
 map2 = Native.Signal.map2
@@ -81,13 +81,13 @@ map5 = Native.Signal.map5
 be used to step the stat forward. The outgoing signal represents the current
 state.
 
-      clickCount : Signal Int
-      clickCount =
-          foldp (\click total -> total + 1) 0 Mouse.clicks
+    clickCount : Signal Int
+    clickCount =
+        foldp (\click total -> total + 1) 0 Mouse.clicks
 
-      timeSoFar : Signal Time
-      timeSoFar =
-          foldp (+) 0 (fps 40)
+    timeSoFar : Signal Time
+    timeSoFar =
+        foldp (+) 0 (fps 40)
 
 So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
 is the time the program has been running, updated 40 times a second.
@@ -99,13 +99,13 @@ foldp = Native.Signal.foldp
 {-| Merge two signals into one. This function is extremely useful for bringing
 together lots of different signals to feed into a `foldp`.
 
-      type Update = MouseMove (Int,Int) | TimeDelta Float
+    type Update = MouseMove (Int,Int) | TimeDelta Float
 
-      updates : Signal Update
-      updates =
-          merge
-              (map MouseMove Mouse.position)
-              (map TimeDelta (fps 40))
+    updates : Signal Update
+    updates =
+        merge
+            (map MouseMove Mouse.position)
+            (map TimeDelta (fps 40))
 
 If an update comes from either of the incoming signals, it updates the outgoing
 signal. If an update comes on both signals at the same time, the left update
@@ -118,15 +118,15 @@ merge = Native.Signal.merge
 two signals. When multiple updates come in at the same time, the left-most
 update wins, just like with `merge`.
 
-      type Update = MouseMove (Int,Int) | TimeDelta Float | Click
+    type Update = MouseMove (Int,Int) | TimeDelta Float | Click
 
-      updates : Signal Update
-      updates =
-          mergeMany
-              [ map MouseMove Mouse.position
-              , map TimeDelta (fps 40)
-              , map (always Click) Mouse.clicks
-              ]
+    updates : Signal Update
+    updates =
+        mergeMany
+            [ map MouseMove Mouse.position
+            , map TimeDelta (fps 40)
+            , map (always Click) Mouse.clicks
+            ]
 -}
 mergeMany : List (Signal a) -> Signal a
 mergeMany signals =
@@ -138,13 +138,13 @@ keep an update. If no updates ever flow through, we use the default value
 provided. The following example only keeps even numbers and has an initial
 value of zero.
 
-      numbers : Signal Int
+    numbers : Signal Int
 
-      isEven : Int -> Bool
+    isEven : Int -> Bool
 
-      evens : Signal Int
-      evens =
-          keepIf isEven 0 numbers
+    evens : Signal Int
+    evens =
+        keepIf isEven 0 numbers
 -}
 keepIf : (a -> Bool) -> a -> Signal a -> Signal a
 keepIf =
@@ -156,13 +156,13 @@ drop an update. If we drop all updates, we use the default value provided.
 The following example drops all even numbers and has an initial value of
 one.
 
-      numbers : Signal Int
+    numbers : Signal Int
 
-      isEven : Int -> Bool
+    isEven : Int -> Bool
 
-      odds : Signal Int
-      odds =
-          dropIf isEven 1 numbers
+    odds : Signal Int
+    odds =
+        dropIf isEven 1 numbers
 -}
 dropIf : (a -> Bool) -> a -> Signal a -> Signal a
 dropIf =
@@ -173,9 +173,9 @@ dropIf =
 just in case that signal is *never* true and no updates make it through. For
 example, here is how you would capture mouse drags.
 
-      dragPosition : Signal (Int,Int)
-      dragPosition =
-          keepWhen Mouse.isDown (0,0) Mouse.position
+    dragPosition : Signal (Int,Int)
+    dragPosition =
+        keepWhen Mouse.isDown (0,0) Mouse.position
 -}
 keepWhen : Signal Bool -> a -> Signal a -> Signal a
 keepWhen bs def sig = 
@@ -190,14 +190,14 @@ dropWhen bs = keepWhen (not <~ bs)
 
 {-| Drop updates that repeat the current value of the signal.
 
-      numbers : Signal Int
+    numbers : Signal Int
 
-      noDups : Signal Int
-      noDups =
-          dropRepeats numbers
+    noDups : Signal Int
+    noDups =
+        dropRepeats numbers
 
-      --  numbers => 0 0 3 3 5 5 5 4 ...
-      --  noDups  => 0   3   5     4 ...
+    --  numbers => 0 0 3 3 5 5 5 4 ...
+    --  noDups  => 0   3   5     4 ...
 -}
 dropRepeats : Signal a -> Signal a
 dropRepeats = Native.Signal.dropRepeats
@@ -220,13 +220,13 @@ f <~ s = Native.Signal.map f s
 many signals to flow into a function. Think of it as a fancy alias for `mapN`.
 For example, the following declarations are equivalent:
 
-      main : Signal Element
-      main =
-        scene <~ Window.dimensions ~ Mouse.position
+    main : Signal Element
+    main =
+      scene <~ Window.dimensions ~ Mouse.position
 
-      main : Signal ELement
-      main =
-        map2 scene Window.dimensions Mouse.position
+    main : Signal ELement
+    main =
+      map2 scene Window.dimensions Mouse.position
 
 You can use this pattern for as many signals as you want by using `(~)` a bunch
 of times, so you can go higher than `map5` if you need to.
@@ -261,18 +261,18 @@ channel =
 {-| Create a `Message` that can be sent to an `Channel` with a handler like
 `Html.onclick` or `Html.onblur`.
 
-      import Html
+    import Html
 
-      type Update = NoOp | Add Int | Remove Int
+    type Update = NoOp | Add Int | Remove Int
 
-      updates : Channel Update
-      updates = channel NoOp
+    updates : Channel Update
+    updates = channel NoOp
 
-      addButton : Html.Html
-      addButton =
-          Html.button
-              [ onclick (send updates (Add 1)) ]
-              [ Html.text "Add 1" ]
+    addButton : Html.Html
+    addButton =
+        Html.button
+            [ onclick (send updates (Add 1)) ]
+            [ Html.text "Add 1" ]
 -}
 send : Channel a -> a -> Message
 send =
@@ -282,19 +282,19 @@ send =
 {-| Receive all the messages sent to an `Channel` as a `Signal`. The following
 example shows how you would set up a system that uses an `Channel`.
 
-      -- initialState : Model
-      -- type Update = NoOp | ...
-      -- step : Update -> Model -> Model
-      -- view : Channel Update -> Model -> Element
+    -- initialState : Model
+    -- type Update = NoOp | ...
+    -- step : Update -> Model -> Model
+    -- view : Channel Update -> Model -> Element
 
-      updates : Channel Update
-      updates = channel NoOp
+    updates : Channel Update
+    updates = channel NoOp
 
-      main : Signal Element
-      main =
-        map
-          (view updates)
-          (foldp step initialState (subscribe updates))
+    main : Signal Element
+    main =
+      map
+        (view updates)
+        (foldp step initialState (subscribe updates))
 
 The `updates` channel appears twice in `main` because it serves as a bridge
 between your view and your signals. In the view you `send` to it, and in signal

@@ -42,10 +42,10 @@ import List ((::))
 produce values outside of the range [minInt, maxInt] but sufficient
 randomness is not guaranteed.
 
-      int 0 10   -- an integer between zero and ten
-      int -5 5   -- an integer between -5 and 5
+    int 0 10   -- an integer between zero and ten
+    int -5 5   -- an integer between -5 and 5
 
-      int minInt maxInt  -- an integer in the widest range feasible
+    int minInt maxInt  -- an integer in the widest range feasible
 -}
 int : Int -> Int -> Generator Int
 int a b seed =
@@ -105,9 +105,9 @@ float a b seed =
 a point in a certain 2D space. Imagine we have a collage that is 400 pixels
 wide and 200 pixels tall.
 
-      randomPoint : Generator (Int,Int)
-      randomPoint =
-          pair (int -200 200) (int -100 100)
+    randomPoint : Generator (Int,Int)
+    randomPoint =
+        pair (int -200 200) (int -100 100)
 
 -}
 pair : Generator a -> Generator b -> Generator (a,b)
@@ -120,15 +120,15 @@ pair genLeft genRight seed =
 
 {-| Create a list of random values using a generator function.
 
-      floatList : Generator (List Float)
-      floatList = list 10 (float 0 1)
+    floatList : Generator (List Float)
+    floatList = list 10 (float 0 1)
 
-      intList : Generator (List Int)
-      intList = list 5 (int 0 100)
+    intList : Generator (List Int)
+    intList = list 5 (int 0 100)
 
-      intPairs : Generator (List (Int, Int))
-      intPairs =
-          list 10 (pair int int)
+    intPairs : Generator (List (Int, Int))
+    intPairs =
+        list 10 (pair int int)
 -}
 list : Int -> Generator a -> Generator (List a)
 list n gen =
@@ -148,12 +148,12 @@ value and a new seed. The new seed is used to generate new random values. You
 can use this to define Generators of your own. For example, here is how
 `pair` is implemented.
 
-      pair : Generator a -> Generator b -> Generator (a,b)
-      pair genLeft genRight seed =
-          let (left , seed' ) = genLeft seed
-              (right, seed'') = genRight seed'
-          in
-              ((left,right), seed'')
+    pair : Generator a -> Generator b -> Generator (a,b)
+    pair genLeft genRight seed =
+        let (left , seed' ) = genLeft seed
+            (right, seed'') = genRight seed'
+        in
+            ((left,right), seed'')
 -}
 type alias Generator a =
     Seed -> (a, Seed)
@@ -170,18 +170,18 @@ type alias Seed =
 {-| Run a random value generator with a given seed. It will give you back a
 random value and a new seed.
 
-      seed0 = initialSeed 42
+    seed0 = initialSeed 42
 
-      -- generate int seed0 ==> (4123, seed1)
-      -- generate int seed1 ==> (-123, seed2)
-      -- generate int seed2 ==> (1021, seed3)
+    -- generate int seed0 ==> (4123, seed1)
+    -- generate int seed1 ==> (-123, seed2)
+    -- generate int seed2 ==> (1021, seed3)
 
 Notice that we use different seeds on each line. This is important! If you use
 the same seed, you get the same results.
 
-      -- generate int seed0 ==> (4123, seed1)
-      -- generate int seed0 ==> (4123, seed1)
-      -- generate int seed0 ==> (4123, seed1)
+    -- generate int seed0 ==> (4123, seed1)
+    -- generate int seed0 ==> (4123, seed1)
+    -- generate int seed0 ==> (4123, seed1)
 -}
 generate : Generator a -> Seed -> (a, Seed)
 generate generator seed =

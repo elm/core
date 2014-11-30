@@ -42,9 +42,9 @@ type Text = Text
 {-| Styles for lines on text. This allows you to add an underline, an overline,
 or a strike out text:
 
-      line Under   (fromString "underline")
-      line Over    (fromString "overline")
-      line Through (fromString "strike out")
+    line Under   (fromString "underline")
+    line Over    (fromString "overline")
+    line Through (fromString "strike out")
 -}
 type Line = Under | Over | Through
 
@@ -53,13 +53,13 @@ empty or the `height` is `Nothing`, the users will fall back on their browser's
 default settings. The following `Style` is black, 16 pixel tall, underlined, and
 Times New Roman (assuming that typeface is available on the user's computer):
 
-      { typeface = [ "Times New Roman", "serif" ]
-      , height   = Just 16
-      , color    = black
-      , bold     = False
-      , italic   = False
-      , line     = Just Under
-      }
+    { typeface = [ "Times New Roman", "serif" ]
+    , height   = Just 16
+    , color    = black
+    , bold     = False
+    , italic   = False
+    , line     = Just Under
+    }
 -}
 type alias Style =
   { typeface : List String
@@ -73,13 +73,13 @@ type alias Style =
 {-| Plain black text. It uses the browsers default typeface and text height.
 No decorations are used.
 
-      { typeface = []
-      , height = Nothing
-      , color = black
-      , bold = False
-      , italic = False
-      , line = Nothing
-      }
+    { typeface = []
+    , height = Nothing
+    , color = black
+    , bold = False
+    , italic = False
+    , line = Nothing
+    }
 -}
 defaultStyle : Style
 defaultStyle =
@@ -147,14 +147,14 @@ join seperator texts =
 `footerStyle` that is specifically for the bottom of your page, you could apply
 it to text like this:
 
-      style footerStyle (fromString "the old prince / 2007")
+    style footerStyle (fromString "the old prince / 2007")
 -}
 style : Style -> Text -> Text
 style = Native.Text.style
 
 {-| Provide a list of prefered typefaces for some text.
 
-      ["helvetica","arial","sans-serif"]
+    ["helvetica","arial","sans-serif"]
 
 Not every browser has access to the same typefaces, so rendering will use the
 first typeface in the list that is found on the user's computer. If there are
@@ -166,51 +166,51 @@ typeface = Native.Text.typeface
 
 {-| Switch to a monospace typeface. Good for code snippets.
 
-      monospace (fromString "foldl (+) 0 [1,2,3]")
+    monospace (fromString "foldl (+) 0 [1,2,3]")
 -}
 monospace : Text -> Text
 monospace = Native.Text.monospace
 
 {-| Create a link by providing a URL and the text of the link.
 
-      link "http://elm-lang.org" (fromString "Elm Website")
+    link "http://elm-lang.org" (fromString "Elm Website")
 -}
 link : String -> Text -> Text
 link = Native.Text.link
 
 {-| Set the height of some text.
 
-      height 40 (fromString "Title")
+    height 40 (fromString "Title")
 -}
 height : Float -> Text -> Text
 height = Native.Text.height
 
 {-| Set the color of some text.
 
-      color red (fromString "Red")
+    color red (fromString "Red")
 -}
 color : Color -> Text -> Text
 color = Native.Text.color
 
 {-| Make text bold.
 
-      fromString "sometimes you want " ++ bold (fromString "emphasis")
+    fromString "sometimes you want " ++ bold (fromString "emphasis")
 -}
 bold : Text -> Text
 bold = Native.Text.bold
 
 {-| Make text italic.
 
-      fromString "make it " ++ italic (fromString "important")
+    fromString "make it " ++ italic (fromString "important")
 -}
 italic : Text -> Text
 italic = Native.Text.italic
 
 {-| Put lines on text.
 
-      line Under   (fromString "underlined")
-      line Over    (fromString "overlined")
-      line Through (fromString "strike out")
+    line Under   (fromString "underlined")
+    line Over    (fromString "overlined")
+    line Through (fromString "strike out")
 -}
 line : Line -> Text -> Text
 line = Native.Text.line
@@ -241,7 +241,7 @@ justified = Native.Text.justified
 
 {-| Display a string with no styling.
 
-      plainText string = leftAligned (fromString string)
+    plainText string = leftAligned (fromString string)
 -}
 plainText : String -> Element
 plainText str =
@@ -254,7 +254,7 @@ markdown = Native.Text.markdown
 {-| Convert anything to its textual representation and make it displayable in
 the browser. Excellent for debugging.
 
-        asText value = leftAligned (monospace (fromString (show value)))
+    asText value = leftAligned (monospace (fromString (show value)))
 -}
 asText : a -> Element
 asText value =

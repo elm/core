@@ -214,7 +214,7 @@ fittedImage w h src =
 at the given top left coordinate. If you have a 140-by-140 image,
 the following will cut a 100-by-100 square out of the middle of it.
 
-        croppedImage (20,20) 100 100 "yogi.jpg"
+    croppedImage (20,20) 100 100 "yogi.jpg"
 -}
 croppedImage : (Int,Int) -> Int -> Int -> String -> Element
 croppedImage pos w h src =
@@ -241,7 +241,7 @@ type alias Position =
 easily, and there are tons of ways to set the `Position`.
 To center `element` exactly in a 300-by-300 square you would say:
 
-        container 300 300 middle element
+    container 300 300 middle element
 
 By setting the color of the container, you can create borders.
 -}
@@ -264,11 +264,11 @@ type Direction = DUp | DDown | DLeft | DRight | DIn | DOut
 {-| Have a list of elements flow in a particular direction.
 The `Direction` starts from the first element in the list.
 
-        flow right [a,b,c]
+    flow right [a,b,c]
 
-          +---+---+---+
-          | a | b | c |
-          +---+---+---+
+        +---+---+---+
+        | a | b | c |
+        +---+---+---+
 -}
 flow : Direction -> List Element -> Element
 flow dir es =

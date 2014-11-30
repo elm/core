@@ -45,13 +45,11 @@ caseInsensitive = Native.Regex.caseInsensitive
 
 {-| Check to see if a Regex is contained in a string.
 
-```haskell
-  contains (regex "123") "12345" == True
-  contains (regex "b+") "aabbcc" == True
+    contains (regex "123") "12345" == True
+    contains (regex "b+") "aabbcc" == True
 
-  contains (regex "789") "12345" == False
-  contains (regex "z+") "aabbcc" == False
-```
+    contains (regex "789") "12345" == False
+    contains (regex "z+") "aabbcc" == False
 -}
 contains : Regex -> String -> Bool
 contains = Native.Regex.contains
@@ -88,17 +86,15 @@ type HowMany = All | AtMost Int
 
 {-| Find matches in a string:
 
-```haskell
-  findTwoCommas = find (AtMost 2) (regex ",")
+    findTwoCommas = find (AtMost 2) (regex ",")
 
-    -- map .index (findTwoCommas "a,b,c,d,e") == [1,3]
-    -- map .index (findTwoCommas "a b c d e") == []
+      -- map .index (findTwoCommas "a,b,c,d,e") == [1,3]
+      -- map .index (findTwoCommas "a b c d e") == []
 
-  places = find All (regex "[oi]n a (\\w+)") "I am on a boat in a lake."
+    places = find All (regex "[oi]n a (\\w+)") "I am on a boat in a lake."
 
-    -- map .match places == ["on a boat", "in a lake"]
-    -- map .submatches places == [ [Just "boat"], [Just "lake"] ]
-```
+      -- map .match places == ["on a boat", "in a lake"]
+      -- map .submatches places == [ [Just "boat"], [Just "lake"] ]
 -}
 find : HowMany -> Regex -> String -> List Match
 find = Native.Regex.find
@@ -106,26 +102,22 @@ find = Native.Regex.find
 {-| Replace matches. The function from `Match` to `String` lets
 you use the details of a specific match when making replacements.
 
-```haskell
-  devowel = replace All (regex "[aeiou]") (\_ -> "")
+    devowel = replace All (regex "[aeiou]") (\_ -> "")
 
-    -- devowel "The quick brown fox" == "Th qck brwn fx"
+      -- devowel "The quick brown fox" == "Th qck brwn fx"
 
-  reverseWords = replace All (regex "\\w+") (\{match} -> String.reverse match)
+    reverseWords = replace All (regex "\\w+") (\{match} -> String.reverse match)
 
-    -- reverseWords "deliver mined parts" == "reviled denim strap"
-```
+      -- reverseWords "deliver mined parts" == "reviled denim strap"
 -}
 replace : HowMany -> Regex -> (Match -> String) -> String -> String
 replace = Native.Regex.replace
 
 {-| Split a string, using the regex as the separator.
 
-```haskell
-  split (AtMost 1) (regex ",") "tom,99,90,85" == ["tom","99,90,85"]
+    split (AtMost 1) (regex ",") "tom,99,90,85" == ["tom","99,90,85"]
 
-  split All (regex ",") "a,b,c,d" == ["a","b","c","d"]
-```
+    split All (regex ",") "a,b,c,d" == ["a","b","c","d"]
 -}
 split : HowMany -> Regex -> String -> List String
 split = Native.Regex.split
