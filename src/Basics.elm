@@ -111,23 +111,23 @@ infixl 7 `rem`
 
 {-| Find the remainder after dividing one number by another.
 
-       7 `rem` 2 == 1
-      -1 `rem` 4 == -1
+     7 `rem` 2 == 1
+    -1 `rem` 4 == -1
 -}
 rem : Int -> Int -> Int
 rem = Native.Basics.rem
 
 {-| Perform [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic).
 
-       7 % 2 == 1
-      -1 % 4 == 3
+     7 % 2 == 1
+    -1 % 4 == 3
 -}
 (%) : Int -> Int -> Int
 (%) = Native.Basics.mod
 
 {-| Exponentiation
 
-      3^2 == 9`
+    3^2 == 9`
 -}
 (^) : number -> number -> number
 (^) = Native.Basics.exp
@@ -170,9 +170,9 @@ sqrt = Native.Basics.sqrt
 
 {-| Negate a number.
 
-      negate 42 == -42
-      negate -42 == 42
-      negate 0 == 0
+    negate 42 == -42
+    negate -42 == 42
+    negate 0 == 0
 -}
 negate : number -> number
 negate = Native.Basics.negate
@@ -183,8 +183,8 @@ abs = Native.Basics.abs
 
 {-| Calculate the logarithm of a number with a given base.
 
-      logBase 10 100 == 2
-      logBase 2 256 == 8
+    logBase 10 100 == 2
+    logBase 2 256 == 8
 -}
 logBase : Float -> Float -> Float
 logBase = Native.Basics.logBase
@@ -192,9 +192,9 @@ logBase = Native.Basics.logBase
 {-| Clamps a number within a given range. With the expression
 `clamp 100 200 x` the results are as follows:
 
-      100     if x < 100
-       x      if 100 <= x < 200
-      200     if 200 <= x
+    100     if x < 100
+     x      if 100 <= x < 200
+    200     if 200 <= x
 -}
 clamp : number -> number -> number -> number
 clamp = Native.Basics.clamp
@@ -310,20 +310,20 @@ toFloat = Native.Basics.toFloat
 NaN stands for *not a number* and it is [a standardized part of floating point
 numbers](http://en.wikipedia.org/wiki/NaN).
 
-      isNaN (0/0)     == True
-      isNaN (sqrt -1) == True
-      isNaN (1/0)     == False  -- infinity is a number
-      isNaN 1         == False
+    isNaN (0/0)     == True
+    isNaN (sqrt -1) == True
+    isNaN (1/0)     == False  -- infinity is a number
+    isNaN 1         == False
 -}
 isNaN : Float -> Bool
 isNaN = Native.Basics.isNaN
 
 {- | Determine whether a float is positive or negative infinity.
 
-      isInfinite (0/0)     == False
-      isInfinite (sqrt -1) == False
-      isInfinite (1/0)     == True
-      isInfinite 1         == False
+    isInfinite (0/0)     == False
+    isInfinite (sqrt -1) == False
+    isInfinite (1/0)     == True
+    isInfinite 1         == False
 
 Notice that NaN is not infinite! For float `n` to be finite implies that
 `not (isInfinite n || isNaN n)` evaluates to `True`.
@@ -334,8 +334,8 @@ isInfinite = Native.Basics.isInfinite
 
 {-| Turn any kind of value into a string.
 
-      toString 42    == "42"
-      toString [1,2] == "[1,2]"
+    toString 42    == "42"
+    toString [1,2] == "[1,2]"
 -}
 toString : a -> String
 toString = Native.Show.toString
@@ -343,8 +343,8 @@ toString = Native.Show.toString
 
 {-| Put two appendable things together. This includes strings, lists, and text.
 
-      "hello" ++ "world" == "helloworld"
-      [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
+    "hello" ++ "world" == "helloworld"
+    [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
 -}
 (++) : appendable -> appendable -> appendable
 (++) = Native.Utils.append
@@ -357,15 +357,15 @@ infixr 5 ++
 {-| Function composition, passing results along in the suggested direction. For
 example, the following code checks if the square root of a number is odd:
 
-      not << isEven << sqrt
+    not << isEven << sqrt
 
 You can think of this operator as equivalent to the following:
 
-      (g << f)  ==  (\x -> g (f x))
+    (g << f)  ==  (\x -> g (f x))
 
 So our example expands out to something like this:
 
-      \n -> not (isEven (sqrt n))
+    \n -> not (isEven (sqrt n))
 -}
 (<<) : (b -> c) -> (a -> b) -> (a -> c)
 (<<) g f x = g (f x)
@@ -373,7 +373,7 @@ So our example expands out to something like this:
 {-| Function composition, passing results along in the suggested direction. For
 example, the following code checks if the square root of a number is odd:
 
-      sqrt >> isEven >> not
+    sqrt >> isEven >> not
 
 This direction of function composition seems less pleasant than `(<<)` which
 reads nicely in expressions like: `filter (not << isRegistered) students`
@@ -385,13 +385,14 @@ reads nicely in expressions like: `filter (not << isRegistered) students`
 for avoiding parenthesis and writing code in a more natural way.
 Consider the following code to create a pentagon:
 
-        scale 2 (move (10,10) (filled blue (ngon 5 30)))
+    scale 2 (move (10,10) (filled blue (ngon 5 30)))
 
 This can also be written as:
 
-        ngon 5 30 |> filled blue
-                  |> move (10,10)
-                  |> scale 2
+    ngon 5 30
+      |> filled blue
+      |> move (10,10)
+      |> scale 2
 -}
 (|>) : a -> (a -> b) -> b
 x |> f = f x
@@ -399,11 +400,11 @@ x |> f = f x
 {-| Backward function application `f <| x == f x`. This function is useful for
 avoiding parenthesis. Consider the following code to create a text element:
 
-        text (monospace (toText "code"))
+    text (monospace (toText "code"))
 
 This can also be written as:
 
-        text << monospace <| toText "code"
+    text << monospace <| toText "code"
 -}
 (<|) : (a -> b) -> a -> b
 f <| x = f x
@@ -423,14 +424,14 @@ identity x = x
 a function that *always* returns the same value regardless of what input you give.
 It is defined as:
 
-        always a b = a
+    always a b = a
 
 It totally ignores the second argument, so `always 42` is a function that always
 returns 42. When you are dealing with higher-order functions, this comes in
 handy more often than you might expect. For example, creating a zeroed out list
 of length ten would be:
 
-        map (always 0) [0..9]
+    map (always 0) [0..9]
 -}
 always : a -> b -> a
 always a _ = a
