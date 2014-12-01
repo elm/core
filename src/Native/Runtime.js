@@ -299,18 +299,76 @@ if (!Elm.fullscreen) {
           var Element = Elm.Native.Graphics.Element.make(elm);
           elm.node.appendChild(Element.render(currentScene));
 
-          // set up updates so that the DOM is adjusted as necessary.
+          var _requestAnimationFrame =
+              (typeof requestAnimationFrame === 'undefined') ?
+              function (cb) { setTimeout(cb, 1000/60); } :
+              requestAnimationFrame;
+
+          // domUpdate is called whenever the main Signal changes.
+          //
+          // domUpdate and drawCallback implement a small state machine in order
+          // to schedule only 1 draw per animation frame. This enforces that
+          // once draw has been called, it will not be called again until the
+          // next frame.
+          //
+          // drawCallback is scheduled whenever
+          // 1. The state transitions from SCHEDULED to DREW, or
+          // 2. The state transitions from EMPTY to SCHEDULED
+          //
+          // Invariants:
+          // 1. In the EMPTY state, there is never a scheduled drawCallback.
+          // 2. In the SCHEDULED and DREW states, there is always exactly 1
+          //    scheduled drawCallback.
+          var EMPTY = 0;
+          var SCHEDULED = 1;
+          var DREW = 2;
+          var state = EMPTY;
           var savedScene = currentScene;
-          var previousDrawId = 0;
+          var scheduledScene = currentScene;
+
           function domUpdate(newScene) {
-              previousDrawId = draw(previousDrawId, function(_) {
-                  Element.updateAndReplace(elm.node.firstChild, savedScene, newScene);
-                  if (elm.Native.Window) {
-                      elm.Native.Window.values.resizeIfNeeded();
-                  }
-                  savedScene = newScene;
-              });
+              scheduledScene = newScene;
+
+              switch (state) {
+                  case EMPTY:
+                      _requestAnimationFrame(drawCallback);
+                      state = SCHEDULED;
+                      return;
+                  case SCHEDULED:
+                      state = SCHEDULED;
+                      return;
+                  case DREW:
+                      state = SCHEDULED;
+                      return;
+              }
           }
+
+          function drawCallback() {
+              switch (state) {
+                  case EMPTY:
+                      throw new Error(
+                        "Unexpected draw callback.\n" +
+                        "Please report this to <https://github.com/elm-lang/Elm/issues>."
+                      );
+                  case SCHEDULED:
+                      _requestAnimationFrame(drawCallback);
+                      state = DREW;
+                      draw();
+                      return;
+                  case DREW:
+                      state = EMPTY;
+                      return;
+              }
+          }
+
+          function draw() {
+              Element.updateAndReplace(elm.node.firstChild, savedScene, scheduledScene);
+              if (elm.Native.Window) {
+                  elm.Native.Window.values.resizeIfNeeded();
+              }
+              savedScene = scheduledScene;
+          }
+
           var renderer = A2(Signal.map, domUpdate, signalGraph);
 
           // must check for resize after 'renderer' is created so
@@ -321,34 +379,6 @@ if (!Elm.fullscreen) {
 
           return renderer;
         }
-
-
-        // define function for drawing efficiently
-        //
-        //   draw : RequestID -> (() -> ()) -> RequestID
-        //
-        // Takes a "RequestID" allowing you to cancel old requests if possible.
-        // Returns a "RequestID" so you can refer to past requests.
-        //
-        function draw(previousRequestID, callback) {
-            callback();
-            return previousRequestID;
-        }
-
-        var vendors = ['ms', 'moz', 'webkit', 'o'];
-        var win = typeof window !== 'undefined' ? window : {};
-        for (var i = 0; i < vendors.length && !win.requestAnimationFrame; ++i) {
-            win.requestAnimationFrame = win[vendors[i]+'RequestAnimationFrame'];
-            win.cancelAnimationFrame  = win[vendors[i]+'CancelAnimationFrame'] ||
-                                        win[vendors[i]+'CancelRequestAnimationFrame'];
-        }
-        if (win.requestAnimationFrame && win.cancelAnimationFrame) {
-            draw = function(previousRequestID, callback) {
-                win.cancelAnimationFrame(previousRequestID);
-                return win.requestAnimationFrame(callback);
-            };
-        }
-
 
         //// HOT SWAPPING ////
 
