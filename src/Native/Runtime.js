@@ -321,7 +321,6 @@ if (!Elm.fullscreen) {
           //    scheduled drawCallback.
           var EMPTY = 0;
           var SCHEDULED = 1;
-          var DREW = 2;
           var state = EMPTY;
           var savedScene = currentScene;
           var scheduledScene = currentScene;
@@ -337,26 +336,17 @@ if (!Elm.fullscreen) {
                   case SCHEDULED:
                       state = SCHEDULED;
                       return;
-                  case DREW:
-                      state = SCHEDULED;
-                      return;
               }
           }
 
           function drawCallback() {
               switch (state) {
                   case EMPTY:
-                      throw new Error(
-                        "Unexpected draw callback.\n" +
-                        "Please report this to <https://github.com/elm-lang/Elm/issues>."
-                      );
+                      return;
                   case SCHEDULED:
                       _requestAnimationFrame(drawCallback);
-                      state = DREW;
-                      draw();
-                      return;
-                  case DREW:
                       state = EMPTY;
+                      draw();
                       return;
               }
           }
