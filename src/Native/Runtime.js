@@ -300,7 +300,10 @@ if (!Elm.fullscreen) {
           elm.node.appendChild(Element.render(initialScene));
 
           var _requestAnimationFrame =
-              requestAnimationFrame || function(cb) { setTimeout(cb, 1000/60); };
+              typeof requestAnimationFrame !== 'undefined'
+                ? requestAnimationFrame
+                : function(cb) { setTimeout(cb, 1000/60); }
+                ;
 
           // domUpdate is called whenever the main Signal changes.
           //
