@@ -304,59 +304,36 @@ if (!Elm.fullscreen) {
               function (cb) { setTimeout(cb, 1000/60); } :
               requestAnimationFrame;
 
-          // domUpdate is called whenever the main Signal changes.
+          // domUpdate is called whenever the main Signal changes. On domUpdate,
           //
-          // domUpdate and drawCallback implement a small state machine in order
-          // to schedule only 1 draw per animation frame. This enforces that
-          // once draw has been called, it will not be called again until the
-          // next frame.
-          //
-          // drawCallback is scheduled whenever
-          // 1. The state transitions from SCHEDULED to DREW, or
-          // 2. The state transitions from EMPTY to SCHEDULED
-          //
-          // Invariants:
-          // 1. In the EMPTY state, there is never a scheduled drawCallback.
-          // 2. In the SCHEDULED and DREW states, there is always exactly 1
-          //    scheduled drawCallback.
-          var EMPTY = 0;
-          var SCHEDULED = 1;
-          var state = EMPTY;
+          // 1. schedule a draw using requestAnimationFrame if there is no draw already scheduled
+          // 2. replace the scene to be drawn with newScene
+          var drawScheduled = false;
           var savedScene = currentScene;
-          var scheduledScene = currentScene;
+          var newScene = currentScene;
 
-          function domUpdate(newScene) {
-              scheduledScene = newScene;
-
-              switch (state) {
-                  case EMPTY:
-                      _requestAnimationFrame(drawCallback);
-                      state = SCHEDULED;
-                      return;
-                  case SCHEDULED:
-                      state = SCHEDULED;
-                      return;
+          function domUpdate(_newScene) {
+              newScene = _newScene;
+              if (!drawScheduled) {
+                  _requestAnimationFrame(drawCallback);
+                  drawScheduled = true;
               }
           }
 
           function drawCallback() {
-              switch (state) {
-                  case EMPTY:
-                      return;
-                  case SCHEDULED:
-                      _requestAnimationFrame(drawCallback);
-                      state = EMPTY;
-                      draw();
-                      return;
+              if (drawScheduled) {
+                  _requestAnimationFrame(drawCallback);
+                  draw();
+                  drawScheduled = false;
               }
           }
 
           function draw() {
-              Element.updateAndReplace(elm.node.firstChild, savedScene, scheduledScene);
+              Element.updateAndReplace(elm.node.firstChild, savedScene, newScene);
               if (elm.Native.Window) {
                   elm.Native.Window.values.resizeIfNeeded();
               }
-              savedScene = scheduledScene;
+              savedScene = newScene;
           }
 
           var renderer = A2(Signal.map, domUpdate, signalGraph);
