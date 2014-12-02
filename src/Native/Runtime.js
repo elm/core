@@ -293,16 +293,14 @@ if (!Elm.fullscreen) {
           if (!('recv' in signalGraph)) {
               signalGraph = Signal.constant(signalGraph);
           }
-          var currentScene = signalGraph.value;
+          var initialScene = signalGraph.value;
 
-         // Add the currentScene to the DOM
+         // Add the initialScene to the DOM
           var Element = Elm.Native.Graphics.Element.make(elm);
-          elm.node.appendChild(Element.render(currentScene));
+          elm.node.appendChild(Element.render(initialScene));
 
           var _requestAnimationFrame =
-              (typeof requestAnimationFrame === 'undefined') ?
-              function (cb) { setTimeout(cb, 1000/60); } :
-              requestAnimationFrame;
+              requestAnimationFrame || function(cb) { setTimeout(cb, 1000/60); };
 
           // domUpdate is called whenever the main Signal changes.
           //
@@ -312,51 +310,65 @@ if (!Elm.fullscreen) {
           // next frame.
           //
           // drawCallback is scheduled whenever
-          // 1. The state transitions from SCHEDULED to DREW, or
-          // 2. The state transitions from EMPTY to SCHEDULED
+          // 1. The state transitions from PENDING_REQUEST to EXTRA_REQUEST, or
+          // 2. The state transitions from NO_REQUEST to PENDING_REQUEST
           //
           // Invariants:
-          // 1. In the EMPTY state, there is never a scheduled drawCallback.
-          // 2. In the SCHEDULED and DREW states, there is always exactly 1
+          // 1. In the NO_REQUEST state, there is never a scheduled drawCallback.
+          // 2. In the PENDING_REQUEST and EXTRA_REQUEST states, there is always exactly 1
           //    scheduled drawCallback.
-          var EMPTY = 0;
-          var SCHEDULED = 1;
-          var DREW = 2;
-          var state = EMPTY;
-          var savedScene = currentScene;
-          var scheduledScene = currentScene;
+          var NO_REQUEST = 0;
+          var PENDING_REQUEST = 1;
+          var EXTRA_REQUEST = 2;
+          var state = NO_REQUEST;
+          var savedScene = initialScene;
+          var scheduledScene = initialScene;
 
           function domUpdate(newScene) {
               scheduledScene = newScene;
 
               switch (state) {
-                  case EMPTY:
+                  case NO_REQUEST:
                       _requestAnimationFrame(drawCallback);
-                      state = SCHEDULED;
+                      state = PENDING_REQUEST;
                       return;
-                  case SCHEDULED:
-                      state = SCHEDULED;
+                  case PENDING_REQUEST:
+                      state = PENDING_REQUEST;
                       return;
-                  case DREW:
-                      state = SCHEDULED;
+                  case EXTRA_REQUEST:
+                      state = PENDING_REQUEST;
                       return;
               }
           }
 
           function drawCallback() {
               switch (state) {
-                  case EMPTY:
+                  case NO_REQUEST:
+                      // This state should not be possible. How can there be no
+                      // request, yet somehow we are actively fulfilling a
+                      // request?
                       throw new Error(
                         "Unexpected draw callback.\n" +
-                        "Please report this to <https://github.com/elm-lang/Elm/issues>."
+                        "Please report this to <https://github.com/elm-lang/core/issues>."
                       );
-                  case SCHEDULED:
+
+                  case PENDING_REQUEST:
+                      // At this point, we do not *know* that another frame is
+                      // needed, but we make an extra request to rAF just in
+                      // case. It's possible to drop a frame if rAF is called
+                      // too late, so we just do it preemptively.
                       _requestAnimationFrame(drawCallback);
-                      state = DREW;
+                      state = EXTRA_REQUEST;
+
+                      // There's also stuff we definitely need to draw.
                       draw();
                       return;
-                  case DREW:
-                      state = EMPTY;
+
+                  case EXTRA_REQUEST:
+                      // Turns out the extra request was not needed, so we will
+                      // stop calling rAF. No reason to call it all the time if
+                      // no one needs it.
+                      state = NO_REQUEST;
                       return;
               }
           }
