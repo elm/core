@@ -299,18 +299,43 @@ if (!Elm.fullscreen) {
           var Element = Elm.Native.Graphics.Element.make(elm);
           elm.node.appendChild(Element.render(currentScene));
 
-          // set up updates so that the DOM is adjusted as necessary.
+          var _requestAnimationFrame =
+              (typeof requestAnimationFrame === 'undefined') ?
+              function (cb) { setTimeout(cb, 1000/60); } :
+              requestAnimationFrame;
+
+          // domUpdate is called whenever the main Signal changes. On domUpdate,
+          //
+          // 1. schedule a draw using requestAnimationFrame if there is no draw already scheduled
+          // 2. replace the scene to be drawn with newScene
+          var drawScheduled = false;
           var savedScene = currentScene;
-          var previousDrawId = 0;
-          function domUpdate(newScene) {
-              previousDrawId = draw(previousDrawId, function(_) {
-                  Element.updateAndReplace(elm.node.firstChild, savedScene, newScene);
-                  if (elm.Native.Window) {
-                      elm.Native.Window.values.resizeIfNeeded();
-                  }
-                  savedScene = newScene;
-              });
+          var newScene = currentScene;
+
+          function domUpdate(_newScene) {
+              newScene = _newScene;
+              if (!drawScheduled) {
+                  _requestAnimationFrame(drawCallback);
+                  drawScheduled = true;
+              }
           }
+
+          function drawCallback() {
+              if (drawScheduled) {
+                  _requestAnimationFrame(drawCallback);
+                  draw();
+                  drawScheduled = false;
+              }
+          }
+
+          function draw() {
+              Element.updateAndReplace(elm.node.firstChild, savedScene, newScene);
+              if (elm.Native.Window) {
+                  elm.Native.Window.values.resizeIfNeeded();
+              }
+              savedScene = newScene;
+          }
+
           var renderer = A2(Signal.map, domUpdate, signalGraph);
 
           // must check for resize after 'renderer' is created so
@@ -321,34 +346,6 @@ if (!Elm.fullscreen) {
 
           return renderer;
         }
-
-
-        // define function for drawing efficiently
-        //
-        //   draw : RequestID -> (() -> ()) -> RequestID
-        //
-        // Takes a "RequestID" allowing you to cancel old requests if possible.
-        // Returns a "RequestID" so you can refer to past requests.
-        //
-        function draw(previousRequestID, callback) {
-            callback();
-            return previousRequestID;
-        }
-
-        var vendors = ['ms', 'moz', 'webkit', 'o'];
-        var win = typeof window !== 'undefined' ? window : {};
-        for (var i = 0; i < vendors.length && !win.requestAnimationFrame; ++i) {
-            win.requestAnimationFrame = win[vendors[i]+'RequestAnimationFrame'];
-            win.cancelAnimationFrame  = win[vendors[i]+'CancelAnimationFrame'] ||
-                                        win[vendors[i]+'CancelRequestAnimationFrame'];
-        }
-        if (win.requestAnimationFrame && win.cancelAnimationFrame) {
-            draw = function(previousRequestID, callback) {
-                win.cancelAnimationFrame(previousRequestID);
-                return win.requestAnimationFrame(callback);
-            };
-        }
-
 
         //// HOT SWAPPING ////
 
