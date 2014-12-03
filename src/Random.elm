@@ -7,9 +7,43 @@ module Random
     )
   where
 
-{-| This library helps you generate pseudo-random values. The best way to use
-it in your programs probably involves carrying a `Seed` in your application's
-state.
+{-| This library helps you generate pseudo-random values.
+
+The general pattern is to define a `Generator` which can produce certain kinds
+of random values. You actually produce random values by feeding a fresh `Seed`
+to your `Generator`.
+
+Since you need a fresh `Seed` to produce more random values, you should
+probably store a `Seed` in your application's state. This will allow you to
+keep updating it as you generate random values and fresh seeds.
+
+The following example models a bunch of bad guys that randomly appear. The
+`possiblyAddBadGuy` function uses the random seed to see if we should add a bad
+guy, and if so, it places a bad guy at a randomly generated point.
+
+    type alias Model =
+        { badGuys : List (Float,Float)
+        , seed : Seed
+        }
+
+    possiblyAddBadGuy : Model -> Model
+    possiblyAddBadGuy model =
+        let (addProbability, seed') =
+              generate (float 0 1) model.seed
+        in
+            if addProbability < 0.9
+              then
+                { model |
+                    seed <- seed'
+                }
+              else
+                let (position, seed'') =
+                      generate (pair (float 0 100) (float 0 100)) seed'
+                in
+                    { model |
+                        badGuys <- position :: model.badGuys
+                        seed <- seed''
+                    }
 
 Details: This is an implemenation of the Portable Combined Generator of
 L'Ecuyer for 32-bit computers. It is almost a direct translation from the
@@ -38,9 +72,9 @@ import List
 import List ((::))
 
 
-{-| Generate a 32-bit integer in a given range. This function will continue to
-produce values outside of the range [minInt, maxInt] but sufficient
-randomness is not guaranteed.
+{-| Create a generator that produces 32-bit integers in a given range. This
+function *can* produce values outside of the range [minInt, maxInt] but
+sufficient randomness is not guaranteed.
 
     int 0 10   -- an integer between zero and ten
     int -5 5   -- an integer between -5 and 5
@@ -82,7 +116,14 @@ minInt : Int
 minInt = -2147483648
 
 
-{-| Generate a float in a given range.
+{-| Create a generator that produces floats in a given range.
+
+    probability : Generator Float
+    probability =
+        float 0 1
+
+    -- generate probability seed0 ==> (0.51, seed1)
+    -- generate probability seed1 ==> (0.04, seed2)
 -}
 float : Float -> Float -> Generator Float
 float a b seed =
@@ -170,18 +211,18 @@ type alias Seed =
 {-| Run a random value generator with a given seed. It will give you back a
 random value and a new seed.
 
-    seed0 = initialSeed 42
+    seed0 = initialSeed 31415
 
-    -- generate int seed0 ==> (4123, seed1)
-    -- generate int seed1 ==> (-123, seed2)
-    -- generate int seed2 ==> (1021, seed3)
+    -- generate (int 0 100) seed0 ==> (42, seed1)
+    -- generate (int 0 100) seed1 ==> (31, seed2)
+    -- generate (int 0 100) seed2 ==> (99, seed3)
 
 Notice that we use different seeds on each line. This is important! If you use
 the same seed, you get the same results.
 
-    -- generate int seed0 ==> (4123, seed1)
-    -- generate int seed0 ==> (4123, seed1)
-    -- generate int seed0 ==> (4123, seed1)
+    -- generate (int 0 100) seed0 ==> (42, seed1)
+    -- generate (int 0 100) seed0 ==> (42, seed1)
+    -- generate (int 0 100) seed0 ==> (42, seed1)
 -}
 generate : Generator a -> Seed -> (a, Seed)
 generate generator seed =
