@@ -3,7 +3,7 @@ module Trampoline where
 makes it possible to recursively call a function without growing the stack.
 
 Popular JavaScript implementations do not perform any tail-call elimination, so
-recursive functions can cause a stack overflow if they go to deep. Trampolines
+recursive functions can cause a stack overflow if they go too deep. Trampolines
 permit unbounded recursion despite limitations in JavaScript.
 
 This strategy may create many intermediate closures, which is very expensive in
