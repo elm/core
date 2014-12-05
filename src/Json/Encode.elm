@@ -3,8 +3,8 @@ module Json.Encode where
 
 {-| Library for turning Elm values into JSON values.
 
-# To String
-@docs toString
+# Encoding
+@docs encode
 
 # Primatives
 @docs string, int, float, bool, null

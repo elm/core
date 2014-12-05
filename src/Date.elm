@@ -5,7 +5,7 @@ module Date where
 issues with internationalization or locale formatting.
 
 # Conversions
-@docs read, toTime, fromTime
+@docs fromString, toTime, fromTime
 
 # Extractions
 @docs year, month, Month, day, dayOfWeek, Day, hour, minute, second
