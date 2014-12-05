@@ -41,12 +41,12 @@
 
   * Add the following functions to `Maybe`
 
-        (?) : Maybe a -> a -> a
+        withDefault : a -> Maybe a -> a
         oneOf : List (Maybe a) -> Maybe a
         map : (a -> b) -> Maybe a -> Maybe b
         andThen : Maybe a -> (a -> Maybe b) -> Maybe b
 
-  * Remove `Maybe.maybe` so `maybe 0 sqrt Nothing` becomes `map sqrt Nothing ? 0`
+  * Remove `Maybe.maybe` so `maybe 0 sqrt Nothing` becomes `withDefault 0 (map sqrt Nothing)`
 
   * Add `Result` library for proper error handling. This is for cases when
     you want a computation to succeed, but if there is a mistake, it should
