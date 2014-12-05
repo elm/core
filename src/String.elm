@@ -65,7 +65,7 @@ pattern match on strings exactly as you would with lists.
 uncons : String -> Maybe (Char, String)
 uncons = Native.String.uncons
 
-{-| Append two strings. You can also use [the `(++)` operator](/library/List.elm#++)
+{-| Append two strings. You can also use [the `(++)` operator](Basics#++)
 to do this.
 
     append "butter" "fly" == "butterfly"
