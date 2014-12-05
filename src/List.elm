@@ -7,7 +7,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, tail, last, filter, take, drop
+@docs head, tail, filter, take, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
