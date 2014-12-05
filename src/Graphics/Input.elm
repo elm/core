@@ -89,18 +89,19 @@ favorite British sport:
 
     sportDropDown : Element
     sportDropDown =
-        dropDown
-          [ (""        , Signal.send sport Nothing)
-          , ("Football", Signal.send sport (Just Football))
-          , ("Cricket" , Signal.send sport (Just Cricket))
-          , ("Snooker" , Signal.send sport (Just Snooker))
+        dropDown (Signal.send sport)
+          [ (""        , Nothing)
+          , ("Football", Just Football)
+          , ("Cricket" , Just Cricket)
+          , ("Snooker" , Just Snooker)
           ]
 
-If the user selects "Football" from the drop down menue, `sport.signal`
+If the user selects "Football" from the drop down menue, `Signal.subscribe sport`
 will update to `Just Football`.
 -}
-dropDown : List (String, Signal.Message) -> Element
-dropDown = Native.Graphics.Input.dropDown
+dropDown : (a -> Signal.Message) -> List (String, a) -> Element
+dropDown =
+  Native.Graphics.Input.dropDown
 
 
 {-| Detect mouse hovers over a specific `Element`. In the following example,
