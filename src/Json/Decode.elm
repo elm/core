@@ -4,7 +4,7 @@ module Json.Decode where
 # Run a Decoder
 @docs decodeString, decodeValue
 
-# Primatives
+# Primitives
 @docs string, int, float, bool, null
 
 # Arrays
