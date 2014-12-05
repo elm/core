@@ -9,7 +9,7 @@
 
 ### Make JSON parsing easy
 
-  * Added `JavaScript.ToElm`, `JavaScript.FromElm`, and `Json` libraries
+  * Added `Json.Decode` and `Json.Encode` libraries
 
 
 ### Use more natural names
@@ -48,6 +48,8 @@
 
   * Remove `Maybe.maybe` so `maybe 0 sqrt Nothing` becomes `withDefault 0 (map sqrt Nothing)`
 
+  * Remove `Maybe.isJust` and `Maybe.isNothing` in favor of pattern matching
+
   * Add `Result` library for proper error handling. This is for cases when
     you want a computation to succeed, but if there is a mistake, it should
     produce a nice error message.
@@ -56,8 +58,8 @@
 
   * Revamp functions that result in a `Maybe`.
 
-      - Remove `Dict.getOrElse` and `Dict.getOrFail` in favor of `Dict.get key dict ? 0`
-      - Remove `Array.getOrElse` and `Array.getOrFail` in favor of `Array.get index array ? 0`
+      - Remove `Dict.getOrElse` and `Dict.getOrFail` in favor of `withDefault 0 (Dict.get key dict)`
+      - Remove `Array.getOrElse` and `Array.getOrFail` in favor of `withDefault 0 (Array.get index array)`
       - Change `String.toInt : String -> Maybe Int` to `String.toInt : String -> Result String Int`
       - Change `String.toFloat : String -> Maybe Float` to `String.toFloat : String -> Result String Float`
 
@@ -74,3 +76,7 @@
   * Make the following changes in `List`:
       - Replace `(++)` with `append`
       - Remove `join`
+
+### Miscellaneous
+
+  * Rename `Text.toText` to `Text.fromString`
