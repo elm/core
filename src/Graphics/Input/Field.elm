@@ -81,7 +81,7 @@ type alias Highlight =
     , width:Int
     }
 
-{-| An highlight with zero width, so you cannot see it. -}
+{-| A highlight with zero width, so you cannot see it. -}
 noHighlight : Highlight
 noHighlight = Highlight Color.blue 0
 
