@@ -1,5 +1,6 @@
 module Test.Basics (tests) where
 
+import Basics (..)
 import ElmTest.Assertion (..)
 import ElmTest.Test (..)
 

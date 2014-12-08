@@ -1,7 +1,9 @@
 module Test.Dict (tests) where
 
+import Basics (..)
 import Dict
 import List
+import Maybe (..)
 
 import ElmTest.Assertion (..)
 import ElmTest.Test (..)
@@ -26,9 +28,6 @@ tests =
         , test "member 2" <| assertEqual False (Dict.member "Spike" animals)
         , test "get 1" <| assertEqual (Just "cat") (Dict.get "Tom" animals)
         , test "get 2" <| assertEqual Nothing (Dict.get "Spike" animals)
-        , test "getOrElse 1" <| assertEqual "mouse" (Dict.getOrElse "dog" "Jerry" animals)
-        , test "getOrElse 2" <| assertEqual "dog" (Dict.getOrElse "dog" "Spike" animals)
-        , test "getOrFail" <| assertEqual "cat" (Dict.getOrFail "Tom" animals)
         ]
       combineTests = suite "combine Tests"
         [ test "union" <| assertEqual animals (Dict.union (Dict.singleton "Jerry" "mouse") (Dict.singleton "Tom" "cat"))

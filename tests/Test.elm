@@ -1,5 +1,8 @@
 module Main where
 
+import Basics (..)
+import Signal (..)
+
 import ElmTest.Assertion as A
 import ElmTest.Run as R
 import ElmTest.Runner.Console (runDisplay)

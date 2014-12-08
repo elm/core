@@ -1,11 +1,14 @@
 module Test.Equality (tests) where
 
+import Basics (..)
+import Maybe (..)
+
 import ElmTest.Assertion (..)
 import ElmTest.Test (..)
 
-data Different
+type Different
     = A String 
-    | B [Int]
+    | B (List Int)
 
 tests : Test
 tests = 

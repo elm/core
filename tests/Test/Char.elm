@@ -1,5 +1,6 @@
 module Test.Char (tests) where
 
+import Basics (..)
 import Char
 
 import ElmTest.Assertion (..)

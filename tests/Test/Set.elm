@@ -1,5 +1,7 @@
 module Test.Set (tests) where
 
+import Basics (..)
+
 import Set
 import Set (Set)
 import List
