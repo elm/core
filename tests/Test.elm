@@ -1,5 +1,8 @@
 module Main where
 
+import Basics (..)
+import Signal (..)
+
 import ElmTest.Assertion as A
 import ElmTest.Run as R
 import ElmTest.Runner.Console (runDisplay)
@@ -22,8 +25,8 @@ import Test.Trampoline as Trampoline
 tests : Test
 tests =
     suite "Elm Standard Library Tests"
-    [ Array.tests
-    , Basics.tests
+    [ -- Array.tests
+      Basics.tests
     , Char.tests
     , CodeGen.tests
     , Dict.tests

@@ -1,5 +1,8 @@
 module Test.Trampoline (tests) where
 
+import Basics (..)
+
+import List
 import Trampoline (..)
 
 import ElmTest.Assertion (..)
@@ -10,7 +13,7 @@ badSum n =
     let loop x acc =
             case x of
               0 -> acc
-              _ -> loop (x-1) (acc+x)
+              _ -> loop (x - 1) (acc+x)
     in loop n 0
 
 goodSum : Int -> Int
@@ -23,7 +26,7 @@ goodSum n =
 
 tests : Test
 tests =
-    let mkLoopCheck n = test ("Equivalent Loop Check #"++ show n) (assertEqual (badSum n) (goodSum n))
-        loopChecks = suite "Equivalent to untrampolined Tests" <| map mkLoopCheck [0..25]
+    let mkLoopCheck n = test ("Equivalent Loop Check #"++ toString n) (assertEqual (badSum n) (goodSum n))
+        loopChecks = suite "Equivalent to untrampolined Tests" <| List.map mkLoopCheck [0..25]
         noStackOverflow = test "Trampoline Deep Recursion Test" (assertEqual 500000500000 (goodSum 1000000))
     in suite "Trampoline Tests" [noStackOverflow, loopChecks]

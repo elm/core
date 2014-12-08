@@ -1,6 +1,9 @@
 module Test.String (tests) where
 
+import Basics (..)
+
 import List
+import Maybe (..)
 import String
 
 import ElmTest.Assertion (..)
@@ -23,7 +26,7 @@ tests =
         , test "append 1" <| assertEqual "butterfly" (String.append "butter" "fly")
         , test "append 2" <| assertEqual "butter" (String.append "butter" "")
         , test "append 3" <| assertEqual "butter" (String.append "" "butter")
-        , test "concat" <| assertEqual "nevertheless" (concat ["never","the","less"])
+        , test "concat" <| assertEqual "nevertheless" (String.concat ["never","the","less"])
         , test "split commas" <| assertEqual ["cat","dog","cow"] (String.split "," "cat,dog,cow")
         , test "split slashes"<| assertEqual ["home","steve","Desktop", ""] (String.split "/" "home/steve/Desktop/")
         , test "join spaces"  <| assertEqual "cat dog cow" (String.join " " ["cat","dog","cow"])

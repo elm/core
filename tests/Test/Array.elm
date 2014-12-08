@@ -1,7 +1,10 @@
 module Test.Array (tests) where
 
-import List
 import Array
+import Basics (..)
+import List
+import List ((::))
+import Maybe (..)
 import Native.Array
 
 import ElmTest.Assertion (..)
@@ -14,7 +17,7 @@ mergeSplit n arr =
   in Array.append left right
 
 holeArray : Array.Array Int
-holeArray = foldl mergeSplit (Array.fromList [0..100]) [0..100]
+holeArray = List.foldl mergeSplit (Array.fromList [0..100]) [0..100]
 
 tests : Test
 tests =
@@ -45,9 +48,6 @@ tests =
         [ test "get" <| assertEqual (Just 2) (Array.get 1 (Array.fromList [3,2,1]))
         , test "get 2" <| assertEqual Nothing (Array.get 5 (Array.fromList [3,2,1]))
         , test "get 3" <| assertEqual Nothing (Array.get -1 (Array.fromList [3,2,1]))
-        , test "getOrElse 1" <| assertEqual 1 (Array.getOrElse 0 2 (Array.fromList [3,2,1]))
-        , test "getOrElse 2" <| assertEqual 0 (Array.getOrElse 0 5 (Array.fromList [3,2,1]))
-        , test "getOrFail" <| assertEqual 1 (Array.getOrFail 2 (Array.fromList [3,2,1]))
         , test "set" <| assertEqual (Array.fromList [1,7,3]) (Array.set 1 7 (Array.fromList [1,2,3]))
         ]
       takingArraysApartTests = suite "Taking Arrays Apart"
