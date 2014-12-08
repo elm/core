@@ -18,6 +18,6 @@ install:
 before_script:
   - ./elm-make/.cabal-sandbox/bin/elm-make --yes --output raw-test.js Test.elm
   - bash elm-io.sh raw-test.js test.js
-
+  - grep -Ev "appendChild" test.js > test2.js
 script:
-  - node test.js
+  - node test2.js
