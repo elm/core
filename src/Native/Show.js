@@ -54,7 +54,7 @@ Elm.Native.Show.make = function(elm) {
             }
             else if (v.ctor === "_Array") {
                 if (!_Array) {
-                    _Array = Elm.Dict.make(elm);
+                    _Array = Elm.Array.make(elm);
                 }
                 var list = _Array.toList(v);
                 return "Array.fromList " + toString(list);
