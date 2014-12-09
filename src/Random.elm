@@ -106,12 +106,12 @@ iLogBase b i =
     if i < b then 1 else 1 + iLogBase b (i // b)
 
 
-{-| The maximum value for randomly generated for 32-bit ints. -}
+{-| The maximum value for randomly generated 32-bit ints. -}
 maxInt : Int
 maxInt = 2147483647
 
 
-{-| The minimum value for randomly generated for 32-bit ints. -}
+{-| The minimum value for randomly generated 32-bit ints. -}
 minInt : Int
 minInt = -2147483648
 
