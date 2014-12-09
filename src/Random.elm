@@ -4,6 +4,7 @@ module Random
     , list, pair
     , minInt, maxInt
     , generate, initialSeed
+    , customGenerator
     )
   where
 
@@ -61,6 +62,10 @@ module. It has a period of roughly 2.30584e18.
 # Constants
 
 @docs maxInt, minInt
+
+# Custom Generators
+
+@docs customGenerator
 
 -}
 
@@ -162,10 +167,12 @@ pair (Generator genLeft) (Generator genRight) =
 {-| Create a list of random values using a generator function.
 
     floatList : Generator (List Float)
-    floatList = list 10 (float 0 1)
+    floatList =
+        list 10 (float 0 1)
 
     intList : Generator (List Int)
-    intList = list 5 (int 0 100)
+    intList =
+        list 5 (int 0 100)
 
     intPairs : Generator (List (Int, Int))
     intPairs =
@@ -184,6 +191,24 @@ listHelp list n generate seed =
     else
         let (value, seed') = generate seed
         in  listHelp (value :: list) (n-1) generate seed'
+
+
+{-| Create a custom generator. You provide a function that takes a seed, and
+returns a random value and a new seed. You can use this to create custom
+generators not covered by the basic functions in this library.
+
+    pairOf : Generator a -> Generator (a,a)
+    pairOf generator =
+      customGenerator <| \seed ->
+        let (left , seed' ) = generate generator seed
+            (right, seed'') = generate generator seed'
+        in
+            ((left,right), seed'')
+
+-}
+customGenerator : (Seed -> (a, Seed)) -> Generator a
+customGenerator generate =
+    Generator generate
 
 
 {-| A `Generator` is a function that takes a seed, and then returns a random
