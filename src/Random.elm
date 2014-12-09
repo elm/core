@@ -164,7 +164,7 @@ pair (Generator genLeft) (Generator genRight) =
         ((left,right), seed'')
 
 
-{-| Create a list of random values using a generator function.
+{-| Create a list of random values.
 
     floatList : Generator (List Float)
     floatList =
