@@ -281,7 +281,7 @@ If one list is longer, the extra elements are dropped.
 
     map2 (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
 
-    pairs : List a -> List b -> [(a,b)]
+    pairs : List a -> List b -> List (a,b)
     pairs lefts rights =
         map2 (,) lefts rights
 -}
