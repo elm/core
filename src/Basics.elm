@@ -400,11 +400,11 @@ x |> f = f x
 {-| Backward function application `f <| x == f x`. This function is useful for
 avoiding parenthesis. Consider the following code to create a text element:
 
-    text (monospace (toText "code"))
+    text (monospace (fromString "code"))
 
 This can also be written as:
 
-    text << monospace <| toText "code"
+    text << monospace <| fromString "code"
 -}
 (<|) : (a -> b) -> a -> b
 f <| x = f x
