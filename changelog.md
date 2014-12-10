@@ -7,6 +7,18 @@
   * Remove special list syntax in types, so `[a]` becomes `List a`
 
 
+### Reduce Default Imports
+
+The set of default imports has been reduced to the following:
+
+```haskell
+import Basics (..)
+import Maybe ( Maybe( Just, Nothing ) )
+import Result ( Result( Ok, Err ) )
+import List ( List )
+import Signal ( Signal )
+```
+
 ### Make JSON parsing easy
 
   * Added `Json.Decode` and `Json.Encode` libraries
