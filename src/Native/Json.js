@@ -378,13 +378,14 @@ Elm.Native.Json.make = function(localRuntime) {
     function oneOf(decoders) {
         return function(value) {
             var errors = [];
-            while (decoders.ctor !== '[]') {
+            var temp = decoders;
+            while (temp.ctor !== '[]') {
                 try {
-                    return decoders._0(value);
+                    return temp._0(value);
                 } catch(e) {
                     errors.push(e.message);
                 }
-                decoders = decoders._1;
+                temp = temp._1;
             }
             throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
         }
