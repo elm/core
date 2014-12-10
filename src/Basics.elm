@@ -3,9 +3,6 @@ module Basics where
 
 {-| Tons of useful functions that get imported by default.
 
-The following libraries also get imported by default: List, Signal,
-Text, Maybe, Time, Graphics.Element, Color, Graphics.Collage.
-
 # Equality
 @docs (==), (/=)
 

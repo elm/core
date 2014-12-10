@@ -8,3 +8,20 @@ Every Elm project needs the core libraries. They provide basic functionality inc
   * Core data structures like lists, dictionaries, and sets
   * Underlying implementation of Signals
   * Core rendering libraries
+
+## Default Imports
+
+In all Elm files there is a small set of default imports:
+
+```haskell
+import Basics (..)
+import Maybe ( Maybe( Just, Nothing ) )
+import Result ( Result( Ok, Err ) )
+import Signal ( Signal )
+```
+
+The intention is to include things that are both extremely useful and very
+unlikely to overlap with anything that anyone will ever write in a library.
+By keeping the set of default imports small, it also becomes easier to use
+whatever version of `map` suits your fancy. Finally, it makes it easier to
+figure out where the heck a function is coming from.
