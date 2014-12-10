@@ -19,10 +19,10 @@ import Native.Trampoline
 example of a tail-recursive function and rewrite it in a way that lets us use
 a trampoline:
 
-    length : [a] -> Int
+    length : List a -> Int
     length list = length' 0 list
 
-    length' : Int -> [a] -> Int
+    length' : Int -> List a -> Int
     length' accum list =
         case list of
           []     -> accum
@@ -31,10 +31,10 @@ a trampoline:
 This finds the length of a list, but if the list is too long, it may cause a
 stack overflow. We can rewrite it as follows:
 
-    length : [a] -> Int
+    length : List a -> Int
     length list = trampoline (length' 0 list)
 
-    length' : Int -> [a] -> Trampoline Int
+    length' : Int -> List a -> Trampoline Int
     length' accum list =
         case list of
           []     -> Done accum
