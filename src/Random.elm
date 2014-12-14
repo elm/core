@@ -208,6 +208,7 @@ listHelp list n generate seed =
 
 -}
 
+map : (a -> b) -> Generator a -> Generator b
 map f (Generator generate) = Generator <| \seed ->
   let (x, seed') = generate seed in (f x, seed')
 
