@@ -28,6 +28,8 @@ tests =
         , test "member 2" <| assertEqual False (Dict.member "Spike" animals)
         , test "get 1" <| assertEqual (Just "cat") (Dict.get "Tom" animals)
         , test "get 2" <| assertEqual Nothing (Dict.get "Spike" animals)
+        , test "size of empty dictionary" <| assertEqual 0 (Dict.size Dict.empty)
+        , test "size of example dictionary" <| assertEqual 2 (Dict.size animals)
         ]
       combineTests = suite "combine Tests"
         [ test "union" <| assertEqual animals (Dict.union (Dict.singleton "Jerry" "mouse") (Dict.singleton "Tom" "cat"))

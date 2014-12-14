@@ -3,6 +3,7 @@ module Set
     ( Set
     , empty, singleton, insert, remove
     , member
+    , size
     , foldl, foldr, map
     , filter, partition
     , union, intersect, diff
@@ -19,7 +20,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs empty, singleton, insert, remove
 
 # Query
-@docs member
+@docs member, size
 
 # Combine
 @docs union, intersect, diff
@@ -57,6 +58,10 @@ remove = Dict.remove
 {-| Determine if a value is in a set. -}
 member : comparable -> Set comparable -> Bool
 member = Dict.member
+
+{-| Number of elements in a set (i.e., its cardinality). -}
+size : Set comparable -> Int
+size = Dict.size
 
 {-| Get the union of two sets. Keep all values. -}
 union : Set comparable -> Set comparable -> Set comparable

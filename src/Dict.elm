@@ -2,6 +2,7 @@ module Dict
     ( Dict
     , empty, singleton, insert, update
     , get, remove, member
+    , size
     , filter
     , partition
     , foldl, foldr, map
@@ -20,7 +21,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs empty, singleton, insert, update, remove
 
 # Query
-@docs member, get
+@docs member, get, size
 
 # Combine
 @docs union, intersect, diff
@@ -140,6 +141,13 @@ member key dict =
     case get key dict of
       Just _ -> True
       Nothing -> False
+
+{-| Number of keys that are mapped by a dictionary. -}
+size : Dict comparable v -> Int
+size dict =
+    case dict of
+      RBNode _ _ _ left right -> 1 + size left + size right
+      RBEmpty _ -> 0
 
 
 ensureBlackRoot : Dict k v -> Dict k v

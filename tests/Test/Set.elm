@@ -24,6 +24,7 @@ pred x = x <= 50
 tests : Test
 tests =
     let
+      queryTests = suite "query Tests" [test "size of set of 100 elements" <| assertEqual 100 (Set.size set)]
       filterTests = suite "filter Tests" [test "Simple filter" <| assertEqual setPart1 <| Set.filter pred set]
       partitionTests = suite "partition Tests" [test "Simple partition" <| assertEqual (setPart1, setPart2) <| Set.partition pred set]
-    in suite "Set Tests" [partitionTests, filterTests]
+    in suite "Set Tests" [queryTests, partitionTests, filterTests]
