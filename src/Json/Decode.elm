@@ -127,7 +127,7 @@ object2 =
 {-| Use two different decoders on a JS value. This is nice for extracting
 multiple fields from an object.
 
-    type Task = { task : String, id : Int, completed : Bool }
+    type alias Task = { task : String, id : Int, completed : Bool }
 
     point : Decoder (Float,Float)
     point =
