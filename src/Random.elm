@@ -219,7 +219,9 @@ map f (Generator generate) = Generator <| \seed ->
 
 andThen : Generator a -> (a -> Generator b) -> Generator b
 andThen (Generator generate) f =  Generator <| \seed ->
-  let (Generator generateB, seed') = generate seed in generateB seed'
+  let (a, seed') = generate seed
+      (Generator generateB) = f a
+  in generateB seed'
 
 {-| Create a custom generator. You provide a function that takes a seed, and
 returns a random value and a new seed. You can use this to create custom
