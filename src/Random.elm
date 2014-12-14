@@ -55,6 +55,9 @@ module. It has a period of roughly 2.30584e18.
 
 @docs int, float, pair, list
 
+# Helpers
+@docs map, andThen
+
 # Running a Generator
 
 @docs generate, initialSeed
@@ -192,6 +195,31 @@ listHelp list n generate seed =
         let (value, seed') = generate seed
         in  listHelp (value :: list) (n-1) generate seed'
 
+{-| Map a function over the value of an existing generator. 
+
+    bool : Generator Bool
+    bool = Random.map ((==) 1) (int 0 1)
+
+    lowercaseLetter : Generator Char
+    lowercaseLetter = Random.map (\n -> Char.fromCode (n + 65)) (int 1 26)
+
+    uppercaseLetter : Generator Char
+    uppercaseLetter = Random.map (\n -> Char.fromCode (n + 65)) (int 1 26)
+
+-}
+
+map f (Generator generate) = Generator <| \seed ->
+  let (x, seed') = generate seed in (f x, seed')
+
+{-| Chain random operations, threading through the seed.
+
+    randomLetter : Generator Char
+    randomLetter = bool `andThen` \b -> if b then uppercaseLetter else lowercaseLetter
+-}
+
+andThen : Generator a -> (a -> Generator b) -> Generator b
+andThen (Generator generate) f =  Generator <| \seed ->
+  let (Generator generateB, seed') = generate seed in generateB seed'
 
 {-| Create a custom generator. You provide a function that takes a seed, and
 returns a random value and a new seed. You can use this to create custom
