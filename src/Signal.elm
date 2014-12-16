@@ -258,7 +258,7 @@ channel =
     Native.Signal.input
 
 
-{-| Create a `Message` that can be sent to an `Channel` with a handler like
+{-| Create a `Message` that can be sent to a `Channel` with a handler like
 `Html.onclick` or `Html.onblur`.
 
     import Html
@@ -279,8 +279,8 @@ send =
     Native.Signal.send
 
 
-{-| Receive all the messages sent to an `Channel` as a `Signal`. The following
-example shows how you would set up a system that uses an `Channel`.
+{-| Receive all the messages sent to a `Channel` as a `Signal`. The following
+example shows how you would set up a system that uses a `Channel`.
 
     -- initialState : Model
     -- type Update = NoOp | ...
