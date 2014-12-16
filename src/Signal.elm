@@ -251,7 +251,7 @@ primary use case is receiving updates from UI elements such as buttons and
 text fields. The argument is a default value for the custom signal.
 
 Note: This is an inherently impure function, so `(channel ())`
-and `(channel ())` produce two different signals.
+and `(channel ())` produce two different channels.
 -}
 channel : a -> Channel a
 channel =
