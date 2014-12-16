@@ -1,6 +1,6 @@
 module Graphics.Input where
 {-| This module is for creating input widgets such as buttons and text fields.
-All functions in this library report to a [`Signal.Input`](Signal#customSignal).
+All functions in this library report to a [`Signal.Channel`](Signal#send).
 
 # Basic Input Elements
 
