@@ -119,7 +119,7 @@ uses `Results`.
 
     resultParseInt : String -> Result String Int
     resultParseInt string =
-        fromMaybe ("error parsing string: " ++ show string) (parseInt string)
+        fromMaybe ("error parsing string: " ++ toString string) (parseInt string)
 -}
 fromMaybe : e -> Maybe a -> Result e a
 fromMaybe err maybe =
