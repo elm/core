@@ -9,7 +9,7 @@ way to manage errors in Elm.
 @docs map, andThen
 
 # Formatting Errors
-@docs toMaybe, fromMaybe formatError
+@docs toMaybe, fromMaybe, formatError
 -}
 
 import Maybe ( Maybe(Just, Nothing) )
