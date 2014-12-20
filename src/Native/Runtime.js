@@ -16,8 +16,6 @@ if (!Elm.fullscreen) {
             var tag = container.tagName;
             if (tag !== 'DIV') {
                 throw new Error('Elm.node must be given a DIV, not a ' + tag + '.');
-            } else if (container.hasChildNodes()) {
-                throw new Error('Elm.node must be given an empty DIV. No children allowed!');
             }
             return init(Display.COMPONENT, container, module, ports || {});
         };
@@ -318,7 +316,12 @@ if (!Elm.fullscreen) {
             }
 
             // Add the initialScene to the DOM
-            elm.node.appendChild(render(initialScene));
+            var container = elm.node;
+            var node = render(initialScene);
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            container.appendChild(node);
 
             var _requestAnimationFrame =
                 typeof requestAnimationFrame !== 'undefined'
