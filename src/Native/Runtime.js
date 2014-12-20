@@ -123,22 +123,14 @@ if (!Elm.fullscreen) {
             try {
                 Module = module.make(elm);
                 checkPorts(elm);
-            } catch(e) {
-                var code = document.createElement('code');
-
-                var lines = e.message.split('\n');
-                code.appendChild(document.createTextNode(lines[0]));
-                code.appendChild(document.createElement('br'));
-                code.appendChild(document.createElement('br'));
-                for (var i = 1; i < lines.length; ++i) {
-                    code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i]));
-                    code.appendChild(document.createElement('br'));
+            }
+            catch (error) {
+                if (typeof document === 'undefined') {
+                    console.log(e.message);
+                    throw error;
                 }
-                code.appendChild(document.createElement('br'));
-                code.appendChild(document.createTextNode("Open the developer console for more details."));
-
-                container.appendChild(code);
-                throw e;
+                container.appendChild(errorNode(error.message));
+                throw error;
             }
             inputs = filterDeadInputs(inputs);
             filterListeners(inputs, listeners);
@@ -178,6 +170,22 @@ if (!Elm.fullscreen) {
                         "Remove declarations until there is exactly one.");
                 }
             }
+        }
+
+        function errorNode(message) {
+            var code = document.createElement('code');
+
+            var lines = message.split('\n');
+            code.appendChild(document.createTextNode(lines[0]));
+            code.appendChild(document.createElement('br'));
+            code.appendChild(document.createElement('br'));
+            for (var i = 1; i < lines.length; ++i) {
+                code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i]));
+                code.appendChild(document.createElement('br'));
+            }
+            code.appendChild(document.createElement('br'));
+            code.appendChild(document.createTextNode("Open the developer console for more details."));
+            return code;
         }
 
 
