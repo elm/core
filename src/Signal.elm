@@ -33,11 +33,15 @@ import Native.Signal
 import List
 import Basics (fst, snd, not)
 
+
 type Signal a = Signal
+
 
 {-| Create a constant signal that never changes. -}
 constant : a -> Signal a
-constant = Native.Signal.constant
+constant =
+    Native.Signal.constant
+
 
 {-| Apply a function to the current value of a signal.
 
@@ -50,7 +54,9 @@ constant = Native.Signal.constant
         map toElement Mouse.position
 -}
 map : (a -> result) -> Signal a -> Signal result
-map = Native.Signal.map
+map =
+    Native.Signal.map
+
 
 {-| Apply a function to the current value of two signals. In the following
 example, we figure out the `aspectRatio` of the window by combining the
@@ -65,16 +71,24 @@ current width and height.
         map2 ratio Window.width Window.height
 -}
 map2 : (a -> b -> result) -> Signal a -> Signal b -> Signal result
-map2 = Native.Signal.map2
+map2 =
+    Native.Signal.map2
+
 
 map3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
-map3 = Native.Signal.map3
+map3 =
+    Native.Signal.map3
+
 
 map4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
-map4 = Native.Signal.map4
+map4 =
+    Native.Signal.map4
+
 
 map5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
-map5 = Native.Signal.map5
+map5 =
+    Native.Signal.map5
+
 
 
 {-| Create a past-dependent signal. Each update from the incoming signals will
@@ -93,7 +107,8 @@ So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
 is the time the program has been running, updated 40 times a second.
 -}
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
-foldp = Native.Signal.foldp
+foldp =
+    Native.Signal.foldp
 
 
 {-| Merge two signals into one. This function is extremely useful for bringing
@@ -112,7 +127,9 @@ signal. If an update comes on both signals at the same time, the left update
 wins.
 -}
 merge : Signal a -> Signal a -> Signal a
-merge = Native.Signal.merge
+merge =
+    Native.Signal.merge
+
 
 {-| Merge many signals into one. This is useful when you are merging more than
 two signals. When multiple updates come in at the same time, the left-most
@@ -181,6 +198,7 @@ keepWhen : Signal Bool -> a -> Signal a -> Signal a
 keepWhen bs def sig = 
     snd <~ (keepIf fst (False, def) ((,) <~ (sampleOn sig bs) ~ sig))
 
+
 {-| Drop events when the first signal is true. You provide a default value
 just in case that signal is *always* true and we drop all updates.
 -}
@@ -200,20 +218,24 @@ dropWhen bs = keepWhen (not <~ bs)
     --  noDups  => 0   3   5     4 ...
 -}
 dropRepeats : Signal a -> Signal a
-dropRepeats = Native.Signal.dropRepeats
+dropRepeats =
+    Native.Signal.dropRepeats
+
 
 {-| Sample from the second input every time an event occurs on the first input.
 For example, `(sampleOn clicks (every second))` will give the approximate time
 of the latest click. -}
 sampleOn : Signal a -> Signal b -> Signal b
-sampleOn = Native.Signal.sampleOn
+sampleOn =
+    Native.Signal.sampleOn
 
 
 {-| An alias for `map`. A prettier way to apply a function to the current value
 of a signal.
 -}
 (<~) : (a -> b) -> Signal a -> Signal b
-f <~ s = Native.Signal.map f s
+f <~ s =
+    Native.Signal.map f s
 
 
 {-| Intended to be paired with the `(<~)` operator, this makes it possible for
@@ -232,7 +254,8 @@ You can use this pattern for as many signals as you want by using `(~)` a bunch
 of times, so you can go higher than `map5` if you need to.
 -}
 (~) : Signal (a -> b) -> Signal a -> Signal b
-sf ~ s = Native.Signal.map2 (\f x -> f x) sf s
+sf ~ s =
+    Native.Signal.map2 (\f x -> f x) sf s
 
 infixl 4 <~
 infixl 4 ~
