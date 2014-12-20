@@ -24,10 +24,10 @@ install:
   -
   - curl https://raw.githubusercontent.com/maxsnew/IO/master/elm-io.sh > elm-io.sh
   - npm install jsdom
-  - ./.cabal-sandbox/bin/elm-package install -y
+  - bin/elm-package install -y
 
 before_script:
-  - ./.cabal-sandbox/bin/elm-make --yes --output raw-test.js Test.elm
+  - bin/elm-make --yes --output raw-test.js Test.elm
   - bash elm-io.sh raw-test.js test.js
   - grep -Ev "appendChild" test.js > test2.js
 script:
