@@ -11,13 +11,13 @@ install:
   - cd ..
   -
   - git clone https://github.com/elm-lang/elm-package.git
-  - cd elm-compiler
+  - cd elm-package
   - cabal sandbox init --sandbox ..
   - cabal install
   - cd ..
   -
   - git clone https://github.com/elm-lang/elm-make.git
-  - cd elm-compiler
+  - cd elm-make
   - cabal sandbox init --sandbox ..
   - cabal install
   - cd ..
