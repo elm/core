@@ -304,9 +304,21 @@ if (!Elm.fullscreen) {
             }
             var initialScene = signalGraph.value;
 
+            // Figure out what the render functions should be
+            var render;
+            var update;
+            if (initialScene.props) {
+                var Element = Elm.Native.Graphics.Element.make(elm);
+                render = Element.render;
+                update = Element.updateAndReplace;
+            } else {
+                var VirtualDom = Elm.Native.VirtualDom.make(elm);
+                render = VirtualDom.render;
+                update = VirtualDom.updateAndReplace;
+            }
+
             // Add the initialScene to the DOM
-            var Element = Elm.Native.Graphics.Element.make(elm);
-            elm.node.appendChild(Element.render(initialScene));
+            elm.node.appendChild(render(initialScene));
 
             var _requestAnimationFrame =
                 typeof requestAnimationFrame !== 'undefined'
@@ -386,7 +398,7 @@ if (!Elm.fullscreen) {
             }
 
             function draw() {
-                Element.updateAndReplace(elm.node.firstChild, savedScene, scheduledScene);
+                update(elm.node.firstChild, savedScene, scheduledScene);
                 if (elm.Native.Window) {
                     elm.Native.Window.values.resizeIfNeeded();
                 }
