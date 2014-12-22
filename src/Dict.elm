@@ -118,8 +118,6 @@ dictionary.
     get "Mouse" animals == Just Mouse
     get "Spike" animals == Nothing
 
-The `(?)` operator from the `Maybe` library makes it easy to give a default
-value.
 -}
 get : comparable -> Dict comparable v -> Maybe v
 get targetKey dict =

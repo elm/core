@@ -246,7 +246,7 @@ For example, the following declarations are equivalent:
     main =
       scene <~ Window.dimensions ~ Mouse.position
 
-    main : Signal ELement
+    main : Signal Element
     main =
       map2 scene Window.dimensions Mouse.position
 

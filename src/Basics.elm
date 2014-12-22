@@ -124,7 +124,7 @@ rem = Native.Basics.rem
 
 {-| Exponentiation
 
-    3^2 == 9`
+    3^2 == 9
 -}
 (^) : number -> number -> number
 (^) = Native.Basics.exp
@@ -256,7 +256,7 @@ This operator short-circuits to `False` if the first argument is `False`.
 (&&) = Native.Basics.and
 
 {-| The logical OR operator. `True` if one or both inputs are `True`.
-This operator short-circuits to `True` if the first argument is True.
+This operator short-circuits to `True` if the first argument is `True`.
 -}
 (||) : Bool -> Bool -> Bool
 (||) = Native.Basics.or
