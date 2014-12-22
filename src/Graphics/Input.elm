@@ -45,7 +45,7 @@ button =
 
 {-| Same as `button` but lets you customize buttons to look however you want.
 
-    click : Signal.Channel
+    click : Signal.Channel ()
     click = Signal.channel ()
 
     prettyButton : Element
