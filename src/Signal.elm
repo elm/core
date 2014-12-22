@@ -6,14 +6,17 @@ Some useful functions for working with time (e.g. setting FPS) and combining
 signals and time (e.g.  delaying updates, getting timestamps) can be found in
 the [`Time`](Time) library.
 
-# Merging
-@docs merge, mergeMany
+# Constants
+@docs constant
 
 # Mapping
 @docs map, map2, map3, map4, map5
 
 # Fancy Mapping
 @docs (<~), (~)
+
+# Merging
+@docs merge, mergeMany
 
 # Past-Dependence
 @docs foldp
@@ -23,9 +26,6 @@ the [`Time`](Time) library.
 
 # Channels
 @docs channel, send, subscribe
-
-# Constants
-@docs constant
 
 -}
 
@@ -58,9 +58,10 @@ map =
     Native.Signal.map
 
 
-{-| Apply a function to the current value of two signals. In the following
-example, we figure out the `aspectRatio` of the window by combining the
-current width and height.
+{-| Apply a function to the current value of two signals. The function is
+reevaluated whenever *either* signal changes. In the following example, we
+figure out the `aspectRatio` of the window by combining the current width and
+height.
 
     ratio : Int -> Int -> Float
     ratio width height =
@@ -216,6 +217,9 @@ dropWhen bs = keepWhen (not <~ bs)
 
     --  numbers => 0 0 3 3 5 5 5 4 ...
     --  noDups  => 0   3   5     4 ...
+
+The signal should not be a signal of functions, or a record that contains a
+function (you'll get a runtime error since functions cannot be equated).
 -}
 dropRepeats : Signal a -> Signal a
 dropRepeats =
@@ -223,8 +227,8 @@ dropRepeats =
 
 
 {-| Sample from the second input every time an event occurs on the first input.
-For example, `(sampleOn clicks (every second))` will give the approximate time
-of the latest click. -}
+For example, `(sampleOn Mouse.clicks (Time.every Time.second))` will give the
+approximate time of the latest click. -}
 sampleOn : Signal a -> Signal b -> Signal b
 sampleOn =
     Native.Signal.sampleOn
@@ -282,7 +286,8 @@ channel =
 
 
 {-| Create a `Message` that can be sent to a `Channel` with a handler like
-`Html.onclick` or `Html.onblur`.
+`Html.onclick` or `Html.onblur`. This doesn't actually send the message; it just
+creates the message to be sent.
 
     import Html
 

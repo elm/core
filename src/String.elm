@@ -239,13 +239,13 @@ words = Native.String.words
 lines : String -> List String
 lines = Native.String.lines
 
-{-| Convert a string to all upper case. Useful for case insensitive comparisons
+{-| Convert a string to all upper case. Useful for case-insensitive comparisons
 and VIRTUAL YELLING.
 -}
 toUpper : String -> String
 toUpper = Native.String.toUpper
 
-{-| Convert a string to all lower case. Useful for case insensitive comparisons. -}
+{-| Convert a string to all lower case. Useful for case-insensitive comparisons. -}
 toLower : String -> String
 toLower = Native.String.toLower
 
@@ -303,7 +303,7 @@ endsWith = Native.String.endsWith
 indexes : String -> String -> List Int
 indexes = Native.String.indexes
 
-{-| Alias for `indexes` -}
+{-| Alias for `indexes`. -}
 indices : String -> String -> List Int
 indices = Native.String.indexes
 
