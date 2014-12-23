@@ -188,6 +188,7 @@ newElement w h e =
 type ElementPrim
     = Image ImageStyle Int Int String
     | Container Position Element
+    | ScrollContainer Element
     | Flow Direction (List Element)
     | Spacer
     | RawHtml
@@ -249,6 +250,13 @@ container : Int -> Int -> Position -> Element -> Element
 container w h pos e =
     newElement w h (Container pos e)
 
+{-| Put an element in a scrolling container.  The container will scroll
+vertically and/or horizontally if the contained element is taller and/or wider
+than the container.
+-}
+scrollContainer : Int -> Int -> Element -> Element
+scrollContainer w h e =
+    newElement w h (ScrollContainer e)
 
 {-| Create an empty box. This is useful for getting your spacing right and
 for making borders.
