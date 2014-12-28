@@ -22,16 +22,43 @@ type Result error value = Ok value | Err error
 
 
 {-| Apply a function to a result. If the result is `Ok`, it will be converted.
-If the result is an `Err`, the same error value will propegate through.
+If the result is an `Err`, the same error value will propagate through.
 
     map sqrt (Ok 4.0)          == Ok 2.0
     map sqrt (Err "bad input") == Err "bad input"
 -}
-map : (a -> b) -> Result e a -> Result e b
-map f result =
-    case result of
+map : (a -> value) -> Result err a -> Result err value
+map f a =
+    case a of
       Ok  v -> Ok (f v)
       Err e -> Err e
+
+
+{-| Apply a function to two results, if both results are `Ok`. If not,
+the first argument which is an `Err` will propagate through.
+
+    map2 (+) (String.toInt "1") (String.toInt "2")   == (Ok 3)
+    map2 (+) (String.toInt "1") (String.toInt "y") == (Err "could not convert string 'y' to an Int")
+    map2 (+) (String.toInt "x") (String.toInt "y") == (Err "could not convert string 'x' to an Int")
+-}
+map2 : (a -> b -> value) -> Result err a -> Result err b -> Result err value
+map2 f a b =
+  map f a `andThen` (\x -> map x b)
+
+
+map3 : (a -> b -> c -> value) -> Result err a -> Result err b -> Result err c -> Result err value
+map3 f a b c =
+  map2 f a b `andThen` (\x -> map x c)
+
+
+map4 : (a -> b -> c -> d -> value) -> Result err a -> Result err b -> Result err c -> Result err d -> Result err value
+map4 f a b c d =
+  map3 f a b c `andThen` (\x -> map x d)
+
+
+map5 : (a -> b -> c -> d -> e -> value) -> Result err a -> Result err b -> Result err c -> Result err d -> Result err e -> Result err value
+map5 f a b c d e =
+  map4 f a b c d `andThen` (\x -> map x e)
 
 
 {-| Chain together a sequence of computations that may fail. It is helpful

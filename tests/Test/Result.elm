@@ -29,6 +29,20 @@ tests =
           test "map Ok" <| assertEqual (Ok 3) (Result.map ((+) 1) (Ok 2)),
           test "map Err" <| assertEqual (Err "error") (Result.map ((+) 1) (Err "error"))
         ]
+      mapNTests = suite "mapN Tests"
+        [
+          test "map2 Ok" <| assertEqual (Ok 3) (Result.map2 (+) (Ok 1) (Ok 2)),
+          test "map2 Err" <| assertEqual (Err "x") (Result.map2 (+) (Ok 1) (Err "x")),
+
+          test "map3 Ok" <| assertEqual (Ok 6) (Result.map3 add3 (Ok 1) (Ok 2) (Ok 3)),
+          test "map3 Err" <| assertEqual (Err "x") (Result.map3 add3 (Ok 1) (Ok 2) (Err "x")),
+
+          test "map4 Ok" <| assertEqual (Ok 10) (Result.map4 add4 (Ok 1) (Ok 2) (Ok 3) (Ok 4)),
+          test "map4 Err" <| assertEqual (Err "x") (Result.map4 add4 (Ok 1) (Ok 2) (Ok 3) (Err "x")),
+
+          test "map5 Ok" <| assertEqual (Ok 15) (Result.map5 add5 (Ok 1) (Ok 2) (Ok 3) (Ok 4) (Ok 5)),
+          test "map5 Err" <| assertEqual (Err "x") (Result.map5 add5 (Ok 1) (Ok 2) (Ok 3) (Ok 4) (Err "x"))
+        ]
       andThenTests = suite "andThen Tests"
         [
           test "andThen Ok" <| assertEqual (Ok 42) ((String.toInt "42") `Result.andThen` isEven),
@@ -42,5 +56,6 @@ tests =
   in
     suite "Result Tests"
     [ mapTests
+    , mapNTests
     , andThenTests
     ]
