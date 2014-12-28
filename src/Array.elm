@@ -16,8 +16,8 @@ reads, updates, and appends.
 # Taking Arrays Apart
 @docs slice, toList, toIndexedList
 
-# Mapping and Folding
-@docs map, indexedMap, foldl, foldr
+# Mapping, Filtering, and Folding
+@docs map, indexedMap, filter, foldl, foldr
 -}
 
 import Native.Array
