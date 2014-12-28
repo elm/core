@@ -92,7 +92,7 @@ map5 =
 
 
 {-| Create a past-dependent signal. Each update from the incoming signals will
-be used to step the stat forward. The outgoing signal represents the current
+be used to step the state forward. The outgoing signal represents the current
 state.
 
     clickCount : Signal Int
