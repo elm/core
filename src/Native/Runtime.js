@@ -123,11 +123,11 @@ if (!Elm.fullscreen) {
                 checkPorts(elm);
             }
             catch (error) {
-                if (typeof document === 'undefined') {
-                    console.log(e.message);
-                    throw error;
+                if (typeof container.appendChild == 'undefined') {
+                    console.log(error.message);
+                } else {
+                    container.appendChild(errorNode(error.message));
                 }
-                container.appendChild(errorNode(error.message));
                 throw error;
             }
             inputs = filterDeadInputs(inputs);
