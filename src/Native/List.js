@@ -140,10 +140,6 @@ Elm.Native.List.make = function(elm) {
         return false;
     }
 
-    function reverse(xs) {
-        return fromArray(toArray(xs).reverse());
-    }
-
     function append(xs, ys) {
         if (xs.ctor === '[]') {
             return ys;
@@ -305,7 +301,6 @@ Elm.Native.List.make = function(elm) {
         filter:F2(filter),
         length:length,
         member:F2(member),
-        reverse:reverse,
 
         all:F2(all),
         any:F2(any),

@@ -175,7 +175,8 @@ length = Native.List.length
     reverse [1..4] == [4,3,2,1]
 -}
 reverse : List a -> List a
-reverse = Native.List.reverse
+reverse =
+    foldl (::) []
 
 {-| Determine if all elements satisfy the predicate.
 
