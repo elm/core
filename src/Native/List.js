@@ -47,16 +47,6 @@ Elm.Native.List.make = function(elm) {
         return v.ctor === '[]' ? throwError('tail') : v._1;
     }
 
-    function last(xs) {
-        if (xs.ctor === '[]') { throwError('last'); }
-        var out = xs._0;
-        while (xs.ctor !== '[]') {
-            out = xs._0;
-            xs = xs._1;
-        }
-        return out;
-    }
-
     function map(f, xs) {
         var arr = [];
         while (xs.ctor !== '[]') {
@@ -244,10 +234,6 @@ Elm.Native.List.make = function(elm) {
         }));
     }
 
-    function nth(xs, n) {
-        return toArray(xs)[n];
-    }
-
     function take(n, xs) {
         var arr = [];
         while (xs.ctor !== '[]' && n > 0) {
@@ -288,7 +274,6 @@ Elm.Native.List.make = function(elm) {
 
         head:head,
         tail:tail,
-        last:last,
 
         map:F2(map),
         foldl:F3(foldl),
@@ -311,7 +296,6 @@ Elm.Native.List.make = function(elm) {
         sort:sort,
         sortBy:F2(sortBy),
         sortWith:F2(sortWith),
-        nth:F2(nth),
         take:F2(take),
         drop:F2(drop),
         repeat:F2(repeat)
