@@ -5,8 +5,11 @@ way to manage errors in Elm.
 # Type and Constructors
 @docs Result
 
-# Common Helpers
-@docs map, andThen
+# Mapping
+@docs map, map2, map3, map4, map5
+
+# Chaining
+@docs andThen
 
 # Formatting Errors
 @docs toMaybe, fromMaybe, formatError
@@ -37,9 +40,9 @@ map f a =
 {-| Apply a function to two results, if both results are `Ok`. If not,
 the first argument which is an `Err` will propagate through.
 
-    map2 (+) (String.toInt "1") (String.toInt "2")   == (Ok 3)
-    map2 (+) (String.toInt "1") (String.toInt "y") == (Err "could not convert string 'y' to an Int")
-    map2 (+) (String.toInt "x") (String.toInt "y") == (Err "could not convert string 'x' to an Int")
+    map2 (+) (String.toInt "1") (String.toInt "2") == Ok 3
+    map2 (+) (String.toInt "1") (String.toInt "y") == Err "could not convert string 'y' to an Int"
+    map2 (+) (String.toInt "x") (String.toInt "y") == Err "could not convert string 'x' to an Int"
 -}
 map2 : (a -> b -> value) -> Result err a -> Result err b -> Result err value
 map2 f a b =
