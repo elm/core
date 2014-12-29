@@ -30,10 +30,10 @@ If the result is an `Err`, the same error value will propagate through.
     map sqrt (Ok 4.0)          == Ok 2.0
     map sqrt (Err "bad input") == Err "bad input"
 -}
-map : (a -> value) -> Result err a -> Result err value
-map f a =
-    case a of
-      Ok  v -> Ok (f v)
+map : (a -> value) -> Result x a -> Result x value
+map func ra =
+    case ra of
+      Ok a -> Ok (func a)
       Err e -> Err e
 
 
@@ -44,24 +44,42 @@ the first argument which is an `Err` will propagate through.
     map2 (+) (String.toInt "1") (String.toInt "y") == Err "could not convert string 'y' to an Int"
     map2 (+) (String.toInt "x") (String.toInt "y") == Err "could not convert string 'x' to an Int"
 -}
-map2 : (a -> b -> value) -> Result err a -> Result err b -> Result err value
-map2 f a b =
-  map f a `andThen` (\x -> map x b)
+map2 : (a -> b -> value) -> Result x a -> Result x b -> Result x value
+map2 func ra rb =
+    case (ra,rb) of
+      (Ok a, Ok b) -> Ok (func a b)
+      (Err x, _) -> Err x
+      (_, Err x) -> Err x
 
 
-map3 : (a -> b -> c -> value) -> Result err a -> Result err b -> Result err c -> Result err value
-map3 f a b c =
-  map2 f a b `andThen` (\x -> map x c)
+map3 : (a -> b -> c -> value) -> Result x a -> Result x b -> Result x c -> Result x value
+map3 func ra rb rc =
+    case (ra,rb,rc) of
+      (Ok a, Ok b, Ok c) -> Ok (func a b c)
+      (Err x, _, _) -> Err x
+      (_, Err x, _) -> Err x
+      (_, _, Err x) -> Err x
 
 
-map4 : (a -> b -> c -> d -> value) -> Result err a -> Result err b -> Result err c -> Result err d -> Result err value
-map4 f a b c d =
-  map3 f a b c `andThen` (\x -> map x d)
+map4 : (a -> b -> c -> d -> value) -> Result x a -> Result x b -> Result x c -> Result x d -> Result x value
+map4 func ra rb rc rd =
+    case (ra,rb,rc,rd) of
+      (Ok a, Ok b, Ok c, Ok d) -> Ok (func a b c d)
+      (Err x, _, _, _) -> Err x
+      (_, Err x, _, _) -> Err x
+      (_, _, Err x, _) -> Err x
+      (_, _, _, Err x) -> Err x
 
 
-map5 : (a -> b -> c -> d -> e -> value) -> Result err a -> Result err b -> Result err c -> Result err d -> Result err e -> Result err value
-map5 f a b c d e =
-  map4 f a b c d `andThen` (\x -> map x e)
+map5 : (a -> b -> c -> d -> e -> value) -> Result x a -> Result x b -> Result x c -> Result x d -> Result x e -> Result x value
+map5 func ra rb rc rd re =
+    case (ra,rb,rc,rd,re) of
+      (Ok a, Ok b, Ok c, Ok d, Ok e) -> Ok (func a b c d e)
+      (Err x, _, _, _, _) -> Err x
+      (_, Err x, _, _, _) -> Err x
+      (_, _, Err x, _, _) -> Err x
+      (_, _, _, Err x, _) -> Err x
+      (_, _, _, _, Err x) -> Err x
 
 
 {-| Chain together a sequence of computations that may fail. It is helpful
@@ -97,7 +115,7 @@ message. It is often best to create a custom type that explicitly represents
 the exact ways your computation may fail. This way it is easy to handle in your
 code.
 -}
-andThen : Result e a -> (a -> Result e b) -> Result e b
+andThen : Result x a -> (a -> Result x b) -> Result x b
 andThen result callback =
     case result of
       Ok value -> callback value
@@ -135,7 +153,7 @@ you need to interact with some code that primarily uses maybes.
     maybeParseInt string =
         toMaybe (parseInt string)
 -}
-toMaybe : Result e a -> Maybe a
+toMaybe : Result x a -> Maybe a
 toMaybe result =
     case result of
       Ok  v -> Just v
@@ -151,7 +169,7 @@ uses `Results`.
     resultParseInt string =
         fromMaybe ("error parsing string: " ++ toString string) (parseInt string)
 -}
-fromMaybe : e -> Maybe a -> Result e a
+fromMaybe : x -> Maybe a -> Result x a
 fromMaybe err maybe =
     case maybe of
       Just v  -> Ok v
