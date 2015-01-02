@@ -38,11 +38,16 @@ Elm.Native.Time.make = function(elm) {
     return A3( Signal.map2, F2(f), isOn, ticker );
   }
 
+  function fst(pair) {
+      return pair._0;
+  }
+
   function every(t) {
-    var clock = NS.input(elm.timer.now());
+    var ticker = NS.input(Utils.Tuple0);
     function tellTime() {
-        elm.notify(clock.id, elm.timer.now());
+        elm.notify(ticker.id, Utils.Tuple0);
     }
+    var clock = A2( Signal.map, fst, NS.timestamp(ticker) );
     setInterval(tellTime, t);
     return clock;
   }
