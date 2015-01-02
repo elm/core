@@ -20,7 +20,7 @@ Elm.Native.Time.make = function(elm) {
 
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
-    var programStart = elm.timer.now();
+    var programStart = elm.timer.now(); // it would be better to set programStart once as a global variable of the runtime [jvoigtlaender]
     var prev, curr, diff, wasOn = true;
     var zero = true;
     var ticker = NS.input(zero);
