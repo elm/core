@@ -14,32 +14,35 @@ Elm.Native.Time.make = function(elm) {
       return pair._0;
   }
 
+  function snd(pair) {
+      return pair._1;
+  }
+
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
-    var prev = elm.timer.now(), curr = prev, diff = 0, wasOn = true;
-    var ticker = NS.input(diff);
-    function tick(zero) {
-      return function() {
-        curr = elm.timer.now();
-        diff = zero ? 0 : curr - prev;
-        if (prev > curr) {
-          diff = 0;
-        }
-        prev = curr;
-        elm.notify(ticker.id, diff);
-      };
-    }
+    var programStart = elm.timer.now();
+    var prev, curr, diff, wasOn = true;
+    var zero = true;
+    var ticker = NS.input(zero);
     var timeoutID = 0;
     function f(isOn, t) {
       if (isOn) {
-        timeoutID = elm.setTimeout(tick(!wasOn && isOn), msPerFrame);
+        timeoutID = elm.setTimeout( function() { elm.notify(ticker.id, !wasOn && isOn); } , msPerFrame);
       } else if (wasOn) {
         clearTimeout(timeoutID);
       }
       wasOn = isOn;
       return t;
     }
-    return A3( Signal.map2, F2(f), isOn, ticker );
+    function g(event, old) {
+      prev = snd(old);
+      curr = fst(event);
+      zero = snd(event);
+      diff = zero ? 0 : curr - prev;
+      return Utils.Tuple2(diff, curr);
+    }
+    var deltas = A2( Signal.map, fst, A3( Signal.foldp, F2(g), Utils.Tuple2(0, programStart), NS.timestamp(ticker) ) );
+    return A3( Signal.map2, F2(f), isOn, deltas );
   }
 
   function every(t) {
