@@ -118,10 +118,18 @@ Elm.Native.Signal.make = function(localRuntime) {
     input.kids.push(this);
   }
 
-  function timestamp(a) {
-    function update() { return Utils.Tuple2(localRuntime.timer.now(), a.value); }
-    return new LiftN(update, [a]);
+  function Timestamp(input) {
+    this.id = Utils.guid();
+    this.value = Utils.Tuple2(localRuntime.timer.now(), input.value);
+    this.kids = [];
+    this.recv = function(timestep, changed, parentID) {
+      if (changed) { this.value = Utils.Tuple2(timestep, input.value); }
+      broadcastToKids(this, timestep, changed);
+    };
+    input.kids.push(this);
   }
+
+  function timestamp(input) { return new Timestamp(input); }
 
   function SampleOn(s1,s2) {
     this.id = Utils.guid();
