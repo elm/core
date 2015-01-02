@@ -10,6 +10,10 @@ Elm.Native.Time.make = function(elm) {
   var Maybe = Elm.Maybe.make(elm);
   var Utils = Elm.Native.Utils.make(elm);
 
+  function fst(pair) {
+      return pair._0;
+  }
+
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
     var prev = elm.timer.now(), curr = prev, diff = 0, wasOn = true;
@@ -36,10 +40,6 @@ Elm.Native.Time.make = function(elm) {
       return t;
     }
     return A3( Signal.map2, F2(f), isOn, ticker );
-  }
-
-  function fst(pair) {
-      return pair._0;
   }
 
   function every(t) {
