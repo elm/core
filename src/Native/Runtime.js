@@ -29,28 +29,15 @@ if (!Elm.fullscreen) {
             var inputs = [];
 
             /* OFFSET
-             * Elm's time traveling debugger lets you interrupt the smooth flow of time
-             * by pausing and continuing program execution. To ensure the user sees a
-             * program that moves smoothly through the pause/continue time gap,
-             * we need to adjsut the value of Date.now().
+             * Elm's time traveling debugger lets you pause time. This means
+             * "now" may be shifted a bit into the past. By wrapping Date.now()
+             * we can manage this.
              */
-            var timer = function() {
-                var inducedDelay = 0;
-
-                var now = function() {
-                    return Date.now() - inducedDelay;
-                };
-
-                var addDelay = function(d) {
-                    inducedDelay += d;
-                    return inducedDelay;
-                };
-
-                return {
-                    now : now,
-                    addDelay : addDelay
+            var timer = {
+                now: function() {
+                    return Date.now();
                 }
-            }();
+            };
 
             var updateInProgress = false;
             function notify(id, v) {
