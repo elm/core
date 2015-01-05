@@ -21,4 +21,5 @@ install:
   - cd ..
 
 script:
+  - export PATH=$PWD/bin:$PATH
   - tests/run-test.sh
