@@ -20,9 +20,8 @@ Elm.Native.Time.make = function(elm) {
 
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
-    var prev, curr, diff, wasOn = true;
-    var zero = true;
-    var ticker = NS.input(zero);
+    var wasOn = true;
+    var ticker = NS.input(true);
     var timeoutID = 0;
     function f(isOn, t) {
       if (isOn) {
@@ -34,10 +33,10 @@ Elm.Native.Time.make = function(elm) {
       return t;
     }
     function g(event, old) {
-      prev = snd(old);
-      curr = fst(event);
-      zero = snd(event);
-      diff = zero ? 0 : curr - prev;
+      var prev = snd(old);
+      var curr = fst(event);
+      var zero = snd(event);
+      var diff = zero ? 0 : curr - prev;
       return Utils.Tuple2(diff, curr);
     }
     var deltas = A2( Signal.map, fst, A3( Signal.foldp, F2(g), Utils.Tuple2(0, elm.timer.programStart), NS.timestamp(ticker) ) );
