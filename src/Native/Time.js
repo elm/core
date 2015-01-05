@@ -33,11 +33,8 @@ Elm.Native.Time.make = function(elm) {
       return t;
     }
     function g(event, old) {
-      var prev = snd(old);
       var curr = fst(event);
-      var zero = snd(event);
-      var diff = zero ? 0 : curr - prev;
-      return Utils.Tuple2(diff, curr);
+      return Utils.Tuple2(snd(event) ? 0 : curr - snd(old), curr);
     }
     var deltas = A2( Signal.map, fst, A3( Signal.foldp, F2(g), Utils.Tuple2(0, elm.timer.programStart), NS.timestamp(ticker) ) );
     return A3( Signal.map2, F2(f), isOn, deltas );
