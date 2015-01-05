@@ -2,7 +2,10 @@ Elm.Native.Show = {};
 Elm.Native.Show.make = function(elm) {
     elm.Native = elm.Native || {};
     elm.Native.Show = elm.Native.Show || {};
-    if (elm.Native.Show.values) return elm.Native.Show.values;
+    if (elm.Native.Show.values)
+    {
+        return elm.Native.Show.values;
+    }
 
     var _Array;
     var Dict;
