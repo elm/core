@@ -26,9 +26,5 @@ install:
   - npm install jsdom
   - bin/elm-package install -y
 
-before_script:
-  - bin/elm-make --yes --output raw-test.js Test.elm
-  - bash elm-io.sh raw-test.js test.js
-  - grep -Ev "appendChild" test.js > test2.js
 script:
-  - node test2.js
+  - tests/run-test.sh
