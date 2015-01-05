@@ -1,7 +1,5 @@
 language: haskell
 install:
-  - cd tests
-  - cp -r ../src src
   - cabal sandbox init
   -
   - git clone https://github.com/elm-lang/elm-compiler.git
@@ -21,10 +19,6 @@ install:
   - cabal sandbox init --sandbox ..
   - cabal install
   - cd ..
-  -
-  - curl https://raw.githubusercontent.com/maxsnew/IO/master/elm-io.sh > elm-io.sh
-  - npm install jsdom
-  - bin/elm-package install -y
 
 script:
   - tests/run-test.sh
