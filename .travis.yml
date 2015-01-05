@@ -1,7 +1,5 @@
 language: haskell
 install:
-  - cd tests
-  - cp -r ../src src
   - cabal sandbox init
   -
   - git clone https://github.com/elm-lang/elm-compiler.git
@@ -21,14 +19,8 @@ install:
   - cabal sandbox init --sandbox ..
   - cabal install
   - cd ..
-  -
-  - curl https://raw.githubusercontent.com/maxsnew/IO/master/elm-io.sh > elm-io.sh
-  - npm install jsdom
-  - bin/elm-package install -y
 
 before_script:
-  - bin/elm-make --yes --output raw-test.js Test.elm
-  - bash elm-io.sh raw-test.js test.js
-  - grep -Ev "appendChild" test.js > test2.js
+  - export PATH=$PWD/bin:$PATH
 script:
-  - node test2.js
+  - tests/run-test.sh
