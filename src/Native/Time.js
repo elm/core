@@ -20,7 +20,6 @@ Elm.Native.Time.make = function(elm) {
 
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
-    var programStart = elm.timer.now(); // it would be better to set programStart once as a global variable of the runtime [jvoigtlaender]
     var prev, curr, diff, wasOn = true;
     var zero = true;
     var ticker = NS.input(zero);
@@ -41,7 +40,7 @@ Elm.Native.Time.make = function(elm) {
       diff = zero ? 0 : curr - prev;
       return Utils.Tuple2(diff, curr);
     }
-    var deltas = A2( Signal.map, fst, A3( Signal.foldp, F2(g), Utils.Tuple2(0, programStart), NS.timestamp(ticker) ) );
+    var deltas = A2( Signal.map, fst, A3( Signal.foldp, F2(g), Utils.Tuple2(0, elm.timer.programStart), NS.timestamp(ticker) ) );
     return A3( Signal.map2, F2(f), isOn, deltas );
   }
 

@@ -47,6 +47,7 @@ if (!Elm.fullscreen) {
                 };
 
                 return {
+                    programStart : now(),
                     now : now,
                     addDelay : addDelay
                 }

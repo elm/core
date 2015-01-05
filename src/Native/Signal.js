@@ -120,8 +120,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
   function Timestamp(input) {
     this.id = Utils.guid();
-    var programStart = localRuntime.timer.now(); // it would be better to set programStart once as a global variable of the runtime [jvoigtlaender]
-    this.value = Utils.Tuple2(programStart, input.value);
+    this.value = Utils.Tuple2(localRuntime.timer.programStart, input.value);
     this.kids = [];
     this.recv = function(timestep, changed, parentID) {
       if (changed) { this.value = Utils.Tuple2(timestep, input.value); }
