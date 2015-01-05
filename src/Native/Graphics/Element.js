@@ -9,8 +9,11 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
     'use strict';
 
     // attempt to short-circuit
-    if ('values' in Elm.Native.Graphics.Element) {
-        return Elm.Native.Graphics.Element.values;
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Graphics = localRuntime.Native.Graphics || {};
+    localRuntime.Native.Graphics.Element = localRuntime.Native.Graphics.Element || {};
+    if ('values' in localRuntime.Native.Graphics.Element) {
+        return localRuntime.Native.Graphics.Element.values;
     }
 
     var Color = Elm.Native.Color.make(localRuntime);
@@ -509,7 +512,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
     }
 
 
-    return Elm.Native.Graphics.Element.values = {
+    return localRuntime.Native.Graphics.Element.values = {
         render: render,
         update: update,
         updateAndReplace: updateAndReplace,

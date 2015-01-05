@@ -9,8 +9,11 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     'use strict';
 
     // attempt to short-circuit
-    if ('values' in Elm.Native.Graphics.Collage) {
-        return Elm.Native.Graphics.Collage.values;
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Graphics = localRuntime.Native.Graphics || {};
+    localRuntime.Native.Graphics.Collage = localRuntime.Native.Graphics.Collage || {};
+    if ('values' in localRuntime.Native.Graphics.Collage) {
+        return localRuntime.Native.Graphics.Collage.values;
     }
 
     // okay, we cannot short-ciruit, so now we define everything
@@ -409,7 +412,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
       	});
     }
 
-    return Elm.Native.Graphics.Collage.values = {
+    return localRuntime.Native.Graphics.Collage.values = {
         collage:F3(collage)
     };
 };
