@@ -20,6 +20,7 @@ install:
   - cabal install
   - cd ..
 
-script:
+before_script:
   - export PATH=$PWD/bin:$PATH
+script:
   - tests/run-test.sh
