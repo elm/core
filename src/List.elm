@@ -7,7 +7,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, tail, filter, take, drop
+@docs head, tail, filter, take, takeIf, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
@@ -331,6 +331,17 @@ intersperse sep xs =
 -}
 take : Int -> List a -> List a
 take = Native.List.take
+
+{-| Take the first *n* members of a list which satisfy the predicate.
+It is more efficient than using *take* and *filter* together because it
+does not build and intermediate list and does not need to iterate to
+the end if enough members are found earlier.
+
+    takeIf 2 (\x -> x % 2 == 0) [1,2,3,4,5] == [2,4]
+
+-}
+takeIf : Int -> (a -> Bool) -> List a -> List a
+takeIf = Native.List.takeIf
 
 {-| Drop the first *n* members of a list.
 

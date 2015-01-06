@@ -244,6 +244,18 @@ Elm.Native.List.make = function(elm) {
         return fromArray(arr);
     }
 
+    function takeIf(n, pred, xs) {
+        var arr = [];
+        while (xs.ctor !== '[]' && n > 0) {
+            if (pred(xs._0)) {
+                arr.push(xs._0);
+                --n;
+            }
+            xs = xs._1;
+        }
+        return fromArray(arr);
+    }
+
     function drop(n, xs) {
         while (xs.ctor !== '[]' && n > 0) {
             xs = xs._1;
@@ -297,6 +309,7 @@ Elm.Native.List.make = function(elm) {
         sortBy:F2(sortBy),
         sortWith:F2(sortWith),
         take:F2(take),
+        takeIf:F3(takeIf),
         drop:F2(drop),
         repeat:F2(repeat)
     };
