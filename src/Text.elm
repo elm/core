@@ -248,7 +248,7 @@ plainText str =
     leftAligned (fromString str)
 
 {-| for internal use only -}
-markdown : String -> Element
+markdown : Element
 markdown = Native.Text.markdown
 
 {-| Convert anything to its textual representation and make it displayable in
