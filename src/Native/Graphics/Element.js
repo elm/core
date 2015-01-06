@@ -327,16 +327,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             return rootNode;
 
         case "RawHtml":
-            // only markdown blocks have guids, so this must be a text block
-            if (nextE.guid === null) {
-                if(currE.html.valueOf() !== nextE.html.valueOf()) {
-                    node.innerHTML = nextE.html;
-                }
-                updateProps(node, curr, next);
-                return rootNode;
-            }
-            if (nextE.guid !== currE.guid) {
-                return render(next);
+            if(currE.html.valueOf() !== nextE.html.valueOf()) {
+                node.innerHTML = nextE.html;
             }
             updateProps(node, curr, next);
             return rootNode;
