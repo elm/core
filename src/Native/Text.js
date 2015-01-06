@@ -128,20 +128,18 @@ Elm.Native.Text.make = function(elm) {
             var raw = {
                 ctor :'RawHtml',
                 html : Utils.makeText(text),
-                align: align,
-                guid : null
+                align: align
             };
             var pos = A2(NativeElement.htmlHeight, 0, raw);
             return A3(Element.newElement, pos._0, pos._1, raw);
         }
     }
 
-    function markdown(text, guid) {
+    function markdown(text) {
         var raw = {
             ctor:'RawHtml',
             html: text,
-            align: null,
-            guid: guid
+            align: null
         };
         var pos = A2(NativeElement.htmlHeight, 0, raw);
         return A3(Element.newElement, pos._0, pos._1, raw);
