@@ -9,8 +9,11 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
     'use strict';
 
     // attempt to short-circuit
-    if ('values' in Elm.Native.Graphics.Element) {
-        return Elm.Native.Graphics.Element.values;
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Graphics = localRuntime.Native.Graphics || {};
+    localRuntime.Native.Graphics.Element = localRuntime.Native.Graphics.Element || {};
+    if ('values' in localRuntime.Native.Graphics.Element) {
+        return localRuntime.Native.Graphics.Element.values;
     }
 
     var Color = Elm.Native.Color.make(localRuntime);
@@ -324,16 +327,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             return rootNode;
 
         case "RawHtml":
-            // only markdown blocks have guids, so this must be a text block
-            if (nextE.guid === null) {
-                if(currE.html.valueOf() !== nextE.html.valueOf()) {
-                    node.innerHTML = nextE.html;
-                }
-                updateProps(node, curr, next);
-                return rootNode;
-            }
-            if (nextE.guid !== currE.guid) {
-                return render(next);
+            if(currE.html.valueOf() !== nextE.html.valueOf()) {
+                node.innerHTML = nextE.html;
             }
             updateProps(node, curr, next);
             return rootNode;
@@ -509,7 +504,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
     }
 
 
-    return Elm.Native.Graphics.Element.values = {
+    return localRuntime.Native.Graphics.Element.values = {
         render: render,
         update: update,
         updateAndReplace: updateAndReplace,
