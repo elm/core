@@ -358,7 +358,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             ++i;
             if (!kid) {
                 div.appendChild(node);
-            } else if (kid.getContext) {
+            } else {
                 div.insertBefore(node, kid);
             }
         }
