@@ -10,20 +10,12 @@ Elm.Native.Time.make = function(elm) {
   var Maybe = Elm.Maybe.make(elm);
   var Utils = Elm.Native.Utils.make(elm);
 
-  function fst(pair) {
-      return pair._0;
-  }
-
-  function snd(pair) {
-      return pair._1;
-  }
-
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
     var wasOn = true;
     var ticker = NS.input(true);
     var timeoutID = 0;
-    function f(isOn, t) {
+    function startStopTimer(isOn, t) {
       if (isOn) {
         timeoutID = elm.setTimeout( function() { elm.notify(ticker.id, !wasOn && isOn); } , msPerFrame);
       } else if (wasOn) {
@@ -32,12 +24,16 @@ Elm.Native.Time.make = function(elm) {
       wasOn = isOn;
       return t;
     }
-    function g(event, old) {
-      var curr = fst(event);
-      return Utils.Tuple2(snd(event) ? 0 : curr - snd(old), curr);
+    function calcDelta(event, old) {
+      var curr = event._0;
+      return { delta: event._1 ? 0 : curr - old.timestamp, timestamp: curr };
     }
-    var deltas = A2( Signal.map, fst, A3( Signal.foldp, F2(g), Utils.Tuple2(0, elm.timer.programStart), NS.timestamp(ticker) ) );
-    return A3( Signal.map2, F2(f), isOn, deltas );
+    var deltas = A2( Signal.map, function(p) { return p.delta; }, A3( Signal.foldp, F2(calcDelta), { delta: 0, timestamp: elm.timer.programStart }, NS.timestamp(ticker) ) );
+    return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
+  }
+
+  function fst(pair) {
+      return pair._0;
   }
 
   function every(t) {
