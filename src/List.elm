@@ -337,7 +337,7 @@ It is more efficient than using *take* and *filter* together because it
 does not build and intermediate list and does not need to iterate to
 the end if enough members are found earlier.
 
-    takeIf 2 (\x -> x % 2 == 0) [1,2,3,4,5] == [2,4]
+    takeIf 2 (\x -> x % 2 == 0) [1,2,3,4,5,6] == [2,4]
 
 -}
 takeIf : Int -> (a -> Bool) -> List a -> List a
