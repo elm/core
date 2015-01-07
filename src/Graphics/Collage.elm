@@ -190,7 +190,8 @@ moveX x f = { f | x <- f.x + x }
 moveY : Float -> Form -> Form
 moveY y f = { f | y <- f.y + y }
 
-{-| Scale a form by a given factor. Scaling by 2 doubles the size.
+{-| Scale a form by a given factor. Scaling by 2 doubles both dimensions,
+and quadruples the area.
 -}
 scale : Float -> Form -> Form
 scale s f = { f | scale <- f.scale * s }
