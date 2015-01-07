@@ -18,6 +18,7 @@ import Test.CodeGen as CodeGen
 import Test.Dict as Dict
 import Test.Equality as Equality
 import Test.List as List
+import Test.Result as Result
 import Test.Set as Set
 import Test.String as String
 import Test.Trampoline as Trampoline
@@ -32,6 +33,7 @@ tests =
     , Dict.tests
     , Equality.tests
     , List.tests
+    , Result.tests
     , Set.tests
     , String.tests
     , Trampoline.tests

@@ -2,7 +2,10 @@ Elm.Native.Show = {};
 Elm.Native.Show.make = function(elm) {
     elm.Native = elm.Native || {};
     elm.Native.Show = elm.Native.Show || {};
-    if (elm.Native.Show.values) return elm.Native.Show.values;
+    if (elm.Native.Show.values)
+    {
+        return elm.Native.Show.values;
+    }
 
     var _Array;
     var Dict;
@@ -22,10 +25,10 @@ Elm.Native.Show.make = function(elm) {
             return v + "";
         }
         else if ((v instanceof String) && v.isChar) {
-            return "'" + addSlashes(v) + "'";
+            return "'" + addSlashes(v, true) + "'";
         }
         else if (type === "string") {
-            return '"' + addSlashes(v) + '"';
+            return '"' + addSlashes(v, false) + '"';
         }
         else if (type === "object" && '_' in v && probablyPublic(v)) {
             var output = [];
@@ -103,15 +106,18 @@ Elm.Native.Show.make = function(elm) {
         return "<internal structure>";
     };
 
-    function addSlashes(str) {
-        return str.replace(/\\/g, '\\\\')
+    function addSlashes(str, isChar) {
+        var s = str.replace(/\\/g, '\\\\')
                   .replace(/\n/g, '\\n')
                   .replace(/\t/g, '\\t')
                   .replace(/\r/g, '\\r')
                   .replace(/\v/g, '\\v')
-                  .replace(/\0/g, '\\0')
-                  .replace(/\'/g, "\\'")
-                  .replace(/\"/g, '\\"');
+                  .replace(/\0/g, '\\0');
+        if (isChar) {
+            return s.replace(/\'/g, "\\'")
+        } else {
+            return s.replace(/\"/g, '\\"');
+        }
     }
 
     function probablyPublic(v) {

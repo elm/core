@@ -14,8 +14,18 @@ tests =
             , test "clamp mid" <| assertEqual 15 (clamp 10 20 15)
             , test "clamp high" <| assertEqual 20 (clamp 10 20 25)
             ]
+        toStringTests = suite "toString Tests"
+            [ test "toString Int" <| assertEqual "42" (toString 42)
+            , test "toString Float" <| assertEqual "42.52" (toString 42.52)
+            , test "toString Char" <| assertEqual "'c'" (toString 'c')
+            , test "toString Char single quote" <| assertEqual "'\\''" (toString '\'')
+            , test "toString Char double quote" <| assertEqual "'\"'" (toString '"')
+            , test "toString String single quote" <| assertEqual "\"not 'escaped'\"" (toString "not 'escaped'")
+            , test "toString String double quote" <| assertEqual "\"are \\\"escaped\\\"\"" (toString "are \"escaped\"")
+            ]
 
     in
         suite "Basics"
             [ comparison
+            , toStringTests
             ]

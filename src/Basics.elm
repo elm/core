@@ -329,10 +329,12 @@ isInfinite : Float -> Bool
 isInfinite = Native.Basics.isInfinite
 
 
-{-| Turn any kind of value into a string.
+{-| Turn any kind of value into a string. When you view the resulting string
+with `Text.fromString` it should look just like the value it came from.
 
-    toString 42    == "42"
+    toString 42 == "42"
     toString [1,2] == "[1,2]"
+    toString "he said, \"hi\"" == "\"he said, \\\"hi\\\"\""
 -}
 toString : a -> String
 toString = Native.Show.toString

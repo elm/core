@@ -35,7 +35,7 @@ make sense to do this:
         case entity of
           Ship -> ...
           Fish -> ...
-          _ -> Debug.crash ("drawEntity not implemented for " ++ show entity ++ " yet!")
+          _ -> Debug.crash ("drawEntity not implemented for " ++ toString entity ++ " yet!")
 
 Note that incomplete pattern matches are *very* bad practice! They are one of
 the very few ways to crash an Elm program, and they are completely avoidable.

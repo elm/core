@@ -16,8 +16,6 @@ if (!Elm.fullscreen) {
             var tag = container.tagName;
             if (tag !== 'DIV') {
                 throw new Error('Elm.node must be given a DIV, not a ' + tag + '.');
-            } else if (container.hasChildNodes()) {
-                throw new Error('Elm.node must be given an empty DIV. No children allowed!');
             }
             return init(Display.COMPONENT, container, module, ports || {});
         };
@@ -31,28 +29,15 @@ if (!Elm.fullscreen) {
             var inputs = [];
 
             /* OFFSET
-             * Elm's time traveling debugger lets you interrupt the smooth flow of time
-             * by pausing and continuing program execution. To ensure the user sees a
-             * program that moves smoothly through the pause/continue time gap,
-             * we need to adjsut the value of Date.now().
+             * Elm's time traveling debugger lets you pause time. This means
+             * "now" may be shifted a bit into the past. By wrapping Date.now()
+             * we can manage this.
              */
-            var timer = function() {
-                var inducedDelay = 0;
-
-                var now = function() {
-                    return Date.now() - inducedDelay;
-                };
-
-                var addDelay = function(d) {
-                    inducedDelay += d;
-                    return inducedDelay;
-                };
-
-                return {
-                    now : now,
-                    addDelay : addDelay
+            var timer = {
+                now: function() {
+                    return Date.now();
                 }
-            }();
+            };
 
             var updateInProgress = false;
             function notify(id, v) {
@@ -123,22 +108,14 @@ if (!Elm.fullscreen) {
             try {
                 Module = module.make(elm);
                 checkPorts(elm);
-            } catch(e) {
-                var code = document.createElement('code');
-
-                var lines = e.message.split('\n');
-                code.appendChild(document.createTextNode(lines[0]));
-                code.appendChild(document.createElement('br'));
-                code.appendChild(document.createElement('br'));
-                for (var i = 1; i < lines.length; ++i) {
-                    code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i]));
-                    code.appendChild(document.createElement('br'));
+            }
+            catch (error) {
+                if (typeof container.appendChild == 'undefined') {
+                    console.log(error.message);
+                } else {
+                    container.appendChild(errorNode(error.message));
                 }
-                code.appendChild(document.createElement('br'));
-                code.appendChild(document.createTextNode("Open the developer console for more details."));
-
-                container.appendChild(code);
-                throw e;
+                throw error;
             }
             inputs = filterDeadInputs(inputs);
             filterListeners(inputs, listeners);
@@ -178,6 +155,22 @@ if (!Elm.fullscreen) {
                         "Remove declarations until there is exactly one.");
                 }
             }
+        }
+
+        function errorNode(message) {
+            var code = document.createElement('code');
+
+            var lines = message.split('\n');
+            code.appendChild(document.createTextNode(lines[0]));
+            code.appendChild(document.createElement('br'));
+            code.appendChild(document.createElement('br'));
+            for (var i = 1; i < lines.length; ++i) {
+                code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i]));
+                code.appendChild(document.createElement('br'));
+            }
+            code.appendChild(document.createElement('br'));
+            code.appendChild(document.createTextNode("Open the developer console for more details."));
+            return code;
         }
 
 
@@ -296,9 +289,26 @@ if (!Elm.fullscreen) {
             }
             var initialScene = signalGraph.value;
 
+            // Figure out what the render functions should be
+            var render;
+            var update;
+            if (initialScene.props) {
+                var Element = Elm.Native.Graphics.Element.make(elm);
+                render = Element.render;
+                update = Element.updateAndReplace;
+            } else {
+                var VirtualDom = Elm.Native.VirtualDom.make(elm);
+                render = VirtualDom.render;
+                update = VirtualDom.updateAndReplace;
+            }
+
             // Add the initialScene to the DOM
-            var Element = Elm.Native.Graphics.Element.make(elm);
-            elm.node.appendChild(Element.render(initialScene));
+            var container = elm.node;
+            var node = render(initialScene);
+            while (container.firstChild) {
+                container.removeChild(container.firstChild);
+            }
+            container.appendChild(node);
 
             var _requestAnimationFrame =
                 typeof requestAnimationFrame !== 'undefined'
@@ -378,7 +388,7 @@ if (!Elm.fullscreen) {
             }
 
             function draw() {
-                Element.updateAndReplace(elm.node.firstChild, savedScene, scheduledScene);
+                update(elm.node.firstChild, savedScene, scheduledScene);
                 if (elm.Native.Window) {
                     elm.Native.Window.values.resizeIfNeeded();
                 }
