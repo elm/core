@@ -21,7 +21,7 @@ Elm.Native.Mouse.make = function(localRuntime) {
         return pair._0;
     }
     function snd(pair) {
-        return pair._0;
+        return pair._1;
     }
 
     var x = A2( Signal.map, fst, position );
