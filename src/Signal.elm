@@ -124,7 +124,7 @@ together lots of different signals to feed into a `foldp`.
 
 If an update comes from either of the incoming signals, it updates the outgoing
 signal. If an update comes on both signals at the same time, the left update
-wins.
+wins (i.e., the right update is discarded).
 -}
 merge : Signal a -> Signal a -> Signal a
 merge =
