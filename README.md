@@ -15,7 +15,7 @@ In all Elm files there is a small set of default imports:
 
 ```haskell
 import Basics (..)
-import List ( List )
+import List ( List, (::) )
 import Maybe ( Maybe( Just, Nothing ) )
 import Result ( Result( Ok, Err ) )
 import Signal ( Signal )
