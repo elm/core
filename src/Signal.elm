@@ -6,17 +6,14 @@ Some useful functions for working with time (e.g. setting FPS) and combining
 signals and time (e.g.  delaying updates, getting timestamps) can be found in
 the [`Time`](Time) library.
 
-# Constants
-@docs constant
+# Merging
+@docs merge, mergeMany
 
 # Mapping
 @docs map, map2, map3, map4, map5
 
 # Fancy Mapping
 @docs (<~), (~)
-
-# Merging
-@docs merge, mergeMany
 
 # Past-Dependence
 @docs foldp
@@ -26,6 +23,9 @@ the [`Time`](Time) library.
 
 # Channels
 @docs channel, send, subscribe
+
+# Constants
+@docs constant
 
 -}
 
