@@ -38,6 +38,7 @@ The current sentiment is that it is already quite error prone once you get to
 -}
 
 import Basics (..)
+import Maybe
 import Maybe ( Maybe(Just,Nothing) )
 import Native.List
 
@@ -54,20 +55,28 @@ import Native.List
 infixr 5 ::
 
 
-{-| Extract the first element of a list. List must be non-empty.
+{-| Extract the first element of a list.
 
     head [1,2,3] == 1
 -}
-head : List a -> a
-head = Native.List.head
+head : List a -> Maybe a
+head l =
+    case l of
+        x :: xs -> Just x
+        [] -> Nothing
 
 
-{-| Extract the elements after the head of the list. List must be non-empty.
+{-| Split the first element off and returns it together with the rest of the
+list.
 
-    tail [1,2,3] == [2,3]
+    uncons [1,2,3] == Just (1, [2,3])
+    uncons []      == Nothing
 -}
-tail : List a -> List a
-tail = Native.List.tail
+uncons : List a -> Maybe (a, List a)
+uncons l =
+    case l of
+        x :: xs -> Just (x, xs)
+        [] -> Nothing
 
 
 {-| Determine if a list is empty.
