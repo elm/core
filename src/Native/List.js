@@ -11,10 +11,6 @@ Elm.Native.List.make = function(elm) {
     var Nil = Utils.Nil;
     var Cons = Utils.Cons;
 
-    function throwError(f) {
-        throw new Error("Function '" + f + "' expects a non-empty list!");
-    }
-
     function toArray(xs) {
         var out = [];
         while (xs.ctor !== '[]') {
@@ -38,13 +34,6 @@ Elm.Native.List.make = function(elm) {
             do { lst = Cons(hi,lst) } while (hi-->lo);
         }
         return lst
-    }
-
-    function head(v) {
-        return v.ctor === '[]' ? throwError('head') : v._0;
-    }
-    function tail(v) {
-        return v.ctor === '[]' ? throwError('tail') : v._1;
     }
 
     function map(f, xs) {
@@ -253,9 +242,6 @@ Elm.Native.List.make = function(elm) {
         fromArray:fromArray,
         range:range,
         append: F2(append),
-
-        head:head,
-        tail:tail,
 
         map:F2(map),
         foldl:F3(foldl),
