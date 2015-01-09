@@ -41,8 +41,11 @@ import Transform2D (Transform2D)
 import Transform2D as T
 import Native.Graphics.Collage
 import Graphics.Model
-import Graphics.Model (BasicForm(..), Element, FillStyle(..), LineCap(..), LineJoin(..), ShapeStyle(..))
+import Graphics.Model (BasicForm(..), FillStyle(..), LineCap(..), LineJoin(..), ShapeStyle(..))
 import Color (Color, black, Gradient)
+
+{- Include Graphics.Element in the build for Native.Graphics.Collage -}
+import Graphics.Element (Element)
 
 
 type alias LineStyle = Graphics.Model.LineStyle
