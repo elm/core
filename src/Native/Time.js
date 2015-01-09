@@ -55,6 +55,7 @@ Elm.Native.Time.make = function(elm) {
       fpsWhen : F2(fpsWhen),
       fps : function(t) { return fpsWhen(t, Signal.constant(true)); },
       every : every,
+      utcOffset : Signal.constant(new Date().getTimezoneOffset() * -60000),
       delay : NS.delay,
       timestamp : NS.timestamp,
       toDate : function(t) { return new window.Date(t); },

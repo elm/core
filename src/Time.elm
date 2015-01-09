@@ -7,7 +7,10 @@ module Time where
       inMilliseconds, inSeconds, inMinutes, inHours
 
 # Tickers
-@docs fps, fpsWhen, every
+@docs fps, fpsWhen
+
+# Clock time
+@docs every, utcOffset
 
 # Timing
 @docs timestamp, delay, since
@@ -72,6 +75,14 @@ every t.
 -}
 every : Time -> Signal Time
 every = Native.Time.every
+
+{-| The difference between UTC time and local time. The expected use is
+`Signal.map2 (+) (every second) utcOffset`. The value varies based on the user's
+location and time of year (due to daylight savings time), although currently it
+does not update while the program is running. -}
+
+utcOffset : Signal Time
+utcOffset = Native.Time.utcOffset
 
 {-| Takes a time `t` and any signal. The resulting boolean signal is true for
 time `t` after every event on the input signal. So ``(second `since`
