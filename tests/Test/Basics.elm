@@ -50,10 +50,34 @@ tests =
             , test "atan2" <| assert (abs (1.55 - atan2 36 0.65) < 0.01)
             , test "pi" <| assert (abs (3.14 - pi) < 0.01)
             ]
-
+        basicMathTests = suite "Basic Math Tests"
+            [ test "add float" <| assertEqual 159 (155.6 + 3.4)
+            , test "add int" <| assertEqual 17 ((round 10) + (round 7))
+            , test "subtract float" <| assertEqual -6.3 (1 - 7.3)
+            , test "subtract int" <| assertEqual 1130 ((round 9432) - (round 8302))
+            , test "multiply float" <| assertEqual 435.15 (96.7 * 4.5)
+            , test "multiply int" <| assertEqual 90 ((round 10) * (round 9))
+            , test "divide float" <| assertEqual 13.175 (527 / 40)
+            , test "divide int" <| assertEqual 23 (70 // 3)
+            , test "7 `rem` 2" <| assertEqual 1 (7 `rem` 2)
+            , test "-1 `rem` 4" <| assertEqual -1 (-1 `rem` 4)
+            , test "7 % 2" <| assertEqual 1 (7 % 2)
+            , test "-1 % 4" <| assertEqual 3 (-1 % 4)
+            , test "3^2" <| assertEqual 9 (3^2)
+            , test "sqrt" <| assertEqual 9 (sqrt 81)
+            , test "negate 42" <| assertEqual -42 (negate 42)
+            , test "negate -42" <| assertEqual 42 (negate -42)
+            , test "negate 0" <| assertEqual 0 (negate 0)
+            , test "abs -25" <| assertEqual 25 (abs -25)
+            , test "abs 76" <| assertEqual 76 (abs 76)
+            , test "logBase 10 100" <| assertEqual 2 (logBase 10 100)
+            , test "logBase 2 256" <| assertEqual 8 (logBase 2 256)
+            , test "e" <| assert (abs (2.72 - e) < 0.01)
+            ]
     in
         suite "Basics"
             [ comparison
             , toStringTests
             , geometryTests
+            , basicMathTests
             ]
