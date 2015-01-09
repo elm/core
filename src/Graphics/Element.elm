@@ -42,26 +42,14 @@ import Native.Graphics.Element
 import List as List
 import Color (..)
 import Maybe ( Maybe(..) )
+import Graphics.Model
+import Graphics.Model ( Direction(..), ElementPrim(..), ImageStyle(..), Pos(..), Properties, Three(..) )
 
-
-type alias Properties = {
-  id      : Int,
-  width   : Int,
-  height  : Int,
-  opacity : Float,
-  color   : Maybe Color,
-  href    : String,
-  tag     : String,
-  hover   : (),
-  click   : ()
- }
-
-
-type alias Element =
-    { props : Properties
-    , element : ElementPrim
-    }
-
+{- Re-export public types -}
+type alias Element = Graphics.Model.Element
+type alias Position = Graphics.Model.Position
+type alias Direction = Graphics.Model.Direction
+type alias Pos = Graphics.Model.Pos
 
 {-| An Element that takes up no space. Good for things that appear conditionally:
 
@@ -185,17 +173,6 @@ newElement w h e =
   }
 
 
-type ElementPrim
-    = Image ImageStyle Int Int String
-    | Container Position Element
-    | Flow Direction (List Element)
-    | Spacer
-    | RawHtml
-    | Custom -- for custom Elements implemented in JS, see collage for example
-
-type ImageStyle = Plain | Fitted | Cropped (Int,Int) | Tiled
-
-
 {-| Create an image given a width, height, and image source. -}
 image : Int -> Int -> String -> Element
 image w h src =
@@ -225,18 +202,6 @@ tiledImage w h src =
     newElement w h (Image Tiled w h src)
 
 
-type Three = P | Z | N
-
-type Pos = Absolute Int | Relative Float
-
-type alias Position =
-    { horizontal : Three
-    , vertical : Three
-    , x : Pos
-    , y : Pos
-    }
-
-
 {-| Put an element in a container. This lets you position the element really
 easily, and there are tons of ways to set the `Position`.
 To center `element` exactly in a 300-by-300 square you would say:
@@ -256,9 +221,6 @@ for making borders.
 spacer : Int -> Int -> Element
 spacer w h =
     newElement w h Spacer
-
-
-type Direction = DUp | DDown | DLeft | DRight | DIn | DOut
 
 
 {-| Have a list of elements flow in a particular direction.
