@@ -30,7 +30,7 @@ The current sentiment is that it is already quite error prone once you get to
 @docs foldr, foldl
 
 # Special Folds
-@docs sum, product, maximum, minimum, all, any, foldr1, foldl1, scanl, scanl1
+@docs sum, product, maximum, minimum, all, any, scanl
 
 # Sorting
 @docs sort, sortBy, sortWith
@@ -118,27 +118,12 @@ foldl = Native.List.foldl
 foldr : (a -> b -> b) -> b -> List a -> b
 foldr = Native.List.foldr
 
-{-| Reduce a list from the left without a base case. List must be non-empty. -}
-foldl1 : (a -> a -> a) -> List a -> a
-foldl1 = Native.List.foldl1
-
-{-| Reduce a list from the right without a base case. List must be non-empty. -}
-foldr1 : (a -> a -> a) -> List a -> a
-foldr1 = Native.List.foldr1
-
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
 
     scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
 -}
 scanl : (a -> b -> b) -> b -> List a -> List b
 scanl = Native.List.scanl
-
-{-| Same as scanl but it doesn't require a base case. List must be non-empty.
-
-    scanl1 (+) [1,2,3,4] == [1,3,6,10]
--}
-scanl1 : (a -> a -> a) -> List a -> List a
-scanl1 = Native.List.scanl1
 
 {-| Keep only elements that satisfy the predicate.
 
