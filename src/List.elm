@@ -244,18 +244,26 @@ product numbers =
 
 {-| Find the maximum element in a non-empty list.
 
-    maximum [1,4,2] == 4
+    maximum [1,4,2] == Just 4
+    maximum []      == Nothing
 -}
-maximum : List comparable -> comparable
-maximum = foldl1 max
+maximum : List comparable -> Maybe comparable
+maximum list =
+    case list of
+        x :: xs -> Just (foldl max x xs)
+        _ -> Nothing
 
 
 {-| Find the minimum element in a non-empty list.
 
-    minimum [3,2,1] == 1
+    minimum [3,2,1] == Just 1
+    minimum []      == Nothing
 -}
-minimum : List comparable -> comparable
-minimum = foldl1 min
+minimum : List comparable -> Maybe comparable
+minimum list =
+    case list of
+        x :: xs -> Just (foldl min x xs)
+        _ -> Nothing
 
 
 {-| Partition a list based on a predicate. The first list contains all values
