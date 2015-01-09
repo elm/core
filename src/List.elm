@@ -244,18 +244,20 @@ product numbers =
 
 {-| Find the maximum element in a non-empty list.
 
-    maximum [1,4,2] == 4
+    maximum 0 [1,4,2] == Just 4
+    maximum 0 []      == 0
 -}
-maximum : List comparable -> comparable
-maximum = foldl1 max
+maximum : comparable -> List comparable -> comparable
+maximum def list = foldl max def list
 
 
 {-| Find the minimum element in a non-empty list.
 
-    minimum [3,2,1] == 1
+    minimum 10 [3,2,1] == Just 1
+    minimum 10 []      == 10
 -}
-minimum : List comparable -> comparable
-minimum = foldl1 min
+minimum : comparable -> List comparable -> comparable
+minimum def list = foldl min def list
 
 
 {-| Partition a list based on a predicate. The first list contains all values
