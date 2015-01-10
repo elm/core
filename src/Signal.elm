@@ -149,8 +149,8 @@ update wins, just like with `merge`.
 -}
 mergeMany : List (Signal a) -> Signal a
 mergeMany signals =
-    case signals of
-        s :: rest -> List.foldr merge s rest
+    case List.reverse signals of
+        last :: rest -> List.foldl merge last rest
         _ -> Debug.crash "Signal.mergeMany needs a non-empty list."
 
 
