@@ -73,6 +73,11 @@ tests =
       reverseTests = suite "reverse Tests"
         [ test "reverse" <| assertEqual [5,4,3,2,1] (List.reverse [1,2,3,4,5])
         ]
+      takeIfTests = suite "takeIf Tests"
+        [ test "takeIf 1" <| assertEqual [2] (List.takeIf 1 (\x -> x % 2 == 0) [1,2,3,4,5])
+        , test "takeIf 2" <| assertEqual [2,4] (List.takeIf 2 (\x -> x % 2 == 0) [1,2,3,4,5,6])
+        , test "takeIf too many" <| assertEqual [2,4] (List.takeIf 3 (\x -> x % 2 == 0) [1,2,3,4,5])
+        ]
   in
       suite "List Tests"
       [ partitionTests
@@ -87,4 +92,5 @@ tests =
       , sortByTests
       , sortWithTests
       , reverseTests
+      , takeIfTests
       ]
