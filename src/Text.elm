@@ -32,7 +32,7 @@ There are also a bunch of functions to set parts of a `Style` individually:
 
 import Basics (..)
 import Color (Color, black)
-import Graphics.Element (Element, Three, Pos, ElementPrim, Properties)
+import Graphics.Element (Element)
 import List
 import Maybe (Maybe(Nothing))
 import Native.Text

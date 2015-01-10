@@ -40,44 +40,21 @@ import List
 import Transform2D (Transform2D)
 import Transform2D as T
 import Native.Graphics.Collage
-import Graphics.Element (Element)
+import Graphics.Model
+import Graphics.Model (BasicForm(..), FillStyle(..), ShapeStyle(..))
 import Color (Color, black, Gradient)
 
+{- Include Graphics.Element in the build for Native.Graphics.Collage -}
+import Graphics.Element (Element)
 
-type alias Form =
-    { theta : Float
-    , scale : Float
-    , x : Float
-    , y : Float
-    , alpha : Float
-    , form : BasicForm
-    }
 
-type FillStyle
-    = Solid Color
-    | Texture String
-    | Grad Gradient
+type alias LineStyle = Graphics.Model.LineStyle
+type alias LineCap = Graphics.Model.LineCap
+type alias LineJoin = Graphics.Model.LineJoin
+type alias Form = Graphics.Model.Form
+type alias Shape = Graphics.Model.Shape
+type alias Path = Graphics.Model.Shape
 
-{-| The shape of the ends of a line. -}
-type LineCap = Flat | Round | Padded
-
-{-| The shape of the &ldquo;joints&rdquo; of a line, where each line segment
-meets. `Sharp` takes an argument to limit the length of the joint. This
-defaults to 10.
--}
-type LineJoin = Smooth | Sharp Float | Clipped
-
-{-| All of the attributes of a line style. This lets you build up a line style
-however you want. You can also update existing line styles with record updates.
--}
-type alias LineStyle =
-    { color : Color
-    , width : Float
-    , cap   : LineCap
-    , join  : LineJoin
-    , dashing : List Int
-    , dashOffset : Int
-    }
 
 {-| The default line style, which is solid black with flat caps and sharp joints.
 You can use record updates to build the line style you
@@ -106,18 +83,6 @@ dashed clr = { defaultLine | color <- clr, dashing <- [8,4] }
 {-| Create a dotted line style with a given color. Dashing equals `[3,3]`. -}
 dotted : Color -> LineStyle
 dotted clr = { defaultLine | color <- clr, dashing <- [3,3] }
-
-type BasicForm
-    = FPath LineStyle Path
-    | FShape ShapeStyle Shape
-    | FImage Int Int (Int,Int) String
-    | FElement Element
-    | FGroup Transform2D (List Form)
-
-type ShapeStyle
-    = Line LineStyle
-    | Fill FillStyle
-
 
 form : BasicForm -> Form
 form f = { theta=0, scale=1, x=0, y=0, alpha=1, form=f }
@@ -213,9 +178,6 @@ relationships between forms, so you are free to do all kinds of 2D graphics.
 collage : Int -> Int -> List Form -> Element
 collage = Native.Graphics.Collage.collage
 
-
-type alias Path = List (Float,Float)
-
 {-| Create a path that follows a sequence of points. -}
 path : List (Float,Float) -> Path
 path ps = ps
@@ -223,8 +185,6 @@ path ps = ps
 {-| Create a path along a given line segment. -}
 segment : (Float,Float) -> (Float,Float) -> Path
 segment p1 p2 = [p1,p2]
-
-type alias Shape = List (Float,Float)
 
 {-| Create an arbitrary polygon by specifying its corners in order.
 `polygon` will automatically close all shapes, so the given list
