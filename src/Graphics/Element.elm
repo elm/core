@@ -43,7 +43,6 @@ import List as List
 import Color (..)
 import Maybe ( Maybe(..) )
 
-
 type alias Properties = {
   id      : Int,
   width   : Int,
@@ -274,16 +273,18 @@ flow : Direction -> List Element -> Element
 flow dir es =
   let ws = List.map widthOf es
       hs = List.map heightOf es
+      maxW = List.maximum 0 ws
+      maxH = List.maximum 0 hs
       newFlow w h = newElement w h (Flow dir es)
   in 
   if es == [] then empty else
   case dir of
-    DUp    -> newFlow (List.maximum ws) (List.sum hs)
-    DDown  -> newFlow (List.maximum ws) (List.sum hs)
-    DLeft  -> newFlow (List.sum ws) (List.maximum hs)
-    DRight -> newFlow (List.sum ws) (List.maximum hs)
-    DIn    -> newFlow (List.maximum ws) (List.maximum hs)
-    DOut   -> newFlow (List.maximum ws) (List.maximum hs)
+    DUp    -> newFlow maxW (List.sum hs)
+    DDown  -> newFlow maxW (List.sum hs)
+    DLeft  -> newFlow (List.sum ws) maxH
+    DRight -> newFlow (List.sum ws) maxH
+    DIn    -> newFlow maxW maxH
+    DOut   -> newFlow maxW maxH
 
 
 {-| Stack elements vertically.
@@ -327,7 +328,7 @@ layers es =
   let ws = List.map widthOf es
       hs = List.map heightOf es
   in
-      newElement (List.maximum ws) (List.maximum hs) (Flow DOut es)
+      newElement (List.maximum 0 ws) (List.maximum 0 hs) (Flow DOut es)
 
 
 -- Repetitive things --
