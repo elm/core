@@ -60,10 +60,10 @@ infixr 5 ::
     head [1,2,3] == 1
 -}
 head : List a -> Maybe a
-head l =
-    case l of
-        x :: xs -> Just x
-        [] -> Nothing
+head list =
+  case list of
+    x :: xs -> Just x
+    [] -> Nothing
 
 
 {-| Split the first element off and returns it together with the rest of the
@@ -73,10 +73,10 @@ list.
     uncons []      == Nothing
 -}
 uncons : List a -> Maybe (a, List a)
-uncons l =
-    case l of
-        x :: xs -> Just (x, xs)
-        [] -> Nothing
+uncons list =
+  case list of
+    x :: xs -> Just (x, xs)
+    [] -> Nothing
 
 
 {-| Determine if a list is empty.
@@ -169,8 +169,8 @@ length = Native.List.length
     reverse [1..4] == [4,3,2,1]
 -}
 reverse : List a -> List a
-reverse l =
-    foldl (::) [] l
+reverse list =
+    foldl (::) [] list
 
 {-| Determine if all elements satisfy the predicate.
 
@@ -243,9 +243,9 @@ product numbers =
 -}
 maximum : List comparable -> Maybe comparable
 maximum list =
-    case list of
-        x :: xs -> Just (foldl max x xs)
-        _ -> Nothing
+  case list of
+    x :: xs -> Just (foldl max x xs)
+    _ -> Nothing
 
 
 {-| Find the minimum element in a non-empty list.
@@ -255,9 +255,9 @@ maximum list =
 -}
 minimum : List comparable -> Maybe comparable
 minimum list =
-    case list of
-        x :: xs -> Just (foldl min x xs)
-        _ -> Nothing
+  case list of
+    x :: xs -> Just (foldl min x xs)
+    _ -> Nothing
 
 
 {-| Partition a list based on a predicate. The first list contains all values

@@ -150,8 +150,8 @@ update wins, just like with `merge`.
 mergeMany : List (Signal a) -> Signal a
 mergeMany signals =
     case List.reverse signals of
-        last :: rest -> List.foldl merge last rest
-        _ -> Debug.crash "Signal.mergeMany needs a non-empty list."
+      last :: rest -> List.foldl merge last rest
+      _ -> Debug.crash "Signal.mergeMany needs a non-empty list."
 
 
 {-| Filter out some updates. The given function decides whether we should

@@ -273,7 +273,7 @@ flow : Direction -> List Element -> Element
 flow dir es =
   let ws = List.map widthOf es
       hs = List.map heightOf es
-      maxOrZero l = List.maximum l |> withDefault 0
+      maxOrZero list = withDefault 0 (List.maximum list)
       newFlow w h = newElement w h (Flow dir es)
   in 
   if es == [] then empty else
@@ -328,8 +328,8 @@ layers es =
       hs = List.map heightOf es
   in
       newElement
-          (List.maximum ws |> withDefault 0)
-          (List.maximum hs |> withDefault 0)
+          (withDefault 0 (List.maximum ws))
+          (withDefault 0 (List.maximum hs))
           (Flow DOut es)
 
 
