@@ -32,6 +32,7 @@ the [`Time`](Time) library.
 import Native.Signal
 import List
 import Basics (fst, snd, not)
+import Debug
 
 
 type Signal a = Signal
@@ -148,7 +149,9 @@ update wins, just like with `merge`.
 -}
 mergeMany : List (Signal a) -> Signal a
 mergeMany signals =
-    List.foldr1 merge signals
+    case List.reverse signals of
+      last :: rest -> List.foldl merge last rest
+      _ -> Debug.crash "Signal.mergeMany needs a non-empty list."
 
 
 {-| Filter out some updates. The given function decides whether we should

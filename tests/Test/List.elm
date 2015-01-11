@@ -44,7 +44,7 @@ tests =
         ]
       intersperseTests = suite "intersperse Tests"
         [ test "intersperse doc check" <| assertEqual ["turtles","on","turtles","on","turtles"] (List.intersperse "on" ["turtles","turtles","turtles"])
-        , test "intersperse stress test" <| assertEqual (List.tail <| List.concat <| List.map2 (\x y -> [x,y]) falseList trueList) (List.intersperse False trueList)
+        , test "intersperse stress test" <| assertEqual (List.drop 1 <| List.concat <| List.map2 (\x y -> [x,y]) falseList trueList) (List.intersperse False trueList)
         ]
       zipTests = suite "map2 Tests"
         [ test "zip doc check 1" <| assertEqual [(1,6),(2,7)] (List.map2 (,) [1,2,3] [6,7])

@@ -11,10 +11,6 @@ Elm.Native.List.make = function(elm) {
     var Nil = Utils.Nil;
     var Cons = Utils.Cons;
 
-    function throwError(f) {
-        throw new Error("Function '" + f + "' expects a non-empty list!");
-    }
-
     function toArray(xs) {
         var out = [];
         while (xs.ctor !== '[]') {
@@ -38,13 +34,6 @@ Elm.Native.List.make = function(elm) {
             do { lst = Cons(hi,lst) } while (hi-->lo);
         }
         return lst
-    }
-
-    function head(v) {
-        return v.ctor === '[]' ? throwError('head') : v._0;
-    }
-    function tail(v) {
-        return v.ctor === '[]' ? throwError('tail') : v._1;
     }
 
     function map(f, xs) {
@@ -76,20 +65,6 @@ Elm.Native.List.make = function(elm) {
         return acc;
     }
 
-    function foldl1(f, xs) {
-        return xs.ctor === '[]' ? throwError('foldl1') : foldl(f, xs._0, xs._1);
-    }
-
-    function foldr1(f, xs) {
-        if (xs.ctor === '[]') { throwError('foldr1'); }
-        var arr = toArray(xs);
-        var acc = arr.pop();
-        for (var i = arr.length; i--; ) {
-            acc = A2(f, arr[i], acc);
-        }
-        return acc;
-    }
-
     function scanl(f, b, xs) {
         var arr = toArray(xs);
         arr.unshift(b);
@@ -98,10 +73,6 @@ Elm.Native.List.make = function(elm) {
             arr[i] = A2(f, arr[i], arr[i-1]);
         }
         return fromArray(arr);
-    }
-
-    function scanl1(f, xs) {
-        return xs.ctor === '[]' ? throwError('scanl1') : scanl(f, xs._0, xs._1);
     }
 
     function filter(pred, xs) {
@@ -272,17 +243,11 @@ Elm.Native.List.make = function(elm) {
         range:range,
         append: F2(append),
 
-        head:head,
-        tail:tail,
-
         map:F2(map),
         foldl:F3(foldl),
         foldr:F3(foldr),
 
-        foldl1:F2(foldl1),
-        foldr1:F2(foldr1),
         scanl:F3(scanl),
-        scanl1:F2(scanl1),
         filter:F2(filter),
         length:length,
         member:F2(member),
