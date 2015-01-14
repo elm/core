@@ -1,5 +1,5 @@
 module Text where
-{-| A library for styling and displaying text. Whlie the `String` library
+{-| A library for styling and displaying text. While the `String` library
 focuses on representing and manipulating strings of character strings, the
 `Text` library focuses on how those strings should look on screen. It lets
 you make text bold or italic, set the typeface, set the text size, etc.
@@ -152,7 +152,7 @@ it to text like this:
 style : Style -> Text -> Text
 style = Native.Text.style
 
-{-| Provide a list of prefered typefaces for some text.
+{-| Provide a list of preferred typefaces for some text.
 
     ["helvetica","arial","sans-serif"]
 
