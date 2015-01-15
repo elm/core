@@ -1,6 +1,6 @@
 module Color
-    ( rgb, rgba, hsl, hsla, greyscale, grayscale, complement
-    , linear, radial
+    ( Color, rgb, rgba, hsl, hsla, greyscale, grayscale, complement
+    , Gradient, linear, radial
     , toRgb, toHsl
     , red, orange, yellow, green, blue, purple, brown
     , lightRed, lightOrange, lightYellow, lightGreen, lightBlue, lightPurple, lightBrown
