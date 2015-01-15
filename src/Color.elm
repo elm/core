@@ -1,4 +1,13 @@
-module Color where
+module Color
+    ( rgb, rgba, hsl, hsla, greyscale, grayscale, complement
+    , linear, radial
+    , toRgb, toHsl
+    , red, orange, yellow, green, blue, purple, brown
+    , lightRed, lightOrange, lightYellow, lightGreen, lightBlue, lightPurple, lightBrown
+    , darkRed, darkOrange, darkYellow, darkGreen, darkBlue, darkPurple, darkBrown
+    , white, lightGrey, grey, darkGrey, lightCharcoal, charcoal, darkCharcoal, black
+    , lightGray, gray, darkGray
+    ) where
 
 {-| Library for working with colors. Includes
 [RGB](https://en.wikipedia.org/wiki/RGB_color_model) and
