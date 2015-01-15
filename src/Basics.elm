@@ -1,5 +1,5 @@
 module Basics
-    ( Order
+    ( Order (..)
     , (==), (/=)
     , (<), (>), (<=), (>=), max, min, Order, compare
     , not, (&&), (||), xor, otherwise
