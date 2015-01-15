@@ -1,7 +1,6 @@
 module Basics
-    ( Order (..)
-    , (==), (/=)
-    , (<), (>), (<=), (>=), max, min, Order, compare
+    ( (==), (/=)
+    , (<), (>), (<=), (>=), max, min, Order (..), compare
     , not, (&&), (||), xor, otherwise
     , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
     , pi, cos, sin, tan, acos, asin, atan, atan2
