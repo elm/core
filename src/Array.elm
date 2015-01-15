@@ -1,4 +1,11 @@
-module Array where
+module Array
+    ( Array
+    , empty, repeat, initialize, fromList
+    , length, push, append
+    , get, set
+    , slice, toList, toIndexedList
+    , map, indexedMap, filter, foldl, foldr
+    ) where
 
 {-| A library for fast immutable arrays. The elements in an array must have the
 same type. The arrays are implemented in Relaxed Radix Balanced-Trees for fast
