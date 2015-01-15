@@ -1,4 +1,9 @@
-module Time where
+module Time
+    ( Time, millisecond, second, minute, hour
+    , inMilliseconds, inSeconds, inMinutes, inHours
+    , fps, fpsWhen, every
+    , timestamp, delay, since
+    ) where
 
 {-| Library for working with time.
 
