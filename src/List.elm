@@ -1,6 +1,6 @@
 module List
     ( isEmpty, length, reverse, member
-    , head, tail, filter, take, drop
+    , head, uncons, filter, take, drop
     , repeat, (::), append, concat, intersperse
     , partition, unzip
     , map, map2, map3, map4, map5
@@ -17,7 +17,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, tail, filter, take, drop
+@docs head, uncons, filter, take, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
