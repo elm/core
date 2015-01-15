@@ -1,4 +1,7 @@
-module Bitwise where
+module Bitwise
+    ( and, or, xor, complement
+    , shiftLeft, shiftRight, shiftRightLogical
+    ) where
 
 {-| Library for [bitwise operations](http://en.wikipedia.org/wiki/Bitwise_operation).
 
