@@ -1,5 +1,18 @@
-
-module Basics where
+module Basics
+    ( Order
+    , (==), (/=)
+    , (<), (>), (<=), (>=), max, min, Order, compare
+    , not, (&&), (||), xor, otherwise
+    , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
+    , pi, cos, sin, tan, acos, asin, atan, atan2
+    , round, floor, ceiling, truncate, toFloat
+    , degrees, radians, turns
+    , toPolar, fromPolar
+    , isNaN, isInfinite
+    , toString, (++)
+    , fst, snd
+    , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
+    ) where
 
 {-| Tons of useful functions that get imported by default.
 
