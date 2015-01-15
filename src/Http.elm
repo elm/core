@@ -1,4 +1,9 @@
-module Http where
+module Http
+    ( send, sendGet
+    , get, post, request
+    , Response(..), Request(..)
+    ) where
+
 {-| A library for asynchronous HTTP requests. See the `WebSocket`
 library if you have very strict latency requirements.
 
