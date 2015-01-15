@@ -1,4 +1,8 @@
-module Debug where
+module Debug
+    ( log, crash
+    , watch, watchSummary, trace
+    ) where
+
 {-| This library is for investigating bugs or performance problems. It should
 *not* be used in production code.
 
