@@ -1,4 +1,14 @@
-module List where
+module List
+    ( isEmpty, length, reverse, member
+    , head, tail, filter, take, drop
+    , repeat, (::), append, concat, intersperse
+    , partition, unzip
+    , map, map2, map3, map4, map5
+    , filterMap, concatMap, indexedMap
+    , foldr, foldl
+    , sum, product, maximum, minimum, all, any, scanl
+    , sort, sortBy, sortWith
+    ) where
 
 {-| A library for manipulating lists of values. Every value in a
 list must have the same type.
