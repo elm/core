@@ -1,7 +1,7 @@
 module Http
     ( send, sendGet
     , get, post, request
-    , Response(..), Request(..)
+    , Response(..), Request
     ) where
 
 {-| A library for asynchronous HTTP requests. See the `WebSocket`
