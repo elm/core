@@ -1,5 +1,6 @@
-
-module Window where
+module Window
+    ( dimensions, width, height
+    ) where
 
 {-| Provides information about the container that your Elm program lives in.
 When you embed Elm in a `<div>` it gives the dimensions of the container, not
