@@ -1,4 +1,7 @@
-module Trampoline where
+module Trampoline
+    ( trampoline, Trampoline(..)
+    ) where
+
 {-| A [trampoline](http://en.wikipedia.org/wiki/Tail-recursive_function#Through_trampolining)
 makes it possible to recursively call a function without growing the stack.
 
