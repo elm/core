@@ -4,7 +4,7 @@ module Array
     , length, push, append
     , get, set
     , slice, toList, toIndexedList
-    , map, indexedMap, filter, foldl, foldr
+    , map, indexedMap, keepIf, dropIf, foldl, foldr
     ) where
 
 {-| A library for fast immutable arrays. The elements in an array must have the
@@ -24,7 +24,7 @@ reads, updates, and appends.
 @docs slice, toList, toIndexedList
 
 # Mapping, Filtering, and Folding
-@docs map, indexedMap, filter, foldl, foldr
+@docs map, indexedMap, keepIf, dropIf, foldl, foldr
 -}
 
 import Native.Array
@@ -103,15 +103,26 @@ foldl = Native.Array.foldl
 foldr : (a -> b -> b) -> b -> Array a -> b
 foldr = Native.Array.foldr
 
-{-| Keep only elements that satisfy the predicate:
 
-    filter isEven (fromList [1..6]) == (fromList [2,4,6])
+{-| Keep certain elements.
+
+    keepIf isEven (fromList [1..6]) == fromList [2,4,6]
 -}
-filter : (a -> Bool) -> Array a -> Array a
-filter isOkay arr =
+keepIf : (a -> Bool) -> Array a -> Array a
+keepIf isOkay arr =
     let update x xs = if isOkay x then Native.Array.push x xs else xs
     in
-        Native.Array.foldl update Native.Array.empty arr
+        foldl update Native.Array.empty arr
+
+
+{-| Drop certain elements.
+
+    dropIf isEven (fromList [1..6]) == fromList [1,3,5]
+-}
+dropIf : (a -> Bool) -> Array a -> Array a
+dropIf isBad array =
+    keepIf (not << isBad) array
+
 
 {-| Return an empty array.
 
