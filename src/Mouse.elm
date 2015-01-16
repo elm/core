@@ -1,5 +1,7 @@
-
-module Mouse where
+module Mouse
+    ( position, x, y
+    , isDown, clicks
+    ) where
 
 {-| Library for working with mouse input.
 
