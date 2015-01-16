@@ -4,7 +4,6 @@ module Text
     , link, Style, style, defaultStyle, Line(..)
     , plainText, asText
     , typeface, monospace, height, color, bold, italic, line
-    , markdown -- not documented since for internal use only
     ) where
 
 {-| A library for styling and displaying text. While the `String` library
@@ -254,10 +253,6 @@ justified = Native.Text.justified
 plainText : String -> Element
 plainText str =
     leftAligned (fromString str)
-
-{-| for internal use only -}
-markdown : Element
-markdown = Native.Text.markdown
 
 {-| Convert anything to its textual representation and make it displayable in
 the browser. Excellent for debugging.
