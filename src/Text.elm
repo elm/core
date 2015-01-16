@@ -1,4 +1,12 @@
-module Text where
+module Text
+    ( fromString, empty, append, concat, join
+    , leftAligned, rightAligned, centered, justified
+    , link, Style, style, defaultStyle, Line(..)
+    , plainText, asText
+    , typeface, monospace, height, color, bold, italic, line
+    , markdown -- not documented since for internal use only
+    ) where
+
 {-| A library for styling and displaying text. While the `String` library
 focuses on representing and manipulating strings of character strings, the
 `Text` library focuses on how those strings should look on screen. It lets
