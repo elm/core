@@ -1,4 +1,15 @@
-module Signal where
+module Signal
+    ( Signal
+    , merge, mergeMany
+    , map, map2, map3, map4, map5
+    , (<~), (~)
+    , foldp
+    , keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
+    , Channel, Message
+    , channel, send, subscribe
+    , constant
+    ) where
+
 {-| The library for general signal manipulation. Includes mapping, merging,
 filters, past-dependence, and helpers for handling inputs from the UI.
 
