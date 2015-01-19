@@ -118,7 +118,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     }
 
     function drawLine(ctx, style, path) {
-        setStrokeStyle(ctx, style)
+        setStrokeStyle(ctx, style);
         return line(ctx, style, path);
     }
 
@@ -151,21 +151,67 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
     function drawShape(redo, ctx, style, path) {
         trace(ctx, path);
-        setFillStyle(ctx, style)
+        setFillStyle(ctx, style);
         ctx.scale(1,-1);
         ctx.fill();
     }
 
+    // Convert the object returned by the text module
+    // into something we can use for styling canvas text
+    function parseTextObject(text) {
+
+        // Collect all css properties into one object
+        var textObj = (function readFrom(text) {
+            if (text.hasOwnProperty('style')) {
+                var textObj = readFrom(text.text);
+                var tmp = text.style.split(':');
+                // Remove trailing ';' and spaces
+                tmp[1] = tmp[1].substring(0, tmp[1].length - 1);
+                textObj[tmp[0].trim()] = tmp[1].trim();
+                return textObj;
+            }
+            else {
+                return {
+                    "text": text
+                };
+            }
+        })(text);
+
+        // extract the css properties into a properly formatted
+        // font shorthand string to feed to ctx.font
+        // the array is necessary to guarantee property order
+        textObj.fontString = "";
+        var props = ['font-style', 'font-variant', 'font-weight',
+                     'font-size', 'font-family'];
+        var defaults = {
+            "font-style"   : "normal",
+            "font-variant" : "normal",
+            "font-weight"  : "normal",
+            "font-size"    : "12px",
+            "font-family"  : "sans-serif"
+        };
+        for (var i=0; i<props.length; i++) {
+            var p = props[i];
+            textObj.fontString += " "
+                + (textObj.hasOwnProperty(p) ? textObj[p] : defaults[p]);
+        }
+        return textObj;
+    }
+
     function fillText(redo, ctx, style, text) {
-        setFillStyle(ctx, style)
+        setFillStyle(ctx, style);
         ctx.scale(1,-1);
-        ctx.fillText(text, 0, 0);
+        var textObj = parseTextObject(text);
+        ctx.font = textObj.fontString;
+        ctx.fillText(textObj.text, 0, 0);
     }
 
     function strokeText(redo, ctx, style, text) {
-        setStrokeStyle(ctx, style)
+        setStrokeStyle(ctx, style);
         ctx.scale(1,-1);
-        ctx.strokeText(text, 0, 0);
+        var textObj = parseTextObject(text);
+        ctx.font = textObj.fontString;
+        ctx.strokeText(textObj.text, 0, 0);
     }
 
     function drawImage(redo, ctx, form) {
