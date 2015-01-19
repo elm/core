@@ -42,6 +42,7 @@ import Transform2D as T
 import Native.Graphics.Collage
 import Graphics.Element (Element)
 import Color (Color, black, Gradient)
+import Text (Text)
 
 
 type alias Form =
@@ -224,20 +225,21 @@ path ps = ps
 segment : (Float,Float) -> (Float,Float) -> Path
 segment p1 p2 = [p1,p2]
 
-type alias Shape = List (Float,Float)
+type Shape = Polygon (List (Float,Float))
+           | TextShape Text
 
 {-| Create an arbitrary polygon by specifying its corners in order.
 `polygon` will automatically close all shapes, so the given list
 of points does not need to start and end with the same position.
 -}
 polygon : List (Float,Float) -> Shape
-polygon points = points
+polygon points = Polygon points
 
 {-| A rectangle with a given width and height. -}
 rect : Float -> Float -> Shape
 rect w h = let hw = w/2
                hh = h/2
-           in  [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
+           in  Polygon [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
 
 {-| A square with a given edge length. -}
 square : Float -> Shape
@@ -251,7 +253,7 @@ oval w h =
       hw = w/2
       hh = h/2
       f i = (hw * cos (t*i), hh * sin (t*i))
-  in  List.map f [0..n-1]
+  in  Polygon (List.map f [0..n-1])
 
 {-| A circle with a given radius. -}
 circle : Float -> Shape
@@ -268,4 +270,10 @@ ngon n r =
   let m = toFloat n
       t = 2 * pi / m
       f i = ( r * cos (t*i), r * sin (t*i) )
-  in  List.map f [0..m-1]
+  in  Polygon (List.map f [0..m-1])
+
+{-| Convert Text into a Shape which can be rendered in the collage.  The text
+may then be filled or outlined in the same way as other shapes 
+-}
+text : Text -> Shape
+text t = TextShape t

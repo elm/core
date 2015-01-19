@@ -24,6 +24,35 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     var Element = Elm.Graphics.Element.make(localRuntime);
     var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 
+    function setStrokeStyle(ctx, style) {
+        ctx.lineWidth = style.width;
+
+        var cap = style.cap.ctor;
+        ctx.lineCap = cap === 'Flat'
+            ? 'butt'
+            : cap === 'Round'
+                ? 'round'
+                : 'square';
+
+        var join = style.join.ctor;
+        ctx.lineJoin = join === 'Smooth'
+            ? 'round'
+            : join === 'Sharp'
+                ? 'miter'
+                : 'bevel';
+
+        ctx.miterLimit = style.join._0 || 10;
+        ctx.strokeStyle = Color.toCss(style.color);
+    }
+
+    function setFillStyle(ctx, style) {
+        var sty = style.ctor;
+        ctx.fillStyle = sty === 'Solid'
+            ? Color.toCss(style._0)
+            : sty === 'Texture'
+                ? texture(redo, ctx, style._0)
+                : gradient(ctx, style._0);
+    }
 
     function trace(ctx, path) {
         var points = List.toArray(path);
@@ -89,25 +118,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     }
 
     function drawLine(ctx, style, path) {
-        ctx.lineWidth = style.width;
-
-        var cap = style.cap.ctor;
-        ctx.lineCap = cap === 'Flat'
-            ? 'butt'
-            : cap === 'Round'
-                ? 'round'
-                : 'square';
-
-        var join = style.join.ctor;
-        ctx.lineJoin = join === 'Smooth'
-            ? 'round'
-            : join === 'Sharp'
-                ? 'miter'
-                : 'bevel';
-
-        ctx.miterLimit = style.join._0 || 10;
-        ctx.strokeStyle = Color.toCss(style.color);
-
+        setStrokeStyle(ctx, style)
         return line(ctx, style, path);
     }
 
@@ -140,15 +151,21 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
     function drawShape(redo, ctx, style, path) {
         trace(ctx, path);
-        var sty = style.ctor;
-        ctx.fillStyle = sty === 'Solid'
-            ? Color.toCss(style._0)
-            : sty === 'Texture'
-                ? texture(redo, ctx, style._0)
-                : gradient(ctx, style._0);
-
+        setFillStyle(ctx, style)
         ctx.scale(1,-1);
         ctx.fill();
+    }
+
+    function fillText(redo, ctx, style, text) {
+        setFillStyle(ctx, style)
+        ctx.scale(1,-1);
+        ctx.fillText(text, 0, 0);
+    }
+
+    function strokeText(redo, ctx, style, text) {
+        setStrokeStyle(ctx, style)
+        ctx.scale(1,-1);
+        ctx.strokeText(text, 0, 0);
     }
 
     function drawImage(redo, ctx, form) {
@@ -184,11 +201,22 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         case 'FPath' : drawLine(ctx, f._0, f._1); break;
         case 'FImage': drawImage(redo, ctx, f); break;
         case 'FShape':
-          if (f._0.ctor === 'Line') {
-            f._1.closed = true;
-            drawLine(ctx, f._0._0, f._1);
-          } else {
-            drawShape(redo, ctx, f._0._0, f._1);
+          switch(f._1.ctor) {
+            case 'Polygon':
+              if (f._0.ctor === 'Line') {
+                  f._1._1.closed = true;
+                  drawLine(ctx, f._0._0, f._1._0);
+              } else {
+                  drawShape(redo, ctx, f._0._0, f._1._0);
+              }
+              break;
+            case 'TextShape':
+              if (f._0.ctor == 'Line') {
+                  strokeText(redo, ctx, f._0._0, f._1._0);
+              } else {
+                  fillText(redo, ctx, f._0._0, f._1._0);
+              }
+              break;
           }
         break;
         }
