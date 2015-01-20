@@ -134,8 +134,6 @@ push = Native.Array.push
     get  5 (fromList [0,1,2]) == Nothing
     get -1 (fromList [0,1,2]) == Nothing
 
-The `(?)` operator from the `Maybe` library makes it easy to give a default
-value.
 -}
 get : Int -> Array a -> Maybe a
 get i array =
