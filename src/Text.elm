@@ -1,5 +1,12 @@
-module Text where
-{-| A library for styling and displaying text. Whlie the `String` library
+module Text
+    ( fromString, empty, append, concat, join
+    , leftAligned, rightAligned, centered, justified
+    , link, Style, style, defaultStyle, Line(..)
+    , plainText, asText
+    , typeface, monospace, height, color, bold, italic, line
+    ) where
+
+{-| A library for styling and displaying text. While the `String` library
 focuses on representing and manipulating strings of character strings, the
 `Text` library focuses on how those strings should look on screen. It lets
 you make text bold or italic, set the typeface, set the text size, etc.
@@ -152,7 +159,7 @@ it to text like this:
 style : Style -> Text -> Text
 style = Native.Text.style
 
-{-| Provide a list of prefered typefaces for some text.
+{-| Provide a list of preferred typefaces for some text.
 
     ["helvetica","arial","sans-serif"]
 
@@ -246,10 +253,6 @@ justified = Native.Text.justified
 plainText : String -> Element
 plainText str =
     leftAligned (fromString str)
-
-{-| for internal use only -}
-markdown : String -> Element
-markdown = Native.Text.markdown
 
 {-| Convert anything to its textual representation and make it displayable in
 the browser. Excellent for debugging.

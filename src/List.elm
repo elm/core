@@ -1,4 +1,14 @@
-module List where
+module List
+    ( isEmpty, length, reverse, member
+    , head, uncons, filter, take, drop
+    , repeat, (::), append, concat, intersperse
+    , partition, unzip
+    , map, map2, map3, map4, map5
+    , filterMap, concatMap, indexedMap
+    , foldr, foldl
+    , sum, product, maximum, minimum, all, any, scanl
+    , sort, sortBy, sortWith
+    ) where
 
 {-| A library for manipulating lists of values. Every value in a
 list must have the same type.
@@ -7,7 +17,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, tail, filter, take, drop
+@docs head, uncons, filter, take, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
@@ -30,7 +40,7 @@ The current sentiment is that it is already quite error prone once you get to
 @docs foldr, foldl
 
 # Special Folds
-@docs sum, product, maximum, minimum, all, any, foldr1, foldl1, scanl, scanl1
+@docs sum, product, maximum, minimum, all, any, scanl
 
 # Sorting
 @docs sort, sortBy, sortWith
@@ -38,6 +48,7 @@ The current sentiment is that it is already quite error prone once you get to
 -}
 
 import Basics (..)
+import Maybe
 import Maybe ( Maybe(Just,Nothing) )
 import Native.List
 
@@ -54,20 +65,28 @@ import Native.List
 infixr 5 ::
 
 
-{-| Extract the first element of a list. List must be non-empty.
+{-| Extract the first element of a list.
 
     head [1,2,3] == 1
 -}
-head : List a -> a
-head = Native.List.head
+head : List a -> Maybe a
+head list =
+  case list of
+    x :: xs -> Just x
+    [] -> Nothing
 
 
-{-| Extract the elements after the head of the list. List must be non-empty.
+{-| Split the first element off and returns it together with the rest of the
+list.
 
-    tail [1,2,3] == [2,3]
+    uncons [1,2,3] == Just (1, [2,3])
+    uncons []      == Nothing
 -}
-tail : List a -> List a
-tail = Native.List.tail
+uncons : List a -> Maybe (a, List a)
+uncons list =
+  case list of
+    x :: xs -> Just (x, xs)
+    [] -> Nothing
 
 
 {-| Determine if a list is empty.
@@ -118,27 +137,12 @@ foldl = Native.List.foldl
 foldr : (a -> b -> b) -> b -> List a -> b
 foldr = Native.List.foldr
 
-{-| Reduce a list from the left without a base case. List must be non-empty. -}
-foldl1 : (a -> a -> a) -> List a -> a
-foldl1 = Native.List.foldl1
-
-{-| Reduce a list from the right without a base case. List must be non-empty. -}
-foldr1 : (a -> a -> a) -> List a -> a
-foldr1 = Native.List.foldr1
-
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
 
     scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
 -}
 scanl : (a -> b -> b) -> b -> List a -> List b
 scanl = Native.List.scanl
-
-{-| Same as scanl but it doesn't require a base case. List must be non-empty.
-
-    scanl1 (+) [1,2,3,4] == [1,3,6,10]
--}
-scanl1 : (a -> a -> a) -> List a -> List a
-scanl1 = Native.List.scanl1
 
 {-| Keep only elements that satisfy the predicate.
 
@@ -175,8 +179,8 @@ length = Native.List.length
     reverse [1..4] == [4,3,2,1]
 -}
 reverse : List a -> List a
-reverse =
-    foldl (::) []
+reverse list =
+    foldl (::) [] list
 
 {-| Determine if all elements satisfy the predicate.
 
@@ -244,18 +248,26 @@ product numbers =
 
 {-| Find the maximum element in a non-empty list.
 
-    maximum [1,4,2] == 4
+    maximum [1,4,2] == Just 4
+    maximum []      == Nothing
 -}
-maximum : List comparable -> comparable
-maximum = foldl1 max
+maximum : List comparable -> Maybe comparable
+maximum list =
+  case list of
+    x :: xs -> Just (foldl max x xs)
+    _ -> Nothing
 
 
 {-| Find the minimum element in a non-empty list.
 
-    minimum [3,2,1] == 1
+    minimum [3,2,1] == Just 1
+    minimum []      == Nothing
 -}
-minimum : List comparable -> comparable
-minimum = foldl1 min
+minimum : List comparable -> Maybe comparable
+minimum list =
+  case list of
+    x :: xs -> Just (foldl min x xs)
+    _ -> Nothing
 
 
 {-| Partition a list based on a predicate. The first list contains all values

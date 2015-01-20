@@ -14,7 +14,8 @@ module Dict
 type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or
 lists of comparable types.
 
-Insert, remove, and query operations all take *O(log n)* time.
+Insert, remove, and query operations all take *O(log n)* time. Dictionary
+equality with `(==)` is unreliable and should not be used.
 
 # Build
 @docs empty, singleton, insert, update, remove
@@ -118,8 +119,6 @@ dictionary.
     get "Mouse" animals == Just Mouse
     get "Spike" animals == Nothing
 
-The `(?)` operator from the `Maybe` library makes it easy to give a default
-value.
 -}
 get : comparable -> Dict comparable v -> Maybe v
 get targetKey dict =

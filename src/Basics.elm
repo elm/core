@@ -1,5 +1,17 @@
-
-module Basics where
+module Basics
+    ( (==), (/=)
+    , (<), (>), (<=), (>=), max, min, Order (..), compare
+    , not, (&&), (||), xor, otherwise
+    , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
+    , pi, cos, sin, tan, acos, asin, atan, atan2
+    , round, floor, ceiling, truncate, toFloat
+    , degrees, radians, turns
+    , toPolar, fromPolar
+    , isNaN, isInfinite
+    , toString, (++)
+    , fst, snd
+    , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
+    ) where
 
 {-| Tons of useful functions that get imported by default.
 
@@ -124,7 +136,7 @@ rem = Native.Basics.rem
 
 {-| Exponentiation
 
-    3^2 == 9`
+    3^2 == 9
 -}
 (^) : number -> number -> number
 (^) = Native.Basics.exp
@@ -256,7 +268,7 @@ This operator short-circuits to `False` if the first argument is `False`.
 (&&) = Native.Basics.and
 
 {-| The logical OR operator. `True` if one or both inputs are `True`.
-This operator short-circuits to `True` if the first argument is True.
+This operator short-circuits to `True` if the first argument is `True`.
 -}
 (||) : Bool -> Bool -> Bool
 (||) = Native.Basics.or

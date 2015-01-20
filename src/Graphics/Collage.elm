@@ -3,6 +3,11 @@ module Graphics.Collage where
 {-| The collage API is for freeform graphics. You can move, rotate, scale, etc.
 all sorts of forms including lines, shapes, images, and elements.
 
+Collages use the same coordinate system you might see in an algebra or physics
+problem. The origin (0,0) is at the center of the collage, not the top left
+corner as in some other graphics libraries. Furthermore, the y-axis points up,
+so moving a form 10 units in the y-axis will move it up on screen.
+
 # Unstructured Graphics
 @docs collage
  
@@ -185,7 +190,8 @@ moveX x f = { f | x <- f.x + x }
 moveY : Float -> Form -> Form
 moveY y f = { f | y <- f.y + y }
 
-{-| Scale a form by a given factor. Scaling by 2 doubles the size.
+{-| Scale a form by a given factor. Scaling by 2 doubles both dimensions,
+and quadruples the area.
 -}
 scale : Float -> Form -> Form
 scale s f = { f | scale <- f.scale * s }

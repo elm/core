@@ -1,4 +1,13 @@
-module String where
+module String
+    ( isEmpty, length, reverse, repeat
+    , cons, uncons, fromChar, append, concat, split, join, words, lines
+    , slice, left, right, dropLeft, dropRight
+    , contains, startsWith, endsWith, indexes, indices
+    , toInt, toFloat, toList, fromList
+    , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
+    , map, filter, foldl, foldr, any, all
+    ) where
+
 {-| A built-in representation for efficient string manipulation. String literals
 are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 
@@ -239,13 +248,13 @@ words = Native.String.words
 lines : String -> List String
 lines = Native.String.lines
 
-{-| Convert a string to all upper case. Useful for case insensitive comparisons
+{-| Convert a string to all upper case. Useful for case-insensitive comparisons
 and VIRTUAL YELLING.
 -}
 toUpper : String -> String
 toUpper = Native.String.toUpper
 
-{-| Convert a string to all lower case. Useful for case insensitive comparisons. -}
+{-| Convert a string to all lower case. Useful for case-insensitive comparisons. -}
 toLower : String -> String
 toLower = Native.String.toLower
 
@@ -303,7 +312,7 @@ endsWith = Native.String.endsWith
 indexes : String -> String -> List Int
 indexes = Native.String.indexes
 
-{-| Alias for `indexes` -}
+{-| Alias for `indexes`. -}
 indices : String -> String -> List Int
 indices = Native.String.indexes
 

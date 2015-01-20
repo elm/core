@@ -276,7 +276,7 @@ Elm.Native.Array.make = function(elm) {
         }
       } else {
         for (var i = a.table.length; i--; ) {
-          b = foldl(f, b, a.table[i]);
+          b = foldr(f, b, a.table[i]);
         }
       }
       return b;

@@ -1,4 +1,9 @@
-module Regex where
+module Regex
+    ( regex, escape, caseInsensitive
+    , HowMany(..), Match
+    , contains, find, replace, split
+    ) where
+
 {-| A library for working with regular expressions. It uses [the
 same kind of regular expressions accepted by JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions).
 

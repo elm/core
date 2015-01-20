@@ -1,5 +1,7 @@
-
-module Date where
+module Date
+    ( Date, fromString, toTime, fromTime
+    , year, month, Month(..), day, dayOfWeek, Day(..), hour, minute, second
+    ) where
 
 {-| Library for working with dates. Email the mailing list if you encounter
 issues with internationalization or locale formatting.

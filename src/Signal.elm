@@ -1,4 +1,15 @@
-module Signal where
+module Signal
+    ( Signal
+    , merge, mergeMany
+    , map, map2, map3, map4, map5
+    , (<~), (~)
+    , foldp
+    , keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
+    , Channel, Message
+    , channel, send, subscribe
+    , constant
+    ) where
+
 {-| The library for general signal manipulation. Includes mapping, merging,
 filters, past-dependence, and helpers for handling inputs from the UI.
 
@@ -32,6 +43,7 @@ the [`Time`](Time) library.
 import Native.Signal
 import List
 import Basics (fst, snd, not)
+import Debug
 
 
 type Signal a = Signal
@@ -58,9 +70,10 @@ map =
     Native.Signal.map
 
 
-{-| Apply a function to the current value of two signals. In the following
-example, we figure out the `aspectRatio` of the window by combining the
-current width and height.
+{-| Apply a function to the current value of two signals. The function is
+reevaluated whenever *either* signal changes. In the following example, we
+figure out the `aspectRatio` of the window by combining the current width and
+height.
 
     ratio : Int -> Int -> Float
     ratio width height =
@@ -124,7 +137,7 @@ together lots of different signals to feed into a `foldp`.
 
 If an update comes from either of the incoming signals, it updates the outgoing
 signal. If an update comes on both signals at the same time, the left update
-wins.
+wins (i.e., the right update is discarded).
 -}
 merge : Signal a -> Signal a -> Signal a
 merge =
@@ -147,7 +160,9 @@ update wins, just like with `merge`.
 -}
 mergeMany : List (Signal a) -> Signal a
 mergeMany signals =
-    List.foldr1 merge signals
+    case List.reverse signals of
+      last :: rest -> List.foldl merge last rest
+      _ -> Debug.crash "Signal.mergeMany needs a non-empty list."
 
 
 {-| Filter out some updates. The given function decides whether we should
@@ -216,6 +231,9 @@ dropWhen bs = keepWhen (not <~ bs)
 
     --  numbers => 0 0 3 3 5 5 5 4 ...
     --  noDups  => 0   3   5     4 ...
+
+The signal should not be a signal of functions, or a record that contains a
+function (you'll get a runtime error since functions cannot be equated).
 -}
 dropRepeats : Signal a -> Signal a
 dropRepeats =
@@ -223,8 +241,8 @@ dropRepeats =
 
 
 {-| Sample from the second input every time an event occurs on the first input.
-For example, `(sampleOn clicks (every second))` will give the approximate time
-of the latest click. -}
+For example, `(sampleOn Mouse.clicks (Time.every Time.second))` will give the
+approximate time of the latest click. -}
 sampleOn : Signal a -> Signal b -> Signal b
 sampleOn =
     Native.Signal.sampleOn
@@ -246,7 +264,7 @@ For example, the following declarations are equivalent:
     main =
       scene <~ Window.dimensions ~ Mouse.position
 
-    main : Signal ELement
+    main : Signal Element
     main =
       map2 scene Window.dimensions Mouse.position
 
@@ -282,7 +300,8 @@ channel =
 
 
 {-| Create a `Message` that can be sent to a `Channel` with a handler like
-`Html.onclick` or `Html.onblur`.
+`Html.onclick` or `Html.onblur`. This doesn't actually send the message; it just
+creates the message to be sent.
 
     import Html
 

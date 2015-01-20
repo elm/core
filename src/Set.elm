@@ -13,7 +13,8 @@ module Set
 includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or lists
 of comparable types.
 
-Insert, remove, and query operations all take *O(log n)* time.
+Insert, remove, and query operations all take *O(log n)* time. Set equality with
+`(==)` is unreliable and should not be used.
 
 # Build
 @docs empty, singleton, insert, remove

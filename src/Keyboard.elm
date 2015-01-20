@@ -1,4 +1,10 @@
-module Keyboard where
+module Keyboard
+    ( KeyCode
+    , arrows, wasd, directions
+    , enter, space, ctrl, shift, alt, meta
+    , isDown, keysDown, lastPressed
+    ) where
+
 {-| Library for working with keyboard input.
 
 # Representing Keys
