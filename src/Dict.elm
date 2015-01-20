@@ -465,9 +465,9 @@ fromList assocs =
         keepIf (\student grades -> average grades > 90) students
 -}
 keepIf : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-keepIf predicate dictionary =
+keepIf isOkay dictionary =
     let add key value dict =
-            if predicate key value
+            if isOkay key value
                 then insert key value dict
                 else dict
     in
@@ -481,8 +481,8 @@ keepIf predicate dictionary =
         dropIf (\id task -> isComplete task) tasks
 -}
 dropIf : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-dropIf predicate dict =
-    keepIf (not << predicate) dict
+dropIf isBad dict =
+    keepIf (\k v -> not (isBad k v)) dict
 
 
 {-| Partition a dictionary according to a predicate. The first dictionary
