@@ -11,6 +11,6 @@
     "native-modules": true,
     "dependencies": {
         "maxsnew/IO": "1.0.0 <= v < 2.0.0",
-        "deadfoxygrandpa/Elm-Test": "1.0.1 <= v < 2.0.0"
+        "deadfoxygrandpa/Elm-Test": "1.0.3 <= v < 2.0.0"
     }
 }
