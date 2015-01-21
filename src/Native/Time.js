@@ -1,76 +1,94 @@
 Elm.Native.Time = {};
-Elm.Native.Time.make = function(elm) {
+Elm.Native.Time.make = function(localRuntime) {
 
-  elm.Native = elm.Native || {};
-  elm.Native.Time = elm.Native.Time || {};
-  if (elm.Native.Time.values) return elm.Native.Time.values;
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Time = localRuntime.Native.Time || {};
+    if (localRuntime.Native.Time.values) {
+        return localRuntime.Native.Time.values;
+    }
 
-  var Signal = Elm.Signal.make(elm);
-  var NS = Elm.Native.Signal.make(elm);
-  var Maybe = Elm.Maybe.make(elm);
-  var Utils = Elm.Native.Utils.make(elm);
+    var Signal = Elm.Signal.make(localRuntime);
+    var NS = Elm.Native.Signal.make(localRuntime);
+    var Maybe = Elm.Maybe.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
-  function fpsWhen(desiredFPS, isOn) {
-    var msPerFrame = 1000 / desiredFPS;
-    var wasOn = true;
-    var ticker = NS.input(true);
-    var timeoutID = 0;
-    function startStopTimer(isOn, t) {
-      if (isOn) {
-        timeoutID = elm.setTimeout( function() {
-                                      elm.notify(ticker.id, !wasOn && isOn); 
-                                    }
-                                  , msPerFrame
-                                  );
-      } else if (wasOn) {
-        clearTimeout(timeoutID);
+
+    function fpsWhen(desiredFPS, isOn) {
+        var msPerFrame = 1000 / desiredFPS;
+        var ticker = NS.input(true);
+
+        // manage time deltas
+        var initialState = {
+            delta: 0,
+            timestamp: localRuntime.timer.programStart
+        };
+        function updateState(event, old) {
+            var curr = event._0;
+            return {
+                delta: event._1 ? 0 : curr - old.timestamp,
+                timestamp: curr
+            };
+        }
+        var state = A3( Signal.foldp, F2(updateState), initialState, NS.timestamp(ticker) );
+
+        var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
+
+        // turn ticker on and off depending on isOn signal
+        var wasOn = true;
+        var timeoutID = 0;
+        function startStopTimer(isOn, t) {
+            if (isOn)
+            {
+                timeoutID = localRuntime.setTimeout(function() {
+                    localRuntime.notify(ticker.id, !wasOn && isOn); 
+                }, msPerFrame);
+            }
+            else if (wasOn)
+            {
+                clearTimeout(timeoutID);
+            }
+            wasOn = isOn;
+            return t;
+        }
+
+        return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
+    }
+
+    
+    function fps(t) {
+        return fpsWhen(t, Signal.constant(true));
+    }
+
+
+    function every(t) {
+      var ticker = NS.input(Utils.Tuple0);
+      function tellTime() {
+          localRuntime.notify(ticker.id, Utils.Tuple0);
       }
-      wasOn = isOn;
-      return t;
+      var clock = A2( Signal.map, fst, NS.timestamp(ticker) );
+      setInterval(tellTime, t);
+      return clock;
     }
-    function calcDelta(event, old) {
-      var curr = event._0;
-      return { delta: event._1 ? 0 : curr - old.timestamp, timestamp: curr };
+
+
+    function fst(pair) {
+        return pair._0;
     }
-    var deltas = A2( Signal.map
-                   , function(p) {
-                       return p.delta;
-                     }
-                   , A3( Signal.foldp
-                       , F2(calcDelta)
-                       , { delta: 0, timestamp: elm.timer.programStart }
-                       , NS.timestamp(ticker)
-                       )
-                   );
-    return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
-  }
 
-  function fst(pair) {
-      return pair._0;
-  }
 
-  function every(t) {
-    var ticker = NS.input(Utils.Tuple0);
-    function tellTime() {
-        elm.notify(ticker.id, Utils.Tuple0);
+    function read(s) {
+        var t = Date.parse(s);
+        return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
     }
-    var clock = A2( Signal.map, fst, NS.timestamp(ticker) );
-    setInterval(tellTime, t);
-    return clock;
-  }
 
-  function read(s) {
-      var t = Date.parse(s);
-      return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
-  }
-  return elm.Native.Time.values = {
-      fpsWhen : F2(fpsWhen),
-      fps : function(t) { return fpsWhen(t, Signal.constant(true)); },
-      every : every,
-      delay : NS.delay,
-      timestamp : NS.timestamp,
-      toDate : function(t) { return new window.Date(t); },
-      read   : read
-  };
+    return localRuntime.Native.Time.values = {
+        fpsWhen: F2(fpsWhen),
+        fps: fps,
+        every: every,
+        delay: NS.delay,
+        timestamp: NS.timestamp,
+        toDate: function(t) { return new window.Date(t); },
+        read: read
+    };
 
 };
