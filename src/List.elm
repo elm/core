@@ -1,6 +1,6 @@
 module List
     ( isEmpty, length, reverse, member
-    , head, uncons, filter, take, drop
+    , head, uncons, keepIf, dropIf, keep, drop
     , repeat, (::), append, concat, intersperse
     , partition, unzip
     , map, map2, map3, map4, map5
@@ -17,7 +17,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, uncons, filter, take, drop
+@docs head, uncons, keepIf, dropIf, keep, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
@@ -144,12 +144,23 @@ foldr = Native.List.foldr
 scanl : (a -> b -> b) -> b -> List a -> List b
 scanl = Native.List.scanl
 
+
 {-| Keep only elements that satisfy the predicate.
 
-    filter isEven [1..6] == [2,4,6]
+    keepIf isEven [1..6] == [2,4,6]
 -}
-filter : (a -> Bool) -> List a -> List a
-filter = Native.List.filter
+keepIf : (a -> Bool) -> List a -> List a
+keepIf = Native.List.keepIf
+
+
+{-| Keep only elements that satisfy the predicate.
+
+    dropIf isEven [1..6] == [2,4,6]
+-}
+dropIf : (a -> Bool) -> List a -> List a
+dropIf shouldDrop list =
+  keepIf (not << shouldDrop) list
+
 
 {-| Apply a function that may succeed to all values in the list, but only keep
 the successes.
@@ -337,12 +348,12 @@ intersperse sep xs =
           in
               hd :: spersed
 
-{-| Take the first *n* members of a list.
+{-| Keep the first *n* members of a list.
 
-    take 2 [1,2,3,4] == [1,2]
+    keep 2 [1,2,3,4] == [1,2]
 -}
-take : Int -> List a -> List a
-take = Native.List.take
+keep : Int -> List a -> List a
+keep = Native.List.keep
 
 {-| Drop the first *n* members of a list.
 

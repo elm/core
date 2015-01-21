@@ -67,7 +67,7 @@ Elm.Native.Keyboard.make = function(elm) {
                     isChanged = true;
                     var v = up.value;
                     var notEq = function(kc) { return kc !== v.keyCode };
-                    var newCodes = A2(NList.filter, notEq, this.value.keyCodes);
+                    var newCodes = A2(NList.keepIf, notEq, this.value.keyCodes);
                     this.value = state(v.altKey, v.metaKey, newCodes);
                 }
                 else if (parentID === blur.id) {

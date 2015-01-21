@@ -4,7 +4,7 @@ module Set
     , empty, singleton, insert, remove
     , member
     , foldl, foldr, map
-    , filter, partition
+    , keepIf, dropIf, partition
     , union, intersect, diff
     , toList, fromList
     ) where
@@ -29,7 +29,7 @@ Insert, remove, and query operations all take *O(log n)* time. Set equality with
 @docs toList, fromList
 
 # Transform
-@docs map, foldl, foldr, filter, partition
+@docs map, foldl, foldr, keepIf, dropIf, partition
 
 -}
 
@@ -92,9 +92,32 @@ foldr f b s = Dict.foldr (\k _ b -> f k b) b s
 map : (comparable -> comparable') -> Set comparable -> Set comparable'
 map f s = fromList (List.map f (toList s))
 
-{-| Create a new set consisting only of elements which satisfy a predicate. -}
-filter : (comparable -> Bool) -> Set comparable -> Set comparable
-filter p set = Dict.filter (\k _ -> p k) set
+
+{-| Create a new set that keeps certain elements.
+
+    keepIf isEven (Set.fromList [1,2,3,4,5]) == Set.fromList [2,4]
+
+    isEven : Int -> Bool
+    isEven n =
+        n % 2 == 0
+-}
+keepIf : (comparable -> Bool) -> Set comparable -> Set comparable
+keepIf p set =
+    Dict.keepIf (\k _ -> p k) set
+
+
+{-| Create a new set that drops certain elements.
+
+    dropIf isEven (Set.fromList [1,2,3,4,5]) == Set.fromList [1,3,5]
+
+    isEven : Int -> Bool
+    isEven n =
+        n % 2 == 0
+-}
+dropIf : (comparable -> Bool) -> Set comparable -> Set comparable
+dropIf p set =
+    Dict.dropIf (\k _ -> p k) set
+
 
 {-| Create two new sets; the first consisting of elements which satisfy a
 predicate, the second consisting of elements which do not. -}
