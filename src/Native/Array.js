@@ -2,9 +2,12 @@ Elm.Native.Array = {};
 Elm.Native.Array.make = function(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Array = localRuntime.Native.Array || {};
-    if (localRuntime.Native.Array.values) return localRuntime.Native.Array.values;
-    if ('values' in Elm.Native.Array)
-      return localRuntime.Native.Array.values = Elm.Native.Array.values;
+    if (localRuntime.Native.Array.values) {
+        return localRuntime.Native.Array.values;
+    }
+    if ('values' in Elm.Native.Array) {
+        return localRuntime.Native.Array.values = Elm.Native.Array.values;
+    }
 
     var List = Elm.Native.List.make(localRuntime);
 

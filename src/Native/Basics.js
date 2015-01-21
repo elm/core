@@ -2,7 +2,9 @@ Elm.Native.Basics = {};
 Elm.Native.Basics.make = function(localRuntime) {
   localRuntime.Native = localRuntime.Native || {};
   localRuntime.Native.Basics = localRuntime.Native.Basics || {};
-  if (localRuntime.Native.Basics.values) return localRuntime.Native.Basics.values;
+  if (localRuntime.Native.Basics.values) {
+      return localRuntime.Native.Basics.values;
+  }
 
   var Utils = Elm.Native.Utils.make(localRuntime);
 
