@@ -1,11 +1,10 @@
-
 Elm.Native.Basics = {};
-Elm.Native.Basics.make = function(elm) {
-  elm.Native = elm.Native || {};
-  elm.Native.Basics = elm.Native.Basics || {};
-  if (elm.Native.Basics.values) return elm.Native.Basics.values;
+Elm.Native.Basics.make = function(localRuntime) {
+  localRuntime.Native = localRuntime.Native || {};
+  localRuntime.Native.Basics = localRuntime.Native.Basics || {};
+  if (localRuntime.Native.Basics.values) return localRuntime.Native.Basics.values;
 
-  var Utils = Elm.Native.Utils.make(elm);
+  var Utils = Elm.Native.Utils.make(localRuntime);
 
   function div(a, b) {
       return (a/b)|0;
@@ -114,5 +113,5 @@ Elm.Native.Basics.make = function(elm) {
       isInfinite: isInfinite
   };
 
-  return elm.Native.Basics.values = basics;
+  return localRuntime.Native.Basics.values = basics;
 };
