@@ -123,13 +123,17 @@ Elm.Native.Signal.make = function(localRuntime) {
     this.value = Utils.Tuple2(localRuntime.timer.programStart, input.value);
     this.kids = [];
     this.recv = function(timestep, changed, parentID) {
-      if (changed) { this.value = Utils.Tuple2(timestep, input.value); }
+      if (changed) {
+        this.value = Utils.Tuple2(timestep, input.value);
+      }
       broadcastToKids(this, timestep, changed);
     };
     input.kids.push(this);
   }
 
-  function timestamp(input) { return new Timestamp(input); }
+  function timestamp(input) {
+    return new Timestamp(input);
+  }
 
   function SampleOn(s1,s2) {
     this.id = Utils.guid();

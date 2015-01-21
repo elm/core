@@ -17,7 +17,11 @@ Elm.Native.Time.make = function(elm) {
     var timeoutID = 0;
     function startStopTimer(isOn, t) {
       if (isOn) {
-        timeoutID = elm.setTimeout( function() { elm.notify(ticker.id, !wasOn && isOn); } , msPerFrame);
+        timeoutID = elm.setTimeout( function() {
+                                      elm.notify(ticker.id, !wasOn && isOn); 
+                                    }
+                                  , msPerFrame
+                                  );
       } else if (wasOn) {
         clearTimeout(timeoutID);
       }
@@ -28,7 +32,16 @@ Elm.Native.Time.make = function(elm) {
       var curr = event._0;
       return { delta: event._1 ? 0 : curr - old.timestamp, timestamp: curr };
     }
-    var deltas = A2( Signal.map, function(p) { return p.delta; }, A3( Signal.foldp, F2(calcDelta), { delta: 0, timestamp: elm.timer.programStart }, NS.timestamp(ticker) ) );
+    var deltas = A2( Signal.map
+                   , function(p) {
+                       return p.delta;
+                     }
+                   , A3( Signal.foldp
+                       , F2(calcDelta)
+                       , { delta: 0, timestamp: elm.timer.programStart }
+                       , NS.timestamp(ticker)
+                       )
+                   );
     return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
   }
 
