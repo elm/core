@@ -34,6 +34,7 @@ if (!Elm.fullscreen) {
              * we can manage this.
              */
             var timer = {
+                programStart : Date.now(),
                 now: function() {
                     return Date.now();
                 }

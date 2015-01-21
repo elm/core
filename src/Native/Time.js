@@ -12,37 +12,49 @@ Elm.Native.Time.make = function(elm) {
 
   function fpsWhen(desiredFPS, isOn) {
     var msPerFrame = 1000 / desiredFPS;
-    var prev = elm.timer.now(), curr = prev, diff = 0, wasOn = true;
-    var ticker = NS.input(diff);
-    function tick(zero) {
-      return function() {
-        curr = elm.timer.now();
-        diff = zero ? 0 : curr - prev;
-        if (prev > curr) {
-          diff = 0;
-        }
-        prev = curr;
-        elm.notify(ticker.id, diff);
-      };
-    }
+    var wasOn = true;
+    var ticker = NS.input(true);
     var timeoutID = 0;
-    function f(isOn, t) {
+    function startStopTimer(isOn, t) {
       if (isOn) {
-        timeoutID = elm.setTimeout(tick(!wasOn && isOn), msPerFrame);
+        timeoutID = elm.setTimeout( function() {
+                                      elm.notify(ticker.id, !wasOn && isOn); 
+                                    }
+                                  , msPerFrame
+                                  );
       } else if (wasOn) {
         clearTimeout(timeoutID);
       }
       wasOn = isOn;
       return t;
     }
-    return A3( Signal.map2, F2(f), isOn, ticker );
+    function calcDelta(event, old) {
+      var curr = event._0;
+      return { delta: event._1 ? 0 : curr - old.timestamp, timestamp: curr };
+    }
+    var deltas = A2( Signal.map
+                   , function(p) {
+                       return p.delta;
+                     }
+                   , A3( Signal.foldp
+                       , F2(calcDelta)
+                       , { delta: 0, timestamp: elm.timer.programStart }
+                       , NS.timestamp(ticker)
+                       )
+                   );
+    return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
+  }
+
+  function fst(pair) {
+      return pair._0;
   }
 
   function every(t) {
-    var clock = NS.input(elm.timer.now());
+    var ticker = NS.input(Utils.Tuple0);
     function tellTime() {
-        elm.notify(clock.id, elm.timer.now());
+        elm.notify(ticker.id, Utils.Tuple0);
     }
+    var clock = A2( Signal.map, fst, NS.timestamp(ticker) );
     setInterval(tellTime, t);
     return clock;
   }
