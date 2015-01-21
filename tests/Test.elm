@@ -21,6 +21,7 @@ import Test.List as List
 import Test.Result as Result
 import Test.Set as Set
 import Test.String as String
+import Test.Regex as Regex
 import Test.Trampoline as Trampoline
 
 tests : Test
@@ -36,6 +37,7 @@ tests =
     , Result.tests
     , Set.tests
     , String.tests
+    , Regex.tests
     , Trampoline.tests
     ]
 

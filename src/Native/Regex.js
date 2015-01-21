@@ -74,8 +74,9 @@ Elm.Native.Regex.make = function(elm) {
     }
 
     function split(n, re, str) {
+        n = n.ctor === "All" ? Infinity : n._0;
         if (n === Infinity) {
-            return List.fromArray(string.split(re));
+            return List.fromArray(str.split(re));
         }
         var string = str;
         var result;
