@@ -20,6 +20,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     var Color = Elm.Native.Color.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
     var Transform = Elm.Transform2D.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     var Element = Elm.Graphics.Element.make(localRuntime);
     var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
@@ -158,29 +159,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
     // Convert the object returned by the text module
     // into something we can use for styling canvas text
-    function parseTextObject(text) {
-
-        // Collect all css properties into one object
-        var textObj = (function readFrom(text) {
-            if (text.hasOwnProperty('style')) {
-                var textObj = readFrom(text.text);
-                var tmp = text.style.split(':');
-                // Remove trailing ';' and spaces
-                tmp[1] = tmp[1].substring(0, tmp[1].length - 1);
-                textObj[tmp[0].trim()] = tmp[1].trim();
-                return textObj;
-            }
-            else {
-                return {
-                    "text": text
-                };
-            }
-        })(text);
-
-        // extract the css properties into a properly formatted
-        // font shorthand string to feed to ctx.font
+    function parseTextModuleOutput(text) {
         // the array is necessary to guarantee property order
-        textObj.fontString = "";
         var props = ['font-style', 'font-variant', 'font-weight',
                      'font-size', 'font-family'];
         var defaults = {
@@ -190,28 +170,66 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             "font-size"    : "12px",
             "font-family"  : "sans-serif"
         };
-        for (var i=0; i<props.length; i++) {
-            var p = props[i];
-            textObj.fontString += " "
-                + (textObj.hasOwnProperty(p) ? textObj[p] : defaults[p]);
+
+        // Convert to HTML and use the style attribute to extract styles
+        var node = document.createElement('div');
+        node.innerHTML = Utils.makeText(text);
+        var textArr = [];
+        for (var n=0; n<node.childNodes.length; n++) {
+            var span = node.childNodes[n];
+            var textObj = {
+                text: span.textContent,
+                fontString: ''
+            };
+            for (var i=0; i<props.length; i++) {
+                var p = props[i];
+                var value = span.style && span.style.hasOwnProperty(p)
+                                       && span.style[p].length > 0
+                            ? span.style[p]
+                            : defaults[p];
+                textObj.fontString += " " + value;
+                if (p == 'font-size') {
+                    // Record the text height for later use
+                    if (/[0-9]+px/i.test(value))
+                        textObj.height = parseInt(value.substring(0, value.length - 2));
+                    else
+                        textObj.height = 0;
+
+                }
+            }
+            textArr.push(textObj);
         }
-        return textObj;
+        return textArr;
+    }
+
+    function drawText(ctx, text, canvasDrawFn) {
+        ctx.scale(1,-1);
+        var textArr = parseTextModuleOutput(text);
+        var totalWidth = 0;
+        var maxHeight = 0;
+        textArr.forEach( function(textObj) {
+            ctx.font = textObj.fontString;
+            var metrics = ctx.measureText(textObj.text);
+            textObj.width = metrics.width;
+            totalWidth += textObj.width;
+            maxHeight = Math.max(maxHeight, textObj.height);
+        });
+        var x = -totalWidth / 2.0;
+        textArr.forEach( function(textObj) {
+            ctx.font = textObj.fontString;
+            canvasDrawFn.call(ctx, textObj.text, x, maxHeight / 2);
+            x += textObj.width;
+        });
     }
 
     function fillText(redo, ctx, style, text) {
         setFillStyle(ctx, style);
-        ctx.scale(1,-1);
-        var textObj = parseTextObject(text);
-        ctx.font = textObj.fontString;
-        ctx.fillText(textObj.text, 0, 0);
+        drawText(ctx, text, ctx.fillText);
     }
 
     function strokeText(redo, ctx, style, text) {
         setStrokeStyle(ctx, style);
-        ctx.scale(1,-1);
-        var textObj = parseTextObject(text);
-        ctx.font = textObj.fontString;
-        ctx.strokeText(textObj.text, 0, 0);
+        drawText(ctx, text, ctx.strokeText);
     }
 
     function drawImage(redo, ctx, form) {
