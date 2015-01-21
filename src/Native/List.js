@@ -224,15 +224,12 @@ Elm.Native.List.make = function(elm) {
     }
 
     function repeat(n, x) {
-        var arr = [];
-        var pattern = [x];
-        while (n > 0) {
-            if (n & 1) arr = arr.concat(pattern);
-            n >>= 1, pattern = pattern.concat(pattern);
+        out = Nil;
+        while (n-- > 0) {
+            out = Cons(x, out);
         }
-        return fromArray(arr);
+        return out;
     }
-
 
     Elm.Native.List.values = {
         Nil:Nil,
