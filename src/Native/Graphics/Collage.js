@@ -229,6 +229,12 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
     function strokeText(redo, ctx, style, text) {
         setStrokeStyle(ctx, style);
+        // Use native canvas API for dashes only for text for now
+        // Degrades to non-dashed on IE 9 + 10
+        if (style.dashing.ctor !== '[]' && ctx.setLineDash) {
+            var pattern = List.toArray(style.dashing);
+            ctx.setLineDash(pattern);
+        }
         drawText(ctx, text, ctx.strokeText);
     }
 
