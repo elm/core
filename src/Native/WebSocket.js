@@ -1,12 +1,15 @@
 Elm.Native.WebSocket = {};
-Elm.Native.WebSocket.make = function(elm) {
+Elm.Native.WebSocket.make = function(localRuntime) {
 
-  elm.Native = elm.Native || {};
-  elm.Native.WebSocket = elm.Native.WebSocket || {};
-  if (elm.Native.WebSocket.values) return elm.Native.WebSocket.values;
+  localRuntime.Native = localRuntime.Native || {};
+  localRuntime.Native.WebSocket = localRuntime.Native.WebSocket || {};
+  if (localRuntime.Native.WebSocket.values)
+  {
+      return localRuntime.Native.WebSocket.values;
+  }
 
-  var Signal = Elm.Signal.make(elm);
-  var List = Elm.Native.List.make(elm);
+  var Signal = Elm.Signal.make(localRuntime);
+  var List = Elm.Native.List.make(localRuntime);
 
   function open(url, outgoing) {
     var incoming = Signal.constant("");
@@ -21,7 +24,7 @@ Elm.Native.WebSocket.make = function(elm) {
       ready = true;
     };
     ws.onmessage = function(event) {
-      elm.notify(incoming.id, event.data);
+      localRuntime.notify(incoming.id, event.data);
     };
     
     function send(msg) {
@@ -32,5 +35,5 @@ Elm.Native.WebSocket.make = function(elm) {
     return A3(Signal.map2, F2(take1), incoming, A2(Signal.map, send, outgoing));
   }
 
-  return elm.Native.WebSocket.values = { connect: F2(open) };
+  return localRuntime.Native.WebSocket.values = { connect: F2(open) };
 };

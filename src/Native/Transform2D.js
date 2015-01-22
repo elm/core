@@ -1,12 +1,16 @@
 Elm.Native.Transform2D = {};
-Elm.Native.Transform2D.make = function(elm) {
+Elm.Native.Transform2D.make = function(localRuntime) {
 
- elm.Native = elm.Native || {};
- elm.Native.Transform2D = elm.Native.Transform2D || {};
- if (elm.Native.Transform2D.values) return elm.Native.Transform2D.values;
+ localRuntime.Native = localRuntime.Native || {};
+ localRuntime.Native.Transform2D = localRuntime.Native.Transform2D || {};
+ if (localRuntime.Native.Transform2D.values)
+ {
+     return localRuntime.Native.Transform2D.values;
+ }
 
  var A;
- if (typeof Float32Array === 'undefined') {
+ if (typeof Float32Array === 'undefined')
+ {
      A = function(arr) {
          this.length = arr.length;
          this[0] = arr[0];
@@ -16,7 +20,9 @@ Elm.Native.Transform2D.make = function(elm) {
          this[4] = arr[4];
          this[5] = arr[5];
      };
- } else {
+ }
+ else
+ {
      A = Float32Array;
  }
 
@@ -79,7 +85,7 @@ Elm.Native.Transform2D.make = function(elm) {
                    m21*ndx + m22*ndy + mdy]);
  }
 
- return elm.Native.Transform2D.values = {
+ return localRuntime.Native.Transform2D.values = {
      identity:identity,
      matrix:F6(matrix),
      rotation:rotation,

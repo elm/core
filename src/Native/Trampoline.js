@@ -1,8 +1,11 @@
 Elm.Native.Trampoline = {};
-Elm.Native.Trampoline.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Trampoline = elm.Native.Trampoline || {};
-    if (elm.Native.Trampoline.values) return elm.Native.Trampoline.values;
+Elm.Native.Trampoline.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Trampoline = localRuntime.Native.Trampoline || {};
+    if (localRuntime.Native.Trampoline.values)
+    {
+        return localRuntime.Native.Trampoline.values;
+    }
 
     // trampoline : Trampoline a -> a
     function trampoline(t) {
@@ -18,7 +21,7 @@ Elm.Native.Trampoline.make = function(elm) {
         }
     }
 
-    return elm.Native.Trampoline.values = {
+    return localRuntime.Native.Trampoline.values = {
         trampoline:trampoline
     };
 };

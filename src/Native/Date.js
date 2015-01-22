@@ -1,10 +1,13 @@
 Elm.Native.Date = {};
-Elm.Native.Date.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Date = elm.Native.Date || {};
-    if (elm.Native.Date.values) return elm.Native.Date.values;
+Elm.Native.Date.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Date = localRuntime.Native.Date || {};
+    if (localRuntime.Native.Date.values)
+    {
+        return localRuntime.Native.Date.values;
+    }
 
-    var Result = Elm.Result.make(elm);
+    var Result = Elm.Result.make(localRuntime);
 
     function dateNow() {
         return new window.Date;
@@ -23,7 +26,7 @@ Elm.Native.Date.make = function(elm) {
          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; 
 
 
-    return elm.Native.Date.values = {
+    return localRuntime.Native.Date.values = {
         read    : readDate,
         year    : function(d) { return d.getFullYear(); },
         month   : function(d) { return { ctor:monthTable[d.getMonth()] }; },

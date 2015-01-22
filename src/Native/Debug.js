@@ -1,21 +1,24 @@
 Elm.Native.Debug = {};
-Elm.Native.Debug.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Debug = elm.Native.Debug || {};
-    if (elm.Native.Debug.values)
+Elm.Native.Debug.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Debug = localRuntime.Native.Debug || {};
+    if (localRuntime.Native.Debug.values)
     {
-        return elm.Native.Debug.values;
+        return localRuntime.Native.Debug.values;
     }
 
-    var toString = Elm.Native.Show.make(elm).toString;
+    var toString = Elm.Native.Show.make(localRuntime).toString;
 
     function log(tag, value)
     {
         var msg = tag + ': ' + toString(value);
         var process = process || {};
-        if (process.stdout) {
+        if (process.stdout)
+        {
             process.stdout.write(msg);
-        } else {
+        }
+        else
+        {
             console.log(msg);
         }
         return value;
@@ -28,32 +31,32 @@ Elm.Native.Debug.make = function(elm) {
 
     function tracePath(tag, form)
     {
-        if (elm.debug)
+        if (localRuntime.debug)
         {
-            return elm.debug.trace(tag, form);
+            return localRuntime.debug.trace(tag, form);
         }
         return form;
     }
 
     function watch(tag, value)
     {
-        if (elm.debug)
+        if (localRuntime.debug)
         {
-            elm.debug.watch(tag, value);
+            localRuntime.debug.watch(tag, value);
         }
         return value;
     }
 
     function watchSummary(tag, summarize, value)
     {
-        if (elm.debug)
+        if (localRuntime.debug)
         {
-            elm.debug.watch(tag, summarize(value));
+            localRuntime.debug.watch(tag, summarize(value));
         }
         return value;
     }
 
-    return elm.Native.Debug.values = {
+    return localRuntime.Native.Debug.values = {
         crash: crash,
         tracePath: F2(tracePath),
         log: F2(log),
