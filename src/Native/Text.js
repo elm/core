@@ -1,27 +1,38 @@
 Elm.Native.Text = {};
-Elm.Native.Text.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Text = elm.Native.Text || {};
-    if (elm.Native.Text.values) return elm.Native.Text.values;
+Elm.Native.Text.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Text = localRuntime.Native.Text || {};
+    if (localRuntime.Native.Text.values)
+    {
+        return localRuntime.Native.Text.values;
+    }
 
-    var toCss = Elm.Native.Color.make(elm).toCss;
-    var Element = Elm.Graphics.Element.make(elm);
-    var NativeElement = Elm.Native.Graphics.Element.make(elm);
-    var List = Elm.Native.List.make(elm);
-    var Utils = Elm.Native.Utils.make(elm);
+    var toCss = Elm.Native.Color.make(localRuntime).toCss;
+    var Element = Elm.Graphics.Element.make(localRuntime);
+    var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
+    var List = Elm.Native.List.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     function makeSpaces(s) {
-        if (s.length == 0) { return s; }
+        if (s.length == 0)
+        {
+            return s;
+        }
         var arr = s.split('');
-        if (arr[0] == ' ') { arr[0] = "&nbsp;" }      
+        if (arr[0] == ' ')
+        {
+            arr[0] = "&nbsp;"
+        }
         for (var i = arr.length; --i; ) {
-            if (arr[i][0] == ' ' && arr[i-1] == ' ') {
+            if (arr[i][0] == ' ' && arr[i-1] == ' ')
+            {
                 arr[i-1] = arr[i-1] + arr[i];
                 arr[i] = '';
             }
         }
         for (var i = arr.length; i--; ) {
-            if (arr[i].length > 1 && arr[i][0] == ' ') {
+            if (arr[i].length > 1 && arr[i][0] == ' ')
+            {
                 var spaces = arr[i].split('');
                 for (var j = spaces.length - 2; j >= 0; j -= 2) {
                     spaces[j] = '&nbsp;';
@@ -30,14 +41,18 @@ Elm.Native.Text.make = function(elm) {
             }
         }
         arr = arr.join('');
-        if (arr[arr.length-1] === " ") {
+        if (arr[arr.length-1] === " ")
+        {
             return arr.slice(0,-1) + '&nbsp;';
         }
         return arr;
     }
 
     function properEscape(str) {
-        if (str.length == 0) return str;
+        if (str.length == 0)
+        {
+            return str;
+        }
         str = str //.replace(/&/g,  "&#38;")
             .replace(/"/g,  '&#34;')
             .replace(/'/g,  "&#39;")
@@ -64,7 +79,8 @@ Elm.Native.Text.make = function(elm) {
         var typefaces = List.toArray(list);
         for (var i = typefaces.length; i--; ) {
             var typeface = typefaces[i];
-            if (typeface.indexOf(' ') > -1) {
+            if (typeface.indexOf(' ') > -1)
+            {
                 typefaces[i] = "'" + typeface + "'";
             }
         }
@@ -79,19 +95,24 @@ Elm.Native.Text.make = function(elm) {
     // setting styles of Text
     function style(style, text) {
         var newText = '<span style="color:' + toCss(style.color) + ';'
-        if (style.typeface.ctor !== '[]') {
+        if (style.typeface.ctor !== '[]')
+        {
             newText += 'font-family:' + toTypefaces(style.typeface) + ';'
         }
-        if (style.height.ctor !== "Nothing") {
+        if (style.height.ctor !== "Nothing")
+        {
             newText += 'font-size:' + style.height._0 + 'px;';
         }
-        if (style.bold) {
+        if (style.bold)
+        {
             newText += 'font-weight:bold;';
         }
-        if (style.italic) {
+        if (style.italic)
+        {
             newText += 'font-style:italic;';
         }
-        if (style.line.ctor !== 'Nothing') {
+        if (style.line.ctor !== 'Nothing')
+        {
             newText += 'text-decoration:' + toLine(style.line._0) + ';';
         }
         newText += '">' + Utils.makeText(text) + '</span>'
@@ -145,7 +166,7 @@ Elm.Native.Text.make = function(elm) {
         return A3(Element.newElement, pos._0, pos._1, raw);
     }
 
-    return elm.Native.Text.values = {
+    return localRuntime.Native.Text.values = {
         fromString: fromString,
         append: F2(append),
 

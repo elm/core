@@ -1,17 +1,21 @@
 Elm.Native.String = {};
-Elm.Native.String.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.String = elm.Native.String || {};
-    if (elm.Native.String.values) return elm.Native.String.values;
-    if ('values' in Elm.Native.String) {
-        return elm.Native.String.values = Elm.Native.String.values;
+Elm.Native.String.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.String = localRuntime.Native.String || {};
+    if (localRuntime.Native.String.values)
+    {
+        return localRuntime.Native.String.values;
+    }
+    if ('values' in Elm.Native.String)
+    {
+        return localRuntime.Native.String.values = Elm.Native.String.values;
     }
 
-    var Char = Elm.Char.make(elm);
-    var List = Elm.Native.List.make(elm);
-    var Maybe = Elm.Maybe.make(elm);
-    var Result = Elm.Result.make(elm);
-    var Utils = Elm.Native.Utils.make(elm);
+    var Char = Elm.Char.make(localRuntime);
+    var List = Elm.Native.List.make(localRuntime);
+    var Maybe = Elm.Maybe.make(localRuntime);
+    var Result = Elm.Result.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     function isEmpty(str) {
         return str.length === 0;
@@ -70,7 +74,10 @@ Elm.Native.String.make = function(elm) {
     function repeat(n, str) {
         var result = '';
         while (n > 0) {
-            if (n & 1) result += str;
+            if (n & 1)
+            {
+                result += str;
+            }
             n >>= 1, str += str;
         }
         return result;
@@ -129,13 +136,19 @@ Elm.Native.String.make = function(elm) {
 
     function any(pred, str) {
         for (var i = str.length; i--; ) {
-            if (pred(Utils.chr(str[i]))) return true;
+            if (pred(Utils.chr(str[i])))
+            {
+                return true;
+            }
         }
         return false;
     }
     function all(pred, str) {
         for (var i = str.length; i--; ) {
-            if (!pred(Utils.chr(str[i]))) return false;
+            if (!pred(Utils.chr(str[i])))
+            {
+                return false;
+            }
         }
         return true;
     }
@@ -163,18 +176,22 @@ Elm.Native.String.make = function(elm) {
 
     function toInt(s) {
         var len = s.length;
-        if (len === 0) {
+        if (len === 0)
+        {
             return Result.Err("could not convert string '" + s + "' to an Int" );
         }
         var start = 0;
-        if (s[0] == '-') {
-            if (len === 1) {
+        if (s[0] == '-')
+        {
+            if (len === 1)
+            {
                 return Result.Err("could not convert string '" + s + "' to an Int" );
             }
             start = 1;
         }
         for (var i = start; i < len; ++i) {
-            if (!Char.isDigit(s[i])) {
+            if (!Char.isDigit(s[i]))
+            {
                 return Result.Err("could not convert string '" + s + "' to an Int" );
             }
         }
@@ -183,24 +200,30 @@ Elm.Native.String.make = function(elm) {
 
     function toFloat(s) {
         var len = s.length;
-        if (len === 0) {
+        if (len === 0)
+        {
             return Result.Err("could not convert string '" + s + "' to a Float" );
         }
         var start = 0;
-        if (s[0] == '-') {
-            if (len === 1) {
+        if (s[0] == '-')
+        {
+            if (len === 1)
+            {
                 return Result.Err("could not convert string '" + s + "' to a Float" );
             }
             start = 1;
         }
         var dotCount = 0;
         for (var i = start; i < len; ++i) {
-            if (Char.isDigit(s[i])) {
+            if (Char.isDigit(s[i]))
+            {
                 continue;
             }
-            if (s[i] === '.') {
+            if (s[i] === '.')
+            {
                 dotCount += 1;
-                if (dotCount <= 1) {
+                if (dotCount <= 1)
+                {
                     continue;
                 }
             }

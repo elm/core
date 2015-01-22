@@ -1,13 +1,18 @@
 Elm.Native.Regex = {};
-Elm.Native.Regex.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Regex = elm.Native.Regex || {};
-    if (elm.Native.Regex.values) return elm.Native.Regex.values;
+Elm.Native.Regex.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Regex = localRuntime.Native.Regex || {};
+    if (localRuntime.Native.Regex.values)
+    {
+        return localRuntime.Native.Regex.values;
+    }
     if ('values' in Elm.Native.Regex)
-        return elm.Native.Regex.values = Elm.Native.Regex.values;
+    {
+        return localRuntime.Native.Regex.values = Elm.Native.Regex.values;
+    }
 
-    var List = Elm.Native.List.make(elm);
-    var Maybe = Elm.Maybe.make(elm);
+    var List = Elm.Native.List.make(localRuntime);
+    var Maybe = Elm.Maybe.make(localRuntime);
 
     function escape(str) {
         return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
@@ -53,7 +58,10 @@ Elm.Native.Regex.make = function(elm) {
         n = n.ctor === "All" ? Infinity : n._0;
         var count = 0;
         function jsReplacer(match) {
-            if (count++ > n) return match;
+            if (count++ > n)
+            {
+                return match;
+            }
             var i = arguments.length-3;
             var submatches = new Array(i);
             while (i > 0) {
@@ -75,7 +83,8 @@ Elm.Native.Regex.make = function(elm) {
 
     function split(n, re, str) {
         n = n.ctor === "All" ? Infinity : n._0;
-        if (n === Infinity) {
+        if (n === Infinity)
+        {
             return List.fromArray(str.split(re));
         }
         var string = str;
