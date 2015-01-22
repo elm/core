@@ -1,10 +1,10 @@
-
 Elm.Native.Signal = {};
 Elm.Native.Signal.make = function(localRuntime) {
 
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Signal = localRuntime.Native.Signal || {};
-    if (localRuntime.Native.Signal.values) {
+    if (localRuntime.Native.Signal.values)
+    {
         return localRuntime.Native.Signal.values;
     }
 
@@ -36,10 +36,6 @@ Elm.Native.Signal.make = function(localRuntime) {
             return changed;
         };
         localRuntime.inputs.push(this);
-    }
-
-    function constant(value) {
-        return new Input(value);
     }
 
 
@@ -237,8 +233,10 @@ Elm.Native.Signal.make = function(localRuntime) {
         var delayed = new Input(s.value);
         var firstEvent = true;
         function update(v) {
-          if (firstEvent) {
-              firstEvent = false; return;
+          if (firstEvent)
+          {
+              firstEvent = false;
+              return;
           }
           setTimeout(function() {
               localRuntime.notify(delayed.id, v);
@@ -277,7 +275,11 @@ Elm.Native.Signal.make = function(localRuntime) {
   
             if (count == 2)
             {
-                if (isChanged) { this.value = next; next = null; }
+                if (isChanged)
+                {
+                    this.value = next;
+                    next = null;
+                }
                 broadcastToKids(this, timestep, isChanged);
                 isChanged = false;
                 count = 0;
@@ -310,7 +312,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 
     return localRuntime.Native.Signal.values = {
-        constant: constant,
         map: F2(map),
         map2: F3(map2),
         map3: F4(map3),

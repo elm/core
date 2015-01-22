@@ -4,11 +4,13 @@ Elm.Native.Touch.make = function(localRuntime) {
 
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Touch = localRuntime.Native.Touch || {};
-    if (localRuntime.Native.Touch.values) {
+    if (localRuntime.Native.Touch.values)
+    {
         return localRuntime.Native.Touch.values;
     }
 
     var Signal = Elm.Signal.make(localRuntime);
+    var NS = Elm.Native.Signal.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
 
@@ -38,7 +40,7 @@ Elm.Native.Touch.make = function(localRuntime) {
         };
     }
     
-    var root = Signal.constant([]),
+    var root = NS.input([]),
     tapTime = 500,
     hasTap = false,
     tap = {_:{},x:0,y:0},
@@ -72,7 +74,8 @@ Elm.Native.Touch.make = function(localRuntime) {
     }
     function end(e) {
         var t = dict.remove(e.identifier);
-        if (localRuntime.timer.now() - t.t < tapTime) {
+        if (localRuntime.timer.now() - t.t < tapTime)
+        {
             hasTap = true;
             tap = {
                 _: {},
@@ -107,7 +110,8 @@ Elm.Native.Touch.make = function(localRuntime) {
     function move(e) {
         var point = Utils.getXY(e);
         for (var i = root.value.length; i--; ) {
-            if (root.value[i].id === mouseID) {
+            if (root.value[i].id === mouseID)
+            {
                 root.value[i].x = point._0;
                 root.value[i].y = point._1;
                 localRuntime.notify(root.id, root.value);
@@ -127,7 +131,8 @@ Elm.Native.Touch.make = function(localRuntime) {
         e.identifier = mouseID;
         end(e);
         for (var i = root.value.length; i--; ) {
-            if (root.value[i].id === mouseID) {
+            if (root.value[i].id === mouseID)
+            {
                 root.value.splice(i, 1);
                 --mouseID;
                 break;
@@ -137,7 +142,8 @@ Elm.Native.Touch.make = function(localRuntime) {
     });
     localRuntime.addListener([root.id], node, "blur", function blur(e) {
         node.removeEventListener("mousemove", move);
-        if (root.value.length > 0) {
+        if (root.value.length > 0)
+        {
             localRuntime.notify(root.id, []);
             --mouseID;
         }
