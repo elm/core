@@ -1,36 +1,42 @@
 Elm.Native.Show = {};
-Elm.Native.Show.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Show = elm.Native.Show || {};
-    if (elm.Native.Show.values)
+Elm.Native.Show.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Show = localRuntime.Native.Show || {};
+    if (localRuntime.Native.Show.values)
     {
-        return elm.Native.Show.values;
+        return localRuntime.Native.Show.values;
     }
 
     var _Array;
     var Dict;
     var List;
-    var Utils = Elm.Native.Utils.make(elm);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     var toString = function(v) {
         var type = typeof v;
-        if (type === "function") {
+        if (type === "function")
+        {
             var name = v.func ? v.func.name : v.name;
             return '<function' + (name === '' ? '' : ': ') + name + '>';
         }
-        else if (type === "boolean") {
+        else if (type === "boolean")
+        {
             return v ? "True" : "False";
         }
-        else if (type === "number") {
+        else if (type === "number")
+        {
             return v + "";
         }
-        else if ((v instanceof String) && v.isChar) {
+        else if ((v instanceof String) && v.isChar)
+        {
             return "'" + addSlashes(v, true) + "'";
         }
-        else if (type === "string") {
+        else if (type === "string")
+        {
             return '"' + addSlashes(v, false) + '"';
         }
-        else if (type === "object" && '_' in v && probablyPublic(v)) {
+        else if (type === "object" && '_' in v && probablyPublic(v))
+        {
             var output = [];
             for (var k in v._) {
                 for (var i = v._[k].length; i--; ) {
@@ -41,13 +47,16 @@ Elm.Native.Show.make = function(elm) {
                 if (k === '_') continue;
                 output.push(k + " = " + toString(v[k]));
             }
-            if (output.length === 0) {
+            if (output.length === 0)
+            {
                 return "{}";
             }
             return "{ " + output.join(", ") + " }";
         }
-        else if (type === "object" && 'ctor' in v) {
-            if (v.ctor.substring(0,6) === "_Tuple") {
+        else if (type === "object" && 'ctor' in v)
+        {
+            if (v.ctor.substring(0,6) === "_Tuple")
+            {
                 var output = [];
                 for (var k in v) {
                     if (k === 'ctor') continue;
@@ -55,14 +64,17 @@ Elm.Native.Show.make = function(elm) {
                 }
                 return "(" + output.join(",") + ")";
             }
-            else if (v.ctor === "_Array") {
-                if (!_Array) {
-                    _Array = Elm.Array.make(elm);
+            else if (v.ctor === "_Array")
+            {
+                if (!_Array)
+                {
+                    _Array = Elm.Array.make(localRuntime);
                 }
                 var list = _Array.toList(v);
                 return "Array.fromList " + toString(list);
             }
-            else if (v.ctor === "::") {
+            else if (v.ctor === "::")
+            {
                 var output = '[' + toString(v._0);
                 v = v._1;
                 while (v.ctor === "::") {
@@ -71,25 +83,31 @@ Elm.Native.Show.make = function(elm) {
                 }
                 return output + ']';
             }
-            else if (v.ctor === "[]") {
+            else if (v.ctor === "[]")
+            {
                 return "[]";
             }
-            else if (v.ctor === "RBNode" || v.ctor === "RBEmpty") {
-                if (!Dict) {
-                    Dict = Elm.Dict.make(elm);
+            else if (v.ctor === "RBNode" || v.ctor === "RBEmpty")
+            {
+                if (!Dict)
+                {
+                    Dict = Elm.Dict.make(localRuntime);
                 }
-                if (!List) {
-                    List = Elm.List.make(elm);
+                if (!List)
+                {
+                    List = Elm.List.make(localRuntime);
                 }
                 var list = Dict.toList(v);
                 var name = "Dict";
-                if (list.ctor === "::" && list._0._1.ctor === "_Tuple0") {
+                if (list.ctor === "::" && list._0._1.ctor === "_Tuple0")
+                {
                     name = "Set";
                     list = A2(List.map, function(x){return x._0}, list);
                 }
                 return name + ".fromList " + toString(list);
             }
-            else {
+            else
+            {
                 var output = "";
                 for (var i in v) {
                     if (i === 'ctor') continue;
@@ -100,7 +118,8 @@ Elm.Native.Show.make = function(elm) {
                 return v.ctor + output;
             }
         }
-        if (type === 'object' && 'recv' in v) {
+        if (type === 'object' && 'recv' in v)
+        {
             return '<signal>';
         }
         return "<internal structure>";
@@ -113,9 +132,12 @@ Elm.Native.Show.make = function(elm) {
                   .replace(/\r/g, '\\r')
                   .replace(/\v/g, '\\v')
                   .replace(/\0/g, '\\0');
-        if (isChar) {
+        if (isChar)
+        {
             return s.replace(/\'/g, "\\'")
-        } else {
+        }
+        else
+        {
             return s.replace(/\"/g, '\\"');
         }
     }
@@ -150,7 +172,7 @@ Elm.Native.Show.make = function(elm) {
         return true;
     }
 
-    return elm.Native.Show.values = {
+    return localRuntime.Native.Show.values = {
         toString: toString
     };
 };
