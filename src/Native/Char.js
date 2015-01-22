@@ -20,7 +20,7 @@ Elm.Native.Char.make = function(localRuntime) {
 
     return localRuntime.Native.Char.values = {
         fromCode : function(c) { return String.fromCharCode(c); },
-        toCode   : function(c) { return c.toUpperCase().charCodeAt(0); },
+        toCode   : function(c) { return c.charCodeAt(0); },
         toUpper  : function(c) { return Utils.chr(c.toUpperCase()); },
         toLower  : function(c) { return Utils.chr(c.toLowerCase()); },
         toLocaleUpper : function(c) { return Utils.chr(c.toLocaleUpperCase()); },
