@@ -16,25 +16,31 @@ module Char
 
 import Native.Char
 
+isBetween : Char -> Char -> Char -> Bool
+isBetween low high char = 
+    let code = toCode char
+    in  (code >= toCode low) && (code <= toCode high)
+
 {-| True for upper case letters. -}
 isUpper : Char -> Bool
-isUpper = Native.Char.isUpper
+isUpper = isBetween 'A' 'Z'
 
 {-| True for lower case letters. -}
 isLower : Char -> Bool
-isLower = Native.Char.isLower
+isLower = isBetween 'a' 'z'
 
 {-| True for ASCII digits `[0-9]`. -}
 isDigit : Char -> Bool
-isDigit = Native.Char.isDigit
+isDigit = isBetween '0' '9'
 
 {-| True for ASCII octal digits `[0-7]`. -}
 isOctDigit : Char -> Bool
-isOctDigit = Native.Char.isOctDigit
+isOctDigit = isBetween '0' '7'
 
 {-| True for ASCII hexadecimal digits `[0-9a-fA-F]`. -}
 isHexDigit : Char -> Bool
-isHexDigit = Native.Char.isHexDigit
+isHexDigit char = 
+    isDigit char || isBetween 'a' 'f' char || isBetween 'A' 'Z' char
 
 {-| Convert to upper case. -}
 toUpper : Char -> Char
