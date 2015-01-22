@@ -11,7 +11,7 @@ Elm.Native.Color.make = function(localRuntime) {
         var format = '';
         var colors = '';
         if (c.ctor === 'RGBA')
-	{
+        {
             format = 'rgb';
             colors = c._0 + ', ' + c._1 + ', ' + c._2;
         } 
