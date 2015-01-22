@@ -2,11 +2,13 @@ Elm.Native.Ports = {};
 Elm.Native.Ports.make = function(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Ports = localRuntime.Native.Ports || {};
-    if (localRuntime.Native.Ports.values) {
+    if (localRuntime.Native.Ports.values)
+    {
         return localRuntime.Native.Ports.values;
     }
 
     var Signal;
+    var NS;
 
     function incomingSignal(converter) {
         converter.isSignal = true;
@@ -14,7 +16,8 @@ Elm.Native.Ports.make = function(localRuntime) {
     }
 
     function outgoingSignal(converter) {
-        if (!Signal) {
+        if (!Signal)
+        {
             Signal = Elm.Signal.make(localRuntime);
         }
         return function(signal) {
@@ -38,7 +41,8 @@ Elm.Native.Ports.make = function(localRuntime) {
 
     function portIn(name, converter) {
         var jsValue = localRuntime.ports.incoming[name];
-        if (jsValue === undefined) {
+        if (jsValue === undefined)
+        {
             throw new Error("Initialization Error: port '" + name +
                             "' was not given an input!");
         }
@@ -50,15 +54,17 @@ Elm.Native.Ports.make = function(localRuntime) {
         }
 
         // just return a static value if it is not a signal
-        if (!converter.isSignal) {
+        if (!converter.isSignal)
+        {
             return elmValue;
         }
 
         // create a signal if necessary
-        if (!Signal) {
-            Signal = Elm.Signal.make(localRuntime);
+        if (!NS)
+        {
+            NS = Elm.Native.Signal.make(localRuntime);
         }
-        var signal = Signal.constant(elmValue);
+        var signal = NS.input(elmValue);
         function send(jsValue) {
             try {
                 var elmValue = converter(jsValue);
@@ -89,4 +95,3 @@ Elm.Native.Ports.make = function(localRuntime) {
         portIn: portIn
     };
 };
-
