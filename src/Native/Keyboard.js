@@ -1,9 +1,12 @@
 Elm.Native.Keyboard = {};
-Elm.Native.Keyboard.make = function(elm) {
+Elm.Native.Keyboard.make = function(localRuntime) {
 
-    elm.Native = elm.Native || {};
-    elm.Native.Keyboard = elm.Native.Keyboard || {};
-    if (elm.Native.Keyboard.values) return elm.Native.Keyboard.values;
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
+    if (localRuntime.Native.Keyboard.values)
+    {
+        return localRuntime.Native.Keyboard.values;
+    }
 
     // Duplicated from Native.Signal
     function send(node, timestep, changed) {
@@ -13,24 +16,24 @@ Elm.Native.Keyboard.make = function(elm) {
         }
     }
 
-    var Signal = Elm.Signal.make(elm);
-    var NList = Elm.Native.List.make(elm);
-    var Utils = Elm.Native.Utils.make(elm);
+    var Signal = Elm.Signal.make(localRuntime);
+    var NList = Elm.Native.List.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     var downEvents = Signal.constant(null);
     var upEvents = Signal.constant(null);
     var blurEvents = Signal.constant(null);
 
-    elm.addListener([downEvents.id], document, 'keydown', function down(e) {
-        elm.notify(downEvents.id, e);
+    localRuntime.addListener([downEvents.id], document, 'keydown', function down(e) {
+        localRuntime.notify(downEvents.id, e);
     });
 
-    elm.addListener([upEvents.id], document, 'keyup', function up(e) {
-        elm.notify(upEvents.id, e);
+    localRuntime.addListener([upEvents.id], document, 'keyup', function up(e) {
+        localRuntime.notify(upEvents.id, e);
     });
 
-    elm.addListener([blurEvents.id], window, 'blur', function blur(e) {
-        elm.notify(blurEvents.id, null);
+    localRuntime.addListener([blurEvents.id], window, 'blur', function blur(e) {
+        localRuntime.notify(blurEvents.id, null);
     });
 
     function state(alt, meta, keyCodes) {
@@ -55,27 +58,32 @@ Elm.Native.Keyboard.make = function(elm) {
 
         this.recv = function(timestep, changed, parentID) {
             ++count;
-            if (changed) { 
+            if (changed)
+            { 
                 // We know this a change must only be one of the following cases
-                if (parentID === down.id && !A2(NList.member, down.value.keyCode, this.value.keyCodes)) {
+                if (parentID === down.id && !A2(NList.member, down.value.keyCode, this.value.keyCodes))
+                {
                     isChanged = true;
                     var v = down.value;
                     var newCodes = NList.Cons(v.keyCode, this.value.keyCodes);
                     this.value = state(v.altKey, v.metaKey, newCodes);
                 }
-                else if (parentID === up.id) {
+                else if (parentID === up.id)
+                {
                     isChanged = true;
                     var v = up.value;
                     var notEq = function(kc) { return kc !== v.keyCode };
                     var newCodes = A2(NList.keepIf, notEq, this.value.keyCodes);
                     this.value = state(v.altKey, v.metaKey, newCodes);
                 }
-                else if (parentID === blur.id) {
+                else if (parentID === blur.id)
+                {
                     isChanged = true;
                     this.value = emptyState;
                 }
             }
-            if (count == n) {
+            if (count == n)
+            {
                 send(this, timestep, isChanged);
                 isChanged = false;
                 count = 0;
@@ -142,7 +150,7 @@ Elm.Native.Keyboard.make = function(elm) {
     }, downEvents);
     downEvents.defaultNumberOfKids += 1;
 
-    return elm.Native.Keyboard.values = {
+    return localRuntime.Native.Keyboard.values = {
         isDown:is,
         alt: alt,
         meta: meta,
