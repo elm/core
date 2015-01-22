@@ -1,10 +1,10 @@
 Elm.Native.Char = {};
-Elm.Native.Char.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.Char = elm.Native.Char || {};
-    if (elm.Native.Char.values) return elm.Native.Char.values;
+Elm.Native.Char.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.Char = localRuntime.Native.Char || {};
+    if (localRuntime.Native.Char.values) return localRuntime.Native.Char.values;
 
-    var Utils = Elm.Native.Utils.make(elm);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     function isBetween(lo,hi) { return function(chr) {
 	var c = chr.charCodeAt(0);
@@ -15,7 +15,7 @@ Elm.Native.Char.make = function(elm) {
     var chk1 = isBetween('a'.charCodeAt(0),'f'.charCodeAt(0));
     var chk2 = isBetween('A'.charCodeAt(0),'F'.charCodeAt(0));
 
-    return elm.Native.Char.values = {
+    return localRuntime.Native.Char.values = {
         fromCode : function(c) { return String.fromCharCode(c); },
         toCode   : function(c) { return c.toUpperCase().charCodeAt(0); },
         toUpper  : function(c) { return Utils.chr(c.toUpperCase()); },
