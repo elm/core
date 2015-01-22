@@ -1,12 +1,17 @@
 Elm.Native.List = {};
-Elm.Native.List.make = function(elm) {
-    elm.Native = elm.Native || {};
-    elm.Native.List = elm.Native.List || {};
-    if (elm.Native.List.values) return elm.Native.List.values;
+Elm.Native.List.make = function(localRuntime) {
+    localRuntime.Native = localRuntime.Native || {};
+    localRuntime.Native.List = localRuntime.Native.List || {};
+    if (localRuntime.Native.List.values)
+    {
+        return localRuntime.Native.List.values;
+    }
     if ('values' in Elm.Native.List)
-        return elm.Native.List.values = Elm.Native.List.values;
+    {
+        return localRuntime.Native.List.values = Elm.Native.List.values;
+    }
 
-    var Utils = Elm.Native.Utils.make(elm);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     var Nil = Utils.Nil;
     var Cons = Utils.Cons;
@@ -30,7 +35,8 @@ Elm.Native.List.make = function(elm) {
 
     function range(lo,hi) {
         var lst = Nil;
-        if (lo <= hi) {
+        if (lo <= hi)
+        {
             do { lst = Cons(hi,lst) } while (hi-->lo);
         }
         return lst
@@ -78,7 +84,10 @@ Elm.Native.List.make = function(elm) {
     function keepIf(pred, xs) {
         var arr = [];
         while (xs.ctor !== '[]') {
-            if (pred(xs._0)) { arr.push(xs._0); }
+            if (pred(xs._0))
+            {
+                arr.push(xs._0);
+            }
             xs = xs._1;
         }
         return fromArray(arr);
@@ -95,14 +104,18 @@ Elm.Native.List.make = function(elm) {
 
     function member(x, xs) {
         while (xs.ctor !== '[]') {
-            if (Utils.eq(x,xs._0)) return true;
+            if (Utils.eq(x,xs._0))
+            {
+                return true;
+            }
             xs = xs._1;
         }
         return false;
     }
 
     function append(xs, ys) {
-        if (xs.ctor === '[]') {
+        if (xs.ctor === '[]')
+        {
             return ys;
         }
         var root = Cons(xs._0, Nil);
@@ -119,7 +132,10 @@ Elm.Native.List.make = function(elm) {
 
     function all(pred, xs) {
         while (xs.ctor !== '[]') {
-            if (!pred(xs._0)) return false;
+            if (!pred(xs._0))
+            {
+                return false;
+            }
             xs = xs._1;
         }
         return true;
@@ -127,7 +143,10 @@ Elm.Native.List.make = function(elm) {
 
     function any(pred, xs) {
         while (xs.ctor !== '[]') {
-            if (pred(xs._0)) return true;
+            if (pred(xs._0))
+            {
+                return true;
+            }
             xs = xs._1;
         }
         return false;
@@ -227,7 +246,10 @@ Elm.Native.List.make = function(elm) {
         var arr = [];
         var pattern = [x];
         while (n > 0) {
-            if (n & 1) arr = arr.concat(pattern);
+            if (n & 1)
+            {
+                arr = arr.concat(pattern);
+            }
             n >>= 1, pattern = pattern.concat(pattern);
         }
         return fromArray(arr);
@@ -265,6 +287,6 @@ Elm.Native.List.make = function(elm) {
         drop:F2(drop),
         repeat:F2(repeat)
     };
-    return elm.Native.List.values = Elm.Native.List.values;
+    return localRuntime.Native.List.values = Elm.Native.List.values;
 
 };
