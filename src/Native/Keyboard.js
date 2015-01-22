@@ -17,12 +17,13 @@ Elm.Native.Keyboard.make = function(localRuntime) {
     }
 
     var Signal = Elm.Signal.make(localRuntime);
+    var NS = Elm.Native.Signal.make(localRuntime);
     var NList = Elm.Native.List.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
 
-    var downEvents = Signal.constant(null);
-    var upEvents = Signal.constant(null);
-    var blurEvents = Signal.constant(null);
+    var downEvents = NS.input(null);
+    var upEvents = NS.input(null);
+    var blurEvents = NS.input(null);
 
     localRuntime.addListener([downEvents.id], document, 'keydown', function down(e) {
         localRuntime.notify(downEvents.id, e);
