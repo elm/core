@@ -2,7 +2,10 @@ Elm.Native.Bitwise = {};
 Elm.Native.Bitwise.make = function(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Bitwise = localRuntime.Native.Bitwise || {};
-    if (localRuntime.Native.Bitwise.values) return localRuntime.Native.Bitwise.values;
+    if (localRuntime.Native.Bitwise.values) 
+    {
+        return localRuntime.Native.Bitwise.values;
+    }
 
     function and(a,b) { return a & b; }
     function or (a,b) { return a | b; }

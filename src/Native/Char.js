@@ -2,7 +2,10 @@ Elm.Native.Char = {};
 Elm.Native.Char.make = function(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Char = localRuntime.Native.Char || {};
-    if (localRuntime.Native.Char.values) return localRuntime.Native.Char.values;
+    if (localRuntime.Native.Char.values) 
+    {
+        return localRuntime.Native.Char.values;
+    }
 
     var Utils = Elm.Native.Utils.make(localRuntime);
 
