@@ -81,7 +81,7 @@ Elm.Native.List.make = function(localRuntime) {
         return fromArray(arr);
     }
 
-    function keepIf(pred, xs) {
+    function filter(pred, xs) {
         var arr = [];
         while (xs.ctor !== '[]') {
             if (pred(xs._0))
@@ -224,7 +224,7 @@ Elm.Native.List.make = function(localRuntime) {
         }));
     }
 
-    function keep(n, xs) {
+    function take(n, xs) {
         var arr = [];
         while (xs.ctor !== '[]' && n > 0) {
             arr.push(xs._0);
@@ -270,7 +270,7 @@ Elm.Native.List.make = function(localRuntime) {
         foldr:F3(foldr),
 
         scanl:F3(scanl),
-        keepIf:F2(keepIf),
+        filter:F2(filter),
         length:length,
         member:F2(member),
 
@@ -283,7 +283,7 @@ Elm.Native.List.make = function(localRuntime) {
         sort:sort,
         sortBy:F2(sortBy),
         sortWith:F2(sortWith),
-        keep:F2(keep),
+        take:F2(take),
         drop:F2(drop),
         repeat:F2(repeat)
     };

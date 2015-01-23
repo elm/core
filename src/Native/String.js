@@ -45,7 +45,7 @@ Elm.Native.String.make = function(localRuntime) {
         }
         return out.join('');
     }
-    function keepIf(pred,str) {
+    function filter(pred,str) {
         return str.split('').map(Utils.chr).filter(pred).join('');
     }
     function reverse(str) {
@@ -247,7 +247,7 @@ Elm.Native.String.make = function(localRuntime) {
         concat: concat,
         length: length,
         map: F2(map),
-        keepIf: F2(keepIf),
+        filter: F2(filter),
         reverse: reverse,
         foldl: F3(foldl),
         foldr: F3(foldr),
