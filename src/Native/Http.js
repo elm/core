@@ -10,6 +10,7 @@ Elm.Native.Http.make = function(localRuntime) {
 
     var List = Elm.List.make(localRuntime);
     var Signal = Elm.Signal.make(localRuntime);
+    var NS = Elm.Native.Signal.make(localRuntime);
 
     function registerReq(queue,responses) {
         return function(req) {
@@ -58,7 +59,7 @@ Elm.Native.Http.make = function(localRuntime) {
     }
 
     function send(requests) {
-        var responses = Signal.constant(localRuntime.Http.values.Waiting);
+        var responses = NS.input(localRuntime.Http.values.Waiting);
         var sender = A2( Signal.map, registerReq([],responses), requests );
         function f(x) { return function(y) { return x; } }
         return A3( Signal.map2, f, responses, sender );

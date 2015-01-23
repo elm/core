@@ -52,7 +52,7 @@ type Signal a = Signal
 {-| Create a constant signal that never changes. -}
 constant : a -> Signal a
 constant =
-    Native.Signal.constant
+    Native.Signal.input
 
 
 {-| Apply a function to the current value of a signal.

@@ -9,9 +9,10 @@ Elm.Native.Mouse.make = function(localRuntime) {
     }
 
     var Signal = Elm.Signal.make(localRuntime);
+    var NS = Elm.Native.Signal.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
 
-    var position = Signal.constant(Utils.Tuple2(0,0));
+    var position = NS.input(Utils.Tuple2(0,0));
     position.defaultNumberOfKids = 2;
 
     // do not move x and y into Elm. By setting their default number
@@ -30,8 +31,8 @@ Elm.Native.Mouse.make = function(localRuntime) {
     var y = A2( Signal.map, snd, position );
     y.defaultNumberOfKids = 0;
 
-    var isDown = Signal.constant(false);
-    var clicks = Signal.constant(Utils.Tuple0);
+    var isDown = NS.input(false);
+    var clicks = NS.input(Utils.Tuple0);
 
     var node = localRuntime.isFullscreen()
         ? document
