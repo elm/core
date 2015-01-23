@@ -15,6 +15,7 @@ module Char
 -}
 
 import Native.Char
+import Basics ((&&), (||), (>=), (<=))
 
 isBetween : Char -> Char -> Char -> Bool
 isBetween low high char = 
@@ -40,7 +41,7 @@ isOctDigit = isBetween '0' '7'
 {-| True for ASCII hexadecimal digits `[0-9a-fA-F]`. -}
 isHexDigit : Char -> Bool
 isHexDigit char = 
-    isDigit char || isBetween 'a' 'f' char || isBetween 'A' 'Z' char
+    isDigit char || isBetween 'a' 'f' char || isBetween 'A' 'F' char
 
 {-| Convert to upper case. -}
 toUpper : Char -> Char
