@@ -49,7 +49,7 @@ Elm.Native.Time.make = function(localRuntime) {
             if (isOn)
             {
                 timeoutID = localRuntime.setTimeout(
-                    (!wasOn && isOn) ? notifyTrue : notifyFalse,
+                    !wasOn ? notifyTrue : notifyFalse,
                     msPerFrame
                 );
             }
