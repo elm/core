@@ -1,9 +1,9 @@
-Elm.Native.Json = {};
-Elm.Native.Json.make = function(localRuntime) {
+Elm.Native.JavaScript = {};
+Elm.Native.JavaScript.make = function(localRuntime) {
     localRuntime.Native = localRuntime.Native || {};
-    localRuntime.Native.Json = localRuntime.Native.Json || {};
-    if (localRuntime.Native.Json.values) {
-        return localRuntime.Native.Json.values;
+    localRuntime.Native.JavaScript = localRuntime.Native.JavaScript || {};
+    if (localRuntime.Native.JavaScript.values) {
+        return localRuntime.Native.JavaScript.values;
     }
 
     var ElmArray = Elm.Native.Array.make(localRuntime);
@@ -428,7 +428,7 @@ Elm.Native.Json.make = function(localRuntime) {
         return obj;
     }
 
-    return localRuntime.Native.Json.values = {
+    return localRuntime.Native.JavaScript.values = {
         encode: F2(encode),
         runDecoderString: F2(runDecoderString),
         runDecoderValue: F2(runDecoderValue),
