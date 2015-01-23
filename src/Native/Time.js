@@ -36,12 +36,22 @@ Elm.Native.Time.make = function(localRuntime) {
         // turn ticker on and off depending on isOn signal
         var wasOn = true;
         var timeoutID = 0;
+
+        function notifyTrue() {
+            localRuntime.notify(ticker.id, true);
+        }
+
+        function notifyFalse() {
+            localRuntime.notify(ticker.id, false);
+        }
+
         function startStopTimer(isOn, t) {
             if (isOn)
             {
-                timeoutID = localRuntime.setTimeout(function() {
-                    localRuntime.notify(ticker.id, !wasOn && isOn); 
-                }, msPerFrame);
+                timeoutID = localRuntime.setTimeout(
+                    (!wasOn && isOn) ? notifyTrue : notifyFalse,
+                    msPerFrame
+                );
             }
             else if (wasOn)
             {
@@ -54,7 +64,7 @@ Elm.Native.Time.make = function(localRuntime) {
         return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
     }
 
-    
+
     function fps(t) {
         return fpsWhen(t, Signal.constant(true));
     }
