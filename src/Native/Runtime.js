@@ -56,7 +56,7 @@ if (!Elm.fullscreen) {
                 updateInProgress = false;
             }
             function setTimeout(func, delay) {
-                window.setTimeout(func, delay);
+                return window.setTimeout(func, delay);
             }
 
             var listeners = [];
