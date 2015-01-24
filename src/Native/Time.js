@@ -33,9 +33,6 @@ Elm.Native.Time.make = function(localRuntime) {
 
         var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
 
-        var wasOn = isOn.value;
-        var timeoutID = 0;
-
         function notifyAndForceDeltaToZero() {
             localRuntime.notify(ticker.id, true);
         }
@@ -45,6 +42,8 @@ Elm.Native.Time.make = function(localRuntime) {
         }
 
         // turn ticker on and off depending on isOn signal
+        var wasOn = isOn.value;
+        var timeoutID = 0;
         function startStopTimer(isOn, t) {
             if (isOn)
             {
