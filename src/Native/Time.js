@@ -37,11 +37,11 @@ Elm.Native.Time.make = function(localRuntime) {
         var wasOn = isOn.value;
         var timeoutID = 0;
 
-        function notifyTrue() {
+        function notifyAndForceDeltaToZero() {
             localRuntime.notify(ticker.id, true);
         }
 
-        function notifyFalse() {
+        function notifyAndUseActualDelta() {
             localRuntime.notify(ticker.id, false);
         }
 
@@ -49,7 +49,8 @@ Elm.Native.Time.make = function(localRuntime) {
             if (isOn)
             {
                 timeoutID = localRuntime.setTimeout(
-                    !wasOn ? notifyTrue : notifyFalse,
+                    wasOn ? notifyAndUseActualDelta
+                          : notifyAndForceDeltaToZero,
                     msPerFrame
                 );
             }
