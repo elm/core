@@ -62,11 +62,15 @@ Elm.Native.Time.make = function(localRuntime) {
                     return 0;
                 }
             }
-            else // we know now that !timeStampedIsOn._1 && wasOn
+            else if (wasOn)
             {
                 clearTimeout(timeoutID);
                 wasOn = false;
                 return t;
+            }
+            else // this can only happen on initialization, if isOn-signal starts at false
+            {
+                return 0;
             }
         }
 
