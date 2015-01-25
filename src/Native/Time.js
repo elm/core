@@ -44,6 +44,7 @@ Elm.Native.Time.make = function(localRuntime) {
         var wasTime = timeStampedIsOn.value._0;
         var timeoutID = 0;
         function startStopTimer(timeStampedIsOn, t) {
+            var delta;
             if (timeStampedIsOn._1)
             {
                 timeoutID = localRuntime.setTimeout(
@@ -52,8 +53,9 @@ Elm.Native.Time.make = function(localRuntime) {
                 );
                 if (wasOn)
                 {
+                    delta = timeStampedIsOn._0 - wasTime;
                     wasTime = timeStampedIsOn._0;
-                    return t;
+                    return delta;
                 }
                 else
                 {
