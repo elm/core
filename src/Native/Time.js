@@ -12,56 +12,56 @@ Elm.Native.Time.make = function(localRuntime) {
     var Maybe = Elm.Maybe.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
 
+    function fst(pair) {
+        return pair._0;
+    }
 
     function fpsWhen(desiredFPS, isOn) {
         var msPerFrame = 1000 / desiredFPS;
-        var ticker = NS.input(true);
+        var ticker = NS.input(Utils.Tuple0);
 
-        // manage time deltas
-        var initialState = {
-            delta: 0,
-            timestamp: localRuntime.timer.programStart
-        };
-        function updateState(event, old) {
-            var curr = event._0;
-            return {
-                delta: event._1 ? 0 : curr - old.timestamp,
-                timestamp: curr
-            };
-        }
-        var state = A3( Signal.foldp, F2(updateState), initialState, NS.timestamp(ticker) );
-
-        var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
-
-        function notifyAndForceDeltaToZero() {
-            localRuntime.notify(ticker.id, true);
+        function notifyTicker() {
+            localRuntime.notify(ticker.id, Utils.Tuple0);
         }
 
-        function notifyAndUseActualDelta() {
-            localRuntime.notify(ticker.id, false);
-        }
+        var timeStampsTicker = A2( Signal.map, fst, NS.timestamp(ticker) );
+        var timeStampedIsOn = NS.timestamp(Signal.dropRepeats(isOn));
 
         // turn ticker on and off depending on isOn signal
         var wasOn = isOn.value;
+        var wasTime = localRuntime.timer.programStart;
         var timeoutID = 0;
-        function startStopTimer(isOn, t) {
-            if (isOn)
+        function startStopTimer(timeStampedIsOn, timestampTicker) {
+            var delta = 0;
+            if (timeStampedIsOn._1)
             {
                 timeoutID = localRuntime.setTimeout(
-                    wasOn ? notifyAndUseActualDelta
-                          : notifyAndForceDeltaToZero,
+                    notifyTicker,
                     msPerFrame
                 );
+                if (wasOn)
+                {
+                    delta = timestampTicker - wasTime;
+                    wasTime = timestampTicker;
+                }
+                else
+                {
+                    wasOn = true;
+                    wasTime = timeStampedIsOn._0;
+                }
             }
             else if (wasOn)
             {
                 clearTimeout(timeoutID);
+                delta = timeStampedIsOn._0 - wasTime;
+                wasOn = false;
             }
-            wasOn = isOn;
-            return t;
+            return delta;
         }
 
-        return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
+        return A3( Signal.map2, F2(startStopTimer),
+                   timeStampedIsOn,
+                   timeStampsTicker );
     }
 
 
@@ -79,12 +79,6 @@ Elm.Native.Time.make = function(localRuntime) {
       setInterval(tellTime, t);
       return clock;
     }
-
-
-    function fst(pair) {
-        return pair._0;
-    }
-
 
     function read(s) {
         var t = Date.parse(s);
