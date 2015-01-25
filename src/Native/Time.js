@@ -31,8 +31,6 @@ Elm.Native.Time.make = function(localRuntime) {
         }
         var state = A3( Signal.foldp, F2(updateState), initialState, NS.timestamp(ticker) );
 
-        var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
-
         function notifyTicker() {
             localRuntime.notify(ticker.id, Utils.Tuple0);
         }
@@ -43,7 +41,7 @@ Elm.Native.Time.make = function(localRuntime) {
         var wasOn = isOn.value;
         var wasTime = timeStampedIsOn.value._0;
         var timeoutID = 0;
-        function startStopTimer(timeStampedIsOn, t) {
+        function startStopTimer(timeStampedIsOn, p) {
             var delta;
             if (timeStampedIsOn._1)
             {
@@ -53,8 +51,8 @@ Elm.Native.Time.make = function(localRuntime) {
                 );
                 if (wasOn)
                 {
-                    delta = timeStampedIsOn._0 - wasTime;
-                    wasTime = timeStampedIsOn._0;
+                    delta = p.timestamp - wasTime;
+                    wasTime = p.timestamp;
                     return delta;
                 }
                 else
@@ -68,7 +66,7 @@ Elm.Native.Time.make = function(localRuntime) {
             {
                 clearTimeout(timeoutID);
                 wasOn = false;
-                return t;
+                return p.delta;
             }
             else // this can only happen on initialization, if isOn-signal starts at false
             {
@@ -78,7 +76,7 @@ Elm.Native.Time.make = function(localRuntime) {
 
         return A3( Signal.map2, F2(startStopTimer),
                    timeStampedIsOn,
-                   deltas );
+                   state );
     }
 
 
