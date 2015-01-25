@@ -52,13 +52,15 @@ Elm.Native.Time.make = function(localRuntime) {
                           : notifyAndForceDeltaToZero,
                     msPerFrame
                 );
+                wasOn = true;
+                return t;
             }
             else // we know now that !isOn && wasOn
             {
                 clearTimeout(timeoutID);
+                wasOn = false;
+                return t;
             }
-            wasOn = isOn;
-            return t;
         }
 
         return A3( Signal.map2, F2(startStopTimer),
