@@ -53,7 +53,7 @@ Elm.Native.Time.make = function(localRuntime) {
                     msPerFrame
                 );
             }
-            else if (wasOn)
+            else // we know now that !isOn && wasOn
             {
                 clearTimeout(timeoutID);
             }
