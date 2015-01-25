@@ -42,7 +42,7 @@ Elm.Native.Time.make = function(localRuntime) {
         var wasTime = timeStampedIsOn.value._0;
         var timeoutID = 0;
         function startStopTimer(timeStampedIsOn, p) {
-            var delta;
+            var delta = 0;
             if (timeStampedIsOn._1)
             {
                 timeoutID = localRuntime.setTimeout(
@@ -53,25 +53,20 @@ Elm.Native.Time.make = function(localRuntime) {
                 {
                     delta = p.timestamp - wasTime;
                     wasTime = p.timestamp;
-                    return delta;
                 }
                 else
                 {
                     wasOn = true;
                     wasTime = timeStampedIsOn._0;
-                    return 0;
                 }
             }
             else if (wasOn)
             {
                 clearTimeout(timeoutID);
+                delta = p.delta;
                 wasOn = false;
-                return p.delta;
             }
-            else // this can only happen on initialization, if isOn-signal starts at false
-            {
-                return 0;
-            }
+            return delta;
         }
 
         return A3( Signal.map2, F2(startStopTimer),
