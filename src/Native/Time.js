@@ -15,7 +15,7 @@ Elm.Native.Time.make = function(localRuntime) {
 
     function fpsWhen(desiredFPS, isOn) {
         var msPerFrame = 1000 / desiredFPS;
-        var ticker = NS.input(true);
+        var ticker = NS.input(Utils.Tuple0);
 
         // manage time deltas
         var initialState = {
@@ -25,7 +25,7 @@ Elm.Native.Time.make = function(localRuntime) {
         function updateState(event, old) {
             var curr = event._0;
             return {
-                delta: event._1 ? 0 : curr - old.timestamp,
+                delta: curr - old.timestamp,
                 timestamp: curr
             };
         }
@@ -33,8 +33,8 @@ Elm.Native.Time.make = function(localRuntime) {
 
         var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
 
-        function notifyAndUseActualDelta() {
-            localRuntime.notify(ticker.id, false);
+        function notifyTicker() {
+            localRuntime.notify(ticker.id, Utils.Tuple0);
         }
 
         // turn ticker on and off depending on isOn signal
@@ -44,7 +44,7 @@ Elm.Native.Time.make = function(localRuntime) {
             if (isOn)
             {
                 timeoutID = localRuntime.setTimeout(
-                    notifyAndUseActualDelta,
+                    notifyTicker,
                     msPerFrame
                 );
                 if (wasOn)
