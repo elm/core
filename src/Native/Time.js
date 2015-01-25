@@ -33,10 +33,6 @@ Elm.Native.Time.make = function(localRuntime) {
 
         var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
 
-        function notifyAndForceDeltaToZero() {
-            localRuntime.notify(ticker.id, true);
-        }
-
         function notifyAndUseActualDelta() {
             localRuntime.notify(ticker.id, false);
         }
@@ -47,20 +43,16 @@ Elm.Native.Time.make = function(localRuntime) {
         function startStopTimer(isOn, t) {
             if (isOn)
             {
+                timeoutID = localRuntime.setTimeout(
+                    notifyAndUseActualDelta,
+                    msPerFrame
+                );
                 if (wasOn)
                 {
-                    timeoutID = localRuntime.setTimeout(
-                        notifyAndUseActualDelta,
-                        msPerFrame
-                    );
                     return t;
                 }
                 else
                 {
-                    timeoutID = localRuntime.setTimeout(
-                        notifyAndUseActualDelta,
-                        msPerFrame
-                    );
                     wasOn = true;
                     return 0;
                 }
