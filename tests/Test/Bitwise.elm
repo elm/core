@@ -43,7 +43,7 @@ tests =
             , test "32 `shiftRight` 2 == 8" <| assertEqual 8 (Bitwise.shiftRight 32 2)
             , test "-32 `shiftRight` 1 == -16" <| assertEqual -16 (Bitwise.shiftRight -32 1)
             ]
-        . suite "shiftRightLogical"
+        , suite "shiftRightLogical"
             [ test "32 `shiftRightLogical` 1 == 16" <| assertEqual 16 (Bitwise.shiftRightLogical 32 1)
             , test "32 `shiftRightLogical` 2 == 8" <| assertEqual 8 (Bitwise.shiftRightLogical 32 2)
             , test "-32 `shiftRightLogical` 1 == 2147483632" <| assertEqual 2147483632 (Bitwise.shiftRightLogical -32 1)
