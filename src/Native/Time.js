@@ -63,7 +63,7 @@ Elm.Native.Time.make = function(localRuntime) {
             else if (wasOn)
             {
                 clearTimeout(timeoutID);
-                delta = p.delta;
+                delta = timeStampedIsOn._0 - wasTime;
                 wasOn = false;
             }
             return delta;
