@@ -61,7 +61,9 @@ Elm.Native.Time.make = function(localRuntime) {
             return t;
         }
 
-        return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
+        return A3( Signal.map2, F2(startStopTimer),
+                   Signal.dropRepeats(isOn),
+                   deltas );
     }
 
 
