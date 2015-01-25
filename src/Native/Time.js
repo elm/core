@@ -47,13 +47,23 @@ Elm.Native.Time.make = function(localRuntime) {
         function startStopTimer(isOn, t) {
             if (isOn)
             {
-                timeoutID = localRuntime.setTimeout(
-                    wasOn ? notifyAndUseActualDelta
-                          : notifyAndForceDeltaToZero,
-                    msPerFrame
-                );
-                wasOn = true;
-                return t;
+                if (wasOn)
+                {
+                    timeoutID = localRuntime.setTimeout(
+                        notifyAndUseActualDelta,
+                        msPerFrame
+                    );
+                    return t;
+                }
+                else
+                {
+                    timeoutID = localRuntime.setTimeout(
+                        notifyAndForceDeltaToZero,
+                        msPerFrame
+                    );
+                    wasOn = true;
+                    return t;
+                }
             }
             else // we know now that !isOn && wasOn
             {
