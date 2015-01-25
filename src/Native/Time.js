@@ -58,11 +58,11 @@ Elm.Native.Time.make = function(localRuntime) {
                 else
                 {
                     timeoutID = localRuntime.setTimeout(
-                        notifyAndForceDeltaToZero,
+                        notifyAndUseActualDelta,
                         msPerFrame
                     );
                     wasOn = true;
-                    return t;
+                    return 0;
                 }
             }
             else // we know now that !isOn && wasOn
