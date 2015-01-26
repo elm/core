@@ -26,7 +26,7 @@ Elm.Native.Time.make = function(localRuntime) {
         // Its value is a tuple with the current timestamp, and the state of isOn
         var input = NS.timestamp(A3(Signal.map2, F2(firstArg), Signal.dropRepeats(isOn), ticker));
 
-        var wasOn = isOn.value;
+        var wasOn = false;
         var timeoutId;
         var previousTime = localRuntime.timer.programStart;
 
