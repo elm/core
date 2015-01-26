@@ -38,7 +38,7 @@ Elm.Native.Time.make = function(localRuntime) {
             {
                 timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
             }
-            else
+            else if (wasOn)
             {
                 clearTimeout(timeoutId);
             }
