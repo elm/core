@@ -297,8 +297,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         canvas.style.height = h + 'px';
         canvas.style.display = "block";
         canvas.style.position = "absolute";
-        canvas.width  = w;
-        canvas.height = h;
+        canvas.width  = w * window.devicePixelRatio;
+        canvas.height = h * window.devicePixelRatio;
         return canvas;
     }
 
@@ -314,8 +314,14 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         var kids = div.childNodes;
         var i = 0;
         function transform(transforms, ctx) {
-            ctx.translate(w/2, h/2);
-            ctx.scale(1,-1);
+            ctx.translate(
+              w / 2 * window.devicePixelRatio,
+              h / 2 * window.devicePixelRatio
+            );
+            ctx.scale(
+              0 + window.devicePixelRatio,
+              0 - window.devicePixelRatio
+            );
             var len = transforms.length;
             for (var i = 0; i < len; ++i) {
                 var m = transforms[i];
@@ -328,8 +334,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             while (i < kids.length) {
                 var node = kids[i];
                 if (node.getContext) {
-                    node.width = w;
-                    node.height = h;
+                    node.width = w * window.devicePixelRatio;
+                    node.height = h * window.devicePixelRatio;
                     node.style.width = w + 'px';
                     node.style.height = h + 'px';
                     ++i;
