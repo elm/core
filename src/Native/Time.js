@@ -34,9 +34,9 @@ Elm.Native.Time.make = function(localRuntime) {
             delta: 0
         };
 
-        function update(obj,state) {
-            var timestamp = obj._0;
-            var isOn = obj._1;
+        function update(input,state) {
+            var timestamp = input._0;
+            var isOn = input._1;
             var wasOn = state.wasOn;
             var timeoutID = state.timeoutID;
             var previousTime = state.previousTime;
