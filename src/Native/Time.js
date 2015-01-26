@@ -20,11 +20,11 @@ Elm.Native.Time.make = function(localRuntime) {
             localRuntime.notify(ticker.id, Utils.Tuple0);
         }
 
-        function fst (x, y) { return x; }
+        function firstArg(x, y) { return x; }
 
         // input fires either when isOn changes, or when ticker fires.
         // Its value is a tuple with the current timestamp, and the state of isOn
-        var input = NS.timestamp(A3(Signal.map2, F2(fst), Signal.dropRepeats(isOn), ticker));
+        var input = NS.timestamp(A3(Signal.map2, F2(firstArg), Signal.dropRepeats(isOn), ticker));
 
         var wasOn = isOn.value;
         var timeoutId;
