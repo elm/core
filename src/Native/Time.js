@@ -15,53 +15,52 @@ Elm.Native.Time.make = function(localRuntime) {
 
     function fpsWhen(desiredFPS, isOn) {
         var msPerFrame = 1000 / desiredFPS;
-        var ticker = NS.input(true);
+        var ticker = NS.input(Utils.Tuple0);
 
-        // manage time deltas
+        function notifyTicker()
+        {
+            localRuntime.notify(ticker.id, Utils.Tuple0);
+        }
+
+        function firstArg(x, y) { return x; }
+
+        // input fires either when isOn changes, or when ticker fires.
+        // Its value is a tuple with the current timestamp, and the state of isOn
+        var input = NS.timestamp(A3(Signal.map2, F2(firstArg), Signal.dropRepeats(isOn), ticker));
+
         var initialState = {
-            delta: 0,
-            timestamp: localRuntime.timer.programStart
+            isOn: false,
+            timeoutId: 0,
+            time: localRuntime.timer.programStart,
+            delta: 0
         };
-        function updateState(event, old) {
-            var curr = event._0;
-            return {
-                delta: event._1 ? 0 : curr - old.timestamp,
-                timestamp: curr
-            };
-        }
-        var state = A3( Signal.foldp, F2(updateState), initialState, NS.timestamp(ticker) );
 
-        var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
+        function update(input,state) {
+            var currentTime = input._0;
+            var isOn = input._1;
+            var wasOn = state.isOn;
+            var timeoutId = state.timeoutId;
+            var previousTime = state.time;
 
-        function notifyAndForceDeltaToZero() {
-            localRuntime.notify(ticker.id, true);
-        }
-
-        function notifyAndUseActualDelta() {
-            localRuntime.notify(ticker.id, false);
-        }
-
-        // turn ticker on and off depending on isOn signal
-        var wasOn = isOn.value;
-        var timeoutID = 0;
-        function startStopTimer(isOn, t) {
             if (isOn)
             {
-                timeoutID = localRuntime.setTimeout(
-                    wasOn ? notifyAndUseActualDelta
-                          : notifyAndForceDeltaToZero,
-                    msPerFrame
-                );
+                timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
             }
             else if (wasOn)
             {
-                clearTimeout(timeoutID);
+                clearTimeout(timeoutId);
             }
-            wasOn = isOn;
-            return t;
+
+            return {
+                isOn: isOn,
+                timeoutId: timeoutId,
+                time: currentTime,
+                delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
+            };
         }
 
-        return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
+        return A2( Signal.map, function(state) { return state.delta; },
+                   A3(Signal.foldp, F2(update), update(input.value,initialState), input) );
     }
 
 
