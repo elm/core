@@ -17,7 +17,8 @@ Elm.Native.Time.make = function(localRuntime) {
         var msPerFrame = 1000 / desiredFPS;
         var ticker = NS.input(Utils.Tuple0);
 
-        function notifyTicker() {
+        function notifyTicker()
+        {
             localRuntime.notify(ticker.id, Utils.Tuple0);
         }
 
@@ -28,33 +29,33 @@ Elm.Native.Time.make = function(localRuntime) {
         var input = NS.timestamp(A3(Signal.map2, F2(firstArg), Signal.dropRepeats(isOn), ticker));
 
         var initialState = {
-            wasOn: false,
-            timeoutID: 0,
-            previousTime: localRuntime.timer.programStart,
+            isOn: false,
+            timeoutId: 0,
+            time: localRuntime.timer.programStart,
             delta: 0
         };
 
         function update(input,state) {
-            var timestamp = input._0;
+            var currentTime = input._0;
             var isOn = input._1;
-            var wasOn = state.wasOn;
-            var timeoutID = state.timeoutID;
-            var previousTime = state.previousTime;
+            var wasOn = state.isOn;
+            var timeoutId = state.timeoutId;
+            var previousTime = state.time;
 
             if (isOn)
             {
-                timeoutID = localRuntime.setTimeout(notifyTicker, msPerFrame);
+                timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
             }
             else if (wasOn)
             {
-                clearTimeout(timeoutID);
+                clearTimeout(timeoutId);
             }
 
             return {
-                wasOn: isOn,
-                timeoutID: timeoutID,
-                previousTime: timestamp,
-                delta: (isOn && !wasOn) ? 0 : timestamp - previousTime
+                isOn: isOn,
+                timeoutId: timeoutId,
+                time: currentTime,
+                delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
             };
         }
 
