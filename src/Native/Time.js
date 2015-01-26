@@ -27,15 +27,9 @@ Elm.Native.Time.make = function(localRuntime) {
         // Its value is a tuple with the current timestamp, and the state of isOn
         var input = NS.timestamp(A3(Signal.map2, F2(firstArg), Signal.dropRepeats(isOn), ticker));
 
-        var timeoutID = 0;
-        if (isOn.value)
-        {
-            timeoutID = localRuntime.setTimeout(notifyTicker, msPerFrame);
-        }
-
         var initialState = {
-            wasOn: isOn.value,
-            timeoutID: timeoutID,
+            wasOn: false,
+            timeoutID: 0,
             previousTime: localRuntime.timer.programStart,
             delta: 0
         };
@@ -65,7 +59,7 @@ Elm.Native.Time.make = function(localRuntime) {
         }
 
         return A2( Signal.map, function(state) { return state.delta; },
-                   A3(Signal.foldp, F2(update), initialState, input) );
+                   A3(Signal.foldp, F2(update), update(input.value,initialState), input) );
     }
 
 
