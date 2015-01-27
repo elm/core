@@ -60,7 +60,7 @@ gives a sequence of time deltas as quickly as possible until it reaches
 the desired FPS. A time delta is the time between the last frame and the
 current frame.
 
-Calling, say, `fps 30` twice gives two independently running timers.
+Note: Calling `fps 30` twice gives two independently running timers.
 -}
 fps : number -> Signal Time
 fps = Native.Time.fps
@@ -77,7 +77,7 @@ fpsWhen = Native.Time.fpsWhen
 {-| Takes a time interval `t`. The resulting signal is the current time, updated
 every `t`.
 
-Calling, say, `every 100` twice gives two independently running timers.
+Note: Calling `every 100` twice gives two independently running timers.
 -}
 every : Time -> Signal Time
 every = Native.Time.every
