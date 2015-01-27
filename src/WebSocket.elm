@@ -1,24 +1,45 @@
-module WebSocket
-    ( connect
-    ) where
+module WebSocket where
 
 {-| A library for low latency HTTP communication. See the HTTP library for
 standard requests like GET, POST, etc. The API of this library is likely to
 change to make it more flexible.
-
-# Open a Connection
-@docs connect
 -}
 
-import Signal (Signal)
 import Native.WebSocket
+import JavaScript.Decoder as JavaScript
 
-{-| Create a web-socket. The first argument is the URL of the desired
-web-socket server. The input signal holds the outgoing messages,
-and the resulting signal contains the incoming ones.
--}
-connect : String -> Signal String -> Signal String
-connect = Native.WebSocket.connect
 
--- data Action = Open String | Close String | Send String String
--- connections : Signal Action -> Signal String
+type alias Config =
+    { url : String
+    , protocols : List String
+    }
+
+
+connect : Config -> Promise Error Connection
+connect =
+  Native.WebSocket.connect
+
+
+send : Connection -> String -> Promise Error ()
+send =
+  Native.WebSocket.send
+
+
+type Event
+    = Message JavaScript.Value
+    | Close { code : Int, reason : String, wasClean : Bool }
+
+
+listen : Connection -> (Event -> Promise x a) -> Promise x a
+listen =
+  Native.WebSocket.listen
+
+
+close : Connection -> Promise x ()
+close =
+  Native.WebSocket.close
+
+
+closeWith : Int -> String -> Connection -> Promise x ()
+closeWith =
+  Native.WebSocket.closeWith
