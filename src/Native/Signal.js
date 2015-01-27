@@ -294,23 +294,6 @@ Elm.Native.Signal.make = function(localRuntime) {
     }
 
 
-    // SIGNAL INPUTS
-
-    function input(initialValue) {
-        return new Input(initialValue);
-    }
-
-    function send(input, value) {
-        return function() {
-            localRuntime.notify(input.id, value);
-        };
-    }
-
-    function subscribe(input) {
-        return input;
-    }
-
-
     return localRuntime.Native.Signal.values = {
         map: F2(map),
         map2: F3(map2),
@@ -324,9 +307,6 @@ Elm.Native.Signal.make = function(localRuntime) {
         dropIf: F3(dropIf),
         dropRepeats: dropRepeats,
         sampleOn: F2(sampleOn),
-        timestamp: timestamp,
-        input: input,
-        send: F2(send),
-        subscribe: subscribe
+        timestamp: timestamp
     };
 };
