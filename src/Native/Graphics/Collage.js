@@ -297,8 +297,9 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         canvas.style.height = h + 'px';
         canvas.style.display = "block";
         canvas.style.position = "absolute";
-        canvas.width  = w;
-        canvas.height = h;
+        var ratio = window.devicePixelRatio || 1;
+        canvas.width  = w * ratio;
+        canvas.height = h * ratio;
         return canvas;
     }
 
@@ -313,11 +314,14 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     function nodeStepper(w,h,div) {
         var kids = div.childNodes;
         var i = 0;
+        var ratio = window.devicePixelRatio || 1;
+
         function transform(transforms, ctx) {
-            ctx.translate(w/2, h/2);
-            ctx.scale(1,-1);
+            ctx.translate( w / 2 * ratio, h / 2 * ratio );
+            ctx.scale( ratio, -ratio );
             var len = transforms.length;
-            for (var i = 0; i < len; ++i) {
+            for (var i = 0; i < len; ++i)
+            {
                 var m = transforms[i];
                 ctx.save();
                 ctx.transform(m[0], m[3], m[1], m[4], m[2], m[5]);
@@ -325,11 +329,13 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             return ctx;
         }
         function nextContext(transforms) {
-            while (i < kids.length) {
+            while (i < kids.length)
+            {
                 var node = kids[i];
-                if (node.getContext) {
-                    node.width = w;
-                    node.height = h;
+                if (node.getContext)
+                {
+                    node.width = w * ratio;
+                    node.height = h * ratio;
                     node.style.width = w + 'px';
                     node.style.height = h + 'px';
                     ++i;
