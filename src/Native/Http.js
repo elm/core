@@ -9,63 +9,36 @@ Elm.Native.Http.make = function(localRuntime) {
     }
 
     var List = Elm.List.make(localRuntime);
-    var Signal = Elm.Signal.make(localRuntime);
-    var NS = Elm.Native.Signal.make(localRuntime);
 
-    function registerReq(queue,responses) {
-        return function(req) {
-            if (req.url.length > 0)
-            {
-                sendReq(queue,responses,req);
+    function send(verb, headers, url, mime, body, decoder) {
+        return function(callback) {
+            var request = window.ActiveXObject
+                ? new ActiveXObject("Microsoft.XMLHTTP")
+                : new XMLHttpRequest();
+            request.onreadystatechange = function() {
+                if (request.readyState === 4)
+                {
+                    if (request.status >= 200 && request.status < 300)
+                    {
+                        return callback('Ok', request.response);
+                    }
+                    return callback('Err', throw new Error('throw real error'));
+                }
             }
+            request.open(verb, url, true);
+            function setHeader(pair) {
+                request.setRequestHeader(pair._0, pair._1);
+            }
+            A2(List.map, setHeader, headers);
+            if (mime.ctor === 'Just')
+            {
+                request.overrideMimeType(mime._0);
+            }
+            request.send(body.ctor === 'Just' ? body._0 : undefined);
         };
-    }
-
-    function updateQueue(queue,responses) {
-        if (queue.length > 0)
-        {
-            localRuntime.notify(responses.id, queue[0].value);
-            if (queue[0].value.ctor !== 'Waiting')
-            {
-                queue.shift();
-                setTimeout(function() { updateQueue(queue,responses); }, 0);
-            }
-        }
-    }
-
-    function sendReq(queue,responses,req) {
-        var response = { value: { ctor:'Waiting' } };
-        queue.push(response);
-
-        var request = (window.ActiveXObject
-                       ? new ActiveXObject("Microsoft.XMLHTTP")
-                       : new XMLHttpRequest());
-
-        request.onreadystatechange = function(e) {
-            if (request.readyState === 4)
-            {
-                response.value = (request.status >= 200 && request.status < 300 ?
-                                  { ctor:'Success', _0:request.responseText } :
-                                  { ctor:'Failure', _0:request.status, _1:request.statusText });
-                setTimeout(function() { updateQueue(queue,responses); }, 0);
-            }
-        };
-        request.open(req.verb, req.url, true);
-        function setHeader(pair) {
-            request.setRequestHeader( pair._0, pair._1 );
-        }
-        A2( List.map, setHeader, req.headers );
-        request.send(req.body);
-    }
-
-    function send(requests) {
-        var responses = NS.input(localRuntime.Http.values.Waiting);
-        var sender = A2( Signal.map, registerReq([],responses), requests );
-        function f(x) { return function(y) { return x; } }
-        return A3( Signal.map2, f, responses, sender );
     }
 
     return localRuntime.Native.Http.values = {
-        send:send
+        send: F6(send)
     };
 };

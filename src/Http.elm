@@ -1,64 +1,50 @@
-module Http
-    ( send, sendGet
-    , get, post, request
-    , Response(..), Request
-    ) where
+module Http where
 
-{-| A library for asynchronous HTTP requests. See the `WebSocket`
-library if you have very strict latency requirements.
-
-# Sending Requests
-@docs send, sendGet
-
-# Creating Requests
-@docs get, post, request
-
-# Responses
-@docs Response
--}
-
-import Signal (Signal)
-import Signal
 import Native.Http
 
-{-| The datatype for responses. Success contains only the returned message.
-Failures contain both an error code and an error message.
+
+{-| Send a fully customizable request. Arguments are:
+
+  * verb - GET, POST, PUT, etc.
+  * headers - list of HTTP headers
+  * url - where you want to send the request
+  * body - the body of the HTTP message
+  * mimeType - override the MIME type returned by the server
+  * decoder - turn the response into an Elm value
 -}
-type Response a
-    = Success a
-    | Waiting
-    | Failure Int String
+send : String -> List (String,String) -> String -> String -> Maybe String -> Json.Decoder a -> Promise Error a
+send =
+  Native.Http.send
 
-type alias Request a =
-    { verb : String
-    , url  : String
-    , body : a
-    , headers : List (String,String)
-    }
+-- TODO: deal with getAllResponseHeaders in `send`
 
-{-| Create a customized request. Arguments are request type (get, post, put,
-delete, etc.), target url, data, and a list of additional headers.
+
+
+{-| Send a GET request to the given url. You also specify how to decode the
+response.
+
+    import JavaScript.Decode (list, string)
+
+    hats : Promise Error (List String)
+    hats =
+      get (list string) "http://example.com/hat-categories.json"
+
 -}
-request : String -> String -> String -> List (String,String) -> Request String
-request = Request
+get : Json.Decoder a -> String -> Promise Error a
+get decoder url =
+  send "GET" [] decoder url Nothing
 
-{-| Create a GET request to the given url. -}
-get : String -> Request String
-get url = Request "GET" url "" []
 
-{-| Create a POST request to the given url, carrying the given data. -}
-post : String -> String -> Request String
-post url body = Request "POST" url body []
+{-| Send a POST send to the given url, carrying the given string as the body.
+You also specify how to decode the response.
 
-{-| Performs an HTTP request with the given requests. Produces a signal
-that carries the responses.
+    import JavaScript.Decode (list, string)
+
+    hats : Promise Error (List String)
+    hats =
+      post (list string) "http://example.com/hat-categories.json" ""
+
 -}
-send : Signal (Request a) -> Signal (Response String)
-send = Native.Http.send
-
-{-| Performs an HTTP GET request with the given urls. Produces a signal
-that carries the responses.
--}
-sendGet : Signal String -> Signal (Response String)
-sendGet requestStrings =
-    send (Signal.map get requestStrings)
+post : Json.Decoder a -> String -> String -> Promise Error a
+post url body =
+  send "POST" url body []
