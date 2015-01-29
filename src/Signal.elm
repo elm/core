@@ -104,7 +104,7 @@ map5 =
 
 
 
-{-| Create a past-dependent signal. Each update from the incoming signals will
+{-| Create a past-dependent signal. Each update from the incoming signal will
 be used to step the state forward. The outgoing signal represents the current
 state.
 
@@ -116,8 +116,13 @@ state.
     timeSoFar =
         foldp (+) 0 (fps 40)
 
-So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
-is the time the program has been running, updated 40 times a second.
+So `clickCount` starts with an initial value of 0. From there, it updates on
+each mouse click, incrementing by one. `timeSoFar` is the time the program has
+been running, updated 40 times a second.
+
+Note: the initial value is specified as an argument, it is not related to the
+initial value of the incoming signal. That value is only updated when the
+incoming signal updates.
 -}
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp =
