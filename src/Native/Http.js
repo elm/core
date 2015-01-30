@@ -12,14 +12,13 @@ Elm.Native.Http.make = function(localRuntime) {
 
     function send(verb, headers, url, mime, body, decoder) {
         return function(callback) {
-            var request = window.ActiveXObject
-                ? new ActiveXObject("Microsoft.XMLHTTP")
-                : new XMLHttpRequest();
+            var request = new XMLHttpRequest();
             request.onreadystatechange = function() {
                 if (request.readyState === 4)
                 {
                     if (request.status >= 200 && request.status < 300)
                     {
+                        var headers = request.getAllResponseHeaders();
                         return callback('Ok', request.response);
                     }
                     return callback('Err', throw new Error('throw real error'));
@@ -38,7 +37,28 @@ Elm.Native.Http.make = function(localRuntime) {
         };
     }
 
+    function multipart(dataList) {
+        var formData = new FormData();
+
+        while (dataList.ctor !== '[]')
+        {
+            var data = dataList._0;
+            if (type === 'StringData')
+            {
+                formData.append(data._0, data._1);
+            }
+            else
+            {
+                formData.append(data._0, data._2, data._1);
+            }
+            dataList = dataList._1;
+        }
+
+        return formData;
+    }
+
     return localRuntime.Native.Http.values = {
-        send: F6(send)
+        send: F6(send),
+        multipart: multipart
     };
 };
