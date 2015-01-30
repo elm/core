@@ -166,4 +166,6 @@ testListOfN n =
             [ test "sorted" <| assertEqual (reverse xs) (sortWith (flip compare) (reverse xs))
             , test "unsorted" <| assertEqual (reverse xs) (sortWith (flip compare) xs)
             ]
+            
+        , test "scanl" <| assertEqual (0 :: (map (\x -> sum [1..x]) xs)) (scanl (+) 0 xs)
         ]
