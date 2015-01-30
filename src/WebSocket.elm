@@ -6,7 +6,7 @@ change to make it more flexible.
 -}
 
 import Native.WebSocket
-import JavaScript.Decoder as JavaScript
+import JavaScript.Decode as JavaScript
 
 
 type alias Config =
