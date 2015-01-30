@@ -168,7 +168,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             "font-variant" : "normal",
             "font-weight"  : "normal",
             "font-size"    : "12px",
-            "font-family"  : "sans-serif"
+            "font-family"  : "sans-serif",
         };
 
         // Convert to HTML and use the style attribute to extract styles
@@ -197,6 +197,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
                 }
             }
+            // Extract the color for use with filled text only
+            if (span.style) textObj.color = span.style['color']
             textArr.push(textObj);
         }
         return textArr;
@@ -217,6 +219,9 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         var x = -totalWidth / 2.0;
         textArr.forEach( function(textObj) {
             ctx.font = textObj.fontString;
+            ctx.fillStyle = textObj.color
+                ? textObj.color
+                : "#000" // black fill if no color set
             canvasDrawFn.call(ctx, textObj.text, x, maxHeight / 2);
             x += textObj.width;
         });
