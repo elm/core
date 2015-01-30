@@ -222,8 +222,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         });
     }
 
-    function fillText(redo, ctx, style, text) {
-        setFillStyle(ctx, style);
+    function fillText(redo, ctx, text) {
         drawText(ctx, text, ctx.fillText);
     }
 
@@ -271,24 +270,19 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
         case 'FPath' : drawLine(ctx, f._0, f._1); break;
         case 'FImage': drawImage(redo, ctx, f); break;
         case 'FShape':
-          switch(f._1.ctor) {
-            case 'Polygon':
-              if (f._0.ctor === 'Line') {
-                  f._1._1.closed = true;
-                  drawLine(ctx, f._0._0, f._1._0);
-              } else {
-                  drawShape(redo, ctx, f._0._0, f._1._0);
-              }
-              break;
-            case 'TextShape':
-              if (f._0.ctor == 'Line') {
-                  strokeText(redo, ctx, f._0._0, f._1._0);
-              } else {
-                  fillText(redo, ctx, f._0._0, f._1._0);
-              }
-              break;
+          if (f._0.ctor === 'Line') {
+            f._1.closed = true;
+            drawLine(ctx, f._0._0, f._1);
+          } else {
+            drawShape(redo, ctx, f._0._0, f._1);
+            break;
           }
-        break;
+        case 'FText':
+          fillText(redo, ctx, f._0);
+          break;
+        case 'FOutlinedText':
+          strokeText(redo, ctx, f._0, f._1);
+          break;
         }
         ctx.restore();
     }

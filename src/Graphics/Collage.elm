@@ -111,6 +111,8 @@ dotted clr = { defaultLine | color <- clr, dashing <- [3,3] }
 type BasicForm
     = FPath LineStyle Path
     | FShape ShapeStyle Shape
+    | FOutlinedText LineStyle Text
+    | FText Text
     | FImage Int Int (Int,Int) String
     | FElement Element
     | FGroup Transform2D (List Form)
@@ -225,21 +227,20 @@ path ps = ps
 segment : (Float,Float) -> (Float,Float) -> Path
 segment p1 p2 = [p1,p2]
 
-type Shape = Polygon (List (Float,Float))
-           | TextShape Text
+type alias Shape = List (Float,Float)
 
 {-| Create an arbitrary polygon by specifying its corners in order.
 `polygon` will automatically close all shapes, so the given list
 of points does not need to start and end with the same position.
 -}
 polygon : List (Float,Float) -> Shape
-polygon points = Polygon points
+polygon points = points
 
 {-| A rectangle with a given width and height. -}
 rect : Float -> Float -> Shape
 rect w h = let hw = w/2
                hh = h/2
-           in  Polygon [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
+           in  [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
 
 {-| A square with a given edge length. -}
 square : Float -> Shape
@@ -253,7 +254,7 @@ oval w h =
       hw = w/2
       hh = h/2
       f i = (hw * cos (t*i), hh * sin (t*i))
-  in  Polygon (List.map f [0..n-1])
+  in  List.map f [0..n-1]
 
 {-| A circle with a given radius. -}
 circle : Float -> Shape
@@ -270,10 +271,14 @@ ngon n r =
   let m = toFloat n
       t = 2 * pi / m
       f i = ( r * cos (t*i), r * sin (t*i) )
-  in  Polygon (List.map f [0..m-1])
+  in  List.map f [0..m-1]
 
-{-| Convert Text into a Shape which can be rendered in the collage.  The text
-may then be filled or outlined in the same way as other shapes 
+{-| Render filled text.  The color is set using the methods in the Text module. -}
+text : Text -> Form
+text t = form(FText t)
+
+{-| Render outlined text. The color is taken from the LineStyle attributes, and any
+color set by the methods in the Text module are ignored.
 -}
-text : Text -> Shape
-text t = TextShape t
+outlinedText : LineStyle -> Text -> Form
+outlinedText ls t = form (FOutlinedText ls t)
