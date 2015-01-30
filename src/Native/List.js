@@ -42,15 +42,6 @@ Elm.Native.List.make = function(localRuntime) {
         return lst
     }
 
-    function map(f, xs) {
-        var arr = [];
-        while (xs.ctor !== '[]') {
-            arr.push(f(xs._0));
-            xs = xs._1;
-        }
-        return fromArray(arr);
-    }
-
     // f defined similarly for both foldl and foldr (NB: different from Haskell)
     // ie, foldl : (a -> b -> b) -> b -> [a] -> b
     function foldl(f, b, xs) {
@@ -80,67 +71,7 @@ Elm.Native.List.make = function(localRuntime) {
         }
         return fromArray(arr);
     }
-
-    function filter(pred, xs) {
-        var arr = [];
-        while (xs.ctor !== '[]') {
-            if (pred(xs._0))
-            {
-                arr.push(xs._0);
-            }
-            xs = xs._1;
-        }
-        return fromArray(arr);
-    }
-
-    function length(xs) {
-        var out = 0;
-        while (xs.ctor !== '[]') {
-            out += 1;
-            xs = xs._1;
-        }
-        return out;
-    }
-
-    function member(x, xs) {
-        while (xs.ctor !== '[]') {
-            if (Utils.eq(x,xs._0))
-            {
-                return true;
-            }
-            xs = xs._1;
-        }
-        return false;
-    }
-
-    function append(xs, ys) {
-        if (xs.ctor === '[]')
-        {
-            return ys;
-        }
-        var root = Cons(xs._0, Nil);
-        var curr = root;
-        xs = xs._1;
-        while (xs.ctor !== '[]') {
-            curr._1 = Cons(xs._0, Nil);
-            xs = xs._1;
-            curr = curr._1;
-        }
-        curr._1 = ys;
-        return root;
-    }
-
-    function all(pred, xs) {
-        while (xs.ctor !== '[]') {
-            if (!pred(xs._0))
-            {
-                return false;
-            }
-            xs = xs._1;
-        }
-        return true;
-    }
-
+    
     function any(pred, xs) {
         while (xs.ctor !== '[]') {
             if (pred(xs._0))
@@ -207,10 +138,6 @@ Elm.Native.List.make = function(localRuntime) {
         return fromArray(arr);
     }
 
-    function sort(xs) {
-        return fromArray(toArray(xs).sort(Utils.cmp));
-    }
-
     function sortBy(f, xs) {
         return fromArray(toArray(xs).sort(function(a,b){
             return Utils.cmp(f(a), f(b));
@@ -263,24 +190,17 @@ Elm.Native.List.make = function(localRuntime) {
         toArray:toArray,
         fromArray:fromArray,
         range:range,
-        append: F2(append),
 
-        map:F2(map),
         foldl:F3(foldl),
         foldr:F3(foldr),
 
         scanl:F3(scanl),
-        filter:F2(filter),
-        length:length,
-        member:F2(member),
 
-        all:F2(all),
         any:F2(any),
         map2:F3(map2),
         map3:F4(map3),
         map4:F5(map4),
         map5:F6(map5),
-        sort:sort,
         sortBy:F2(sortBy),
         sortWith:F2(sortWith),
         take:F2(take),
