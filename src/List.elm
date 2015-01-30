@@ -143,7 +143,13 @@ foldr = Native.List.foldr
     scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
 -}
 scanl : (a -> b -> b) -> b -> List a -> List b
-scanl = Native.List.scanl
+scanl f b xs =
+  let scan1 x accAcc =
+        case accAcc of
+          acc::_ -> (f x acc) :: accAcc
+          [] -> [] -- impossible
+  in
+      foldl scan1 [b] xs |> reverse
 
 {-| Keep only elements that satisfy the predicate.
 

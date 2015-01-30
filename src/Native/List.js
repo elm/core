@@ -61,16 +61,6 @@ Elm.Native.List.make = function(localRuntime) {
         }
         return acc;
     }
-
-    function scanl(f, b, xs) {
-        var arr = toArray(xs);
-        arr.unshift(b);
-        var len = arr.length;
-        for (var i = 1; i < len; ++i) {
-            arr[i] = A2(f, arr[i], arr[i-1]);
-        }
-        return fromArray(arr);
-    }
     
     function any(pred, xs) {
         while (xs.ctor !== '[]') {
@@ -193,8 +183,6 @@ Elm.Native.List.make = function(localRuntime) {
 
         foldl:F3(foldl),
         foldr:F3(foldr),
-
-        scanl:F3(scanl),
 
         any:F2(any),
         map2:F3(map2),
