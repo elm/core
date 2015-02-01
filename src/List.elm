@@ -101,8 +101,8 @@ isEmpty xs =
 
 
 member : a -> List a -> Bool
-member =
-  Native.List.member
+member x xs =
+  any (\a -> a == x) xs
 
 
 {-| Apply a function to every element of a list.
@@ -112,7 +112,8 @@ member =
     map not [True,False,True] == [False,True,False]
 -}
 map : (a -> b) -> List a -> List b
-map = Native.List.map
+map f xs =
+  foldr (\x acc -> (f x) :: acc) [] xs
 
 {-| Same as `map` but the function is also applied to the index of each
 element (starting at zero).
@@ -142,14 +143,26 @@ foldr = Native.List.foldr
     scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
 -}
 scanl : (a -> b -> b) -> b -> List a -> List b
-scanl = Native.List.scanl
+scanl f b xs =
+  let scan1 x accAcc =
+        case accAcc of
+          acc::_ -> (f x acc) :: accAcc
+          [] -> [] -- impossible
+  in
+      foldl scan1 [b] xs |> reverse
 
 {-| Keep only elements that satisfy the predicate.
 
     filter isEven [1..6] == [2,4,6]
 -}
 filter : (a -> Bool) -> List a -> List a
-filter = Native.List.filter
+filter pred xs =
+  let conditionalCons x xs' =
+        if pred x
+        then x :: xs'
+        else xs'
+  in
+      foldr conditionalCons [] xs
 
 {-| Apply a function that may succeed to all values in the list, but only keep
 the successes.
@@ -172,7 +185,8 @@ maybeCons f mx xs =
     length [1,2,3] == 3
 -}
 length : List a -> Int
-length = Native.List.length
+length xs =
+  foldl (\_ i -> i + 1) 0 xs
 
 {-| Reverse a list.
 
@@ -189,7 +203,8 @@ reverse list =
     all isEven [] == True
 -}
 all : (a -> Bool) -> List a -> Bool
-all = Native.List.all
+all pred xs =
+  not (any (not << pred) xs)
 
 {-| Determine if any elements satisfy the predicate.
 
@@ -207,7 +222,10 @@ any = Native.List.any
     append ['a','b'] ['c'] == ['a','b','c']
 -}
 append : List a -> List a -> List a
-append = Native.List.append
+append xs ys =
+  case ys of
+    [] -> xs
+    _ -> foldr (::) ys xs
 
 
 {-| Concatenate a bunch of lists into a single list:
@@ -363,7 +381,8 @@ repeat = Native.List.repeat
     sort [3,1,5] == [1,3,5]
 -}
 sort : List comparable -> List comparable
-sort = Native.List.sort
+sort xs =
+  sortBy identity xs
 
 {-| Sort values by a derived property.
 
