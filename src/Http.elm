@@ -1,4 +1,12 @@
-module Http where
+module Http
+    ( get, post, send
+    , Request
+    , Body, empty, string, blob, multipart
+    , Data, stringData, blobData, fileData
+    , Timeout, never
+    , Progress
+    , Response, Value(..)
+    ) where
 {-|
 
 # Fetching JSON
@@ -8,7 +16,13 @@ module Http where
 @docs empty, string, blob, multipart, stringData, blobData, fileData
 
 # Arbitrariy Requests
-@docs send, Request, Timeout, Progress, Response, Value
+@docs send, Request, Response, Value
+
+# Timeouts
+@docs Timeout, never
+
+# Progress
+@docs Progress
 
 -}
 import Native.Http
@@ -81,9 +95,12 @@ fileData =
 
 -- TIMEOUT
 
-type Timeout
-    = Never
-    | After Int (Promise x a)
+type alias Timeout = Int
+
+
+never : Timeout
+never =
+  0
 
 
 -- PROGRESS
