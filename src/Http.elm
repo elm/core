@@ -136,7 +136,7 @@ type Value
 
 {-| Send a request.
 -}
-send : Request -> Timeout -> Progress -> Maybe String -> Promise Error Response
+send : Request -> Timeout -> Maybe Progress -> Maybe String -> Promise Error Response
 send =
   Native.Http.send
 
@@ -154,13 +154,14 @@ response.
 -}
 get : JavaScript.Decoder a -> String -> Promise Error a
 get decoder url =
-  send Nothing decoder
-    { verb = "GET"
-    , headers = []
-    , url = url
-    , body = empty
-    }
-
+  let request =
+        { verb = "GET"
+        , headers = []
+        , url = url
+        , body = empty
+        }
+  in
+      send request never Nothing Nothing `andThen` decodeResponse decoder
 
 
 {-| Send a POST send to the given url, carrying the given string as the body.
@@ -174,10 +175,26 @@ You also specify how to decode the response.
 
 -}
 post : JavaScript.Decoder a -> String -> Body -> Promise Error a
-post url body =
-  send Nothing decoder
-    { verb = "POST"
-    , headers = []
-    , url = url
-    , body = body
-    }
+post decoder url body =
+  let request =
+        { verb = "POST"
+        , headers = []
+        , url = url
+        , body = body
+        }
+  in
+      send request never Nothing Nothing `andThen` decodeResponse decoder
+
+
+decodeResponse : JavaScript.Decoder a -> Response -> Promise Error a
+decodeResponse decoder response =
+  case 200 <= response.status && response.status < 300 of
+    True ->
+      case response.value of
+        Json json ->
+          case JavaScript.decodeValue decoder json of
+            Ok v -> succeed v
+            Err msg -> fail msg
+
+    False ->
+      fail "something"
