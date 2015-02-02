@@ -171,7 +171,7 @@ You also specify how to decode the response.
 
     hats : Promise Error (List String)
     hats =
-      post (list string) "http://example.com/hat-categories.json" ""
+      post (list string) "http://example.com/hat-categories.json" empty
 
 -}
 post : JavaScript.Decoder a -> String -> Body -> Promise Error a
