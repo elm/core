@@ -15,8 +15,8 @@ Elm.Native.Char.make = function(elm) {
     var chk1 = isBetween('a'.charCodeAt(0),'f'.charCodeAt(0));
     var chk2 = isBetween('A'.charCodeAt(0),'F'.charCodeAt(0));
 
-    return elm.Native.Char.values = {
-        fromCode : function(c) { return String.fromCharCode(c); },
+    return localRuntime.Native.Char.values = {
+        fromCode : function(c) { return Utils.chr(String.fromCharCode(c)); },
         toCode   : function(c) { return c.charCodeAt(0); },
         toUpper  : function(c) { return Utils.chr(c.toUpperCase()); },
         toLower  : function(c) { return Utils.chr(c.toLowerCase()); },
