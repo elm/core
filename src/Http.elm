@@ -1,7 +1,18 @@
 module Http where
+{-|
 
+# Fetching JSON
+@docs get, post
+
+# Body Values
+@docs empty, string, blob, multipart, stringData, blobData, fileData
+
+# Arbitrariy Requests
+@docs send, Request, Timeout, Progress, Response, Value
+
+-}
 import Native.Http
-import JavaScript as JS
+import JavaScript.Decode as JavaScript
 
 
 -- REQUESTS
@@ -98,9 +109,9 @@ type alias Response =
 
 type Value
     = Text String
-    | ArrayBuffer ArrayBuffer
+--    | ArrayBuffer ArrayBuffer
     | Blob Blob
-    | Document Document
+--    | Document Document
     | Json JavaScript.Value
 
 
@@ -124,7 +135,7 @@ response.
       get (list string) "http://example.com/hat-categories.json"
 
 -}
-get : JS.Decoder a -> String -> Promise Error a
+get : JavaScript.Decoder a -> String -> Promise Error a
 get decoder url =
   send Nothing decoder
     { verb = "GET"
@@ -145,7 +156,7 @@ You also specify how to decode the response.
       post (list string) "http://example.com/hat-categories.json" ""
 
 -}
-post : JS.Decoder a -> String -> Body -> Promise Error a
+post : JavaScript.Decoder a -> String -> Body -> Promise Error a
 post url body =
   send Nothing decoder
     { verb = "POST"
