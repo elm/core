@@ -33,6 +33,7 @@ Elm.Native.Regex.make = function(localRuntime) {
         var out = [];
         var number = 0;
         var string = str;
+        var lastIndex = re.lastIndex;
         var result;
         while (number++ < n && (result = re.exec(string))) {
             var i = result.length - 1;
@@ -51,6 +52,7 @@ Elm.Native.Regex.make = function(localRuntime) {
                 number: number
             });
         }
+        re.lastIndex = lastIndex;
         return List.fromArray(out);
     }
 
