@@ -292,9 +292,9 @@ type Message a =
     Message (Mailbox a) a
 
 
-relay : Mailbox general -> (specific -> general) -> Mailbox specific
-relay generalize (Mailbox send) =
-    Mailbox (\x -> send (generalize x))
+relay : Mailbox a -> (b -> a) -> Mailbox b
+relay (Mailbox send) f =
+    Mailbox (\x -> send (f x))
 
 
 message : Mailbox a -> a -> Message
