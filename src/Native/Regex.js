@@ -34,8 +34,10 @@ Elm.Native.Regex.make = function(localRuntime) {
         var number = 0;
         var string = str;
         var lastIndex = re.lastIndex;
+        var prevLastIndex = -1;
         var result;
         while (number++ < n && (result = re.exec(string))) {
+            if (prevLastIndex === re.lastIndex) break;
             var i = result.length - 1;
             var subs = new Array(i);
             while (i > 0) {
@@ -51,6 +53,7 @@ Elm.Native.Regex.make = function(localRuntime) {
                 index: result.index,
                 number: number
             });
+            prevLastIndex = re.lastIndex;
         }
         re.lastIndex = lastIndex;
         return List.fromArray(out);
