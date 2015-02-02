@@ -5,8 +5,8 @@ module Signal
     , (<~), (~)
     , foldp
     , keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
-    , Channel, Message
-    , channel, send, subscribe
+    , Mailbox, Message
+    , input, relay, message, send
     , constant
     ) where
 
@@ -281,15 +281,27 @@ infixl 4 ~
 
 ---- INPUTS ----
 
-type Input a =
-    Input (a -> Promise x ())
+input : a -> { signal : Signal a, mailbox : Mailbox a }
 
 
-specialize : (specific -> general) -> Input general -> Input specific
-specialize generalize (Input send) =
-    Input (\x -> send (generalize x))
+type Mailbox a =
+    Mailbox (a -> Promise x ())
 
 
-send : Input a -> a -> Promise x ()
-send (Input actuallySend) value =
+type Message a =
+    Message (Mailbox a) a
+
+
+relay : Mailbox general -> (specific -> general) -> Mailbox specific
+relay generalize (Mailbox send) =
+    Mailbox (\x -> send (generalize x))
+
+
+message : Mailbox a -> a -> Message
+message =
+    Message
+
+
+send : Mailbox a -> a -> Promise x ()
+send (Mailbox actuallySend) value =
     actuallySend value
