@@ -17,6 +17,10 @@ tests =
           , test "toCode 'z'" <| assertEqual 122 <| Char.toCode 'z'
           , test "toCode 'A'" <| assertEqual 65 <| Char.toCode 'A'
           , test "toCode 'Z'" <| assertEqual 90 <| Char.toCode 'Z'
+          , test "fromCode 'a'" <| assertEqual 'a' <| Char.fromCode 97
+          , test "fromCode 'z'" <| assertEqual 'z' <| Char.fromCode 122
+          , test "fromCode 'A'" <| assertEqual 'A' <| Char.fromCode 65
+          , test "fromCode 'Z'" <| assertEqual 'Z' <| Char.fromCode 90
           , test "isLower 'a'" <| assert <| Char.isLower 'a'
           , test "isLower 'A'" <| assert <| not (Char.isLower 'A')
           , test "isLower '0'" <| assert <| not (Char.isLower '0')
