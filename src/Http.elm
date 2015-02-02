@@ -34,6 +34,9 @@ string =
   Str
 
 
+-- arrayBuffer : ArrayBuffer -> Body
+
+
 blob : Blob -> Body
 blob =
   Blob
@@ -84,15 +87,28 @@ type alias Progress =
 
 -- RESPONSE HANDLER
 
-type ResponseHandler a =
-    Handler ResponseType (headers -> J
+type alias Response =
+    { status : Int
+    , statusText : String
+    , headers : Dict String String
+    , url : String
+    , value : Value
+    }
+
+
+type Value
+    = Text String
+    | ArrayBuffer ArrayBuffer
+    | Blob Blob
+    | Document Document
+    | Json JavaScript.Value
 
 
 -- ACTUALLY SEND REQUESTS
 
 {-| Send a request.
 -}
-send : Request -> Timeout -> Progress -> ResponseHandler a -> Promise Error a
+send : Request -> Timeout -> Progress -> Maybe String -> Promise Error Response
 send =
   Native.Http.send
 
