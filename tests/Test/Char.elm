@@ -1,45 +1,94 @@
 module Test.Char (tests) where
 
 import Basics (..)
-import Char
+import Char (..)
+import List
 
 import ElmTest.Assertion (..)
 import ElmTest.Test (..)
 
+
+lower = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ]
+upper = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ]
+dec = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ]
+oct = List.take 8 dec
+hexLower = List.take 6 lower
+hexUpper = List.take 6 upper
+hex = List.append hexLower hexUpper |> List.append dec
+
+lowerCodes = [97..(97 + List.length lower - 1)]
+upperCodes = [65..(65 + List.length upper - 1)]
+decCodes = [48..(48 + List.length dec - 1)]
+
+oneOf : List a -> a -> Bool
+oneOf = flip List.member
+
+  
 tests : Test
-tests = 
-    suite "Char" 
-          [ test "toUpper" <| assertEqual 'C' <| Char.toUpper 'c'
-          , test "toLower" <| assertEqual 'c' <| Char.toLower 'C'
-          , test "toLocaleUpper" <| assertEqual 'C' <| Char.toLocaleUpper 'c'
-          , test "toLocaleLower" <| assertEqual 'c' <| Char.toLocaleLower 'C'
-          , test "toCode 'a'" <| assertEqual 97 <| Char.toCode 'a'
-          , test "toCode 'z'" <| assertEqual 122 <| Char.toCode 'z'
-          , test "toCode 'A'" <| assertEqual 65 <| Char.toCode 'A'
-          , test "toCode 'Z'" <| assertEqual 90 <| Char.toCode 'Z'
-          , test "fromCode 'a'" <| assertEqual 'a' <| Char.fromCode 97
-          , test "fromCode 'z'" <| assertEqual 'z' <| Char.fromCode 122
-          , test "fromCode 'A'" <| assertEqual 'A' <| Char.fromCode 65
-          , test "fromCode 'Z'" <| assertEqual 'Z' <| Char.fromCode 90
-          , test "isLower 'a'" <| assert <| Char.isLower 'a'
-          , test "isLower 'A'" <| assert <| not (Char.isLower 'A')
-          , test "isLower '0'" <| assert <| not (Char.isLower '0')
-          , test "isUpper 'A'" <| assert <| Char.isUpper 'A'
-          , test "isUpper 'a'" <| assert <| not (Char.isUpper 'a')
-          , test "isUpper '0'" <| assert <| not (Char.isUpper '0')
-          , test "isDigit '0'" <| assert <| Char.isDigit '0'
-          , test "isDigit 'a'" <| assert <| not (Char.isDigit 'a')
-          , test "isDigit 'A'" <| assert <| not (Char.isDigit 'A')
-          , test "isOctDigit '0'" <| assert <| Char.isOctDigit '0'
-          , test "isOctDigit '7'" <| assert <| Char.isOctDigit '7'
-          , test "isOctDigit '8'" <| assert <| not (Char.isOctDigit '8')
-          , test "isOctDigit 'a'" <| assert <| not (Char.isOctDigit 'a')
-          , test "isHexDigit '0'" <| assert <| Char.isHexDigit '0'
-          , test "isHexDigit '9'" <| assert <| Char.isHexDigit '9'
-          , test "isHexDigit 'a'" <| assert <| Char.isHexDigit 'a'
-          , test "isHexDigit 'A'" <| assert <| Char.isHexDigit 'A'
-          , test "isHexDigit 'f'" <| assert <| Char.isHexDigit 'f'
-          , test "isHexDigit 'F'" <| assert <| Char.isHexDigit 'F'
-          , test "isHexDigit 'g'" <| assert <| not (Char.isHexDigit 'g')
-          , test "isHexDigit 'G'" <| assert <| not (Char.isHexDigit 'G')
-          ]
+tests = suite "Char"
+  [ suite "toCode"
+      [ test "a-z" <| assertEqual (lowerCodes) (List.map toCode lower)
+      , test "A-Z" <| assertEqual (upperCodes) (List.map toCode upper)
+      , test "0-9" <| assertEqual (decCodes) (List.map toCode dec)
+      ]
+    
+  , suite "fromCode"
+      [ test "a-z" <| assertEqual (lower) (List.map fromCode lowerCodes)
+      , test "A-Z" <| assertEqual (upper) (List.map fromCode upperCodes)
+      , test "0-9" <| assertEqual (dec) (List.map fromCode decCodes)
+      ]
+      
+  , suite "toLocaleLower"
+      [ test "a-z" <| assertEqual (lower) (List.map toLocaleLower lower)
+      , test "A-Z" <| assertEqual (lower) (List.map toLocaleLower upper)
+      , test "0-9" <| assertEqual (dec) (List.map toLocaleLower dec)
+      ]
+      
+  , suite "toLocaleUpper"
+      [ test "a-z" <| assertEqual (upper) (List.map toLocaleUpper lower)
+      , test "A-Z" <| assertEqual (upper) (List.map toLocaleUpper upper)
+      , test "0-9" <| assertEqual (dec) (List.map toLocaleUpper dec)
+      ]
+      
+  , suite "toLower"
+      [ test "a-z" <| assertEqual (lower) (List.map toLower lower)
+      , test "A-Z" <| assertEqual (lower) (List.map toLower upper)
+      , test "0-9" <| assertEqual (dec) (List.map toLower dec)
+      ]
+      
+  , suite "toUpper"
+      [ test "a-z" <| assertEqual (upper) (List.map toUpper lower)
+      , test "A-Z" <| assertEqual (upper) (List.map toUpper upper)
+      , test "0-9" <| assertEqual (dec) (List.map toUpper dec)
+      ]
+    
+  , suite "isLower"
+      [ test "a-z" <| assertEqual (True) (List.all isLower lower)
+      , test "A-Z" <| assertEqual (False) (List.all isLower upper)
+      , test "0-9" <| assertEqual (False) (List.all isLower dec)
+      ]
+    
+  , suite "isUpper"
+      [ test "a-z" <| assertEqual (False) (List.all isUpper lower)
+      , test "A-Z" <| assertEqual (True) (List.all isUpper upper)
+      , test "0-9" <| assertEqual (False) (List.all isUpper dec)
+      ]
+    
+  , suite "isDigit"
+      [ test "a-z" <| assertEqual (False) (List.any isDigit lower)
+      , test "A-Z" <| assertEqual (False) (List.any isDigit upper)
+      , test "0-9" <| assertEqual (True) (List.all isDigit dec)
+      ]
+      
+  , suite "isHexDigit"
+      [ test "a-z" <| assertEqual (List.map (oneOf hex) lower) (List.map isHexDigit lower)
+      , test "A-Z" <| assertEqual (List.map (oneOf hex) upper) (List.map isHexDigit upper)
+      , test "0-9" <| assertEqual (True) (List.all isHexDigit dec)
+      ]
+      
+  , suite "isOctDigit"
+      [ test "a-z" <| assertEqual (False) (List.all isOctDigit lower)
+      , test "A-Z" <| assertEqual (False) (List.all isOctDigit upper)
+      , test "0-9" <| assertEqual (List.map (oneOf oct) dec) (List.map isOctDigit dec)
+      ]
+  ]
