@@ -31,12 +31,8 @@ the [`Time`](Time) library.
 # Filters
 @docs keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
 
-# Channels
-@docs channel, send, subscribe
-
-# Constants
-@docs constant
-
+# Custom Signals
+@docs input, redirect, send, constant
 -}
 
 import Native.Signal
