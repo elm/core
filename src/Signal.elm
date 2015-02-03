@@ -5,8 +5,7 @@ module Signal
     , (<~), (~)
     , foldp
     , keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
-    , Mailbox, Message
-    , input, relay, message, send
+    , Mailbox, input, redirect, send
     , constant
     ) where
 
@@ -285,21 +284,12 @@ input : a -> { signal : Signal a, mailbox : Mailbox a }
 
 
 type Mailbox a =
-    Mailbox (a -> Promise x ())
+    Mailbox (a -> Promise () ())
 
 
-type Message a =
-    Message (Mailbox a) a
-
-
-relay : Mailbox a -> (b -> a) -> Mailbox b
-relay (Mailbox send) f =
+redirect : (b -> a) -> Mailbox a -> Mailbox b
+redirect f (Mailbox send) =
     Mailbox (\x -> send (f x))
-
-
-message : Mailbox a -> a -> Message
-message =
-    Message
 
 
 send : Mailbox a -> a -> Promise x ()
