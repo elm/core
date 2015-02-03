@@ -93,24 +93,34 @@ fileData =
   FileData
 
 
--- TIMEOUT
+-- SETTINGS
 
-type alias Timeout = Int
+type alias Settings =
+    { timeout : Int
+    , onStart : Maybe (Promise x a)
+    , onProgress : Maybe (Progress -> Promise x a)
+    , desiredResponseType : Maybe String
+    }
 
 
-never : Timeout
-never =
-  0
+never : Int
+never = 0
 
-
--- PROGRESS
 
 type alias Progress =
     { lengthComputable : Int
     , loaded : Int
     , total : Int
     }
-    -> Promise x a
+
+
+defaultSettings : Settings
+defaultSettings =
+    { timeout = never
+    , onStart = Nothing
+    , onProgress = Nothing
+    , desiredResponseType = Nothing
+    }
 
 
 -- RESPONSE HANDLER
@@ -136,7 +146,7 @@ type Value
 
 {-| Send a request.
 -}
-send : Request -> Timeout -> Maybe Progress -> Maybe String -> Promise Error Response
+send : Settings -> Request -> Promise Error Response
 send =
   Native.Http.send
 
@@ -161,7 +171,7 @@ get decoder url =
         , body = empty
         }
   in
-      send request never Nothing Nothing `andThen` decodeResponse decoder
+      send defaultSettings request `andThen` decodeResponse decoder
 
 
 {-| Send a POST send to the given url, carrying the given string as the body.
@@ -183,7 +193,7 @@ post decoder url body =
         , body = body
         }
   in
-      send request never Nothing Nothing `andThen` decodeResponse decoder
+      send defaultSettings request `andThen` decodeResponse decoder
 
 
 decodeResponse : JavaScript.Decoder a -> Response -> Promise Error a
