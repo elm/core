@@ -35,8 +35,6 @@ type alias Request =
     }
 
 
--- BODY
-
 type Body
     = Empty
     | Str String
@@ -140,7 +138,18 @@ type Value
 
 -- ACTUALLY SEND REQUESTS
 
-{-| Send a request.
+{-| Send a request exactly how you want it. The `Settings` argument lets you
+configure things like timeouts and progress monitoring. The `Request` argument
+defines all the information that will actually be sent along to a server.
+
+    crossOriginGet : String -> String -> Promise Error Response
+    crossOriginGet origin url =
+      send defaultSettings
+        { verb = "GET"
+        , headers = [("Origin", origin)]
+        , url = url
+        , body = empty
+        }
 -}
 send : Settings -> Request -> Promise Error Response
 send =
