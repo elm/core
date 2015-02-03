@@ -3,8 +3,7 @@ module Http
     , Request
     , Body, empty, string, blob, multipart
     , Data, stringData, blobData, fileData
-    , Timeout, never
-    , Progress
+    , Settings, never, Progress
     , Response, Value(..)
     ) where
 {-|
@@ -18,11 +17,8 @@ module Http
 # Arbitrariy Requests
 @docs send, Request, Response, Value
 
-# Timeouts
-@docs Timeout, never
-
-# Progress
-@docs Progress
+# Settings
+@docs Settings, defaultSettigs, Progress
 
 -}
 import Native.Http
