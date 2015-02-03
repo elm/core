@@ -114,3 +114,11 @@ mapError f promise =
   promise `catch` \x -> fail (f x)
 
 
+-- THREADS
+
+spawn : Promise x a -> Promise y ID
+
+kill : ID -> Promise x ()
+
+sleep : Time -> Promise x ()
+
