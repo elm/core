@@ -3,52 +3,169 @@ Elm.Native.Promise.make = function(localRuntime) {
 
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Promise = localRuntime.Native.Promise || {};
-    if (localRuntime.Native.Promise.values) {
+    if (localRuntime.Native.Promise.values)
+    {
         return localRuntime.Native.Promise.values;
     }
 
-    var DEPTH_LIMIT = 0;
+    var DEPTH_LIMIT = 100;
 
-    function succeed(value) {
-        return function(depth, callback) {
-            return callback(depth + 1, 'Ok', value);
-        }
-    }
-
-    function fail(error) {
-        return function(depth, callback) {
-            return callback(depth + 1, 'Err', error);
-        }
-    }
-
-    function chain(desiredTag) {
-        return function(promise, userCallback) {
-            return function(depth, callback) {
-
-                function newCallback(newDepth, tag, value) {
-                    if (newDepth > DEPTH_LIMIT) {
-                        return setTimeout(function() {
-                            newCallback(0, tag, value);
-                        }, 0);
-                    }
-                    if (tag === desiredTag) {
-                        return userCallback(value)(newDepth + 1, callback);
-                    }
-                    return callback(newDepth + 1, tag, value);
-                }
-
-                return promise(depth + 1, newCallback);
-            };
+    function succeed(value)
+    {
+        return {
+            tag: 'Succeed',
+            value: value
         };
     }
 
-    var andThen = chain('Ok');
-    var catch_ = chain('Err');
+    function fail(error)
+    {
+        return {
+            tag: 'Fail',
+            value: error
+        };
+    }
+
+    function asyncFunction(func)
+    {
+        return {
+            tag: 'Async',
+            asyncFunction: func
+        };
+    }
+
+    function andThen(promise, callback)
+    {
+        return {
+            tag: 'AndThen',
+            promise: promise,
+            callback: callback
+        };
+    }
+
+    function catch_(promise, callback)
+    {
+        return {
+            tag: 'Catch',
+            promise: promise,
+            callback: callback
+        };
+    }
+
+
+    // RUNNER
+
+    function run(initialValue, promiseSignal)
+    {
+        var resultSignal = Signal.input(initialValue);
+        var workQueue = [];
+
+        function register(promise) {
+            var root = { promise: promise };
+            workQueue.push(root);
+            startPromise(resultSignal, workQueue, root);
+        }
+
+        A2(Signal.map, register, promiseSignal);
+
+        return resultSignal;
+    }
+
+    function updateWorkQueue(resultSignal, workQueue)
+    {
+        while (workQueue.length > 0 && workQueue[0].result)
+        {
+            localRuntime.notify(resultSignal.id, workQueue[0].result);
+            workQueue.shift();
+        }
+    }
+
+    function mark(status, promise)
+    {
+        return { status: status, promise: promise };
+    }
+
+    function startPromise(resultSignal, workQueue, root)
+    {
+        var result = runnable(root.promise);
+        while (result.status === 'runnable')
+        {
+            result = stepPromise(resultSignal, workQueue, root, result.promise);
+        }
+
+        if (result.status === 'done')
+        {
+            var promise = result.promise;
+            var tag = promise.tag;
+            root.result = tag === 'Succeed'
+                ? Result.Ok(promise.value)
+                : Result.Err(promise.value);
+            updateWorkQueue(resultSignal, workQueue);
+        }
+
+        if (result.status === 'blocked')
+        {
+            root.promise = result.promise;
+        }
+    }
+
+    function stepPromise(resultSignal, workQueue, root, promise)
+    {
+        var tag = promise.tag;
+
+        if (tag === 'Succeed' || tag === 'Fail')
+        {
+            return mark('done', promise);
+        }
+
+        if (tag === 'Async')
+        {
+            var placeHolder = {};
+            promise.asyncFunction(function(success, value) {
+                placeHolder.tag = success ? 'Succeed' : 'Fail';
+                placeHolder.value = value;
+                startPromise(resultSignal, workQueue, root);
+            });
+            return mark('blocked', placeHolder);
+        }
+
+        if (tag === 'AndThen' || tag === 'Catch')
+        {
+            var result = mark('runnable', promise.promise);
+            while (result.status === 'runnable')
+            {
+                result = stepPromise(resultSignal, workQueue, root, result.promise);
+            }
+
+            if (result.status === 'done')
+            {
+                var activePromise = result.promise;
+                var activeTag = activePromise.tag;
+
+                var succeedChain = activeTag === 'Succeed' && tag === 'AndThen';
+                var failChain = activeTag === 'Fail' && tag === 'Catch';
+
+                return (succeedChain || failChain)
+                    ? mark('runnable', promise.callback(activePromise.value));
+                    : mark('runnable', activePromise);
+            }
+            if (result.status === 'blocked')
+            {
+                return mark('blocked', {
+                    tag: tag,
+                    promise: result.promise,
+                    callback: promise.callback
+                });
+            }
+        }
+    }
 
     return localRuntime.Native.Promise.values = {
         succeed: succeed,
         fail: fail,
-        andThen: andThen,
-        catch_: catch_
+        asyncFunction: asyncFunction,
+        andThen: F2(andThen),
+        catch_: F2(catch_),
+        run: F2(run)
     };
 };
