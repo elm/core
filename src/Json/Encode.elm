@@ -6,7 +6,7 @@ module Json.Encode where
 # Encoding
 @docs encode
 
-# Primatives
+# Primitives
 @docs string, int, float, bool, null
 
 # Arrays
