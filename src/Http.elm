@@ -36,17 +36,17 @@ type alias Request a =
     , headers : List (String,String)
     }
 
-{-| Create a customized request. Arguments are request type (get, post, put,
-delete, etc.), target url, data, and a list of additional headers.
+{-| Create a customized request. Arguments are request type (GET, POST, PUT,
+DELETE, etc.), target URL, data, and a list of additional headers.
 -}
 request : String -> String -> String -> List (String,String) -> Request String
 request = Request
 
-{-| Create a GET request to the given url. -}
+{-| Create a GET request to the given URL. -}
 get : String -> Request String
 get url = Request "GET" url "" []
 
-{-| Create a POST request to the given url, carrying the given data. -}
+{-| Create a POST request to the given URL, carrying the given data. -}
 post : String -> String -> Request String
 post url body = Request "POST" url body []
 
@@ -56,7 +56,7 @@ that carries the responses.
 send : Signal (Request a) -> Signal (Response String)
 send = Native.Http.send
 
-{-| Performs an HTTP GET request with the given urls. Produces a signal
+{-| Performs an HTTP GET request with the given URLs. Produces a signal
 that carries the responses.
 -}
 sendGet : Signal String -> Signal (Response String)
