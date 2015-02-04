@@ -18,6 +18,11 @@ module Promise where
 import Native.Promise
 
 
+run : Signal (Promise x a) -> Signal (Result x a)
+run =
+  Native.Promise.run
+
+
 -- BASICS
 
 succeed : a -> Promise x a
@@ -89,9 +94,7 @@ sequence promises =
         map2 (::) promise (sequence remainingPromises)
 
 
-interleave : List (Promise x a) -> Promise x (List a)
-interleave =
-  Native.Promise.interleave
+-- interleave : List (Promise x a) -> Promise x (List a)
 
 
 
@@ -106,7 +109,7 @@ andThen =
 
 catch : Promise x a -> (x -> Promise x a) -> Promise x a
 catch =
-  Native.Promise.catch
+  Native.Promise.catch_
 
 
 mapError : (x -> y) -> Promise x a -> Promise y a
