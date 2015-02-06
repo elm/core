@@ -103,12 +103,15 @@ Elm.Native.Utils.make = function(localRuntime) {
         return x;
     }
 
+    // TODO: move to text module
     function txt(str) {
         var t = new String(str);
         t.text = true;
         return t;
     }
 
+    // TODO: move to text mode
+    // TODO: rename to textToHtmlString
     function makeText(text) {
         var style = '';
         var href = '';
@@ -219,6 +222,7 @@ Elm.Native.Utils.make = function(localRuntime) {
         };
     }
 
+    // TODO: implement without reliance on text module
     function append(xs,ys) {
         // append Text
         if (xs.text || ys.text) {

@@ -159,6 +159,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
     // Convert the object returned by the text module
     // into something we can use for styling canvas text
+    // TODO: use new Text representation
     function parseTextModuleOutput(text) {
         // the array is necessary to guarantee property order
         var props = ['font-style', 'font-variant', 'font-weight',
