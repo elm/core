@@ -20,10 +20,40 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     var Color = Elm.Native.Color.make(localRuntime);
     var List = Elm.Native.List.make(localRuntime);
     var Transform = Elm.Transform2D.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     var Element = Elm.Graphics.Element.make(localRuntime);
     var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 
+    function setStrokeStyle(ctx, style) {
+        ctx.lineWidth = style.width;
+
+        var cap = style.cap.ctor;
+        ctx.lineCap = cap === 'Flat'
+            ? 'butt'
+            : cap === 'Round'
+                ? 'round'
+                : 'square';
+
+        var join = style.join.ctor;
+        ctx.lineJoin = join === 'Smooth'
+            ? 'round'
+            : join === 'Sharp'
+                ? 'miter'
+                : 'bevel';
+
+        ctx.miterLimit = style.join._0 || 10;
+        ctx.strokeStyle = Color.toCss(style.color);
+    }
+
+    function setFillStyle(ctx, style) {
+        var sty = style.ctor;
+        ctx.fillStyle = sty === 'Solid'
+            ? Color.toCss(style._0)
+            : sty === 'Texture'
+                ? texture(redo, ctx, style._0)
+                : gradient(ctx, style._0);
+    }
 
     function trace(ctx, path) {
         var points = List.toArray(path);
@@ -89,25 +119,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
     }
 
     function drawLine(ctx, style, path) {
-        ctx.lineWidth = style.width;
-
-        var cap = style.cap.ctor;
-        ctx.lineCap = cap === 'Flat'
-            ? 'butt'
-            : cap === 'Round'
-                ? 'round'
-                : 'square';
-
-        var join = style.join.ctor;
-        ctx.lineJoin = join === 'Smooth'
-            ? 'round'
-            : join === 'Sharp'
-                ? 'miter'
-                : 'bevel';
-
-        ctx.miterLimit = style.join._0 || 10;
-        ctx.strokeStyle = Color.toCss(style.color);
-
+        setStrokeStyle(ctx, style);
         return line(ctx, style, path);
     }
 
@@ -140,15 +152,94 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
     function drawShape(redo, ctx, style, path) {
         trace(ctx, path);
-        var sty = style.ctor;
-        ctx.fillStyle = sty === 'Solid'
-            ? Color.toCss(style._0)
-            : sty === 'Texture'
-                ? texture(redo, ctx, style._0)
-                : gradient(ctx, style._0);
-
+        setFillStyle(ctx, style);
         ctx.scale(1,-1);
         ctx.fill();
+    }
+
+    // Convert the object returned by the text module
+    // into something we can use for styling canvas text
+    function parseTextModuleOutput(text) {
+        // the array is necessary to guarantee property order
+        var props = ['font-style', 'font-variant', 'font-weight',
+                     'font-size', 'font-family'];
+        var defaults = {
+            "font-style"   : "normal",
+            "font-variant" : "normal",
+            "font-weight"  : "normal",
+            "font-size"    : "12px",
+            "font-family"  : "sans-serif",
+        };
+
+        // Convert to HTML and use the style attribute to extract styles
+        var node = document.createElement('div');
+        node.innerHTML = Utils.makeText(text);
+        var textArr = [];
+        for (var n=0; n<node.childNodes.length; n++) {
+            var span = node.childNodes[n];
+            var textObj = {
+                text: span.textContent,
+                fontString: ''
+            };
+            for (var i=0; i<props.length; i++) {
+                var p = props[i];
+                var value = span.style && span.style.hasOwnProperty(p)
+                                       && span.style[p].length > 0
+                            ? span.style[p]
+                            : defaults[p];
+                textObj.fontString += " " + value;
+                if (p == 'font-size') {
+                    // Record the text height for later use
+                    if (/[0-9]+px/i.test(value))
+                        textObj.height = parseInt(value.substring(0, value.length - 2));
+                    else
+                        textObj.height = 0;
+
+                }
+            }
+            // Extract the color for use with filled text only
+            if (span.style) textObj.color = span.style['color']
+            textArr.push(textObj);
+        }
+        return textArr;
+    }
+
+    function drawText(ctx, text, canvasDrawFn) {
+        ctx.scale(1,-1);
+        var textArr = parseTextModuleOutput(text);
+        var totalWidth = 0;
+        var maxHeight = 0;
+        textArr.forEach( function(textObj) {
+            ctx.font = textObj.fontString;
+            var metrics = ctx.measureText(textObj.text);
+            textObj.width = metrics.width;
+            totalWidth += textObj.width;
+            maxHeight = Math.max(maxHeight, textObj.height);
+        });
+        var x = -totalWidth / 2.0;
+        textArr.forEach( function(textObj) {
+            ctx.font = textObj.fontString;
+            ctx.fillStyle = textObj.color
+                ? textObj.color
+                : "#000" // black fill if no color set
+            canvasDrawFn.call(ctx, textObj.text, x, maxHeight / 2);
+            x += textObj.width;
+        });
+    }
+
+    function fillText(redo, ctx, text) {
+        drawText(ctx, text, ctx.fillText);
+    }
+
+    function strokeText(redo, ctx, style, text) {
+        setStrokeStyle(ctx, style);
+        // Use native canvas API for dashes only for text for now
+        // Degrades to non-dashed on IE 9 + 10
+        if (style.dashing.ctor !== '[]' && ctx.setLineDash) {
+            var pattern = List.toArray(style.dashing);
+            ctx.setLineDash(pattern);
+        }
+        drawText(ctx, text, ctx.strokeText);
     }
 
     function drawImage(redo, ctx, form) {
@@ -189,8 +280,14 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
             drawLine(ctx, f._0._0, f._1);
           } else {
             drawShape(redo, ctx, f._0._0, f._1);
+            break;
           }
-        break;
+        case 'FText':
+          fillText(redo, ctx, f._0);
+          break;
+        case 'FOutlinedText':
+          strokeText(redo, ctx, f._0, f._1);
+          break;
         }
         ctx.restore();
     }
