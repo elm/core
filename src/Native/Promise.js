@@ -121,12 +121,23 @@ Elm.Native.Promise.make = function(localRuntime) {
         if (tag === 'Async')
         {
             var placeHolder = {};
-            promise.asyncFunction(function(success, value) {
-                placeHolder.tag = success ? 'Succeed' : 'Fail';
-                placeHolder.value = value;
-                startPromise(resultSignal, workQueue, root);
+            var couldBeSync = true;
+            var wasSync = false;
+
+            promise.asyncFunction(function(result) {
+                placeHolder.tag = result.tag;
+                placeHolder.value = result.value;
+                if (couldBeSync)
+                {
+                    wasSync = true;
+                }
+                else
+                {
+                    startPromise(resultSignal, workQueue, root);
+                }
             });
-            return mark('blocked', placeHolder);
+            couldBeSync = false;
+            return mark(wasSync ? 'done' : 'blocked', placeHolder);
         }
 
         if (tag === 'AndThen' || tag === 'Catch')
