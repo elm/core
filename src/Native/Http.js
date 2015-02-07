@@ -9,33 +9,68 @@ Elm.Native.Http.make = function(localRuntime) {
     }
 
     var List = Elm.List.make(localRuntime);
+    var Promise = Elm.Native.Promise.make(localRuntime);
 
-    function send(verb, headers, url, mime, body, decoder) {
-        return function(callback) {
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = function() {
-                if (request.readyState === 4)
+
+    function send(settings, request) {
+        return Promise.asyncFunction(function(callback) {
+            var req = new XMLHttpRequest();
+
+            // monitor progress
+            req.onreadystatechange = function() {
+                if (req.readyState === 4)
                 {
-                    if (request.status >= 200 && request.status < 300)
+                    if (req.status >= 200 && req.status < 300)
                     {
-                        var headers = request.getAllResponseHeaders();
-                        return callback('Ok', request.response);
+                        var headers = req.getAllResponseHeaders();
+                        return callback(Promise.succeed(req.response));
                     }
-                    return callback('Err', throw new Error('throw real error'));
+                    return callback(Promise.fail(throw 'figure out error type'));
                 }
             }
-            request.open(verb, url, true);
-            function setHeader(pair) {
-                request.setRequestHeader(pair._0, pair._1);
-            }
-            A2(List.map, setHeader, headers);
-            if (mime.ctor === 'Just')
+
+            if (settings.onStart.ctor === 'Just')
             {
-                request.overrideMimeType(mime._0);
+                req.addEventListener('loadStart', function() {
+                    Promise.runPromise(settings.onStart._0);
+                });
             }
-            request.send(body.ctor === 'Just' ? body._0 : undefined);
-        };
+
+            if (settings.onProgress.ctor === 'Just')
+            {
+                req.addEventListener('progress', function(event) {
+                    var progress = {
+                        _: {},
+                        lengthComputable: event.lengthComputable,
+                        loaded: event.loaded,
+                        total: event.total
+                    };
+                    var promise = settings.onProgress._0(progress);
+                    Promise.runPromise(promise);
+                });
+            }
+
+            req.open(request.verb, request.url, true);
+
+            // set all the headers
+            function(pair) {
+                req.setRequestHeader(pair._0, pair._1);
+            }
+            A2(List.map, setHeader, request.headers);
+
+            // set the timeout
+            req.timeout = settings.timeout;
+
+            // ask for a specific MIME type for the response
+            if (settings.desiredResponseType.ctor === 'Just')
+            {
+                req.overrideMimeType(settings.desiredResponseType._0);
+            }
+
+            req.send(request.body);
+        });
     }
+
 
     function multipart(dataList) {
         var formData = new FormData();
@@ -56,6 +91,7 @@ Elm.Native.Http.make = function(localRuntime) {
 
         return formData;
     }
+
 
     return localRuntime.Native.Http.values = {
         send: F6(send),
