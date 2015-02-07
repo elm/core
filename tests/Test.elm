@@ -24,6 +24,7 @@ import Test.Set as Set
 import Test.String as String
 import Test.Regex as Regex
 import Test.Trampoline as Trampoline
+import Test.Text as Text
 
 tests : Test
 tests =
@@ -41,6 +42,7 @@ tests =
     , String.tests
     , Regex.tests
     , Trampoline.tests
+    , Text.tests
     ]
 
 console : IO ()
