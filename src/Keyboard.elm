@@ -24,7 +24,7 @@ otherwise.
 
 -}
 
-import Signal (Signal)
+import Signal exposing (Signal)
 import Native.Keyboard
 
 {-| Type alias to make it clearer what integers are supposed to represent

@@ -13,7 +13,7 @@ module Mouse
 
 -}
 
-import Signal (Signal)
+import Signal exposing (Signal)
 import Native.Mouse
 
 {-| The current mouse position. -}

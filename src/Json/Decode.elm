@@ -25,13 +25,12 @@ module Json.Decode where
 
 
 import Native.Json
-import Array (Array)
-import Dict
-import Dict (Dict)
+import Array exposing (Array)
+import Dict exposing (Dict)
 import Json.Encode as JsonEncode
 import List
-import Maybe (Maybe)
-import Result (Result)
+import Maybe exposing (Maybe)
+import Result exposing (Result)
 
 
 type Decoder a = Decoder

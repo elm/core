@@ -17,8 +17,7 @@ library if you have very strict latency requirements.
 @docs Response
 -}
 
-import Signal (Signal)
-import Signal
+import Signal exposing (Signal)
 import Native.Http
 
 {-| The datatype for responses. Success contains only the returned message.

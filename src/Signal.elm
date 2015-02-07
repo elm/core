@@ -42,7 +42,7 @@ the [`Time`](Time) library.
 
 import Native.Signal
 import List
-import Basics (fst, snd, not)
+import Basics exposing (fst, snd, not)
 import Debug
 
 

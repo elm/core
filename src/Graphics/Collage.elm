@@ -35,14 +35,14 @@ it as a single unit.
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import List
-import Transform2D (Transform2D)
+import Transform2D exposing (Transform2D)
 import Transform2D as T
 import Native.Graphics.Collage
-import Graphics.Element (Element)
-import Color (Color, black, Gradient)
-import Text (Text)
+import Graphics.Element exposing (Element)
+import Color exposing (Color, black, Gradient)
+import Text exposing (Text)
 
 
 type alias Form =

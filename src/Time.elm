@@ -19,9 +19,9 @@ module Time
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import Native.Time
-import Signal (Signal, map, merge, foldp)
+import Signal exposing (Signal, map, merge, foldp)
 
 {-| Type alias to make it clearer when you are working with time values.
 Using the `Time` constants instead of raw numbers is very highly recommended.

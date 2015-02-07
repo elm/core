@@ -13,7 +13,7 @@ module Debug
 @docs watch, watchSummary, trace
 -}
 
-import Graphics.Collage (Form)
+import Graphics.Collage exposing (Form)
 import Native.Debug
 
 

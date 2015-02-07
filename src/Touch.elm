@@ -13,9 +13,9 @@ include gestures that would be useful for both games and web-pages.
 @docs taps
 -}
 
-import Signal (Signal)
+import Signal exposing (Signal)
 import Native.Touch
-import Time (Time)
+import Time exposing (Time)
 
 {-| Every `Touch` has `xy` coordinates. It also has an identifier
 `id` to distinguish one touch from another.

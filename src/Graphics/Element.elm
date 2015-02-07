@@ -37,11 +37,11 @@ If you need more precision, you can create custom positions.
       midRightAt, topLeftAt, topRightAt, bottomLeftAt, bottomRightAt
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import Native.Graphics.Element
 import List as List
-import Color (..)
-import Maybe ( Maybe(..), withDefault )
+import Color exposing (..)
+import Maybe exposing ( Maybe(..), withDefault )
 
 type alias Properties = {
   id      : Int,

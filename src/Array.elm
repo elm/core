@@ -28,8 +28,8 @@ reads, updates, and appends.
 -}
 
 import Native.Array
-import Basics (..)
-import Maybe (..)
+import Basics exposing (..)
+import Maybe exposing (..)
 import List
 
 type Array a = Array

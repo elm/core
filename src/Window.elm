@@ -11,7 +11,7 @@ the whole window.
 
 -}
 
-import Signal (Signal)
+import Signal exposing (Signal)
 import Native.Window
 
 {-| The current width and height of the window (i.e. the area viewable to the

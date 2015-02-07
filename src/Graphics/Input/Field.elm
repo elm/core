@@ -14,9 +14,8 @@ text fields programmatically.
 @docs defaultStyle, Style, Outline, noOutline, Highlight, noHighlight, Dimensions, uniformly
 -}
 
-import Color (Color)
-import Color
-import Graphics.Element (Element)
+import Color exposing (Color)
+import Graphics.Element exposing (Element)
 import Native.Graphics.Input
 import Signal
 import Text

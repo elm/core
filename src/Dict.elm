@@ -35,10 +35,9 @@ equality with `(==)` is unreliable and should not be used.
 -}
 
 
-import Basics (..)
-import Maybe (..)
-import List
-import List (..)
+import Basics exposing (..)
+import Maybe exposing (..)
+import List exposing (..)
 import Native.Debug
 import String
 

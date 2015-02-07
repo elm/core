@@ -37,11 +37,11 @@ There are also a bunch of functions to set parts of a `Style` individually:
 
 -}
 
-import Basics (..)
-import Color (Color, black)
-import Graphics.Element (Element, Three, Pos, ElementPrim, Properties)
+import Basics exposing (..)
+import Color exposing (Color, black)
+import Graphics.Element exposing (Element, Three, Pos, ElementPrim, Properties)
 import List
-import Maybe (Maybe(Nothing))
+import Maybe exposing (Maybe(Nothing))
 import Native.Text
 
 type Text = Text

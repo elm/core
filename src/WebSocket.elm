@@ -10,7 +10,7 @@ change to make it more flexible.
 @docs connect
 -}
 
-import Signal (Signal)
+import Signal exposing (Signal)
 import Native.WebSocket
 
 {-| Create a web-socket. The first argument is the URL of the desired
