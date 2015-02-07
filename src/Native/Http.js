@@ -16,19 +16,7 @@ Elm.Native.Http.make = function(localRuntime) {
         return Promise.asyncFunction(function(callback) {
             var req = new XMLHttpRequest();
 
-            // monitor progress
-            req.onreadystatechange = function() {
-                if (req.readyState === 4)
-                {
-                    if (req.status >= 200 && req.status < 300)
-                    {
-                        var headers = req.getAllResponseHeaders();
-                        return callback(Promise.succeed(req.response));
-                    }
-                    return callback(Promise.fail(throw 'figure out error type'));
-                }
-            }
-
+            // start
             if (settings.onStart.ctor === 'Just')
             {
                 req.addEventListener('loadStart', function() {
@@ -36,6 +24,7 @@ Elm.Native.Http.make = function(localRuntime) {
                 });
             }
 
+            // progress
             if (settings.onProgress.ctor === 'Just')
             {
                 req.addEventListener('progress', function(event) {
@@ -49,6 +38,19 @@ Elm.Native.Http.make = function(localRuntime) {
                     Promise.runPromise(promise);
                 });
             }
+
+            // end
+            req.addEventListener('error', function() {
+                return callback(Promise.fail('NetworkError'));
+            });
+
+            req.addEventListener('timeout', function() {
+                return callback(Promise.fail('Abort'));
+            });
+
+            req.addEventListener('load', function() {
+                return callback(Promise.succeed(toResponse(req)));
+            });
 
             req.open(request.verb, request.url, true);
 
@@ -69,6 +71,51 @@ Elm.Native.Http.make = function(localRuntime) {
 
             req.send(request.body);
         });
+    }
+
+
+    // deal with responses
+
+    function toResponse(req) {
+        return {
+            status: req.status,
+            statusText: req.statusText,
+            headers: parseHeaders(req.getAllResponseHeaders()),
+            url: req.url,
+            value: req.response
+        };
+    }
+
+
+    function parseHeaders(rawHeaders) {
+        var headers = Dict.empty;
+
+        if (!rawHeaders)
+        {
+            return headers;
+        }
+
+        var headerPairs = headerStr.split('\u000d\u000a');
+        for (var i = headerPairs.length; i--; )
+        {
+            var headerPair = headerPairs[i];
+            var index = headerPair.indexOf('\u003a\u0020');
+            if (index > 0)
+            {
+                var key = headerPair.substring(0, index);
+                var value = headerPair.substring(index + 2);
+                
+                headers = A3(key, function(oldValue) {
+                    if (oldValue.ctor === 'Just')
+                    {
+                        return Maybe.Just(value + ', ' + oldValue._0);
+                    }
+                    return Maybe.Just(value);
+                }, headers);
+            }
+        }
+
+        return headers;
     }
 
 
