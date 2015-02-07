@@ -1,10 +1,10 @@
-module Maybe (Maybe(Just,Nothing), andThen, map, withDefault, oneOf) where
+module Maybe (Maybe(Just,Nothing), isNothing, andThen, map, withDefault, oneOf) where
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
 you with optional arguments, error handling, and records with optional fields.
 
 # Definition
-@docs Maybe
+@docs Maybe, isNothing
 
 # Common Helpers
 @docs map, withDefault, oneOf
@@ -28,6 +28,19 @@ sometimes, but does not absolutely need it.
     sue = { name = "Sue", age = Nothing }
 -}
 type Maybe a = Just a | Nothing
+
+
+{-| Conveniently check if constructed with `Nothing`.
+
+      isNothing (Just 42) == False
+      isNothing (Just []) == False
+      isNothing Nothing   == True
+-}
+isNothing : Maybe a -> Bool
+isNothing m =
+    case m of
+      Nothing -> True
+      Just _  -> False
 
 
 {-| Provide a default value, turning an optional value into a normal value.
