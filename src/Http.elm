@@ -5,6 +5,7 @@ module Http
     , Data, stringData, blobData, fileData
     , Settings, never, Progress
     , Response, Value(..)
+    , Error
     ) where
 {-|
 
@@ -15,7 +16,7 @@ module Http
 @docs empty, string, blob, multipart, stringData, blobData, fileData
 
 # Arbitrariy Requests
-@docs send, Request, Response, Value
+@docs send, Request, Response, Value, Error
 
 # Settings
 @docs Settings, defaultSettigs, Progress
@@ -134,6 +135,13 @@ type Value
     | Blob Blob
 --    | Document Document
     | Json JavaScript.Value
+
+
+-- Errors
+
+type Error
+    = Timeout
+    | NetworkError
 
 
 -- ACTUALLY SEND REQUESTS
