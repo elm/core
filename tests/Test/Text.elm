@@ -8,14 +8,17 @@ import Native.Test.Text
 
 
 tests : Test
-tests = suite "Text Tests"
-    [ testFromString
-    ]
+tests =
+    suite "Text Tests"
+        [ testFromString
+        ]
 
 toHtmlString : Text -> String
-toHtmlString = Native.Test.Text.textToHtmlString
+toHtmlString =
+    Native.Test.Text.textToHtmlString
 
 testFromString : Test
 testFromString =
     let result = toHtmlString (fromString "Hello")
-     in test "simple" <| assertEqual "Hello" result 
+    in
+        test "simple" <| assertEqual "Hello" result 
