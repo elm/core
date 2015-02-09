@@ -59,7 +59,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 
     function run(initialValue, promiseSignal)
     {
-        var resultSignal = Signal.input(initialValue);
+        var resultSignal = Signal.input(Result.Ok(initialValue));
         var workQueue = [];
 
         function register(promise) {
@@ -77,7 +77,7 @@ Elm.Native.Promise.make = function(localRuntime) {
     {
         while (workQueue.length > 0 && workQueue[0].result)
         {
-            var result = workQueue.shift();
+            var result = workQueue.shift().result;
             setTimeout(function() {
                 localRuntime.notify(resultSignal.id, result);
             }, 0);
