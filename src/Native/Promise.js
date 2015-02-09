@@ -8,7 +8,9 @@ Elm.Native.Promise.make = function(localRuntime) {
         return localRuntime.Native.Promise.values;
     }
 
-    var DEPTH_LIMIT = 100;
+    var Result = Elm.Result.make(localRuntime);
+    var Signal = Elm.Native.Signal.make(localRuntime);
+    var Utils = Elm.Native.Utils.make(localRuntime);
 
     function succeed(value)
     {
@@ -75,8 +77,10 @@ Elm.Native.Promise.make = function(localRuntime) {
     {
         while (workQueue.length > 0 && workQueue[0].result)
         {
-            localRuntime.notify(resultSignal.id, workQueue[0].result);
-            workQueue.shift();
+            var result = workQueue.shift();
+            setTimeout(function() {
+                localRuntime.notify(resultSignal.id, result);
+            }, 0);
         }
     }
 
@@ -87,7 +91,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 
     function startPromise(resultSignal, workQueue, root)
     {
-        var result = runnable(root.promise);
+        var result = mark('runnable', root.promise);
         while (result.status === 'runnable')
         {
             result = stepPromise(resultSignal, workQueue, root, result.promise);
@@ -157,7 +161,7 @@ Elm.Native.Promise.make = function(localRuntime) {
                 var failChain = activeTag === 'Fail' && tag === 'Catch';
 
                 return (succeedChain || failChain)
-                    ? mark('runnable', promise.callback(activePromise.value));
+                    ? mark('runnable', promise.callback(activePromise.value))
                     : mark('runnable', activePromise);
             }
             if (result.status === 'blocked')
@@ -171,12 +175,24 @@ Elm.Native.Promise.make = function(localRuntime) {
         }
     }
 
+
+    // tests
+
+    function print(string) {
+        return asyncFunction(function(callback) {
+            console.log(string);
+            callback(succeed(Utils.Tuple0));
+        });
+    }
+
+
     return localRuntime.Native.Promise.values = {
         succeed: succeed,
         fail: fail,
         asyncFunction: asyncFunction,
         andThen: F2(andThen),
         catch_: F2(catch_),
-        run: F2(run)
+        run: F2(run),
+        print: print
     };
 };

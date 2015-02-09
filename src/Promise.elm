@@ -18,7 +18,9 @@ module Promise where
 import Native.Promise
 
 
-run : Signal (Promise x a) -> Signal (Result x a)
+type Promise x a = Promise
+
+run : a -> Signal (Promise x a) -> Signal (Result x a)
 run =
   Native.Promise.run
 
@@ -51,7 +53,7 @@ map2 func promiseA promiseB =
 
 
 map3 : (a -> b -> c -> result) -> Promise x a -> Promise x b -> Promise x c -> Promise x result
-map3 func promiseA promiseB promiseC promiseD =
+map3 func promiseA promiseB promiseC =
   promiseA
     `andThen` \a -> promiseB
     `andThen` \b -> promiseC
@@ -107,21 +109,27 @@ andThen =
 
 -- ERRORS
 
-catch : Promise x a -> (x -> Promise x a) -> Promise x a
-catch =
+onError : Promise x a -> (x -> Promise y a) -> Promise y a
+onError =
   Native.Promise.catch_
 
 
 mapError : (x -> y) -> Promise x a -> Promise y a
 mapError f promise =
-  promise `catch` \x -> fail (f x)
+  promise `onError` \err -> fail (f err)
 
 
 -- THREADS
 
-spawn : Promise x a -> Promise y ID
+-- spawn : Promise x a -> Promise y ID
 
-kill : ID -> Promise x ()
+-- kill : ID -> Promise x ()
 
-sleep : Time -> Promise x ()
+-- sleep : Time -> Promise x ()
 
+
+-- TESTING
+
+print : String -> Promise x ()
+print =
+  Native.Promise.print
