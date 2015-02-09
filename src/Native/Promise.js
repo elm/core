@@ -186,6 +186,15 @@ Elm.Native.Promise.make = function(localRuntime) {
     }
 
 
+    function sleep(time) {
+        return asyncFunction(function(callback) {
+            setTimeout(function() {
+                callback(succeed(Utils.Tuple0));
+            }, time);
+        });
+    }
+
+
     return localRuntime.Native.Promise.values = {
         succeed: succeed,
         fail: fail,
@@ -193,6 +202,7 @@ Elm.Native.Promise.make = function(localRuntime) {
         andThen: F2(andThen),
         catch_: F2(catch_),
         run: F2(run),
+        sleep: sleep,
         print: print
     };
 };

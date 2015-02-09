@@ -16,6 +16,7 @@ module Promise where
 -}
 
 import Native.Promise
+import Time (Time)
 
 
 type Promise x a = Promise
@@ -125,7 +126,9 @@ mapError f promise =
 
 -- kill : ID -> Promise x ()
 
--- sleep : Time -> Promise x ()
+sleep : Time -> Promise x ()
+sleep =
+  Native.Promise.sleep
 
 
 -- TESTING
