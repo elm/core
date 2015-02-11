@@ -44,7 +44,7 @@ Elm.Native.Http.make = function(localRuntime) {
         request.onreadystatechange = function(e) {
             if (request.readyState === 4)
             {
-                response.value = (request.status >= 200 && request.status < 300 ?
+                response.value = ((request.status == 0 || (request.status >= 200 && request.status < 300)) ?
                                   { ctor:'Success', _0:request.responseText } :
                                   { ctor:'Failure', _0:request.status, _1:request.statusText });
                 setTimeout(function() { updateQueue(queue,responses); }, 0);
