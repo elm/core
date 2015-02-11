@@ -22,7 +22,7 @@ Elm.Native.Array.make = function(localRuntime) {
     //         "lengths" is an array of accumulated lengths of the child nodes
 
     // M is the maximal table size. 32 seems fast. E is the allowed increase
-    // of search steps when concatting to find an index. Lower values will 
+    // of search steps when concatting to find an index. Lower values will
     // decrease balancing, but will increase search steps.
     var M = 32;
     var E = 2;
@@ -317,6 +317,10 @@ Elm.Native.Array.make = function(localRuntime) {
 
     // Maps a function over the elements of an array.
     function map(f, a) {
+        if (a.height === 0){
+          return empty;
+        }
+
         var newA = {
             ctor: "_Array",
             height: a.height,
