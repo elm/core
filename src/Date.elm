@@ -77,3 +77,8 @@ minute = Native.Date.minute
 this returns the integer `0`. -}
 second : Date -> Int
 second = Native.Date.second
+
+{-| Extract the milli-seconds of a given date. Given the date 23 June 1990 at 11:45:30.123AM
+this returns the integer `123`. -}
+milliseconds : Date -> Int
+milliseconds = Native.Date.milliseconds
