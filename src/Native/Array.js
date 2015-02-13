@@ -320,7 +320,7 @@ Elm.Native.Array.make = function(localRuntime) {
         var newA = {
             ctor: "_Array",
             height: a.height,
-            table: new Array(a.table)
+            table: new Array(a.table.length)
         };
         if (a.height > 0)
         {
@@ -345,7 +345,7 @@ Elm.Native.Array.make = function(localRuntime) {
         var newA = {
             ctor: "_Array",
             height: a.height,
-            table: new Array(a.table)
+            table: new Array(a.table.length)
         };
         if (a.height > 0)
         {
