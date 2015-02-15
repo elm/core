@@ -8,7 +8,9 @@ Elm.Native.Http.make = function(localRuntime) {
         return localRuntime.Native.Http.values;
     }
 
+    var Dict = Elm.Dict.make(localRuntime);
     var List = Elm.List.make(localRuntime);
+    var Maybe = Elm.Maybe.make(localRuntime);
     var Promise = Elm.Native.Promise.make(localRuntime);
 
 
@@ -20,7 +22,8 @@ Elm.Native.Http.make = function(localRuntime) {
             if (settings.onStart.ctor === 'Just')
             {
                 req.addEventListener('loadStart', function() {
-                    Promise.runPromise(settings.onStart._0);
+                    var promise = settings.onStart._0;
+                    Promise.spawn(promise);
                 });
             }
 
@@ -35,17 +38,17 @@ Elm.Native.Http.make = function(localRuntime) {
                         total: event.total
                     };
                     var promise = settings.onProgress._0(progress);
-                    Promise.runPromise(promise);
+                    Promise.spawn(promise);
                 });
             }
 
             // end
             req.addEventListener('error', function() {
-                return callback(Promise.fail('NetworkError'));
+                return callback(Promise.fail({ ctor: 'NetworkError' }));
             });
 
             req.addEventListener('timeout', function() {
-                return callback(Promise.fail('Abort'));
+                return callback(Promise.fail({ ctor: 'Timeout' }));
             });
 
             req.addEventListener('load', function() {
@@ -55,7 +58,7 @@ Elm.Native.Http.make = function(localRuntime) {
             req.open(request.verb, request.url, true);
 
             // set all the headers
-            function(pair) {
+            function setHeader(pair) {
                 req.setRequestHeader(pair._0, pair._1);
             }
             A2(List.map, setHeader, request.headers);
@@ -77,12 +80,14 @@ Elm.Native.Http.make = function(localRuntime) {
     // deal with responses
 
     function toResponse(req) {
+        var tag = typeof req.response === 'string' ? 'Text' : 'Blob';
         return {
+            _: {},
             status: req.status,
             statusText: req.statusText,
             headers: parseHeaders(req.getAllResponseHeaders()),
-            url: req.url,
-            value: req.response
+            url: req.responseURL,
+            value: { ctor: tag, _0: req.response }
         };
     }
 
@@ -95,7 +100,7 @@ Elm.Native.Http.make = function(localRuntime) {
             return headers;
         }
 
-        var headerPairs = headerStr.split('\u000d\u000a');
+        var headerPairs = rawHeaders.split('\u000d\u000a');
         for (var i = headerPairs.length; i--; )
         {
             var headerPair = headerPairs[i];
@@ -105,7 +110,7 @@ Elm.Native.Http.make = function(localRuntime) {
                 var key = headerPair.substring(0, index);
                 var value = headerPair.substring(index + 2);
                 
-                headers = A3(key, function(oldValue) {
+                headers = A3(Dict.update, key, function(oldValue) {
                     if (oldValue.ctor === 'Just')
                     {
                         return Maybe.Just(value + ', ' + oldValue._0);
@@ -136,12 +141,12 @@ Elm.Native.Http.make = function(localRuntime) {
             dataList = dataList._1;
         }
 
-        return formData;
+        return { ctor: 'FormData', formData: formData };
     }
 
 
     return localRuntime.Native.Http.values = {
-        send: F6(send),
+        send: F2(send),
         multipart: multipart
     };
 };

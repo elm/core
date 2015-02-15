@@ -3,7 +3,7 @@ module Http
     , Request
     , Body, empty, string, blob, multipart
     , Data, stringData, blobData, fileData
-    , Settings, never, Progress
+    , Settings, defaultSettings, never, Progress
     , Response, Value(..)
     , Error
     ) where
@@ -22,8 +22,13 @@ module Http
 @docs Settings, defaultSettigs, Progress
 
 -}
+import Json.Decode as JavaScript
 import Native.Http
-import JavaScript.Decode as JavaScript
+import Promise (Promise, andThen, succeed, fail)
+import Dict (Dict)
+
+type Blob = TODO_impliment_blob_in_another_library
+type File = TODO_impliment_file_in_another_library
 
 
 -- REQUESTS
@@ -38,10 +43,10 @@ type alias Request =
 
 type Body
     = Empty
-    | Str String
+    | BodyString String
     | ArrayBuffer
-    | FormData
-    | Blob
+    | BodyFormData
+    | BodyBlob
 
 
 empty : Body
@@ -51,15 +56,15 @@ empty =
 
 string : String -> Body
 string =
-  Str
+  BodyString
 
 
 -- arrayBuffer : ArrayBuffer -> Body
 
 
 blob : Blob -> Body
-blob =
-  Blob
+blob _ =
+  BodyBlob
 
 
 type Data
@@ -92,8 +97,8 @@ fileData =
 
 type alias Settings =
     { timeout : Int
-    , onStart : Maybe (Promise x a)
-    , onProgress : Maybe (Progress -> Promise x a)
+    , onStart : Maybe (Promise () ())
+    , onProgress : Maybe (Progress -> Promise () ())
     , desiredResponseType : Maybe String
     }
 
@@ -134,7 +139,6 @@ type Value
 --    | ArrayBuffer ArrayBuffer
     | Blob Blob
 --    | Document Document
-    | Json JavaScript.Value
 
 
 -- Errors
@@ -142,6 +146,7 @@ type Value
 type Error
     = Timeout
     | NetworkError
+    | Other
 
 
 -- ACTUALLY SEND REQUESTS
@@ -214,10 +219,12 @@ decodeResponse decoder response =
   case 200 <= response.status && response.status < 300 of
     True ->
       case response.value of
-        Json json ->
-          case JavaScript.decodeValue decoder json of
+        Text rawJson ->
+          case JavaScript.decodeString decoder rawJson of
             Ok v -> succeed v
-            Err msg -> fail msg
+            Err msg -> fail NetworkError
+
+        _ -> fail Other
 
     False ->
-      fail "something"
+      fail Other

@@ -122,7 +122,11 @@ mapError f promise =
 
 -- THREADS
 
--- spawn : Promise x a -> Promise y ID
+type ID = ID Int
+
+spawn : Promise x a -> Promise y ID
+spawn =
+  Native.Promise.spawn
 
 -- kill : ID -> Promise x ()
 
