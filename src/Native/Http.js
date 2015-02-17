@@ -40,6 +40,7 @@ Elm.Native.Http.make = function(localRuntime) {
         var request = (window.ActiveXObject
                        ? new ActiveXObject("Microsoft.XMLHTTP")
                        : new XMLHttpRequest());
+        request.withCredentials = true;
 
         request.onreadystatechange = function(e) {
             if (request.readyState === 4)
