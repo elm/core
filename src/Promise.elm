@@ -12,7 +12,6 @@ module Promise where
 
 # Errors
 @docs catch, mapError
-
 -}
 
 import Native.Promise
@@ -20,10 +19,6 @@ import Time (Time)
 
 
 type Promise x a = Promise
-
-run : a -> Signal (Promise x a) -> Signal (Result x a)
-run =
-  Native.Promise.run
 
 
 -- BASICS
