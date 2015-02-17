@@ -57,30 +57,32 @@ Elm.Native.Promise.make = function(localRuntime) {
 
     // RUNNER
 
-    function run(initialValue, promiseSignal)
+    function runOne(promise) {
+        runPromise({ promise: promise }, function() {});
+    }
+
+    function runStream(stream)
     {
-        var resultSignal = Signal.input(Result.Ok(initialValue));
         var workQueue = [];
 
         function onComplete() {
-            while (workQueue.length > 0 && workQueue[0].result)
+            workQueue.shift();
+            if (workQueue.length > 0)
             {
-                var result = workQueue.shift().result;
-                setTimeout(function() {
-                    localRuntime.notify(resultSignal.id, result);
-                }, 0);
+                runPromise(workQueue[0], onComplete);
             }
         }
 
         function register(promise) {
             var root = { promise: promise };
+            if (workQueue.length === 0)
+            {
+                runPromise(root, onComplete);
+            }
             workQueue.push(root);
-            runPromise(root, onComplete);
         }
 
-        A2(Signal.map, register, promiseSignal);
-
-        return resultSignal;
+        A2(Signal.map, register, stream);
     }
 
     function mark(status, promise)
@@ -98,11 +100,6 @@ Elm.Native.Promise.make = function(localRuntime) {
 
         if (result.status === 'done')
         {
-            var promise = result.promise;
-            var tag = promise.tag;
-            root.result = tag === 'Succeed'
-                ? Result.Ok(promise.value)
-                : Result.Err(promise.value);
             onComplete();
         }
 
@@ -196,13 +193,11 @@ Elm.Native.Promise.make = function(localRuntime) {
     function spawn(promise) {
         return asyncFunction(function(callback) {
             var id = setTimeout(function() {
-                runPromise({ promise: promise }, noOp);
+                runOne(promise);
             }, 0);
             callback(succeed(id));
         });
     }
-
-    function noOp() {}
 
 
     return localRuntime.Native.Promise.values = {
@@ -211,7 +206,8 @@ Elm.Native.Promise.make = function(localRuntime) {
         asyncFunction: asyncFunction,
         andThen: F2(andThen),
         catch_: F2(catch_),
-        run: F2(run),
+        runStream: runStream,
+        runOne: runOne,
         spawn: spawn,
         sleep: sleep,
         print: print
