@@ -66,10 +66,12 @@ Elm.Native.Text.make = function(localRuntime) {
         return arr.join('<br/>');
     }
 
+    // TODO: change text representation
     function fromString(str) {
         return Utils.txt(properEscape(str));
     }
 
+    // TODO: change text representation
     function append(xs, ys) {
         return Utils.txt(Utils.makeText(xs) + Utils.makeText(ys));
     }
@@ -93,6 +95,7 @@ Elm.Native.Text.make = function(localRuntime) {
     }
 
     // setting styles of Text
+    // TODO: change text representation
     function style(style, text) {
         var newText = '<span style="color:' + toCss(style.color) + ';'
         if (style.typeface.ctor !== '[]')
@@ -118,28 +121,43 @@ Elm.Native.Text.make = function(localRuntime) {
         newText += '">' + Utils.makeText(text) + '</span>'
         return Utils.txt(newText);
     }
+
+    // TODO: change text representation
     function height(px, text) {
         return { style: 'font-size:' + px + 'px;', text:text }
     }
+
+    // TODO: change text representation
     function typeface(names, text) {
         return { style: 'font-family:' + toTypefaces(names) + ';', text:text }
     }
+
+    // TODO: change text representation
     function monospace(text) {
         return { style: 'font-family:monospace;', text:text }
     }
+
+    // TODO: change text representation
     function italic(text) {
         return { style: 'font-style:italic;', text:text }
     }
+
+    // TODO: change text representation
     function bold(text) {
         return { style: 'font-weight:bold;', text:text }
     }
+
+    // TODO: change text representation
     function link(href, text) {
         return { href: fromString(href), text:text };
     }
+
+    // TODO: change text representation
     function line(line, text) {
         return { style: 'text-decoration:' + toLine(line) + ';', text:text };
     }
 
+    // TODO: change text representation
     function color(color, text) {
         return { style: 'color:' + toCss(color) + ';', text:text };
     }
