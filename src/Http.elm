@@ -22,10 +22,14 @@ module Http
 @docs Settings, defaultSettigs, Progress
 
 -}
-import Json.Decode as JavaScript
+import Basics ((&&), (<=), (<))
+import Dict (Dict)
+import JavaScript.Decode as JavaScript
+import Maybe (Maybe(..))
 import Native.Http
 import Promise (Promise, andThen, succeed, fail)
-import Dict (Dict)
+import Result (Result(..))
+
 
 type Blob = TODO_impliment_blob_in_another_library
 type File = TODO_impliment_file_in_another_library

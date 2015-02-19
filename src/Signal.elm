@@ -1,11 +1,11 @@
 module Signal
-    ( Signal
+    ( Signal, Stream, Varying
     , merge, mergeMany
     , map, map2, map3, map4, map5
-    , (<~), (~)
     , foldp
     , keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
-    , Mailbox, input, redirect, send
+    , Channel, Message
+    , channel, send, subscribe
     , constant
     ) where
 
@@ -22,26 +22,33 @@ the [`Time`](Time) library.
 # Mapping
 @docs map, map2, map3, map4, map5
 
-# Fancy Mapping
-@docs (<~), (~)
-
 # Past-Dependence
 @docs foldp
 
 # Filters
 @docs keepIf, dropIf, keepWhen, dropWhen, dropRepeats, sampleOn
 
-# Custom Signals
-@docs input, redirect, send, constant
+# Channels
+@docs channel, send, subscribe
+
+# Constants
+@docs constant
+
 -}
 
 import Native.Signal
 import List
-import Basics (fst, snd, not)
+import Basics (fst, snd, not, (|>))
 import Debug
 
 
 type Signal a = Signal
+
+
+type alias Stream a = Signal a
+
+
+type alias Varying a = Signal a
 
 
 {-| Create a constant signal that never changes. -}
@@ -99,7 +106,7 @@ map5 =
 
 
 
-{-| Create a past-dependent signal. Each update from the incoming signals will
+{-| Create a past-dependent signal. Each update from the incoming signal will
 be used to step the state forward. The outgoing signal represents the current
 state.
 
@@ -111,8 +118,13 @@ state.
     timeSoFar =
         foldp (+) 0 (fps 40)
 
-So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
-is the time the program has been running, updated 40 times a second.
+So `clickCount` starts with an initial value of 0. From there, it updates on
+each mouse click, incrementing by one. `timeSoFar` is the time the program has
+been running, updated 40 times a second.
+
+Note: the initial value is specified as an argument, it is not related to the
+initial value of the incoming signal. That value is only updated when the
+incoming signal updates.
 -}
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp =
@@ -205,15 +217,18 @@ example, here is how you would capture mouse drags.
         keepWhen Mouse.isDown (0,0) Mouse.position
 -}
 keepWhen : Signal Bool -> a -> Signal a -> Signal a
-keepWhen bs def sig = 
-    snd <~ (keepIf fst (False, def) ((,) <~ (sampleOn sig bs) ~ sig))
+keepWhen booleans debaultValue signal = 
+  map2 (,) (sampleOn signal booleans) signal
+    |> keepIf fst (False, debaultValue)
+    |> map snd
 
 
 {-| Drop events when the first signal is true. You provide a default value
 just in case that signal is *always* true and we drop all updates.
 -}
 dropWhen : Signal Bool -> a -> Signal a -> Signal a
-dropWhen bs = keepWhen (not <~ bs)
+dropWhen booleans =
+  keepWhen (map not booleans)
 
 
 {-| Drop updates that repeat the current value of the signal.
@@ -243,51 +258,69 @@ sampleOn =
     Native.Signal.sampleOn
 
 
-{-| An alias for `map`. A prettier way to apply a function to the current value
-of a signal.
--}
-(<~) : (a -> b) -> Signal a -> Signal b
-f <~ s =
-    Native.Signal.map f s
-
-
-{-| Intended to be paired with the `(<~)` operator, this makes it possible for
-many signals to flow into a function. Think of it as a fancy alias for `mapN`.
-For example, the following declarations are equivalent:
-
-    main : Signal Element
-    main =
-      scene <~ Window.dimensions ~ Mouse.position
-
-    main : Signal Element
-    main =
-      map2 scene Window.dimensions Mouse.position
-
-You can use this pattern for as many signals as you want by using `(~)` a bunch
-of times, so you can go higher than `map5` if you need to.
--}
-(~) : Signal (a -> b) -> Signal a -> Signal b
-sf ~ s =
-    Native.Signal.map2 (\f x -> f x) sf s
-
-infixl 4 <~
-infixl 4 ~
-
-
 ---- INPUTS ----
 
-input : a -> { signal : Signal a, mailbox : Mailbox a }
+type Channel a = Channel -- Signal a
+
+type Message = Message -- () -> ()
 
 
-type Mailbox a =
-    Mailbox (a -> Promise () ())
+{-| Create a signal channel that you can `send` messages to. To receive these
+messages, `subscribe` to the channel and turn it into a normal signal. The
+primary use case is receiving updates from UI elements such as buttons and
+text fields. The argument is a default value for the custom signal.
+
+Note: This is an inherently impure function, so `(channel ())`
+and `(channel ())` produce two different channels.
+-}
+channel : a -> Channel a
+channel =
+    Native.Signal.input
 
 
-redirect : (b -> a) -> Mailbox a -> Mailbox b
-redirect f (Mailbox send) =
-    Mailbox (\x -> send (f x))
+{-| Create a `Message` that can be sent to a `Channel` with a handler like
+`Html.onclick` or `Html.onblur`. This doesn't actually send the message; it just
+creates the message to be sent.
+
+    import Html
+
+    type Update = NoOp | Add Int | Remove Int
+
+    updates : Channel Update
+    updates = channel NoOp
+
+    addButton : Html.Html
+    addButton =
+        Html.button
+            [ onclick (send updates (Add 1)) ]
+            [ Html.text "Add 1" ]
+-}
+send : Channel a -> a -> Message
+send =
+    Native.Signal.send
 
 
-send : Mailbox a -> a -> Promise x ()
-send (Mailbox actuallySend) value =
-    actuallySend value
+{-| Receive all the messages sent to a `Channel` as a `Signal`. The following
+example shows how you would set up a system that uses a `Channel`.
+
+    -- initialState : Model
+    -- type Update = NoOp | ...
+    -- step : Update -> Model -> Model
+    -- view : Channel Update -> Model -> Element
+
+    updates : Channel Update
+    updates = channel NoOp
+
+    main : Signal Element
+    main =
+      map
+        (view updates)
+        (foldp step initialState (subscribe updates))
+
+The `updates` channel appears twice in `main` because it serves as a bridge
+between your view and your signals. In the view you `send` to it, and in signal
+world you `subscribe` to it.
+-}
+subscribe : Channel a -> Signal a
+subscribe =
+    Native.Signal.subscribe

@@ -6,7 +6,9 @@ change to make it more flexible.
 
 import Native.WebSocket
 import JavaScript.Decode as JavaScript
+import Promise (Promise)
 
+type Connection = Connection
 
 -- url and protocols
 connect : String -> List String -> Promise x Connection
