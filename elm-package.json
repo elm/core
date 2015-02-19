@@ -40,7 +40,6 @@
         "Trampoline",
         "Transform2D",
         "Varying",
-        "WebSocket",
         "Window"
     ],
     "native-modules": true,
