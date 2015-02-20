@@ -36,17 +36,17 @@ type alias WritableStream a =
 
 map : (a -> b) -> Stream a -> Stream b
 map =
-  Signal.map
+  Native.Signal.streamMap
 
 
 toVarying : a -> Stream a -> Varying a
 toVarying =
-  Native.Reactive.streamToVarying
+  Native.Signal.streamToVarying
 
 
 fromVarying : Varying a -> (a, Stream a)
 fromVarying =
-  Native.Reactive.varyingToStream
+  Native.Signal.varyingToStream
 
 
 {-| Merge two streams into one. This function is extremely useful for bringing
@@ -65,8 +65,8 @@ outgoing stream. If an event comes on both streams at the same time, the left
 event wins (i.e., the right event is discarded).
 -}
 merge : Stream a -> Stream a -> Stream a
-merge =
-  Signal.merge
+merge left right =
+  Native.Signal.genericMerge (\x _ -> x) left right
 
 
 {-| Merge many streams into one. This is useful when you are merging more than
@@ -85,7 +85,7 @@ event wins, just like with `merge`.
 -}
 mergeMany : List (Stream a) -> Stream a
 mergeMany streams =
-    List.foldr merge never streams
+  List.foldr merge never streams
 
 
 {-| Create a past-dependent value. Each update from the incoming stream will
@@ -105,7 +105,7 @@ is the time the program has been running, updated 40 times a second.
 -}
 fold : (a -> b -> b) -> b -> Stream a -> Varying b
 fold =
-  Signal.foldp
+  Native.Signal.fold
 
 
 {-| Filter out some events. The given function decides whether we should

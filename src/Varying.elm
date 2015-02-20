@@ -43,17 +43,17 @@ to pass a combination of varyings and normal values to a function:
 -}
 constant : a -> Varying a
 constant =
-  Signal.constant
+  Native.Signal.input
 
 
 fromStream : a -> Stream a -> Varying a
 fromStream =
-  Native.Reactive.streamToVarying
+  Native.Signal.streamToVarying
 
 
 toStream : Varying a -> (a, Stream a)
 toStream =
-  Native.Reactive.varyingToStream
+  Native.Signal.varyingToStream
 
 
 {-| Apply a function to a varying value.
@@ -68,7 +68,7 @@ toStream =
 -}
 map : (a -> result) -> Varying a -> Varying result
 map =
-  Signal.map
+  Native.Signal.map
 
 
 {-| Apply a function to the current value of two varying values. The function
@@ -86,22 +86,22 @@ height.
 -}
 map2 : (a -> b -> result) -> Varying a -> Varying b -> Varying result
 map2 =
-  Signal.map2
+  Native.Signal.map2
 
 
 map3 : (a -> b -> c -> result) -> Varying a -> Varying b -> Varying c -> Varying result
 map3 =
-  Signal.map3
+  Native.Signal.map3
 
 
 map4 : (a -> b -> c -> d -> result) -> Varying a -> Varying b -> Varying c -> Varying d -> Varying result
 map4 =
-  Signal.map4
+  Native.Signal.map4
 
 
 map5 : (a -> b -> c -> d -> e -> result) -> Varying a -> Varying b -> Varying c -> Varying d -> Varying e -> Varying result
 map5 =
-  Signal.map5
+  Native.Signal.map5
 
 
 {-| An alias for `map`. A prettier way to apply a function to the current value
@@ -137,7 +137,7 @@ of times, so you can go higher than `map5` if you need to.
 -}
 (~) : Varying (a -> b) -> Varying a -> Varying b
 (~) funcs args =
-  Signal.map2 (\f v -> f v) funcs args
+  map2 (\f v -> f v) funcs args
 
 
 infixl 4 <~
