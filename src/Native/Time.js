@@ -3,7 +3,8 @@ Elm.Native.Time.make = function(localRuntime) {
 
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Time = localRuntime.Native.Time || {};
-	if (localRuntime.Native.Time.values) {
+	if (localRuntime.Native.Time.values)
+	{
 		return localRuntime.Native.Time.values;
 	}
 
@@ -12,7 +13,8 @@ Elm.Native.Time.make = function(localRuntime) {
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
-	function fpsWhen(desiredFPS, isOn) {
+	function fpsWhen(desiredFPS, isOn)
+	{
 		var msPerFrame = 1000 / desiredFPS;
 		var ticker = NS.input(Utils.Tuple0);
 
