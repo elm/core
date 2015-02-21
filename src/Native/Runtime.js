@@ -145,8 +145,12 @@ if (!Elm.fullscreen) {
 				}
 				throw error;
 			}
-			inputs = filterDeadInputs(inputs);
+
+			var rootNode = { kids: inputs };
+			trimDeadNodes(rootNode);
+			inputs = rootNode.kids;
 			filterListeners(inputs, listeners);
+
 			addReceivers(elm.ports.outgoing);
 			if (display !== Display.NONE)
 			{
@@ -313,41 +317,26 @@ if (!Elm.fullscreen) {
 		}
 
 
-		function filterDeadInputs(inputs)
+		// returns a boolean representing whether the node is alive or not.
+		function trimDeadNodes(node)
 		{
-			var temp = [];
-			for (var i = inputs.length; i--; )
+			if (node.isOutput)
 			{
-				if (isAlive(inputs[i]))
+				return true;
+			}
+
+			var liveKids = [];
+			for (var i = node.kids.length; i--; )
+			{
+				var kid = node.kids[i];
+				if (trimDeadNodes(kid).isAlive)
 				{
-					temp.push(inputs[i]);
+					liveKids.push(kid);
 				}
 			}
-			return temp;
-		}
+			node.kids = liveKids;
 
-
-		function isAlive(input)
-		{
-			if (!('defaultNumberOfKids' in input))
-			{
-				return true;
-			}
-			var len = input.kids.length;
-			if (len === 0)
-			{
-				return false;
-			}
-			if (len > input.defaultNumberOfKids)
-			{
-				return true;
-			}
-			var alive = false;
-			for (var i = len; i--; )
-			{
-				alive = alive || isAlive(input.kids[i]);
-			}
-			return alive;
+			return liveKids.length > 0;
 		}
 
 
