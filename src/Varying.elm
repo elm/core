@@ -43,7 +43,7 @@ to pass a combination of varyings and normal values to a function:
 -}
 constant : a -> Varying a
 constant =
-  Native.Signal.input
+  Native.Signal.constant
 
 
 fromStream : a -> Stream a -> Varying a

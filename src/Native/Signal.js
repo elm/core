@@ -49,9 +49,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
-	var never = input(null);
-
-
 	// OUTPUT
 
 	function output(handler, parent)
@@ -380,8 +377,9 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	return localRuntime.Native.Signal.values = {
 		input: input,
+		never: input(null),
+		constant: input,
 		output: output,
-		never: never,
 		streamToVarying: F2(streamToVarying),
 		varyingToStream: varyingToStream,
 		streamMap: F2(streamMap),
