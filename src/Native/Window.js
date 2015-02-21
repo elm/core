@@ -21,7 +21,8 @@ Elm.Native.Window.make = function(localRuntime) {
 
 	function getHeight()
 	{
-		if (localRuntime.isFullscreen()) {
+		if (localRuntime.isFullscreen())
+		{
 			return window.innerHeight;
 		}
 		return localRuntime.node.clientHeight;
