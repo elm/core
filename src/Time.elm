@@ -20,7 +20,7 @@ module Time
 
 import Basics (..)
 import Native.Time
-import Stream (Stream)
+import Signal (Stream)
 import Varying
 import Varying (Varying)
 
