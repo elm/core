@@ -15,8 +15,8 @@ module Promise where
 -}
 
 import Native.Promise
-import Time (Time)
 import List ((::))
+import Time (Time)
 
 
 type Promise x a = Promise
@@ -120,11 +120,14 @@ mapError f promise =
 
 type ID = ID Int
 
+
 spawn : Promise x a -> Promise y ID
 spawn =
   Native.Promise.spawn
 
+
 -- kill : ID -> Promise x ()
+
 
 sleep : Time -> Promise x ()
 sleep =
