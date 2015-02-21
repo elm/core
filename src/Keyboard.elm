@@ -1,6 +1,6 @@
 module Keyboard
     ( KeyCode
-    , arrows, wasd, Directions, toXY
+    , arrows, wasd
     , enter, space, ctrl, shift, alt, meta
     , isDown, keysDown, presses
     ) where
@@ -24,8 +24,12 @@ otherwise.
 
 -}
 
+import Basics (always, (-))
+import Set
+import Stream
 import Stream (Stream)
 import Native.Keyboard
+import Varying
 import Varying (Varying)
 
 
@@ -42,6 +46,14 @@ type alias Model =
     { alt : Bool
     , meta : Bool
     , keyCodes : Set.Set KeyCode
+    }
+
+
+empty : Model
+empty =
+    { alt = False
+    , meta = False
+    , keyCodes = Set.empty
     }
 
 
@@ -70,16 +82,13 @@ update event model =
         }
 
     Blur ->
-        { alt = False
-        , meta = False
-        , keyCodes = Set.empty
-        }
+        empty
 
 
 
 model : Varying Model
 model =
-  Stream.fold update emptyState rawEvents
+  Stream.fold update empty rawEvents
 
 
 rawEvents : Stream Event
@@ -101,7 +110,7 @@ type alias Directions =
     }
 
 
-toXY : Directions -> Set KeyCode -> { x : Int, y : Int }
+toXY : Directions -> Set.Set KeyCode -> { x : Int, y : Int }
 toXY {up,down,left,right} keyCodes =
   let is keyCode =
         if Set.member keyCode keyCodes
@@ -172,7 +181,7 @@ enter =
 
 
 {-| Set of keys that are currently down. -}
-keysDown : Varying (Set KeyCode)
+keysDown : Varying (Set.Set KeyCode)
 keysDown =
   Varying.map .keyCodes model
 
