@@ -4,34 +4,18 @@ Elm.Native.Mouse.make = function(localRuntime) {
 
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Mouse = localRuntime.Native.Mouse || {};
-    if (localRuntime.Native.Mouse.values) {
+    if (localRuntime.Native.Mouse.values)
+    {
         return localRuntime.Native.Mouse.values;
     }
 
-    var Signal = Elm.Signal.make(localRuntime);
     var NS = Elm.Native.Signal.make(localRuntime);
     var Utils = Elm.Native.Utils.make(localRuntime);
 
     var position = NS.input(Utils.Tuple2(0,0));
-    position.defaultNumberOfKids = 2;
-
-    // do not move x and y into Elm. By setting their default number
-    // of kids, it is possible to detatch the mouse listeners if
-    // they are not needed.
-    function fst(pair) {
-        return pair._0;
-    }
-    function snd(pair) {
-        return pair._1;
-    }
-
-    var x = A2( Signal.map, fst, position );
-    x.defaultNumberOfKids = 0;
-
-    var y = A2( Signal.map, snd, position );
-    y.defaultNumberOfKids = 0;
 
     var isDown = NS.input(false);
+
     var clicks = NS.input(Utils.Tuple0);
 
     var node = localRuntime.isFullscreen()
@@ -53,8 +37,6 @@ Elm.Native.Mouse.make = function(localRuntime) {
 
     return localRuntime.Native.Mouse.values = {
         position: position,
-        x: x,
-        y: y,
         isDown: isDown,
         clicks: clicks
     };
