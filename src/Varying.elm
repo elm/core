@@ -28,6 +28,7 @@ As the `Html` changes, the user sees different things on screen automatically.
 
 -}
 
+import Native.Signal
 import Signal
 import Signal (Stream)
 
