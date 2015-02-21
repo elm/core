@@ -18,9 +18,9 @@ events to your application logic.
 import List
 import Mailbox (Mailbox)
 import Maybe (Maybe(..))
+import Native.Signal
 import Signal
 import Signal (Varying)
-import Native.Signal
 import Time (Time)
 
 
