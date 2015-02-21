@@ -22,32 +22,21 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 	}
 
 
-	var downs = NS.input(null);
+	function keyStream(node, eventName, handler)
+	{
+		var stream = NS.input(null);
 
-	localRuntime.addListener([downs.id], document, 'keydown', function down(e) {
-		localRuntime.notify(downs.id, keyEvent(e));
-	});
+		localRuntime.addListener([stream.id], node, eventName, function(e) {
+			localRuntime.notify(stream.id, handler(e));
+		});
 
+		return stream;
+	}
 
-	var ups = NS.input(null);
-
-	localRuntime.addListener([ups.id], document, 'keyup', function up(e) {
-		localRuntime.notify(ups.id, keyEvent(e));
-	});
-
-
-	var presses = NS.input(null);
-
-	localRuntime.addListener([downs.id], document, 'keypress', function press(e) {
-		localRuntime.notify(press.id, keyEvent(e));
-	});
-
-
-	var blurs = NS.input(null);
-
-	localRuntime.addListener([blurs.id], window, 'blur', function blur(e) {
-		localRuntime.notify(blurs.id, null);
-	});
+	var downs = keyStream(document, 'keydown', keyEvent);
+	var ups = keyStream(document, 'keyup', keyEvent);
+	var presses = keyStream(document, 'keypress', keyEvent);
+	var blurs = keyStream(window, 'blur', function() { return null; });
 
 
 	return localRuntime.Native.Keyboard.values = {
