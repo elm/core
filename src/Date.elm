@@ -122,4 +122,3 @@ this returns the integer `123`.
 millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
-
