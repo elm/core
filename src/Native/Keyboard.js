@@ -24,7 +24,7 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 
 	function keyStream(node, eventName, handler)
 	{
-		var stream = NS.input(null);
+		var stream = NS.input();
 
 		localRuntime.addListener([stream.id], node, eventName, function(e) {
 			localRuntime.notify(stream.id, handler(e));
