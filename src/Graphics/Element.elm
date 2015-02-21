@@ -43,17 +43,17 @@ import List as List
 import Color (..)
 import Maybe ( Maybe(..), withDefault )
 
-type alias Properties = {
-  id      : Int,
-  width   : Int,
-  height  : Int,
-  opacity : Float,
-  color   : Maybe Color,
-  href    : String,
-  tag     : String,
-  hover   : (),
-  click   : ()
- }
+type alias Properties =
+    { id      : Int
+    , width   : Int
+    , height  : Int
+    , opacity : Float
+    , color   : Maybe Color
+    , href    : String
+    , tag     : String
+    , hover   : ()
+    , click   : ()
+    }
 
 
 type alias Element =
@@ -275,7 +275,7 @@ flow dir es =
       hs = List.map heightOf es
       maxOrZero list = withDefault 0 (List.maximum list)
       newFlow w h = newElement w h (Flow dir es)
-  in 
+  in
   if es == [] then empty else
   case dir of
     DUp    -> newFlow (maxOrZero ws) (List.sum hs)
@@ -309,7 +309,7 @@ below lo hi =
 
 
 {-| Put elements beside each other horizontally.
-To put `a` beside `b` you would say: ``a `beside` b`` 
+To put `a` beside `b` you would say: ``a `beside` b``
 -}
 beside : Element -> Element -> Element
 beside lft rht =
@@ -323,7 +323,7 @@ beside lft rht =
 `layers == flow outward`
 -}
 layers : List Element -> Element
-layers es = 
+layers es =
   let ws = List.map widthOf es
       hs = List.map heightOf es
   in

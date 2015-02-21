@@ -2,7 +2,6 @@ module Time
     ( Time, millisecond, second, minute, hour
     , inMilliseconds, inSeconds, inMinutes, inHours
     , fps, fpsWhen, every
-    , timestamp, delay, since
     ) where
 
 {-| Library for working with time.
@@ -21,7 +20,9 @@ module Time
 
 import Basics (..)
 import Native.Time
-import Signal (Signal, map, merge, foldp)
+import Signal (Stream)
+import Varying
+import Varying (Varying)
 
 
 {-| Type alias to make it clearer when you are working with time values.
@@ -80,9 +81,9 @@ current frame.
 
 Note: Calling `fps 30` twice gives two independently running timers.
 -}
-fps : number -> Signal Time
-fps =
-  Native.Time.fps
+fps : number -> Stream Time
+fps targetFrames =
+  fpsWhen targetFrames (Varying.constant True)
 
 
 {-| Same as the `fps` function, but you can turn it on and off. Allows you
@@ -91,7 +92,7 @@ The first time delta after a pause is always zero, no matter how long
 the pause was. This way summing the deltas will actually give the amount
 of time that the output signal has been running.
 -}
-fpsWhen : number -> Signal Bool -> Signal Time
+fpsWhen : number -> Varying Bool -> Stream Time
 fpsWhen =
   Native.Time.fpsWhen
 
@@ -101,42 +102,6 @@ every `t`.
 
 Note: Calling `every 100` twice gives two independently running timers.
 -}
-every : Time -> Signal Time
+every : Time -> Varying Time
 every =
   Native.Time.every
-
-
-{-| Takes a time `t` and any signal. The resulting boolean signal is true for
-time `t` after every event on the input signal. So ``(second `since`
-Mouse.clicks)`` would result in a signal that is true for one second after
-each mouse click and false otherwise.
--}
-since : Time -> Signal a -> Signal Bool
-since t s =
-    let
-        start = map (always 1) s
-        stop = map (always -1) (delay t s)
-        delaydiff = foldp (+) 0 (merge start stop)
-    in
-        map ((/=) 0) delaydiff
-
-
-{-| Add a timestamp to any signal. Timestamps increase monotonically. When you
-create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
-updates whenever `Mouse.x` updates.
-
-Timestamp updates are tied to individual events, so
-`(timestamp Mouse.x)` and `(timestamp Mouse.y)` will always have the same
-timestamp because they rely on the same underlying event (`Mouse.position`).
--}
-timestamp : Signal a -> Signal (Time, a)
-timestamp =
-  Native.Time.timestamp
-
-
-{-| Delay a signal by a certain amount of time. So `(delay second Mouse.clicks)`
-will update one second later than any mouse click.
--}
-delay : Time -> Signal a -> Signal a
-delay =
-  Native.Time.delay

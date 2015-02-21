@@ -13,26 +13,40 @@ module Mouse
 
 -}
 
-import Signal (Signal)
+import Basics (fst, snd)
+import Stream (Stream)
+import Varying
+import Varying (Varying)
 import Native.Mouse
 
+
 {-| The current mouse position. -}
-position : Signal (Int,Int)
-position = Native.Mouse.position
+position : Varying (Int,Int)
+position =
+  Native.Mouse.position
+
 
 {-| The current x-coordinate of the mouse. -}
-x : Signal Int
-x = Native.Mouse.x
+x : Varying Int
+x =
+  Varying.map fst position
+
 
 {-| The current y-coordinate of the mouse. -}
-y : Signal Int
-y = Native.Mouse.y
+y : Varying Int
+y =
+  Varying.map snd position
+
 
 {-| The current state of the left mouse-button.
 True when the button is down, and false otherwise. -}
-isDown : Signal Bool
-isDown = Native.Mouse.isDown
+isDown : Varying Bool
+isDown =
+  Native.Mouse.isDown
+
 
 {-| Always equal to unit. Event triggers on every mouse click. -}
-clicks : Signal ()
-clicks = Native.Mouse.clicks
+clicks : Stream ()
+clicks =
+  Native.Mouse.clicks
+
