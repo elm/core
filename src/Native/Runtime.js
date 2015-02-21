@@ -352,10 +352,9 @@ if (!Elm.fullscreen) {
 			var signalGraph = Module.main;
 
 			// make sure the signal graph is actually a signal & extract the visual model
-			var Signal = Elm.Signal.make(elm);
-			if (!('recv' in signalGraph))
+			if (!('notify' in signalGraph))
 			{
-				signalGraph = Signal.constant(signalGraph);
+				signalGraph = Elm.Varying.make(elm).constant(signalGraph);
 			}
 			var initialScene = signalGraph.value;
 
@@ -475,7 +474,7 @@ if (!Elm.fullscreen) {
 				savedScene = scheduledScene;
 			}
 
-			var renderer = A2(Signal.map, domUpdate, signalGraph);
+			var renderer = Elm.Native.Signal.make(elm).output(domUpdate, signalGraph);
 
 			// must check for resize after 'renderer' is created so
 			// that changes show up.

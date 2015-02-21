@@ -52,6 +52,28 @@ Elm.Native.Signal.make = function(localRuntime) {
 	var never = input(null);
 
 
+	// OUTPUT
+
+	function output(handler, parent)
+	{
+		var node = {
+			id: Utils.guid(),
+			isOutput: true
+		};
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (update)
+			{
+				handler(parent.value);
+			}
+		};
+
+		parent.kids.push(node);
+
+		return node;
+	}
+
 	// CONVERSION
 
 	function streamToVarying(initial, stream)
@@ -137,7 +159,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
 			++count;
-			
+
 			update = update || parentUpdate;
 
 			if (count === numberOfParents)
@@ -169,7 +191,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		}
 		return mapMany(refreshValue, [a]);
 	}
-	
+
 
 	function map2(func, a, b)
 	{
@@ -179,7 +201,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		}
 		return mapMany(refreshValue, [a,b]);
 	}
-	
+
 
 	function map3(func, a, b, c)
 	{
@@ -189,7 +211,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		}
 		return mapMany(refreshValue, [a,b,c]);
 	}
-	
+
 
 	function map4(func, a, b, c, d)
 	{
@@ -199,7 +221,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		}
 		return mapMany(refreshValue, [a,b,c,d]);
 	}
-	
+
 
 	function map5(func, a, b, c, d, e)
 	{
@@ -293,7 +315,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 				right.update = parentUpdate;
 				right.value = rightStream.value;
 			}
-  
+
 			if (left.touched && right.touched)
 			{
 				var update = false;
@@ -301,17 +323,17 @@ Elm.Native.Signal.make = function(localRuntime) {
 				{
 					node.value = A2(tieBreaker, left.value, right.value);
 					update = true;
-				}				
+				}
 				else if (left.update)
 				{
 					node.value = left.value;
 					update = true;
-				}				
+				}
 				else if (right.update)
 				{
 					node.value = right.value;
 					update = true;
-				}				
+				}
 				left.touched = false;
 				right.touched = false;
 
@@ -351,13 +373,14 @@ Elm.Native.Signal.make = function(localRuntime) {
 		};
 
 		stream.kids.push(node);
-		
+
 		return node;
 	}
 
 
 	return localRuntime.Native.Signal.values = {
 		input: input,
+		output: output,
 		never: never,
 		streamToVarying: F2(streamToVarying),
 		varyingToStream: varyingToStream,
