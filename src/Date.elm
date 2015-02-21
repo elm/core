@@ -44,9 +44,9 @@ fromString =
   Native.Date.read
 
 
-{-| Convert a date into a time since midnight (UTC) of 1 January 1990 (i.e.
-[UNIX time](http://en.wikipedia.org/wiki/Unix_time)). Given the date 23 June
-1990 at 11:45AM this returns the corresponding time.
+{-| Convert a date into a [UNIX time](http://en.wikipedia.org/wiki/Unix_time) in
+milliseconds (i.e. number of milliseconds since midnight (UTC) of 1 January 1970).
+Given the date 23 June 1990 at 11:45AM this returns the corresponding time.
 -}
 toTime : Date -> Time
 toTime =
