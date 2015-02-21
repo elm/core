@@ -173,7 +173,6 @@ send =
   Native.Http.send
 
 
-
 {-| Send a GET request to the given url. You also specify how to decode the
 response.
 

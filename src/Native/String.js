@@ -12,6 +12,7 @@ Elm.Native.String.make = function(localRuntime) {
 		return localRuntime.Native.String.values = Elm.Native.String.values;
 	}
 
+
 	var Char = Elm.Char.make(localRuntime);
 	var List = Elm.Native.List.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
@@ -54,7 +55,7 @@ Elm.Native.String.make = function(localRuntime) {
 		}
 		return out.join('');
 	}
-	function keepIf(pred,str)
+	function filter(pred,str)
 	{
 		return str.split('').map(Utils.chr).filter(pred).join('');
 	}
@@ -296,7 +297,7 @@ Elm.Native.String.make = function(localRuntime) {
 		concat: concat,
 		length: length,
 		map: F2(map),
-		keepIf: F2(keepIf),
+		filter: F2(filter),
 		reverse: reverse,
 		foldl: F3(foldl),
 		foldr: F3(foldr),

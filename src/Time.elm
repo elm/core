@@ -74,17 +74,19 @@ inHours t =
   t / hour
 
 
-{-| Takes desired number of frames per second (fps). The resulting signal
+{-| Takes desired number of frames per second (FPS). The resulting signal
 gives a sequence of time deltas as quickly as possible until it reaches
 the desired FPS. A time delta is the time between the last frame and the
 current frame.
+
+Note: Calling `fps 30` twice gives two independently running timers.
 -}
 fps : number -> Stream Time
 fps targetFrames =
   fpsWhen targetFrames (Varying.constant True)
 
 
-{-| Same as the fps function, but you can turn it on and off. Allows you
+{-| Same as the `fps` function, but you can turn it on and off. Allows you
 to do brief animations based on user input without major inefficiencies.
 The first time delta after a pause is always zero, no matter how long
 the pause was. This way summing the deltas will actually give the amount
@@ -95,10 +97,11 @@ fpsWhen =
   Native.Time.fpsWhen
 
 
-{-| Takes a time interval t. The resulting signal is the current time, updated
-every t.
+{-| Takes a time interval `t`. The resulting signal is the current time, updated
+every `t`.
+
+Note: Calling `every 100` twice gives two independently running timers.
 -}
 every : Time -> Varying Time
 every =
   Native.Time.every
-

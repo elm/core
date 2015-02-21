@@ -70,7 +70,7 @@ if (!Elm.fullscreen) {
 			}
 			function setTimeout(func, delay)
 			{
-				window.setTimeout(func, delay);
+				return window.setTimeout(func, delay);
 			}
 
 			var listeners = [];
@@ -267,7 +267,7 @@ if (!Elm.fullscreen) {
 				var process = process || {};
 				var handler = process.stderr
 					? function(v) { process.stderr.write(v); }
-					: function(v) { console.log('Error:' + v); };
+					: function(v) { console.error(v); };
 				ports.stderr.subscribe(handler);
 			}
 			if ('title' in ports)

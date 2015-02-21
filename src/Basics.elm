@@ -386,13 +386,8 @@ example, the following code checks if the square root of a number is odd:
 
     sqrt >> isEven >> not
 
-You can think of this operator as equivalent to the following:
-
-    (f >> g)  ==  (\x -> g (f x))
-
-So our example expands out to something like this:
-
-    \n -> not (isEven (sqrt n))
+This direction of function composition seems less pleasant than `(<<)` which
+reads nicely in expressions like: `filter (not << isRegistered) students`
 -}
 (>>) : (a -> b) -> (b -> c) -> (a -> c)
 (>>) f g x = g (f x)

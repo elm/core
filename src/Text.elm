@@ -2,7 +2,7 @@ module Text
     ( fromString, empty, append, concat, join
     , leftAligned, rightAligned, centered, justified
     , link, Style, style, defaultStyle, Line(..)
-    , plainText, asText
+    , plainText, asText, Text
     , typeface, monospace, height, color, bold, italic, line
     ) where
 

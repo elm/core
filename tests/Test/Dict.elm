@@ -36,8 +36,7 @@ tests =
         , test "diff" <| assertEqual (Dict.singleton "Jerry" "mouse") (Dict.diff animals (Dict.singleton "Tom" "cat"))
         ]
       transformTests = suite "transform Tests"
-        [ test "keepIf" <| assertEqual (Dict.singleton "Tom" "cat") (Dict.keepIf (\k v -> k == "Tom") animals)
-        , test "dropIf" <| assertEqual (Dict.singleton "Jerry" "mouse") (Dict.dropIf (\k v -> k == "Tom") animals)
+        [ test "filter" <| assertEqual (Dict.singleton "Tom" "cat") (Dict.filter (\k v -> k == "Tom") animals)
         , test "partition" <| assertEqual (Dict.singleton "Tom" "cat", Dict.singleton "Jerry" "mouse") (Dict.partition (\k v -> k == "Tom") animals)
         ]
   in

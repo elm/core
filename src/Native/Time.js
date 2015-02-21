@@ -3,57 +3,69 @@ Elm.Native.Time.make = function(localRuntime) {
 
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Time = localRuntime.Native.Time || {};
-	if (localRuntime.Native.Time.values)
-	{
+	if (localRuntime.Native.Time.values) {
 		return localRuntime.Native.Time.values;
 	}
 
 	var NS = Elm.Native.Signal.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
-	function fpsWhen(desiredFPS, isOn)
-	{
+	function fpsWhen(desiredFPS, isOn) {
 		var msPerFrame = 1000 / desiredFPS;
-		var ticker = NS.input(true);
+		var ticker = NS.input(Utils.Tuple0);
 
-		// manage time deltas
-		var initialState = {
-			delta: 0,
-			timestamp: localRuntime.timer.programStart
-		};
-		function updateState(event, old)
+		function notifyTicker()
 		{
-			var curr = event._0;
-			return {
-				delta: event._1 ? 0 : curr - old.timestamp,
-				timestamp: curr
-			};
+			localRuntime.notify(ticker.id, Utils.Tuple0);
 		}
-		var state = A3( NS.fold, F2(updateState), initialState, NS.timestamp(ticker) );
 
-		var deltas = A2( NS.map, function(p) { return p.delta; }, state );
-
-		// turn ticker on and off depending on isOn signal
-		var wasOn = true;
-		var timeoutID = 0;
-		function startStopTimer(isOn, t)
+		function firstArg(x, y)
 		{
+			return x;
+		}
+
+		// input fires either when isOn changes, or when ticker fires.
+		// Its value is a tuple with the current timestamp, and the state of isOn
+		var input = NS.timestamp(A3(NS.map2, F2(firstArg), NS.dropRepeats(isOn), ticker));
+
+		var initialState = {
+			isOn: false,
+			time: localRuntime.timer.programStart,
+			delta: 0
+		};
+
+		var timeoutId;
+
+		function update(input,state)
+		{
+			var currentTime = input._0;
+			var isOn = input._1;
+			var wasOn = state.isOn;
+			var previousTime = state.time;
+
 			if (isOn)
 			{
-				timeoutID = localRuntime.setTimeout(function() {
-					localRuntime.notify(ticker.id, !wasOn && isOn);
-				}, msPerFrame);
+				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
 			}
 			else if (wasOn)
 			{
-				clearTimeout(timeoutID);
+				clearTimeout(timeoutId);
 			}
-			wasOn = isOn;
-			return t;
+
+			return {
+				isOn: isOn,
+				time: currentTime,
+				delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
+			};
 		}
 
-		return A3( NS.map2, F2(startStopTimer), isOn, deltas );
+		return A2(
+			NS.map,
+			function(state) { return state.delta; },
+			A3(NS.fold, F2(update), update(input.value,initialState), input)
+		);
 	}
 
 

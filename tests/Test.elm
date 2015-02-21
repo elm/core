@@ -13,6 +13,7 @@ import IO.Runner as Run
 
 import Test.Array as Array
 import Test.Basics as Basics
+import Test.Bitwise as Bitwise
 import Test.Char as Char
 import Test.CodeGen as CodeGen
 import Test.Dict as Dict
@@ -29,6 +30,7 @@ tests =
     suite "Elm Standard Library Tests"
     [ Array.tests
     , Basics.tests
+    , Bitwise.tests
     , Char.tests
     , CodeGen.tests
     , Dict.tests

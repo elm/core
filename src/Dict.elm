@@ -2,7 +2,7 @@ module Dict
     ( Dict
     , empty, singleton, insert, update
     , get, remove, member
-    , keepIf, dropIf
+    , filter
     , partition
     , foldl, foldr, map
     , union, intersect, diff
@@ -30,7 +30,7 @@ equality with `(==)` is unreliable and should not be used.
 @docs keys, values, toList, fromList
 
 # Transform
-@docs map, foldl, foldr, keepIf, dropIf, partition
+@docs map, foldl, foldr, filter, partition
 
 -}
 
@@ -424,7 +424,7 @@ union t1 t2 =
 Preference is given to values in the first dictionary. -}
 intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
 intersect t1 t2 =
-    keepIf (\k _ -> k `member` t2) t1
+    filter (\k _ -> k `member` t2) t1
 
 
 {-| Keep a key-value pair when its key does not appear in the second dictionary.
@@ -458,31 +458,15 @@ fromList assocs =
     List.foldl (\(key,value) dict -> insert key value dict) empty assocs
 
 
-{-| Keep certain key-value pairs.
-
-    topStudents : Dict String (List Int)
-    topStudents =
-        keepIf (\student grades -> average grades > 90) students
--}
-keepIf : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-keepIf isOkay dictionary =
+{-| Keep a key-value pair when it satisfies a predicate. -}
+filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+filter predicate dictionary =
     let add key value dict =
-            if isOkay key value
+            if predicate key value
                 then insert key value dict
                 else dict
     in
         foldl add empty dictionary
-
-
-{-| Drop certain key-value pairs.
-
-    activeTasks : Dict Int Task
-    activeTasks =
-        dropIf (\id task -> isComplete task) tasks
--}
-dropIf : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-dropIf isBad dict =
-    keepIf (\k v -> not (isBad k v)) dict
 
 
 {-| Partition a dictionary according to a predicate. The first dictionary

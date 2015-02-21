@@ -5,7 +5,7 @@ module String
     , contains, startsWith, endsWith, indexes, indices
     , toInt, toFloat, toList, fromList
     , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
-    , map, keepIf, dropIf, foldl, foldr, any, all
+    , map, filter, foldl, foldr, any, all
     ) where
 
 {-| A built-in representation for efficient string manipulation. String literals
@@ -34,11 +34,10 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
       trim, trimLeft, trimRight
 
 # Higher-Order Functions
-@docs map, keepIf, dropIf, foldl, foldr, any, all
+@docs map, filter, foldl, foldr, any, all
 -}
 
 import Native.String
-import Basics (not, (<<))
 import Char
 import Maybe (Maybe)
 import Result (Result)
@@ -106,23 +105,12 @@ length = Native.String.length
 map : (Char -> Char) -> String -> String
 map = Native.String.map
 
+{-| Keep only the characters that satisfy the predicate.
 
-{-| Keep certain characters.
-
-    keepIf isDigit "R2-D2" == "22"
+    filter isDigit "R2-D2" == "22"
 -}
-keepIf : (Char -> Bool) -> String -> String
-keepIf = Native.String.keepIf
-
-
-{-| Drop certain characters.
-
-    dropIf isDigit "R2-D2" == "R-D"
--}
-dropIf : (Char -> Bool) -> String -> String
-dropIf isBad string =
-    keepIf (not << isBad) string
-
+filter : (Char -> Bool) -> String -> String
+filter = Native.String.filter
 
 {-| Reverse a string.
 
