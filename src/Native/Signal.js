@@ -159,7 +159,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
-			console.log('map', parentUpdate);
 			++count;
 
 			update = update || parentUpdate;
@@ -279,7 +278,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
-			console.log('timestamp', parentUpdate);
 			if (parentUpdate)
 			{
 				node.value = Utils.Tuple2(timestamp, stream.value);
