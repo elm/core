@@ -268,6 +268,15 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         return div;
     }
 
+    function scrollContainer(elem) {
+        var e = render(elem);
+        var div = createNode('div');
+        div.style.position = 'relative';
+        div.style.overflow = 'auto';
+        div.appendChild(e);
+        return div;
+    }
+
     function rawHtml(elem) {
         var html = elem.html;
         var guid = elem.guid;
@@ -293,6 +302,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
         case 'Image':     return image(e.props, elem);
         case 'Flow':      return flow(elem._0.ctor, elem._1);
         case 'Container': return container(elem._0, elem._1);
+        case 'ScrollContainer': return scrollContainer(elem._0);
         case 'Spacer':    return createNode('div');
         case 'RawHtml':   return rawHtml(elem);
         case 'Custom':    return elem.render(elem.model);
@@ -375,6 +385,12 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
             var subNode = node.firstChild;
             var newSubNode = updateAndReplace(subNode, currE._1, nextE._1);
             setPos(nextE._0, nextE._1, newSubNode);
+            updateProps(node, curr, next);
+            return rootNode;
+
+        case "ScrollContainer":
+            var subNode = node.firstChild;
+            var newSubNode = updateAndReplace(subNode, currE._0, nextE._0);
             updateProps(node, curr, next);
             return rootNode;
 
