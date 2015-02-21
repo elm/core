@@ -3,14 +3,13 @@ Elm.Native.Time.make = function(localRuntime) {
 
     localRuntime.Native = localRuntime.Native || {};
     localRuntime.Native.Time = localRuntime.Native.Time || {};
-    if (localRuntime.Native.Time.values) {
+    if (localRuntime.Native.Time.values)
+    {
         return localRuntime.Native.Time.values;
     }
 
-    var Signal = Elm.Signal.make(localRuntime);
     var NS = Elm.Native.Signal.make(localRuntime);
     var Maybe = Elm.Maybe.make(localRuntime);
-    var Utils = Elm.Native.Utils.make(localRuntime);
 
 
     function fpsWhen(desiredFPS, isOn) {
@@ -29,9 +28,9 @@ Elm.Native.Time.make = function(localRuntime) {
                 timestamp: curr
             };
         }
-        var state = A3( Signal.foldp, F2(updateState), initialState, NS.timestamp(ticker) );
+        var state = A3( NS.fold, F2(updateState), initialState, NS.timestamp(ticker) );
 
-        var deltas = A2( Signal.map, function(p) { return p.delta; }, state );
+        var deltas = A2( NS.map, function(p) { return p.delta; }, state );
 
         // turn ticker on and off depending on isOn signal
         var wasOn = true;
@@ -51,27 +50,25 @@ Elm.Native.Time.make = function(localRuntime) {
             return t;
         }
 
-        return A3( Signal.map2, F2(startStopTimer), isOn, deltas );
-    }
-
-    
-    function fps(t) {
-        return fpsWhen(t, Signal.constant(true));
+        return A3( NS.map2, F2(startStopTimer), isOn, deltas );
     }
 
 
-    function every(t) {
-      var ticker = NS.input(Utils.Tuple0);
-      function tellTime() {
-          localRuntime.notify(ticker.id, Utils.Tuple0);
-      }
-      var clock = A2( Signal.map, fst, NS.timestamp(ticker) );
-      setInterval(tellTime, t);
-      return clock;
+    function every(t)
+    {
+        var ticker = NS.input(null);
+        function tellTime()
+        {
+            localRuntime.notify(ticker.id, null);
+        }
+        var clock = A2( NS.map, fst, NS.timestamp(ticker) );
+        setInterval(tellTime, t);
+        return clock;
     }
 
 
-    function fst(pair) {
+    function fst(pair)
+    {
         return pair._0;
     }
 
@@ -83,10 +80,7 @@ Elm.Native.Time.make = function(localRuntime) {
 
     return localRuntime.Native.Time.values = {
         fpsWhen: F2(fpsWhen),
-        fps: fps,
         every: every,
-        delay: NS.delay,
-        timestamp: NS.timestamp,
         toDate: function(t) { return new window.Date(t); },
         read: read
     };

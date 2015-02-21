@@ -20,7 +20,9 @@ module Time
 
 import Basics (..)
 import Native.Time
-import Signal (Signal)
+import Stream (Stream)
+import Varying
+import Varying (Varying)
 
 
 {-| Type alias to make it clearer when you are working with time values.
@@ -77,9 +79,9 @@ gives a sequence of time deltas as quickly as possible until it reaches
 the desired FPS. A time delta is the time between the last frame and the
 current frame.
 -}
-fps : number -> Signal Time
-fps =
-  Native.Time.fps
+fps : number -> Stream Time
+fps targetFrames =
+  fpsWhen targetFrames (Varying.constant True)
 
 
 {-| Same as the fps function, but you can turn it on and off. Allows you
@@ -88,7 +90,7 @@ The first time delta after a pause is always zero, no matter how long
 the pause was. This way summing the deltas will actually give the amount
 of time that the output signal has been running.
 -}
-fpsWhen : number -> Signal Bool -> Signal Time
+fpsWhen : number -> Varying Bool -> Stream Time
 fpsWhen =
   Native.Time.fpsWhen
 
@@ -96,7 +98,7 @@ fpsWhen =
 {-| Takes a time interval t. The resulting signal is the current time, updated
 every t.
 -}
-every : Time -> Signal Time
+every : Time -> Varying Time
 every =
   Native.Time.every
 
