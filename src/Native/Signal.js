@@ -28,10 +28,14 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		var node = {
 			id: Utils.guid(),
-			initialValue: base,
-			value: base,
 			kids: []
 		};
+
+		if (typeof base !== 'undefined')
+		{
+			node.initialValue = base;
+			node.value = base;
+		}
 
 		node.notify = function(timestamp, targetId, value) {
 			var update = targetId === node.id;
@@ -60,7 +64,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
-			if (update)
+			if (parentUpdate)
 			{
 				handler(parent.value);
 			}
@@ -155,6 +159,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
+			console.log('map', parentUpdate);
 			++count;
 
 			update = update || parentUpdate;
@@ -274,6 +279,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
+			console.log('timestamp', parentUpdate);
 			if (parentUpdate)
 			{
 				node.value = Utils.Tuple2(timestamp, stream.value);
@@ -377,7 +383,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	return localRuntime.Native.Signal.values = {
 		input: input,
-		never: input(null),
+		never: input(),
 		constant: input,
 		output: output,
 		streamToVarying: F2(streamToVarying),

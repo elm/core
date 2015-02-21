@@ -64,7 +64,7 @@ if (!Elm.fullscreen) {
 				var timestep = timer.now();
 				for (var i = inputs.length; i--; )
 				{
-					inputs[i].recv(timestep, id, v);
+					inputs[i].notify(timestep, id, v);
 				}
 				updateInProgress = false;
 			}
@@ -146,16 +146,18 @@ if (!Elm.fullscreen) {
 				throw error;
 			}
 
+			if (display !== Display.NONE)
+			{
+				var graphicsNode = initGraphics(elm, Module);
+			}
+
 			var rootNode = { kids: inputs };
 			trimDeadNodes(rootNode);
 			inputs = rootNode.kids;
 			filterListeners(inputs, listeners);
 
 			addReceivers(elm.ports.outgoing);
-			if (display !== Display.NONE)
-			{
-				var graphicsNode = initGraphics(elm, Module);
-			}
+
 			if (typeof moduleToReplace !== 'undefined')
 			{
 				hotSwap(moduleToReplace, elm);
@@ -163,7 +165,7 @@ if (!Elm.fullscreen) {
 				// rerender scene if graphics are enabled.
 				if (typeof graphicsNode !== 'undefined')
 				{
-					graphicsNode.recv(0, true, 0);
+					graphicsNode.notify(0, true, 0);
 				}
 			}
 
@@ -329,7 +331,7 @@ if (!Elm.fullscreen) {
 			for (var i = node.kids.length; i--; )
 			{
 				var kid = node.kids[i];
-				if (trimDeadNodes(kid).isAlive)
+				if (trimDeadNodes(kid))
 				{
 					liveKids.push(kid);
 				}
