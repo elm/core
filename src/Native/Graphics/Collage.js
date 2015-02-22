@@ -314,11 +314,29 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	function renderForm(redo, ctx, form)
 	{
 		ctx.save();
-		var x = form.x, y = form.y, theta = form.theta, scale = form.scale;
-		if (x !== 0 || y !== 0) ctx.translate(x, y);
-		if (theta !== 0) ctx.rotate(theta);
-		if (scale !== 1) ctx.scale(scale,scale);
-		if (form.alpha !== 1) ctx.globalAlpha = ctx.globalAlpha * form.alpha;
+
+		var x = form.x,
+			y = form.y,
+			theta = form.theta,
+			scale = form.scale;
+
+		if (x !== 0 || y !== 0)
+		{
+			ctx.translate(x, y);
+		}
+		if (theta !== 0)
+		{
+			ctx.rotate(theta);
+		}
+		if (scale !== 1)
+		{
+			ctx.scale(scale,scale);
+		}
+		if (form.alpha !== 1)
+		{
+			ctx.globalAlpha = ctx.globalAlpha * form.alpha;
+		}
+
 		ctx.beginPath();
 		var f = form.form;
 		switch (f.ctor)
