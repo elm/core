@@ -13,6 +13,7 @@ module Char where
 -}
 
 import Native.Char
+import Basics ((&&), (||), (>=), (<=))
 
 {-| True for upper case letters. -}
 isUpper : Char -> Bool

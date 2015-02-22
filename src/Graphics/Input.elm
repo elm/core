@@ -17,6 +17,7 @@ To learn about text fields, see the
 import Signal
 import Graphics.Element (Element)
 import Native.Graphics.Input
+import Text -- used internally
 
 
 {-| Create a standard button. The following example begins making a basic

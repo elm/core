@@ -29,6 +29,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 -}
 
 import Native.String
+import Basics (not, (<<))
 import Char
 import Maybe (Maybe)
 import Result (Result)
