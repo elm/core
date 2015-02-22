@@ -159,36 +159,6 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return t;
 	}
 
-	function makeText(text)
-	{
-		var style = '';
-		var href = '';
-		while (true)
-		{
-			if (text.style)
-			{
-				style += text.style;
-				text = text.text;
-				continue;
-			}
-			if (text.href)
-			{
-				href = text.href;
-				text = text.text;
-				continue;
-			}
-			if (href)
-			{
-				text = '<a href="' + href + '">' + text + '</a>';
-			}
-			if (style)
-			{
-				text = '<span style="' + style + '">' + text + '</span>';
-			}
-			return text;
-		}
-	}
-
 	var count = 0;
 	function guid(_)
 	{
@@ -294,17 +264,23 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 	function append(xs,ys)
 	{
-		// append Text
-		if (xs.text || ys.text)
-		{
-			return txt(makeText(xs) + makeText(ys));
-		}
-
 		// append Strings
 		if (typeof xs === "string")
 		{
 			return xs + ys;
 		}
+
+		// append Text
+		if (xs.ctor.slice(0,5) === 'Text:')
+		{
+			return {
+				ctor: 'Text:Append',
+				_0: xs,
+				_1: ys
+			};
+		}
+
+
 
 		// append Lists
 		if (xs.ctor === '[]')
@@ -361,14 +337,13 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 
 	return localRuntime.Native.Utils.values = {
-		eq:eq,
-		cmp:cmp,
-		compare:F2(compare),
-		Tuple0:Tuple0,
-		Tuple2:Tuple2,
-		chr:chr,
-		txt:txt,
-		makeText:makeText,
+		eq: eq,
+		cmp: cmp,
+		compare: F2(compare),
+		Tuple0: Tuple0,
+		Tuple2: Tuple2,
+		chr: chr,
+		txt: txt,
 		copy: copy,
 		remove: remove,
 		replace: replace,

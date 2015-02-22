@@ -183,94 +183,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		ctx.fill();
 	}
 
-	// Convert the object returned by the text module
-	// into something we can use for styling canvas text
-	function parseTextModuleOutput(text)
-	{
-		// the array is necessary to guarantee property order
-		var props = [
-			'font-style',
-			'font-variant',
-			'font-weight',
-			'font-size',
-			'font-family'
-		];
-		var defaults = {
-			"font-style": "normal",
-			"font-variant": "normal",
-			"font-weight": "normal",
-			"font-size": "12px",
-			"font-family": "sans-serif"
-		};
 
-		// Convert to HTML and use the style attribute to extract styles
-		var node = document.createElement('div');
-		node.innerHTML = Utils.makeText(text);
-		var textArr = [];
-		for (var n = 0; n < node.childNodes.length; ++n)
-		{
-			var span = node.childNodes[n];
-			var textObj = {
-				text: span.textContent,
-				fontString: ''
-			};
-			for (var i = 0; i < props.length; ++i)
-			{
-				var p = props[i];
-				var hasProp =
-					span.style
-					&& span.style.hasOwnProperty(p)
-					&& span.style[p].length > 0;
-				var value = hasProp
-					? span.style[p]
-					: defaults[p];
-				textObj.fontString += " " + value;
-				if (p === 'font-size')
-				{
-					// Record the text height for later use
-					if (/[0-9]+px/i.test(value))
-					{
-						textObj.height = parseInt(value.substring(0, value.length - 2));
-					}
-					else
-					{
-						textObj.height = 0;
-					}
-				}
-			}
-			// Extract the color for use with filled text only
-			if (span.style)
-			{
-				textObj.color = span.style['color'];
-			}
-			textArr.push(textObj);
-		}
-		return textArr;
-	}
-
-	function drawText(ctx, text, canvasDrawFn)
-	{
-		ctx.scale(1,-1);
-		var textArr = parseTextModuleOutput(text);
-		var totalWidth = 0;
-		var maxHeight = 0;
-		textArr.forEach( function(textObj) {
-			ctx.font = textObj.fontString;
-			var metrics = ctx.measureText(textObj.text);
-			textObj.width = metrics.width;
-			totalWidth += textObj.width;
-			maxHeight = Math.max(maxHeight, textObj.height);
-		});
-		var x = -totalWidth / 2.0;
-		textArr.forEach( function(textObj) {
-			ctx.font = textObj.fontString;
-			ctx.fillStyle = textObj.color
-				? textObj.color
-				: "#000"; // black fill if no color set
-			canvasDrawFn.call(ctx, textObj.text, x, maxHeight / 2);
-			x += textObj.width;
-		});
-	}
+	// TEXT RENDERING
 
 	function fillText(redo, ctx, text)
 	{
@@ -289,6 +203,104 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		}
 		drawText(ctx, text, ctx.strokeText);
 	}
+
+	function drawText(ctx, text, canvasDrawFn)
+	{
+		var textChunks = chunkText(defaultContext, text);
+
+		var totalWidth = 0;
+		var maxHeight = 0;
+		var numChunks = textChunks.length;
+
+		ctx.scale(1,-1);
+
+		for (var i = numChunks; i--; )
+		{
+			var chunk = textChunks[i];
+			ctx.font = chunk.font;
+			var metrics = ctx.measureText(chunk.text);
+			console.log(metrics);
+			chunk.width = metrics.width;
+			totalWidth += chunk.width;
+			if (chunk.height > maxHeight)
+			{
+				maxHeight = chunk.height;
+			}
+		}
+
+		var x = -totalWidth / 2.0;
+		for (var i = 0; i < numChunks; ++i)
+		{
+			var chunk = textChunks[i];
+			ctx.font = chunk.font;
+			ctx.fillStyle = chunk.color;
+			canvasDrawFn.call(ctx, chunk.text, x, maxHeight / 2);
+			x += chunk.width;
+		}
+	}
+
+	function toFont(props)
+	{
+		return [
+			props['font-style'],
+			props['font-variant'],
+			props['font-weight'],
+			props['font-size'],
+			props['font-family']
+		].join(' ');
+	}
+
+
+	// Convert the object returned by the text module
+	// into something we can use for styling canvas text
+	function chunkText(context, text)
+	{
+		var tag = text.ctor;
+		if (tag === 'Text:Append')
+		{
+			var leftChunks = chunkText(context, text._0);
+			var rightChunks = chunkText(context, text._1);
+			return leftChunks.concat(rightChunks);
+		}
+		if (tag === 'Text:Text')
+		{
+			return [{
+				text: text._0,
+				color: context.color,
+				height: context['font-size'].slice(0,-2) | 0,
+				font: toFont(context)
+			}];
+		}
+		if (tag === 'Text:Meta')
+		{
+			var newContext = freshContext(text._0, context);
+			return chunkText(newContext, text._1);
+		}
+	}
+
+	function freshContext(props, ctx)
+	{
+		return {
+			'font-style': props['font-style'] || ctx['font-style'],
+			'font-variant': props['font-variant'] || ctx['font-variant'],
+			'font-weight': props['font-weight'] || ctx['font-weight'],
+			'font-size': props['font-size'] || ctx['font-size'],
+			'font-family': props['font-family'] || ctx['font-family'],
+			'color': props['color'] || ctx['color']
+		};
+	}
+
+	var defaultContext = {
+		'font-style': 'normal',
+		'font-variant': 'normal',
+		'font-weight': 'normal',
+		'font-size': '12px',
+		'font-family': 'sans-serif',
+		'color': 'black'
+	};
+
+
+	// IMAGES
 
 	function drawImage(redo, ctx, form)
 	{

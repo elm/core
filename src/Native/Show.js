@@ -112,6 +112,10 @@ Elm.Native.Show.make = function(localRuntime) {
 				}
 				return name + ".fromList " + toString(list);
 			}
+			else if (v.ctor.slice(0,5) === "Text:")
+			{
+				return '<text>'
+			}
 			else
 			{
 				var output = "";
