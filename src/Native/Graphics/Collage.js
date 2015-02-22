@@ -107,8 +107,10 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		ctx.moveTo(x0,y0);
 		while (i--)
 		{
-			x1 = points[i]._0; y1 = points[i]._1;
-			dx = x1 - x0; dy = y1 - y0;
+			x1 = points[i]._0;
+			y1 = points[i]._1;
+			dx = x1 - x0;
+			dy = y1 - y0;
 			remaining = Math.sqrt(dx * dx + dy * dy);
 			while (segmentLength <= remaining)
 			{
@@ -116,7 +118,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 				y0 += dy * segmentLength / remaining;
 				ctx[draw ? 'lineTo' : 'moveTo'](x0, y0);
 				// update starting position
-				dx = x1 - x0; dy = y1 - y0;
+				dx = x1 - x0;
+				dy = y1 - y0;
 				remaining = Math.sqrt(dx * dx + dy * dy);
 				// update pattern
 				draw = !draw;
@@ -128,7 +131,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 				ctx[draw ? 'lineTo' : 'moveTo'](x1, y1);
 				segmentLength -= remaining;
 			}
-			x0 = x1; y0 = y1;
+			x0 = x1;
+			y0 = y1;
 		}
 	}
 
