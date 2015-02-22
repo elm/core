@@ -4,6 +4,8 @@ install:
   -
   - git clone https://github.com/elm-lang/elm-compiler.git
   - cd elm-compiler
+  - git fetch
+  - git checkout stable
   - cabal sandbox init --sandbox ..
   - cabal install
   - cd ..
