@@ -11,10 +11,9 @@ the whole window.
 
 -}
 
-import Basics (fst,snd)
+import Basics exposing (fst,snd)
 import Native.Window
-import Varying
-import Varying (Varying)
+import Varying exposing (Varying)
 
 
 {-| The current width and height of the window (i.e. the area viewable to the

@@ -16,7 +16,7 @@ module JavaScript.Encode where
 @docs object
 -}
 
-import Array (Array)
+import Array exposing (Array)
 import Native.JavaScript
 
 

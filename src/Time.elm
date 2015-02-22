@@ -18,11 +18,10 @@ module Time
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import Native.Time
-import Signal (Stream)
-import Varying
-import Varying (Varying)
+import Signal exposing (Stream)
+import Varying exposing (Varying)
 
 
 {-| Type alias to make it clearer when you are working with time values.

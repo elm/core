@@ -15,7 +15,7 @@ module Char
 -}
 
 import Native.Char
-import Basics ((&&), (||), (>=), (<=))
+import Basics exposing ((&&), (||), (>=), (<=))
 
 
 isBetween : Char -> Char -> Char -> Bool

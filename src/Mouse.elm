@@ -13,10 +13,8 @@ module Mouse
 
 -}
 
-import Basics (fst, snd)
-import Stream (Stream)
-import Varying
-import Varying (Varying)
+import Basics exposing (fst, snd)
+import Stream exposing (Stream)
 import Native.Mouse
 
 

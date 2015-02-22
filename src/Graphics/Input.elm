@@ -15,7 +15,7 @@ To learn about text fields, see the
 -}
 
 import Signal
-import Graphics.Element (Element)
+import Graphics.Element exposing (Element)
 import Native.Graphics.Input
 import Native.Text
 

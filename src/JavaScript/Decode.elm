@@ -25,13 +25,12 @@ module JavaScript.Decode where
 
 
 import Native.JavaScript
-import Array (Array)
-import Dict
-import Dict (Dict)
-import JavaScript.Encode as JsEncode
+import Array exposing (Array)
+import Dict exposing (Dict)
+import Json.Encode as JsonEncode
 import List
-import Maybe (Maybe)
-import Result (Result)
+import Maybe exposing (Maybe)
+import Result exposing (Result)
 
 
 type Decoder a = Decoder
@@ -333,7 +332,7 @@ maybe : Decoder a -> Decoder (Maybe a)
 maybe =
     Native.JavaScript.decodeMaybe
 
-  
+
 {-| Bring in an arbitrary JSON value. Useful if you need to work with crazily
 formatted data. For example, this lets you create a parser for "variadic" lists
 where the first few types are different, followed by 0 or more of the same

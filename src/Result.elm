@@ -21,7 +21,7 @@ way to manage errors in Elm.
 @docs toMaybe, fromMaybe, formatError
 -}
 
-import Maybe ( Maybe(Just, Nothing) )
+import Maybe exposing ( Maybe(Just, Nothing) )
 
 
 {-| A `Result` is either `Ok` meaning the computation succeeded, or it is an

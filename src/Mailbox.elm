@@ -14,7 +14,7 @@ after some effects are performed.
 @docs redirect
 -}
 
-import Promise (Promise, onError, succeed)
+import Promise exposing (Promise, onError, succeed)
 
 
 type Mailbox a =

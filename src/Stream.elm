@@ -16,12 +16,11 @@ events to your application logic.
 -}
 
 import List
-import Mailbox (Mailbox)
-import Maybe (Maybe(..))
+import Mailbox exposing (Mailbox)
+import Maybe exposing (Maybe(..))
 import Native.Signal
-import Signal
-import Signal (Varying)
-import Time (Time)
+import Signal exposing (Varying)
+import Time exposing (Time)
 
 
 type alias Stream a =

@@ -24,13 +24,11 @@ otherwise.
 
 -}
 
-import Basics (always, (-))
+import Basics exposing (always, (-))
 import Set
-import Stream
-import Stream (Stream)
+import Stream exposing (Stream)
 import Native.Keyboard
-import Varying
-import Varying (Varying)
+import Varying exposing (Varying)
 
 
 {-| Type alias to make it clearer what integers are supposed to represent

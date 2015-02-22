@@ -22,7 +22,7 @@ and [`replace`](#replace).
 
 -}
 
-import Maybe (Maybe)
+import Maybe exposing (Maybe)
 import Native.Regex
 
 type Regex = Regex

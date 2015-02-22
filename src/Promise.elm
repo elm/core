@@ -15,8 +15,8 @@ module Promise where
 -}
 
 import Native.Promise
-import List ((::))
-import Time (Time)
+import List exposing ((::))
+import Time exposing (Time)
 
 
 type Promise x a = Promise
