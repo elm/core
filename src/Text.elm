@@ -1,8 +1,7 @@
 module Text
-    ( fromString, empty, append, concat, join
-    , leftAligned, rightAligned, centered, justified
+    ( Text
+    , fromString, empty, append, concat, join
     , link, Style, style, defaultStyle, Line(..)
-    , plainText, asText, Text
     , typeface, monospace, height, color, bold, italic, line
     ) where
 
@@ -14,32 +13,14 @@ you make text bold or italic, set the typeface, set the text size, etc.
 # Creating Text
 @docs fromString, empty, append, concat, join
 
-# Creating Elements
-
-Each of the following functions places `Text` into a box. The function you use
-determines the alignment of the text.
-
-@docs leftAligned, rightAligned, centered, justified
-
 # Links and Style
-@docs link, Style, style, defaultStyle, Line
-
-# Convenience Functions
-
-There are two convenience functions for creating an `Element` which can be
-useful when debugging or prototyping:
-
-@docs plainText, asText
-
-There are also a bunch of functions to set parts of a `Style` individually:
-
-@docs typeface, monospace, height, color, bold, italic, line
+@docs link, typeface, monospace, height, color, bold, italic, line, Line,
+    style, Style, defaultStyle
 
 -}
 
 import Basics exposing (..)
 import Color exposing (Color, black)
-import Graphics.Element exposing (Element, Three, Pos, ElementPrim, Properties)
 import List
 import Maybe exposing (Maybe(Nothing))
 import Native.Text
@@ -244,53 +225,3 @@ italic =
 line : Line -> Text -> Text
 line =
   Native.Text.line
-
-
-{-| Align text along the left side of the text block. This is sometimes known as
-*ragged right*.
--}
-leftAligned : Text -> Element
-leftAligned =
-  Native.Text.leftAligned
-
-
-{-| Align text along the right side of the text block. This is sometimes known
-as *ragged left*.
--}
-rightAligned : Text -> Element
-rightAligned =
-  Native.Text.rightAligned
-
-
-{-| Center text in the text block. There is equal spacing on either side of a
-line of text.
--}
-centered : Text -> Element
-centered =
-  Native.Text.centered
-
-
-{-| Align text along the left and right sides of the text block. Word spacing is
-adjusted to make this possible.
--}
-justified : Text -> Element
-justified =
-  Native.Text.justified
-
-
-{-| Display a string with no styling.
-
-    plainText string = leftAligned (fromString string)
--}
-plainText : String -> Element
-plainText str =
-  leftAligned (fromString str)
-
-{-| Convert anything to its textual representation and make it displayable in
-the browser. Excellent for debugging.
-
-    asText value = leftAligned (monospace (fromString (toString value)))
--}
-asText : a -> Element
-asText value =
-  leftAligned (monospace (fromString (toString value)))

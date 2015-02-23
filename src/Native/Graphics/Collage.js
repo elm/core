@@ -20,11 +20,9 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	// okay, we cannot short-ciruit, so now we define everything
 	var Color = Elm.Native.Color.make(localRuntime);
 	var List = Elm.Native.List.make(localRuntime);
+	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 	var Transform = Elm.Transform2D.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
-
-	var Element = Elm.Graphics.Element.make(localRuntime);
-	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 
 	function setStrokeStyle(ctx, style)
 	{
@@ -647,7 +645,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	function collage(w,h,forms)
 	{
-		return A3(Element.newElement, w, h, {
+		return A3(NativeElement.newElement, w, h, {
 			ctor: 'Custom',
 			type: 'Collage',
 			render: render,

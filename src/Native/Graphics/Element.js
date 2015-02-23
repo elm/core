@@ -19,8 +19,12 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	var Color = Elm.Native.Color.make(localRuntime);
 	var List = Elm.Native.List.make(localRuntime);
+	var Maybe = Elm.Maybe.make(localRuntime);
+	var Text = Elm.Native.Text.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
+
+	// CREATION
 
 	function createNode(elementType)
 	{
@@ -29,6 +33,30 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		node.style.margin = "0";
 		return node;
 	}
+
+
+	function newElement(width, height, elementPrim)
+	{
+		return {
+			_: {},
+			element: elementPrim,
+			props: {
+				_: {},
+				id: Utils.guid(),
+				width: width,
+				height: height,
+				opacity: 1,
+				color: Maybe.Nothing,
+				href: "",
+				tag: "",
+				hover: Utils.Tuple0,
+				click: Utils.Tuple0
+			}
+		};
+	}
+
+
+	// PROPERTIES
 
 	function setProps(elem, node)
 	{
@@ -141,6 +169,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 	}
 
+
+	// IMAGES
+
 	function image(props, img)
 	{
 		switch (img._0.ctor)
@@ -206,6 +237,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		return e;
 	}
 
+
+	// FLOW
+
 	function goOut(node)
 	{
 		node.style.position = 'absolute';
@@ -255,6 +289,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 		return container;
 	}
+
+
+	// CONTAINER
 
 	function toPos(pos)
 	{
@@ -333,6 +370,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		return div;
 	}
 
+
 	function rawHtml(elem)
 	{
 		var html = elem.html;
@@ -350,6 +388,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		div.style.pointerEvents = 'auto';
 		return div;
 	}
+
+
+	// RENDER
 
 	function render(elem)
 	{
@@ -389,6 +430,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 		return newNode;
 	}
+
+
+	// UPDATE
 
 	function update(node, curr, next)
 	{
@@ -602,6 +646,33 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	}
 
 
+	// TEXT
+
+	function block(align)
+	{
+		return function(text)
+		{
+			var raw = {
+				ctor :'RawHtml',
+				html : Text.renderHtml(text),
+				align: align
+			};
+			var pos = htmlHeight(0, raw);
+			return newElement(pos._0, pos._1, raw);
+		}
+	}
+
+	function markdown(text)
+	{
+		var raw = {
+			ctor:'RawHtml',
+			html: text,
+			align: null
+		};
+		var pos = htmlHeight(0, raw);
+		return newElement(pos._0, pos._1, raw);
+	}
+
 	function htmlHeight(width, rawHtml)
 	{
 		// create dummy node
@@ -632,9 +703,13 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		updateAndReplace: updateAndReplace,
 
 		createNode: createNode,
+		newElement: F3(newElement),
 		addTransform: addTransform,
 		htmlHeight: F2(htmlHeight),
-		guid: Utils.guid
+		guid: Utils.guid,
+
+		block: block,
+		markdown: markdown
 	};
 
 };

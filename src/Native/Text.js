@@ -8,8 +8,6 @@ Elm.Native.Text.make = function(localRuntime) {
 	}
 
 	var toCss = Elm.Native.Color.make(localRuntime).toCss;
-	var Element = Elm.Graphics.Element.make(localRuntime);
-	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 	var List = Elm.Native.List.make(localRuntime);
 
 
@@ -267,54 +265,22 @@ Elm.Native.Text.make = function(localRuntime) {
 	}
 
 
-	// TO ELEMENT
-
-	function block(align)
-	{
-		return function(text)
-		{
-			var raw = {
-				ctor :'RawHtml',
-				html : renderHtml(text),
-				align: align
-			};
-			var pos = A2(NativeElement.htmlHeight, 0, raw);
-			return A3(Element.newElement, pos._0, pos._1, raw);
-		}
-	}
-
-	function markdown(text)
-	{
-		var raw = {
-			ctor:'RawHtml',
-			html: text,
-			align: null
-		};
-		var pos = A2(NativeElement.htmlHeight, 0, raw);
-		return A3(Element.newElement, pos._0, pos._1, raw);
-	}
-
 	return localRuntime.Native.Text.values = {
 		fromString: fromString,
 		append: F2(append),
 
-		height : F2(height),
-		italic : italic,
-		bold : bold,
-		line : F2(line),
-		monospace : monospace,
-		typeface : F2(typeface),
-		color : F2(color),
-		link : F2(link),
-		style : F2(style),
+		height: F2(height),
+		italic: italic,
+		bold: bold,
+		line: F2(line),
+		monospace: monospace,
+		typeface: F2(typeface),
+		color: F2(color),
+		link: F2(link),
+		style: F2(style),
 
-		leftAligned  : block('left'),
-		rightAligned : block('right'),
-		centered     : block('center'),
-		justified    : block('justify'),
-		markdown     : markdown,
-
-		toTypefaces:toTypefaces,
-		toLine:toLine
+		toTypefaces: toTypefaces,
+		toLine: toLine,
+		renderHtml: renderHtml
 	};
 };
