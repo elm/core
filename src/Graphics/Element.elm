@@ -1,4 +1,18 @@
-module Graphics.Element where
+module Graphics.Element
+    ( Element
+    , image, fittedImage, croppedImage, tiledImage
+    , width, height, size, color, opacity, link, tag
+    , widthOf, heightOf, sizeOf
+    , flow, Direction, up, down, left, right, inward, outward
+    , layers, above, below, beside
+    , empty, spacer, container
+    , middle, midTop, midBottom, midLeft, midRight, topLeft, topRight
+    , bottomLeft, bottomRight
+    , Pos, Position
+    , absolute, relative, middleAt, midTopAt, midBottomAt, midLeftAt
+    , midRightAt, topLeftAt, topRightAt, bottomLeftAt, bottomRightAt
+    ) where
+
 {-| Graphical elements that snap together to build complex widgets and layouts.
 Each Element is a rectangle with a known width and height, making them easy to
 combine and position.
@@ -43,6 +57,15 @@ import List as List
 import Color exposing (..)
 import Maybe exposing ( Maybe(..), withDefault )
 
+
+-- PRIMITIVES
+
+type alias Element =
+    { props : Properties
+    , element : ElementPrim
+    }
+
+
 type alias Properties =
     { id      : Int
     , width   : Int
@@ -53,12 +76,6 @@ type alias Properties =
     , tag     : String
     , hover   : ()
     , click   : ()
-    }
-
-
-type alias Element =
-    { props : Properties
-    , element : ElementPrim
     }
 
 
@@ -179,9 +196,9 @@ link href e =
 
 
 newElement w h e =
-  { props = Properties (Native.Graphics.Element.guid ()) w h 1 Nothing "" "" () ()
-  , element = e
-  }
+    { props = Properties (Native.Graphics.Element.guid ()) w h 1 Nothing "" "" () ()
+    , element = e
+    }
 
 
 type ElementPrim
@@ -191,6 +208,9 @@ type ElementPrim
     | Spacer
     | RawHtml
     | Custom -- for custom Elements implemented in JS, see collage for example
+
+
+-- IMAGES
 
 type ImageStyle = Plain | Fitted | Cropped (Int,Int) | Tiled
 
@@ -219,10 +239,13 @@ croppedImage : (Int,Int) -> Int -> Int -> String -> Element
 croppedImage pos w h src =
     newElement w h (Image (Cropped pos) w h src)
 
+
 tiledImage : Int -> Int -> String -> Element
 tiledImage w h src =
     newElement w h (Image Tiled w h src)
 
+
+-- LAYOUT
 
 type Three = P | Z | N
 
