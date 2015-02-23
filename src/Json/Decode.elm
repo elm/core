@@ -165,6 +165,46 @@ object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decode
 object8 =
     Native.Json.decodeObject8
 
+{-| Helper function for decode object which have more than 8 fields.
+-}
+field : Decoder a -> String -> Dict.Dict String Value -> Maybe a
+field typ fld dic = case (case Dict.get fld dic of
+                            Just val -> decodeValue (maybe typ) val
+                            Nothing -> Err fld) of
+                      Ok res -> res
+                      Err _ -> Nothing
+
+{-| Helper function for decode object which have more than 8 fields.
+
+    -- type alias MyData =
+    --   { f1 : Maybe String
+    --   , f2 : Maybe Int
+    --   , f3 : Maybe Float
+    --   , f4 : Maybe String
+    --   , f5 : Maybe String
+    --   , f6 : Maybe String
+    --   , f7 : Maybe String
+    --   , f8 : Maybe String
+    --   , f9 : Maybe String
+    --   }
+    objectN : (Dict.Dict String Value -> a) -> Decoder a
+    objectN f = customDecoder (dict value) (\dic -> Ok(f dic))
+
+    myDataDecoder : Decoder MyData
+    myDataDecoder = objectN (\dic ->
+                    { f1 = field string "f1" dic
+                    , f2 = field int "f2" dic
+                    , f3 = field float "f3" dic
+                    , f4 = field string "f4" dic
+                    , f5 = field string "f5" dic
+                    , f6 = field string "f6" dic
+                    , f7 = field string "f7" dic
+                    , f8 = field string "f8" dic
+                    , f9 = field string "f9" dic
+                    })
+-}
+objectN : (Dict.Dict String Value -> a) -> Decoder a
+objectN f = customDecoder (dict value) (\dic -> Ok(f dic))
 
 {-| Turn any object into a list of key-value pairs.
 
