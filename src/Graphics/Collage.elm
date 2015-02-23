@@ -1,4 +1,12 @@
-module Graphics.Collage where
+module Graphics.Collage
+    ( collage, Form
+    , toForm, filled, textured, gradient, outlined, traced, text, outlinedText
+    , move, moveX, moveY, scale, rotate, alpha
+    , group, groupTransform
+    , Shape, rect, oval, square, circle, ngon, polygon
+    , Path, segment, path
+    , solid, dashed, dotted, LineStyle, LineCap(..), LineJoin(..), defaultLine
+    ) where
 
 {-| The collage API is for freeform graphics. You can move, rotate, scale, etc.
 all sorts of forms including lines, shapes, images, and elements.
@@ -10,26 +18,26 @@ so moving a form 10 units in the y-axis will move it up on screen.
 
 # Unstructured Graphics
 @docs collage
- 
+
 # Creating Forms
 @docs toForm, filled, textured, gradient, outlined, traced, text, outlinedText
- 
+
 # Transforming Forms
 @docs move, moveX, moveY, scale, rotate, alpha
- 
+
 # Grouping Forms
 Grouping forms makes it easier to write modular graphics code. You can create
 a form that is a composite of many subforms. From there it is easy to transform
 it as a single unit.
 
 @docs group, groupTransform
- 
+
 # Shapes
 @docs rect, oval, square, circle, ngon, polygon
 
 # Paths
 @docs segment, path
- 
+
 # Line Styles
 @docs solid, dashed, dotted, LineStyle, LineCap, LineJoin, defaultLine
 
