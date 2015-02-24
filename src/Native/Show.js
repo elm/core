@@ -13,6 +13,9 @@ Elm.Native.Show.make = function(elm) {
     var Utils = Elm.Native.Utils.make(elm);
 
     var toString = function(v) {
+        if (v === null) {
+            return 'null';
+        }
         var type = typeof v;
         if (type === "function") {
             var name = v.func ? v.func.name : v.name;
