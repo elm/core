@@ -13,9 +13,10 @@ include gestures that would be useful for both games and web-pages.
 @docs taps
 -}
 
-import Signal exposing (Signal)
 import Native.Touch
 import Time exposing (Time)
+import Varying exposing (Varying)
+
 
 {-| Every `Touch` has `xy` coordinates. It also has an identifier
 `id` to distinguish one touch from another.
@@ -25,20 +26,24 @@ A touch also keeps info about the initial point and time of contact:
 like taps, drags, and swipes which need to know about timing or direction.
 -}
 type alias Touch =
-    { x:Int
-    , y:Int
-    , id:Int
-    , x0:Int
-    , y0:Int
-    , t0:Time
+    { x : Int
+    , y : Int
+    , id : Int
+    , x0 : Int
+    , y0 : Int
+    , t0 : Time
     }
 
+
 {-| A list of ongoing touches. -}
-touches : Signal (List Touch)
-touches = Native.Touch.touches
+touches : Varying (List Touch)
+touches =
+  Native.Touch.touches
+
 
 {-| The last position that was tapped. Default value is `{x=0,y=0}`.
 Updates whenever the user taps the screen.
 -}
-taps : Signal { x:Int, y:Int }
-taps = Native.Touch.taps
+taps : Varying { x:Int, y:Int }
+taps =
+  Native.Touch.taps

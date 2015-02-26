@@ -14,8 +14,9 @@ module Mouse
 -}
 
 import Basics exposing (fst, snd)
-import Stream exposing (Stream)
 import Native.Mouse
+import Stream exposing (Stream)
+import Varying exposing (Varying)
 
 
 {-| The current mouse position. -}
