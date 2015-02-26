@@ -27,7 +27,7 @@ module JavaScript.Decode where
 import Native.JavaScript
 import Array exposing (Array)
 import Dict exposing (Dict)
-import Json.Encode as JsonEncode
+import JavaScript.Encode as JsEncode
 import List
 import Maybe exposing (Maybe)
 import Result exposing (Result)
