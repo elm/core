@@ -115,8 +115,8 @@ toXY {up,down,left,right} keyCodes =
           then 1
           else 0
   in
-      { x = is up - is down
-      , y = is right - is left
+      { x = is right - is left
+      , y = is up - is down
       }
 
 
