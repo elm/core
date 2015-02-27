@@ -39,8 +39,8 @@ Elm.Native.Touch.make = function(localRuntime) {
             this.values = [];
         };
     }
-    
-    var root = NS.input([]),
+
+    var root = NS.input('touch', []),
     tapTime = 500,
     hasTap = false,
     tap = {_:{},x:0,y:0},

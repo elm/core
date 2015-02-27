@@ -476,7 +476,7 @@ if (!Elm.fullscreen) {
 				savedScene = scheduledScene;
 			}
 
-			var renderer = Elm.Native.Signal.make(elm).output(domUpdate, signalGraph);
+			var renderer = Elm.Native.Signal.make(elm).output('main', domUpdate, signalGraph);
 
 			// must check for resize after 'renderer' is created so
 			// that changes show up.

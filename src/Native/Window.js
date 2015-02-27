@@ -29,7 +29,7 @@ Elm.Native.Window.make = function(localRuntime) {
 	}
 
 
-	var dimensions = NS.input(Tuple2(getWidth(), getHeight()));
+	var dimensions = NS.input('Window.dimensions', Tuple2(getWidth(), getHeight()));
 
 
 	function resizeIfNeeded()
