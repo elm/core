@@ -24,10 +24,12 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	// INPUT
 
-	function input(base)
+	function input(name, base)
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'input-' + name,
+			parents: [],
 			kids: []
 		};
 
@@ -52,13 +54,22 @@ Elm.Native.Signal.make = function(localRuntime) {
 		return node;
 	}
 
+	function constant(value)
+	{
+		return input('constant', value);
+	}
+
+	var never = input('never');
+
 
 	// OUTPUT
 
-	function output(handler, parent)
+	function output(name, handler, parent)
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'output-' + name,
+			parents: [parent],
 			isOutput: true
 		};
 
@@ -81,6 +92,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'streamToVarying',
+			parents: [stream],
 			initialValue: initial,
 			value: initial,
 			kids: []
@@ -95,6 +108,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 			broadcastToKids(node, timestamp, parentUpdate);
 		}
 
+		stream.kids.push(node);
+
 		return node;
 	}
 
@@ -103,6 +118,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'varyingToStream',
+			parents: [varying],
 			kids: []
 		};
 
@@ -115,6 +132,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 			broadcastToKids(node, timestamp, parentUpdate);
 		}
 
+		varying.kids.push(node);
+
 		return Utils.Tuple2(varying.initialValue, node);
 	}
 
@@ -124,6 +143,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 	function streamMap(func, stream)
 	{
 		var node = {
+			name: 'streamMap',
+			parents: [stream],
 			id: Utils.guid(),
 			kids: []
 		};
@@ -137,6 +158,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 			broadcastToKids(node, timestamp, parentUpdate);
 		}
 
+		stream.kids.push(node);
+
 		return node;
 	}
 
@@ -148,6 +171,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 		var initialValue = refreshValue();
 		var node = {
 			id: Utils.guid(),
+			name: 'map' + args.length,
+			parents: args,
 			initialValue: initialValue,
 			value: initialValue,
 			kids: []
@@ -241,6 +266,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'fold',
+			parents: [stream],
 			kids: [],
 			initialValue: state,
 			value: state
@@ -267,6 +294,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'timestamp',
+			parents: [stream],
 			kids: []
 		};
 
@@ -293,9 +322,12 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	// MERGING
 
-	function genericMerge(tieBreaker, leftStream, rightStream) {
+	function genericMerge(tieBreaker, leftStream, rightStream)
+	{
 		var node = {
 			id: Utils.guid(),
+			name: 'merge',
+			parents: [leftStream, rightStream],
 			kids: []
 		};
 
@@ -355,6 +387,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		var node = {
 			id: Utils.guid(),
+			name: 'filterMap',
+			parents: [stream],
 			kids: []
 		};
 
@@ -367,7 +401,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 				if (maybe.ctor === 'Just')
 				{
 					update = true;
-					node.value = stream.value;
+					node.value = maybe._0;
 				}
 			}
 			broadcastToKids(node, timestamp, update);
@@ -381,8 +415,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	return localRuntime.Native.Signal.values = {
 		input: input,
-		never: input(),
-		constant: input,
+		never: never,
+		constant: constant,
 		output: output,
 		streamToVarying: F2(streamToVarying),
 		varyingToStream: varyingToStream,
@@ -393,7 +427,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		map4: F5(map4),
 		map5: F6(map5),
 		fold: F3(fold),
-		genericMerge: F2(genericMerge),
+		genericMerge: F3(genericMerge),
 		filterMap: F2(filterMap),
 		timestamp: timestamp
 	};
