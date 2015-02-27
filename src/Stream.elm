@@ -4,6 +4,7 @@ module Stream
     , merge, mergeMany
     , fold
     , filter, filterMap
+    , sample
     , never
     , timestamp
     ) where
@@ -15,6 +16,7 @@ This library provides the basic building blocks for routing these streams of
 events to your application logic.
 -}
 
+import Basics exposing ((|>), (>>), snd)
 import List
 import Mailbox exposing (Mailbox)
 import Maybe exposing (Maybe(..))
@@ -126,6 +128,53 @@ filter isOk stream =
 filterMap : (a -> Maybe b) -> Stream a -> Stream b
 filterMap =
   Native.Signal.filterMap
+
+
+{-| Useful for augmenting a stream with information from a varying value.
+For example, if you are operating on a time delta but want to take the current
+keyboard state into account.
+
+    sample (,) Keyboard.arrows (fps 60)
+
+Now we get events exactly with the `(fps 60)` stream, but they are augmented
+with which arrows are pressed at the moment.
+-}
+sample : (a -> b -> c) -> Varying a -> Stream b -> Stream c
+sample f varying events =
+  let (initialValue, varyingUpdates) =
+          fromVarying varying
+
+      sampleEvents =
+          merge
+            (map Sample events)
+            (map Update varyingUpdates)
+  in
+      fold sampleUpdate { state = initialValue, trigger = Nothing } sampleEvents
+        |> (fromVarying >> snd)
+        |> filterMap (\state -> Maybe.map (f state.state) state.trigger)
+
+
+type SampleEvent a b = Sample a | Update b
+
+
+type alias SampleState a b =
+    { state : b
+    , trigger : Maybe a
+    }
+
+
+sampleUpdate : SampleEvent a b -> SampleState a b -> SampleState a b
+sampleUpdate event state =
+  case event of
+    Sample a ->
+        { state = state.state
+        , trigger = Just a
+        }
+
+    Update b ->
+        { state = b
+        , trigger = Nothing
+        }
 
 
 never : Stream a
