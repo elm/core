@@ -1,5 +1,6 @@
 module Varying
     ( Varying
+    , fromStream, toStream
     , map, map2, map3, map4, map5
     , (<~), (~)
     , constant
