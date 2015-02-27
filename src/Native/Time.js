@@ -10,70 +10,102 @@ Elm.Native.Time.make = function(localRuntime) {
 
 	var NS = Elm.Native.Signal.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
 
+
+	// FRAMES PER SECOND
 
 	function fpsWhen(desiredFPS, isOn)
 	{
 		var msPerFrame = 1000 / desiredFPS;
-		var ticker = NS.input(Utils.Tuple0);
+		var ticker = NS.input('fpsWhen', null);
 
 		function notifyTicker()
 		{
-			localRuntime.notify(ticker.id, Utils.Tuple0);
+			localRuntime.notify(ticker.id, null);
 		}
 
-		function firstArg(x, y)
-		{
-			return x;
-		}
+		var onOffEvents = A2(NS.streamMap, onOff, isOn);
+		var events = A3(NS.genericMerge, F2(firstArg), onOffEvents, ticker);
+		var timestampedEvents = NS.timestamp(events);
 
-		// input fires either when isOn changes, or when ticker fires.
-		// Its value is a tuple with the current timestamp, and the state of isOn
-		var input = NS.timestamp(A3(NS.map2, F2(firstArg), NS.dropRepeats(isOn), ticker));
-
-		var initialState = {
-			isOn: false,
+		var emptyState = {
+			isOn: isOn.initialValue,
 			time: localRuntime.timer.programStart,
-			delta: 0
+			delta: null
 		};
 
-		var timeoutId;
-
-		function update(input,state)
+		if (emptyState.isOn)
 		{
-			var currentTime = input._0;
-			var isOn = input._1;
-			var wasOn = state.isOn;
-			var previousTime = state.time;
-
-			if (isOn)
-			{
-				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
-			}
-			else if (wasOn)
-			{
-				clearTimeout(timeoutId);
-			}
-
-			return {
-				isOn: isOn,
-				time: currentTime,
-				delta: (isOn && !wasOn) ? 0 : currentTime - previousTime
-			};
+			localRuntime.setTimeout(notifyTicker, 0);
 		}
 
-		return A2(
-			NS.map,
-			function(state) { return state.delta; },
-			A3(NS.fold, F2(update), update(input.value,initialState), input)
-		);
+		var timeoutId = 0;
+
+		function fpsUpdate(rawEvent, state)
+		{
+			var currentTime = rawEvent._0;
+			var event = rawEvent._1;
+
+			if (event === null)
+			{
+				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
+				return {
+					isOn: state.isOn,
+					time: currentTime,
+					delta: currentTime - state.time
+				};
+			}
+			else if (!state.isOn && event)
+			{
+				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
+				return {
+					isOn: true,
+					time: currentTime,
+					delta: null
+				};
+			}
+			else if (state.isOn && !event)
+			{
+				clearTimeout(timeoutId);
+				return {
+					isOn: false,
+					time: currentTime,
+					delta: null
+				};
+			}
+		}
+		var state = A3(NS.fold, F2(fpsUpdate), emptyState, timestampedEvents);
+		return A2(NS.filterMap, toDelta, state);
+	}
+
+	function onOff(isOn)
+	{
+		return {
+			ctor: 'OnOff',
+			_0: isOn
+		};
+	}
+
+	function toDelta(state)
+	{
+		if (state.isOn && state.delta !== null)
+		{
+			return Maybe.Just(state.delta);
+		}
+		return Maybe.Nothing;
+	}
+
+	function firstArg(x,y)
+	{
+		return x;
 	}
 
 
+	// EVERY
+
 	function every(t)
 	{
-		var ticker = NS.input(null);
+		var ticker = NS.input('every', null);
 		function tellTime()
 		{
 			localRuntime.notify(ticker.id, null);
