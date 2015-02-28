@@ -1,5 +1,6 @@
 module Stream
     ( Stream
+    , WritableStream
     , map
     , merge, mergeMany
     , fold
