@@ -16,6 +16,8 @@ module Promise where
 
 import Native.Promise
 import List exposing ((::))
+import Result exposing (Result)
+import Signal exposing (Stream)
 import Time exposing (Time)
 
 
@@ -114,6 +116,13 @@ onError =
 mapError : (x -> y) -> Promise x a -> Promise y a
 mapError f promise =
   promise `onError` \err -> fail (f err)
+
+
+-- RUN
+
+run : Stream (Promise x a) -> Stream (Result x a)
+run =
+  Native.Promise.runStream
 
 
 -- THREADS

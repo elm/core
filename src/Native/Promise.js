@@ -12,6 +12,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 	var Signal = Elm.Native.Signal.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
+
 	function succeed(value)
 	{
 		return {
@@ -63,26 +64,35 @@ Elm.Native.Promise.make = function(localRuntime) {
 
 	function runStream(stream)
 	{
+		var results = Signal.input('promise-results');
+
 		var workQueue = [];
 
-		function onComplete() {
-			workQueue.shift();
-			if (workQueue.length > 0)
-			{
-				runPromise(workQueue[0], onComplete);
-			}
+		function onComplete()
+		{
+			var result = workQueue.shift();
+			setTimeout(function() {
+				localRuntime.notify(results.id, result);
+				if (workQueue.length > 0)
+				{
+					runPromise(workQueue[0], onComplete);
+				}
+			}, 0);
 		}
 
-		function register(promise) {
+		function register(promise)
+		{
 			var root = { promise: promise };
-			if (workQueue.length === 0)
+			workQueue.push(root);
+			if (workQueue.length === 1)
 			{
 				runPromise(root, onComplete);
 			}
-			workQueue.push(root);
 		}
 
-		A2(Signal.map, register, stream);
+		Signal.output('run-promises', register, stream);
+
+		return results;
 	}
 
 	function mark(status, promise)
@@ -207,7 +217,6 @@ Elm.Native.Promise.make = function(localRuntime) {
 		andThen: F2(andThen),
 		catch_: F2(catch_),
 		runStream: runStream,
-		runOne: runOne,
 		spawn: spawn,
 		sleep: sleep,
 		print: print
