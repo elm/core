@@ -10,80 +10,37 @@ Elm.Native.Ports.make = function(localRuntime) {
 
 	var NS;
 
-	function incomingSignal(converter)
+
+	// INPUTS
+
+	function inputValue(name, type, converter)
 	{
-		converter.isSignal = true;
-		return converter;
+		return initialValue(name, type, converter);
 	}
 
-	function outgoingSignal(converter)
+	function inputStream(name, type, converter)
 	{
-		return function(signal)
-		{
-			var subscribers = [];
-
-			function subscribe(handler)
-			{
-				subscribers.push(handler);
-			}
-			function unsubscribe(handler)
-			{
-				subscribers.pop(subscribers.indexOf(handler));
-			}
-
-			function notify(value)
-			{
-				var val = converter(value);
-				var len = subscribers.length;
-				for (var i = 0; i < len; ++i)
-				{
-					subscribers[i](val);
-				}
-			}
-
-			if (!NS)
-			{
-				NS = Elm.Native.Signal.make(localRuntime);
-			}
-			NS.output(notify, signal);
-
-			return {
-				subscribe: subscribe,
-				unsubscribe: unsubscribe
-			};
-		};
+		var input = setupSendSignal(name, type, converter);
+		localRuntime.foreignInput[name] = { send: input.send };
+		return input.signal;
 	}
 
-	function portIn(name, converter)
+	function inputVarying(name, type, converter)
 	{
-		var jsValue = localRuntime.ports.incoming[name];
-		if (jsValue === undefined)
-		{
-			throw new Error("Initialization Error: port '" + name +
-							"' was not given an input!");
-		}
-		localRuntime.ports.uses[name] += 1;
-		try
-		{
-			var elmValue = converter(jsValue);
-		}
-		catch(e)
-		{
-			throw new Error("Initialization Error on port '" + name + "': \n" + e.message);
-		}
+		var value = initialValue(name, type, converter);
+		var input = setupSendSignal(name, type, converter, value);
+		localRuntime.foreignInput[name] = { send: input.send };
+		return input.signal;
+	}
 
-		// just return a static value if it is not a signal
-		if (!converter.isSignal)
-		{
-			return elmValue;
-		}
-
-		// create a signal if necessary
+	function setupSendSignal(name, type, converter, initialValue)
+	{
 		if (!NS)
 		{
 			NS = Elm.Native.Signal.make(localRuntime);
 		}
-		var signal = NS.input(elmValue);
+		var signal = NS.input(name, initialValue);
+
 		function send(jsValue)
 		{
 			try
@@ -92,33 +49,125 @@ Elm.Native.Ports.make = function(localRuntime) {
 			}
 			catch(e)
 			{
-				throw new Error("Error sending to port '" + name + "': \n" + e.message);
+				throw new Error(inputError(name, type,
+					"You just sent the value:\n\n" +
+					"    " + JSON.stringify(input.value) + "\n\n" +
+					"but it cannot be converted to the necessary type.\n" +
+					e.message
+				));
 			}
 			setTimeout(function() {
 				localRuntime.notify(signal.id, elmValue);
 			}, 0);
 		}
-		localRuntime.ports.outgoing[name] = { send:send };
-		return signal;
+
+		return {
+			send: send,
+			signal: signal
+		};
 	}
 
-	function portOut(name, converter, value)
+	function initialValue(name, type, converter)
 	{
+		var nameExists = name in localRuntime.givenInputs;
+
+		if (!nameExists)
+		{
+			throw new Error(inputError(name, type,
+				"You must provide an initial value! Something like this in JS:\n\n" +
+				"    Elm.fullscreen(Elm.MyModule, { " + name + ": ... });"
+			));
+		}
+
+		var input = localRuntime.givenInputs[name];
+		input.used = true;
+
 		try
 		{
-			localRuntime.ports.outgoing[name] = converter(value);
+			return converter(input.value);
 		}
 		catch(e)
 		{
-			throw new Error("Initialization Error on port '" + name + "': \n" + e.message);
+			throw new Error(inputError(name, type,
+				"You gave an initial value of:\n\n" +
+				"    " + JSON.stringify(input.value) + "\n\n" +
+				"but it cannot be converted to the necessary type.\n" +
+				e.message
+			));
 		}
+	}
+
+	function inputError(name, type, message)
+	{
+		return "Input Error:\n" +
+			"Regarding the input named '" + name + "' with type:\n\n" +
+			"    " + type.split('\n').join('\n        ') + "\n\n" +
+			message;
+	}
+
+
+	// OUTPUTS
+
+	function outputValue(name, converter, value)
+	{
+		localRuntime.foreignOutput[name] = converter(value);
 		return value;
 	}
 
+	function outputStream(name, converter, value)
+	{
+		localRuntime.foreignOutput[name] = setupSubscription(converter, value);
+		return value;
+	}
+
+	function outputVarying(name, converter, value)
+	{
+		localRuntime.foreignOutput[name] = setupSubscription(converter, value);
+		return value;
+	}
+
+	function setupSubscription(converter, signal)
+	{
+		var subscribers = [];
+
+		function subscribe(handler)
+		{
+			subscribers.push(handler);
+		}
+		function unsubscribe(handler)
+		{
+			subscribers.pop(subscribers.indexOf(handler));
+		}
+
+		function notify(elmValue)
+		{
+			var jsValue = converter(elmValue);
+			var len = subscribers.length;
+			for (var i = 0; i < len; ++i)
+			{
+				subscribers[i](jsValue);
+			}
+		}
+
+		if (!NS)
+		{
+			NS = Elm.Native.Signal.make(localRuntime);
+		}
+		NS.output('output', notify, signal);
+
+		return {
+			subscribe: subscribe,
+			unsubscribe: unsubscribe
+		};
+	}
+
+
 	return localRuntime.Native.Ports.values = {
-		incomingSignal: incomingSignal,
-		outgoingSignal: outgoingSignal,
-		portOut: portOut,
-		portIn: portIn
+		inputValue: inputValue,
+		inputStream: inputStream,
+		inputVarying: inputVarying,
+		outputValue: outputValue,
+		outputStream: outputStream,
+		outputVarying: outputVarying,
 	};
 };

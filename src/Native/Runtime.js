@@ -10,29 +10,29 @@ if (!Elm.fullscreen) {
 			NONE: 2
 		};
 
-		Elm.fullscreen = function(module, ports)
+		Elm.fullscreen = function(module, givenInputs)
 		{
 			var container = document.createElement('div');
 			document.body.appendChild(container);
-			return init(Display.FULLSCREEN, container, module, ports || {});
+			return init(Display.FULLSCREEN, container, module, givenInputs || {});
 		};
 
-		Elm.embed = function(module, container, ports)
+		Elm.embed = function(module, container, givenInputs)
 		{
 			var tag = container.tagName;
 			if (tag !== 'DIV')
 			{
 				throw new Error('Elm.node must be given a DIV, not a ' + tag + '.');
 			}
-			return init(Display.COMPONENT, container, module, ports || {});
+			return init(Display.COMPONENT, container, module, givenInputs || {});
 		};
 
-		Elm.worker = function(module, ports)
+		Elm.worker = function(module, givenInputs)
 		{
-			return init(Display.NONE, {}, module, ports || {});
+			return init(Display.NONE, {}, module, givenInputs || {});
 		};
 
-		function init(display, container, module, ports, moduleToReplace)
+		function init(display, container, module, givenInputs, moduleToReplace)
 		{
 			// defining state needed for an instance of the Elm RTS
 			var inputs = [];
@@ -86,11 +86,15 @@ if (!Elm.fullscreen) {
 				listeners.push(listener);
 			}
 
-			var portUses = {}
-			for (var key in ports)
+			var givenInputsTracker = {};
+			for (var name in givenInputs)
 			{
-				portUses[key] = 0;
+				givenInputsTracker[name] = {
+					value: givenInputs[name],
+					used: false
+				};
 			}
+
 			// create the actual RTS. Any impure modules will attach themselves to this
 			// object. This permits many Elm programs to be embedded per document.
 			var elm = {
@@ -100,11 +104,9 @@ if (!Elm.fullscreen) {
 				addListener: addListener,
 				inputs: inputs,
 				timer: timer,
-				ports: {
-					incoming: ports,
-					outgoing: {},
-					uses: portUses
-				},
+				givenInputs: givenInputsTracker,
+				foreignInput: {},
+				foreignOutput: {},
 
 				isFullscreen: function() { return display === Display.FULLSCREEN; },
 				isEmbed: function() { return display === Display.COMPONENT; },
@@ -115,7 +117,7 @@ if (!Elm.fullscreen) {
 			{
 				removeListeners(listeners);
 				var div = document.createElement('div');
-				var newElm = init(display, div, newModule, ports, elm);
+				var newElm = init(display, div, newModule, givenInputs, elm);
 				inputs = [];
 				// elm.swap = newElm.swap;
 				return newElm;
@@ -131,7 +133,7 @@ if (!Elm.fullscreen) {
 			try
 			{
 				Module = module.make(elm);
-				checkPorts(elm);
+				checkInputs(elm);
 			}
 			catch (error)
 			{
@@ -156,7 +158,7 @@ if (!Elm.fullscreen) {
 			inputs = rootNode.kids;
 			filterListeners(inputs, listeners);
 
-			addReceivers(elm.ports.outgoing);
+			addReceivers(elm.foreignOutput);
 
 			if (typeof moduleToReplace !== 'undefined')
 			{
@@ -171,30 +173,25 @@ if (!Elm.fullscreen) {
 
 			return {
 				swap: swap,
-				ports: elm.ports.outgoing,
+				inputs: elm.foreignInput,
+				outputs: elm.foreignOutput,
 				dispose: dispose
 			};
 		};
 
-		function checkPorts(elm)
+		function checkInputs(elm)
 		{
-			var portUses = elm.ports.uses;
-			for (var key in portUses)
+			var givenInputs = elm.givenInputs;
+			for (var name in givenInputs)
 			{
-				var uses = portUses[key]
-				if (uses === 0)
+				var input = givenInputs[name];
+				if (!input.used)
 				{
 					throw new Error(
-						"Initialization Error: provided port '" + key +
-						"' to a module that does not take it as in input.\n" +
-						"Remove '" + key + "' from the module initialization code.");
-				}
-				else if (uses > 1)
-				{
-					throw new Error(
-						"Initialization Error: port '" + key +
-						"' has been declared multiple times in the Elm code.\n" +
-						"Remove declarations until there is exactly one.");
+						"Input Error:\nAn input named '" + name +
+						"' was given but is not declared by this module.\n" +
+						"Remove '" + name + "' from the module initialization code."
+					);
 				}
 			}
 		}
@@ -209,7 +206,7 @@ if (!Elm.fullscreen) {
 			code.appendChild(document.createElement('br'));
 			for (var i = 1; i < lines.length; ++i)
 			{
-				code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i]));
+				code.appendChild(document.createTextNode('\u00A0 \u00A0 ' + lines[i].replace(/  /g, '\u00A0 ')));
 				code.appendChild(document.createElement('br'));
 			}
 			code.appendChild(document.createElement('br'));
