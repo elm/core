@@ -158,8 +158,6 @@ if (!Elm.fullscreen) {
 			inputs = rootNode.kids;
 			filterListeners(inputs, listeners);
 
-			addReceivers(elm.foreignOutput);
-
 			if (typeof moduleToReplace !== 'undefined')
 			{
 				hotSwap(moduleToReplace, elm);
@@ -243,75 +241,6 @@ if (!Elm.fullscreen) {
 			{
 				var listener = listeners[i];
 				listener.domNode.removeEventListener(listener.eventName, listener.func);
-			}
-		}
-
-		// add receivers for built-in ports if they are defined
-		function addReceivers(ports)
-		{
-			if ('log' in ports)
-			{
-				ports.log.subscribe(function(v) { console.log(v) });
-			}
-			if ('stdout' in ports)
-			{
-				var process = process || {};
-				var handler = process.stdout
-					? function(v) { process.stdout.write(v); }
-					: function(v) { console.log(v); };
-				ports.stdout.subscribe(handler);
-			}
-			if ('stderr' in ports)
-			{
-				var process = process || {};
-				var handler = process.stderr
-					? function(v) { process.stderr.write(v); }
-					: function(v) { console.error(v); };
-				ports.stderr.subscribe(handler);
-			}
-			if ('title' in ports)
-			{
-				if (typeof ports.title === 'string')
-				{
-					document.title = ports.title;
-				}
-				else
-				{
-					ports.title.subscribe(function(v) { document.title = v; });
-				}
-			}
-			if ('redirect' in ports)
-			{
-				ports.redirect.subscribe(function(v) {
-					if (v.length > 0)
-					{
-						window.location = v;
-					}
-				});
-			}
-			if ('favicon' in ports)
-			{
-				if (typeof ports.favicon === 'string')
-				{
-					changeFavicon(ports.favicon);
-				}
-				else
-				{
-					ports.favicon.subscribe(changeFavicon);
-				}
-			}
-			function changeFavicon(src)
-			{
-				var link = document.createElement('link');
-				var oldLink = document.getElementById('elm-favicon');
-				link.id = 'elm-favicon';
-				link.rel = 'shortcut icon';
-				link.href = src;
-				if (oldLink)
-				{
-					document.head.removeChild(oldLink);
-				}
-				document.head.appendChild(link);
 			}
 		}
 
