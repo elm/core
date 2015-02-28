@@ -10,6 +10,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 
 	var NS;
 	var Promise
+	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
 	// WRITABLE STREAMS
@@ -32,7 +33,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 				localRuntime.setTimeout(function() {
 					localRuntime.notify(stream.id, value);
 				}, 0);
-				succeed(Utils.Tuple0);
+				callback(Promise.succeed(Utils.Tuple0));
 			});
 		}
 
