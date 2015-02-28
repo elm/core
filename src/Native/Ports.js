@@ -9,6 +9,41 @@ Elm.Native.Ports.make = function(localRuntime) {
 	}
 
 	var NS;
+	var Promise
+
+
+	// WRITABLE STREAMS
+
+	function writableStream(name)
+	{
+		if (!NS)
+		{
+			NS = Elm.Native.Signal.make(localRuntime);
+		}
+		if (!Promise)
+		{
+			Promise = Elm.Native.Promise.make(localRuntime);
+		}
+
+		var stream = NS.input(name);
+
+		function send(value) {
+			return Promise.asyncFunction(function(callback) {
+				localRuntime.setTimeout(function() {
+					localRuntime.notify(stream.id, value);
+				}, 0);
+				succeed(Utils.Tuple0);
+			});
+		}
+
+		return {
+			stream: stream,
+			mailbox: {
+				ctor: 'Mailbox',
+				_0: send
+			}
+		};
+	}
 
 
 	// INPUTS
@@ -169,5 +204,6 @@ Elm.Native.Ports.make = function(localRuntime) {
 		outputValue: outputValue,
 		outputStream: outputStream,
 		outputVarying: outputVarying,
+		writableStream: writableStream
 	};
 };
