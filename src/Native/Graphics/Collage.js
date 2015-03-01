@@ -217,7 +217,6 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			var chunk = textChunks[i];
 			ctx.font = chunk.font;
 			var metrics = ctx.measureText(chunk.text);
-			console.log(metrics);
 			chunk.width = metrics.width;
 			totalWidth += chunk.width;
 			if (chunk.height > maxHeight)
