@@ -16,8 +16,8 @@ text fields programmatically.
 
 import Color exposing (Color)
 import Graphics.Element exposing (Element)
+import Mailbox
 import Native.Graphics.Input
-import Signal
 import Text
 
 
@@ -193,13 +193,13 @@ place-holder message to use when no input has been provided yet. Finally,
 we give the current `Content` of the field. This argument is last because
 it is most likely to change frequently, making function composition easier.
 -}
-field : Style -> (Content -> Signal.Message) -> String -> Content -> Element
+field : Style -> (Content -> Mailbox.Message) -> String -> Content -> Element
 field =
     Native.Graphics.Input.field
 
 
 {-| Same as `field` but the UI element blocks out each characters. -}
-password : Style -> (Content -> Signal.Message) -> String -> Content -> Element
+password : Style -> (Content -> Mailbox.Message) -> String -> Content -> Element
 password =
     Native.Graphics.Input.password
 
@@ -208,10 +208,10 @@ password =
 addresses. This is helpful for auto-complete and for mobile users who may
 get a custom keyboard with an `@` and `.com` button.
 -}
-email : Style -> (Content -> Signal.Message) -> String -> Content -> Element
+email : Style -> (Content -> Mailbox.Message) -> String -> Content -> Element
 email =
     Native.Graphics.Input.email
 
 
--- area : (Content -> Signal.Message) -> Handle b -> ((Int,Int) -> b) -> (Int,Int) -> String -> Content -> Element
+-- area : (Content -> Mailbox.Message) -> Handle b -> ((Int,Int) -> b) -> (Int,Int) -> String -> Content -> Element
 -- area = Native.Graphics.Input.area

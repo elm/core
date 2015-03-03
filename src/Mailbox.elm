@@ -2,6 +2,7 @@ module Mailbox
     ( Mailbox
     , redirect
     , send
+    , Message, message
     ) where
 {-| Mailboxes make it possible to send messages to a `WritableStream`. This
 makes it possible for the outputs of your program to report back as an input
@@ -59,3 +60,12 @@ and not care what other kinds of `Actions` are possible.
 redirect : (b -> a) -> Mailbox a -> Mailbox b
 redirect f (Mailbox send) =
     Mailbox (\x -> send (f x))
+
+
+type Message = Message (Promise () ())
+
+
+message : Mailbox a -> a -> Message
+message (Mailbox send) value =
+    Message (send value)
+
