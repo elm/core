@@ -217,6 +217,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 		andThen: F2(andThen),
 		catch_: F2(catch_),
 		runStream: runStream,
+		runOne: runOne,
 		spawn: spawn,
 		sleep: sleep,
 		print: print
