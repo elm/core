@@ -27,6 +27,7 @@
         "Mailbox",
         "Maybe",
         "Mouse",
+        "Promise",
         "Random",
         "Regex",
         "Result",
