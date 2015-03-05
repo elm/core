@@ -67,7 +67,7 @@ infixr 5 ::
 
 {-| Extract the first element of a list.
 
-    head [1,2,3] == 1
+    head [1,2,3] == Just 1
 -}
 head : List a -> Maybe a
 head list =
