@@ -334,9 +334,11 @@ layers es =
 
 
 -- Repetitive things --
-
+{-| A pixel value. -}
 absolute : Int -> Pos
 absolute = Absolute
+
+{-| A percentage. -}
 relative : Float -> Pos
 relative = Relative
 
