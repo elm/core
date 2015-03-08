@@ -134,7 +134,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		varying.kids.push(node);
 
-		return Utils.Tuple2(varying.initialValue, node);
+		return node;
 	}
 
 

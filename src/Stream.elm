@@ -1,6 +1,7 @@
 module Stream
     ( Stream
     , WritableStream
+    , toVarying, fromVarying
     , map
     , merge, mergeMany
     , fold
@@ -46,7 +47,7 @@ toVarying =
   Native.Signal.streamToVarying
 
 
-fromVarying : Varying a -> (a, Stream a)
+fromVarying : Varying a -> Stream a
 fromVarying =
   Native.Signal.varyingToStream
 

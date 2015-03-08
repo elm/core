@@ -52,7 +52,7 @@ fromStream =
   Native.Signal.streamToVarying
 
 
-toStream : Varying a -> (a, Stream a)
+toStream : Varying a -> Stream a
 toStream =
   Native.Signal.varyingToStream
 
