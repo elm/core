@@ -138,6 +138,12 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
+	function initialValue(varying)
+	{
+		return varying.initialValue;
+	}
+
+
 	// STREAM MAP
 
 	function streamMap(func, stream)
@@ -420,6 +426,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		output: output,
 		streamToVarying: F2(streamToVarying),
 		varyingToStream: varyingToStream,
+		initialValue: initialValue,
 		streamMap: F2(streamMap),
 		map: F2(map),
 		map2: F3(map2),

@@ -1,6 +1,6 @@
 module Varying
     ( Varying
-    , fromStream, toStream
+    , fromStream, toStream, destructure
     , map, map2, map3, map4, map5
     , (<~), (~)
     , constant
@@ -25,7 +25,7 @@ As the `Html` changes, the user sees different things on screen automatically.
 @docs (<~), (~)
 
 # Conversions
-@docs toStream, fromStream
+@docs toStream, fromStream, destructure
 
 # Constant
 @docs constant
@@ -76,6 +76,21 @@ that an update may result in the same value as before, so the resulting
 toStream : Varying a -> Stream a
 toStream =
   Native.Signal.varyingToStream
+
+
+{-| Destructure a varying value, resulting in the initial value and a stream
+of all the updates. These things are conceptually equivalent.
+
+This can be useful when you need the window dimensions to render your scene,
+but you also need to update your model when a resize occurs.
+
+    (initialSize, resizes) : ((Int,Int), Stream (Int,Int))
+    (initialSize, resizes) =
+      destructure Window.dimensions
+-}
+destructure : Varying a -> (a, Stream a)
+destructure varying =
+  (Native.Signal.initialValue varying, toStream varying)
 
 
 {-| Apply a function to a varying value.

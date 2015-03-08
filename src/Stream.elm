@@ -144,7 +144,7 @@ with which arrows are pressed at the moment.
 sample : (a -> b -> c) -> Varying a -> Stream b -> Stream c
 sample f varying events =
   let (initialValue, varyingUpdates) =
-          fromVarying varying
+          (Native.Signal.initialValue varying, fromVarying varying)
 
       sampleEvents =
           merge
@@ -152,7 +152,7 @@ sample f varying events =
             (map Update varyingUpdates)
   in
       fold sampleUpdate { state = initialValue, trigger = Nothing } sampleEvents
-        |> (fromVarying >> snd)
+        |> fromVarying
         |> filterMap (\state -> Maybe.map (f state.state) state.trigger)
 
 
