@@ -24,9 +24,11 @@ As the `Html` changes, the user sees different things on screen automatically.
 # Fancy Mapping
 @docs (<~), (~)
 
-# Constant Varying
-@docs constant
+# Conversions
+@docs toStream, fromStream
 
+# Constant
+@docs constant
 -}
 
 import Native.Signal
@@ -47,11 +49,30 @@ constant =
   Native.Signal.constant
 
 
+{-| Convert a stream of values into a varying value that updates whenever an
+event comes in on the stream.
+
+    url : Varying String
+    url =
+      fromStream "waiting.gif" imageStream
+
+    constant : a -> Varying a
+    constant value =
+      fromStream value Stream.never
+-}
 fromStream : a -> Stream a -> Varying a
 fromStream =
   Native.Signal.streamToVarying
 
 
+{-| Get a stream that triggers whenever the varying value is *updated*. Note
+that an update may result in the same value as before, so the resulting
+`Stream` can have the same value twice in a row.
+
+    moves : Stream (Int,Int)
+    moves =
+      toStream Mouse.position
+-}
 toStream : Varying a -> Stream a
 toStream =
   Native.Signal.varyingToStream
