@@ -118,13 +118,6 @@ mapError f promise =
   promise `onError` \err -> fail (f err)
 
 
--- RUN
-
-run : Stream (Promise x a) -> Stream (Result x a)
-run =
-  Native.Promise.runStream
-
-
 -- THREADS
 
 type ID = ID Int

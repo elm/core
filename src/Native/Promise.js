@@ -62,17 +62,15 @@ Elm.Native.Promise.make = function(localRuntime) {
 		runPromise({ promise: promise }, function() {});
 	}
 
-	function runStream(stream)
+	function runStream(name, stream, notify)
 	{
-		var results = Signal.input('promise-results');
-
 		var workQueue = [];
 
 		function onComplete()
 		{
 			var result = workQueue.shift();
 			setTimeout(function() {
-				localRuntime.notify(results.id, result);
+				notify(result);
 				if (workQueue.length > 0)
 				{
 					runPromise(workQueue[0], onComplete);
@@ -90,9 +88,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 			}
 		}
 
-		Signal.output('run-promises', register, stream);
-
-		return results;
+		Signal.output('loopback-' + name + '-promises', register, stream);
 	}
 
 	function mark(status, promise)
