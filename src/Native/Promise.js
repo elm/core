@@ -13,6 +13,8 @@ Elm.Native.Promise.make = function(localRuntime) {
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
+	// CONSTRUCTORS
+
 	function succeed(value)
 	{
 		return {
@@ -178,15 +180,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 	}
 
 
-	// tests
-
-	function print(string) {
-		return asyncFunction(function(callback) {
-			console.log(string);
-			callback(succeed(Utils.Tuple0));
-		});
-	}
-
+	// THREADS
 
 	function sleep(time) {
 		return asyncFunction(function(callback) {
@@ -215,7 +209,6 @@ Elm.Native.Promise.make = function(localRuntime) {
 		runStream: runStream,
 		runOne: runOne,
 		spawn: spawn,
-		sleep: sleep,
-		print: print
+		sleep: sleep
 	};
 };

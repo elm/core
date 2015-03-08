@@ -1,17 +1,28 @@
-module Promise where
+module Promise
+    ( Promise
+    , succeed, fail
+    , map, map2, map3, map4, map5, andMap
+    , sequence
+    , andThen
+    , onError, mapError
+    , ID, spawn, sleep
+    ) where
 {-|
 
 # Basics
 @docs succeed, fail
 
 # Mapping
-@docs map, map2, map3, map4, map5, apply
+@docs map, map2, map3, map4, map5, andMap
 
 # Chaining
-@docs andThen
+@docs andThen, sequence
 
 # Errors
-@docs catch, mapError
+@docs onError, mapError
+
+# Threads
+@docs spawn, sleep
 -}
 
 import Native.Promise
@@ -78,8 +89,8 @@ map5 func promiseA promiseB promiseC promiseD promiseE =
     `andThen` \e -> succeed (func a b c d e)
 
 
-apply : Promise x (a -> b) -> Promise x a -> Promise x b
-apply promiseFunc promiseValue =
+andMap : Promise x (a -> b) -> Promise x a -> Promise x b
+andMap promiseFunc promiseValue =
   promiseFunc
     `andThen` \func -> promiseValue
     `andThen` \value -> succeed (func value)
@@ -134,10 +145,3 @@ spawn =
 sleep : Time -> Promise x ()
 sleep =
   Native.Promise.sleep
-
-
--- TESTING
-
-print : String -> Promise x ()
-print =
-  Native.Promise.print
