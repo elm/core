@@ -8,7 +8,7 @@ way to model effects. Long term, the `Promise` API will allow us to describe
 
 The biggest result right now is that the new `Http` module is much more
 flexible and easy to use. It has been moved out of the core libraries into
-`evancz/elm-html`.
+`evancz/elm-http`.
 
 The `Promise` module motivates many of the subsequent changes.
 
