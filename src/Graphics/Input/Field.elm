@@ -14,12 +14,12 @@ text fields programmatically.
 @docs defaultStyle, Style, Outline, noOutline, Highlight, noHighlight, Dimensions, uniformly
 -}
 
-import Color (Color)
-import Color
-import Graphics.Element (Element)
+import Color exposing (Color)
+import Graphics.Element exposing (Element)
+import Mailbox
 import Native.Graphics.Input
-import Signal
 import Text
+
 
 {-| Create uniform dimensions:
 
@@ -31,7 +31,9 @@ edges all have width 1:
     Outline grey (uniformly 1) 4
 -}
 uniformly : Int -> Dimensions
-uniformly n = Dimensions n n n n
+uniformly n =
+    Dimensions n n n n
+
 
 {-| For setting dimensions of a field's padding or outline. The left, right,
 top, and bottom may all have different sizes. The following example creates
@@ -52,6 +54,7 @@ type alias Dimensions =
     , bottom:Int
     }
 
+
 {-| A field can have a outline around it. This lets you set its color, width,
 and radius. The radius allows you to round the corners of your field. Set the
 width to zero to make it invisible. Here is an example outline that is grey
@@ -65,9 +68,12 @@ type alias Outline =
     , radius:Int
     }
 
+
 {-| An outline with zero width, so you cannot see it. -}
 noOutline : Outline
-noOutline = Outline Color.grey (uniformly 0) 0
+noOutline =
+    Outline Color.grey (uniformly 0) 0
+
 
 {-| When a field has focus, it has a blue highlight around it by default. The
 `Highlight` lets you set the `color` and `width` of this highlight. Set the
@@ -81,9 +87,12 @@ type alias Highlight =
     , width:Int
     }
 
+
 {-| A highlight with zero width, so you cannot see it. -}
 noHighlight : Highlight
-noHighlight = Highlight Color.blue 0
+noHighlight =
+    Highlight Color.blue 0
+
 
 {-| Describe the style of a text box. `style` describes the style of the text
 itself using [`Text.Style`](/Text#Style). `highlight` describes the glowing blue
@@ -105,6 +114,7 @@ type alias Style =
     , style     : Text.Style
     }
 
+
 {-| The default style for a text field. The outline is `Color.grey` with width
 1 and radius 2. The highlight is `Color.blue` with width 1, and the default
 text color is black.
@@ -117,6 +127,7 @@ defaultStyle =
     , style     = Text.defaultStyle
     }
 
+
 {-| Represents the current content of a text field. For example:
 
     content = Content "She sells sea shells" (Selection 0 3 Backward)
@@ -128,6 +139,7 @@ type alias Content =
     { string:String
     , selection:Selection
     }
+
 
 {-| The selection within a text field. `start` is never greater than `end`:
 
@@ -142,6 +154,7 @@ type alias Selection =
     , direction:Direction
     }
 
+
 {-| The direction of selection. When the user highlights a selection in a text
 field, they must do it in a particular direction. This determines which end of
 the selection moves when they change the selection by pressing Shift-Left or
@@ -149,12 +162,15 @@ Shift-Right.
 -}
 type Direction = Forward | Backward
 
+
 {-| A field with no content:
 
     Content "" (Selection 0 0 Forward)
 -}
 noContent : Content
-noContent = Content "" (Selection 0 0 Forward)
+noContent =
+    Content "" (Selection 0 0 Forward)
+
 
 {-| Create a text field. The following example creates a time-varying element
 called `nameField`. As the user types their name, the field will be updated
@@ -177,19 +193,25 @@ place-holder message to use when no input has been provided yet. Finally,
 we give the current `Content` of the field. This argument is last because
 it is most likely to change frequently, making function composition easier.
 -}
-field : Style -> (Content -> Signal.Message) -> String -> Content -> Element
-field = Native.Graphics.Input.field
+field : Style -> (Content -> Mailbox.Message) -> String -> Content -> Element
+field =
+    Native.Graphics.Input.field
+
 
 {-| Same as `field` but the UI element blocks out each characters. -}
-password : Style -> (Content -> Signal.Message) -> String -> Content -> Element
-password = Native.Graphics.Input.password
+password : Style -> (Content -> Mailbox.Message) -> String -> Content -> Element
+password =
+    Native.Graphics.Input.password
+
 
 {-| Same as `field` but it adds an annotation that this field is for email
 addresses. This is helpful for auto-complete and for mobile users who may
 get a custom keyboard with an `@` and `.com` button.
 -}
-email : Style -> (Content -> Signal.Message) -> String -> Content -> Element
-email = Native.Graphics.Input.email
+email : Style -> (Content -> Mailbox.Message) -> String -> Content -> Element
+email =
+    Native.Graphics.Input.email
 
--- area : (Content -> Signal.Message) -> Handle b -> ((Int,Int) -> b) -> (Int,Int) -> String -> Content -> Element
+
+-- area : (Content -> Mailbox.Message) -> Handle b -> ((Int,Int) -> b) -> (Int,Int) -> String -> Content -> Element
 -- area = Native.Graphics.Input.area

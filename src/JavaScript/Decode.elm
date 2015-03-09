@@ -1,5 +1,5 @@
-module Json.Decode where
-{-| A way to turn JSON strings and JS values into Elm values.
+module JavaScript.Decode where
+{-| A way to turn JavaScript values into Elm values.
 
 # Run a Decoder
 @docs decodeString, decodeValue
@@ -24,19 +24,18 @@ module Json.Decode where
 -}
 
 
-import Native.Json
-import Array (Array)
-import Dict
-import Dict (Dict)
-import Json.Encode as JsonEncode
+import Native.JavaScript
+import Array exposing (Array)
+import Dict exposing (Dict)
+import JavaScript.Encode as JsEncode
 import List
-import Maybe (Maybe)
-import Result (Result)
+import Maybe exposing (Maybe)
+import Result exposing (Result)
 
 
 type Decoder a = Decoder
 
-type alias Value = JsonEncode.Value
+type alias Value = JsEncode.Value
 
 
 {-| Transform the value returned by a decoder. Most useful when paired with
@@ -61,12 +60,12 @@ the `oneOf` function.
 -}
 map : (a -> b) -> Decoder a -> Decoder b
 map =
-    Native.Json.decodeObject1
+    Native.JavaScript.decodeObject1
 
 
 decodeString : Decoder a -> String -> Result String a
 decodeString =
-    Native.Json.runDecoderString
+    Native.JavaScript.runDecoderString
 
 
 -- OBJECTS
@@ -102,12 +101,12 @@ at fields decoder =
 -}
 (:=) : String -> Decoder a -> Decoder a
 (:=) =
-    Native.Json.decodeField
+    Native.JavaScript.decodeField
 
 
 object1 : (a -> value) -> Decoder a -> Decoder value
 object1 =
-    Native.Json.decodeObject1
+    Native.JavaScript.decodeObject1
 
 
 {-| Use two different decoders on a JS value. This is nice for extracting
@@ -121,7 +120,7 @@ multiple fields from an object.
 -}
 object2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 object2 =
-    Native.Json.decodeObject2
+    Native.JavaScript.decodeObject2
 
 
 {-| Use two different decoders on a JS value. This is nice for extracting
@@ -138,32 +137,32 @@ multiple fields from an object.
 -}
 object3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 object3 =
-    Native.Json.decodeObject3
+    Native.JavaScript.decodeObject3
 
 
 object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 object4 =
-    Native.Json.decodeObject4
+    Native.JavaScript.decodeObject4
 
 
 object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 object5 =
-    Native.Json.decodeObject5
+    Native.JavaScript.decodeObject5
 
 
 object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 object6 =
-    Native.Json.decodeObject6
+    Native.JavaScript.decodeObject6
 
 
 object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 object7 =
-    Native.Json.decodeObject7
+    Native.JavaScript.decodeObject7
 
 
 object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 object8 =
-    Native.Json.decodeObject8
+    Native.JavaScript.decodeObject8
 
 
 {-| Turn any object into a list of key-value pairs.
@@ -175,7 +174,7 @@ object8 =
 -}
 keyValuePairs : Decoder a -> Decoder (List (String, a))
 keyValuePairs =
-    Native.Json.decodeKeyValuePairs
+    Native.JavaScript.decodeKeyValuePairs
 
 
 {-| Turn any object into a dictionary of key-value pairs.
@@ -210,7 +209,7 @@ narrow things down so you can be more targeted.
 -}
 oneOf : List (Decoder a) -> Decoder a
 oneOf =
-    Native.Json.oneOf
+    Native.JavaScript.oneOf
 
 
 {-| Extract a string.
@@ -223,7 +222,7 @@ oneOf =
 -}
 string : Decoder String
 string =
-    Native.Json.decodeString
+    Native.JavaScript.decodeString
 
 
 {-| Extract a float.
@@ -236,7 +235,7 @@ string =
 -}
 float : Decoder Float
 float =
-    Native.Json.decodeFloat
+    Native.JavaScript.decodeFloat
 
 
 {-| Extract an integer.
@@ -249,7 +248,7 @@ float =
 -}
 int : Decoder Int
 int =
-    Native.Json.decodeInt
+    Native.JavaScript.decodeInt
 
 
 {-| Extract a boolean.
@@ -262,7 +261,7 @@ int =
 -}
 bool : Decoder Bool
 bool =
-    Native.Json.decodeBool
+    Native.JavaScript.decodeBool
 
 
 {-| Extract a list from a JS array.
@@ -275,7 +274,7 @@ bool =
 -}
 list : Decoder a -> Decoder (List a)
 list =
-    Native.Json.decodeList
+    Native.JavaScript.decodeList
 
 
 {-| Extract an Array from a JS array.
@@ -288,7 +287,7 @@ list =
 -}
 array : Decoder a -> Decoder (Array a)
 array =
-    Native.Json.decodeArray
+    Native.JavaScript.decodeArray
 
 
 {-| Extract a null value. Primarily useful for creating *other* decoders.
@@ -307,7 +306,7 @@ array =
 -}
 null : a -> Decoder a
 null =
-    Native.Json.decodeNull
+    Native.JavaScript.decodeNull
 
 
 {-| Great for handling optional fields. The following code decodes JSON
@@ -331,9 +330,9 @@ objects that may not have a profession field.
 -}
 maybe : Decoder a -> Decoder (Maybe a)
 maybe =
-    Native.Json.decodeMaybe
+    Native.JavaScript.decodeMaybe
 
-  
+
 {-| Bring in an arbitrary JSON value. Useful if you need to work with crazily
 formatted data. For example, this lets you create a parser for "variadic" lists
 where the first few types are different, followed by 0 or more of the same
@@ -353,17 +352,17 @@ type.
 -}
 value : Decoder Value
 value =
-    Native.Json.decodeValue
+    Native.JavaScript.decodeValue
 
 
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
-    Native.Json.runDecoderValue
+    Native.JavaScript.runDecoderValue
 
 
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
 customDecoder =
-    Native.Json.customDecoder
+    Native.JavaScript.customDecoder
 
 
 {-| Helpful when one field will determine the shape of a bunch of other fields.
@@ -393,7 +392,7 @@ customDecoder =
 -}
 andThen : Decoder a -> (a -> Decoder b) -> Decoder b
 andThen =
-    Native.Json.andThen
+    Native.JavaScript.andThen
 
 
 {-| A decoder that always fails. Useful when paired with `andThen` or `oneOf`
@@ -411,7 +410,7 @@ the last option.
 -}
 fail : String -> Decoder a
 fail =
-    Native.Json.fail
+    Native.JavaScript.fail
 
 
 {-| A decoder that always succeeds. Useful when paired with `andThen` or
@@ -430,14 +429,14 @@ missing.
 -}
 succeed : a -> Decoder a
 succeed =
-    Native.Json.succeed
+    Native.JavaScript.succeed
 
 
 -- TUPLES
 
 tuple1 : (a -> value) -> Decoder a -> Decoder value
 tuple1 =
-    Native.Json.decodeTuple1
+    Native.JavaScript.decodeTuple1
 
 
 {-| Handle an array with exactly two values. Useful for points and simple
@@ -457,7 +456,7 @@ pairs.
 -}
 tuple2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 tuple2 =
-    Native.Json.decodeTuple2
+    Native.JavaScript.decodeTuple2
 
 
 {-| Handle an array with exactly three values.
@@ -470,29 +469,29 @@ tuple2 =
 -}
 tuple3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 tuple3 =
-    Native.Json.decodeTuple3
+    Native.JavaScript.decodeTuple3
 
 
 tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 tuple4 =
-    Native.Json.decodeTuple4
+    Native.JavaScript.decodeTuple4
 
 
 tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 tuple5 =
-    Native.Json.decodeTuple5
+    Native.JavaScript.decodeTuple5
 
 
 tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 tuple6 =
-    Native.Json.decodeTuple6
+    Native.JavaScript.decodeTuple6
 
 
 tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 tuple7 =
-    Native.Json.decodeTuple7
+    Native.JavaScript.decodeTuple7
 
 
 tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 tuple8 =
-    Native.Json.decodeTuple8
+    Native.JavaScript.decodeTuple8

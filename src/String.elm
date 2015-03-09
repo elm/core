@@ -39,8 +39,8 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 
 import Native.String
 import Char
-import Maybe (Maybe)
-import Result (Result)
+import Maybe exposing (Maybe)
+import Result exposing (Result)
 
 
 {-| Determine if a string is empty.

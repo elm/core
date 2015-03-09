@@ -17,8 +17,8 @@ issues with internationalization or locale formatting.
 -}
 
 import Native.Date
-import Time (Time)
-import Result (Result)
+import Time exposing (Time)
+import Result exposing (Result)
 
 
 type Date = Date

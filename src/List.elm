@@ -47,9 +47,9 @@ The current sentiment is that it is already quite error prone once you get to
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import Maybe
-import Maybe ( Maybe(Just,Nothing) )
+import Maybe exposing ( Maybe(Just,Nothing) )
 import Native.List
 
 

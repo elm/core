@@ -49,7 +49,7 @@ that has never helped me remember which one I should be writing.
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import Native.Color
 
 type Color

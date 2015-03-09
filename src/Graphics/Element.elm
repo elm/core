@@ -1,10 +1,34 @@
-module Graphics.Element where
+module Graphics.Element
+    ( Element
+    , image, fittedImage, croppedImage, tiledImage
+    , leftAligned, rightAligned, centered, justified, show
+    , width, height, size, color, opacity, link, tag
+    , widthOf, heightOf, sizeOf
+    , flow, Direction, up, down, left, right, inward, outward
+    , layers, above, below, beside
+    , empty, spacer, container
+    , middle, midTop, midBottom, midLeft, midRight, topLeft, topRight
+    , bottomLeft, bottomRight
+    , Pos, Position
+    , absolute, relative, middleAt, midTopAt, midBottomAt, midLeftAt
+    , midRightAt, topLeftAt, topRightAt, bottomLeftAt, bottomRightAt
+    ) where
+
 {-| Graphical elements that snap together to build complex widgets and layouts.
 Each Element is a rectangle with a known width and height, making them easy to
 combine and position.
 
+# Show Anything
+@docs show
+
 # Images
 @docs image, fittedImage, croppedImage, tiledImage
+
+# Text
+Each of the following functions places [`Text`](Text) into a box. The function
+you use determines the alignment of the text.
+
+@docs leftAligned, rightAligned, centered, justified
 
 # Styling
 @docs width, height, size, color, opacity, link, tag
@@ -37,28 +61,32 @@ If you need more precision, you can create custom positions.
       midRightAt, topLeftAt, topRightAt, bottomLeftAt, bottomRightAt
 -}
 
-import Basics (..)
-import Native.Graphics.Element
+import Basics exposing (..)
+import Color exposing (..)
 import List as List
-import Color (..)
-import Maybe ( Maybe(..), withDefault )
+import Maybe exposing ( Maybe(..), withDefault )
+import Native.Graphics.Element
+import Text exposing (Text)
 
-type alias Properties = {
-  id      : Int,
-  width   : Int,
-  height  : Int,
-  opacity : Float,
-  color   : Maybe Color,
-  href    : String,
-  tag     : String,
-  hover   : (),
-  click   : ()
- }
 
+-- PRIMITIVES
 
 type alias Element =
     { props : Properties
     , element : ElementPrim
+    }
+
+
+type alias Properties =
+    { id      : Int
+    , width   : Int
+    , height  : Int
+    , opacity : Float
+    , color   : Maybe Color
+    , href    : String
+    , tag     : String
+    , hover   : ()
+    , click   : ()
     }
 
 
@@ -178,10 +206,9 @@ link href e =
         }
 
 
-newElement w h e =
-  { props = Properties (Native.Graphics.Element.guid ()) w h 1 Nothing "" "" () ()
-  , element = e
-  }
+newElement : Int -> Int -> ElementPrim -> Element
+newElement =
+    Native.Graphics.Element.newElement
 
 
 type ElementPrim
@@ -191,6 +218,9 @@ type ElementPrim
     | Spacer
     | RawHtml
     | Custom -- for custom Elements implemented in JS, see collage for example
+
+
+-- IMAGES
 
 type ImageStyle = Plain | Fitted | Cropped (Int,Int) | Tiled
 
@@ -219,10 +249,62 @@ croppedImage : (Int,Int) -> Int -> Int -> String -> Element
 croppedImage pos w h src =
     newElement w h (Image (Cropped pos) w h src)
 
+
 tiledImage : Int -> Int -> String -> Element
 tiledImage w h src =
     newElement w h (Image Tiled w h src)
 
+
+-- TEXT
+
+{-| Align text along the left side of the text block. This is sometimes known as
+*ragged right*.
+-}
+leftAligned : Text -> Element
+leftAligned =
+    Native.Graphics.Element.block "left"
+
+
+{-| Align text along the right side of the text block. This is sometimes known
+as *ragged left*.
+-}
+rightAligned : Text -> Element
+rightAligned =
+    Native.Graphics.Element.block "right"
+
+
+{-| Center text in the text block. There is equal spacing on either side of a
+line of text.
+-}
+centered : Text -> Element
+centered =
+    Native.Graphics.Element.block "center"
+
+
+{-| Align text along the left and right sides of the text block. Word spacing is
+adjusted to make this possible.
+-}
+justified : Text -> Element
+justified =
+    Native.Graphics.Element.block "justify"
+
+
+{-| Convert anything to its textual representation and make it displayable in
+the browser. Excellent for debugging.
+
+    main : Element
+    main =
+      show "Hello World!"
+
+    show value =
+        leftAligned (Text.monospace (Text.fromString (toString value)))
+-}
+show : a -> Element
+show value =
+    leftAligned (Text.monospace (Text.fromString (toString value)))
+
+
+-- LAYOUT
 
 type Three = P | Z | N
 
@@ -275,7 +357,7 @@ flow dir es =
       hs = List.map heightOf es
       maxOrZero list = withDefault 0 (List.maximum list)
       newFlow w h = newElement w h (Flow dir es)
-  in 
+  in
   if es == [] then empty else
   case dir of
     DUp    -> newFlow (maxOrZero ws) (List.sum hs)
@@ -309,7 +391,7 @@ below lo hi =
 
 
 {-| Put elements beside each other horizontally.
-To put `a` beside `b` you would say: ``a `beside` b`` 
+To put `a` beside `b` you would say: ``a `beside` b``
 -}
 beside : Element -> Element -> Element
 beside lft rht =
@@ -323,7 +405,7 @@ beside lft rht =
 `layers == flow outward`
 -}
 layers : List Element -> Element
-layers es = 
+layers es =
   let ws = List.map widthOf es
       hs = List.map heightOf es
   in

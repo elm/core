@@ -69,9 +69,8 @@ module. It has a period of roughly 2.30584e18.
 
 -}
 
-import Basics (..)
-import List
-import List ((::))
+import Basics exposing (..)
+import List exposing ((::))
 
 
 {-| Create a generator that produces 32-bit integers in a given range. This
