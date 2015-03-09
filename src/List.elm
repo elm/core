@@ -1,6 +1,6 @@
 module List
     ( isEmpty, length, reverse, member
-    , head, uncons, filter, take, drop
+    , head, filter, take, drop
     , repeat, (::), append, concat, intersperse
     , partition, unzip
     , map, map2, map3, map4, map5
@@ -17,7 +17,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, uncons, filter, take, drop
+@docs head, filter, take, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
@@ -73,19 +73,6 @@ head : List a -> Maybe a
 head list =
   case list of
     x :: xs -> Just x
-    [] -> Nothing
-
-
-{-| Split the first element off and returns it together with the rest of the
-list.
-
-    uncons [1,2,3] == Just (1, [2,3])
-    uncons []      == Nothing
--}
-uncons : List a -> Maybe (a, List a)
-uncons list =
-  case list of
-    x :: xs -> Just (x, xs)
     [] -> Nothing
 
 
