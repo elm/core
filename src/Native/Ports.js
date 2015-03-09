@@ -15,7 +15,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 
 	// WRITABLE STREAMS
 
-	function writableStream(name)
+	function mailbox(name)
 	{
 		if (!NS)
 		{
@@ -39,8 +39,8 @@ Elm.Native.Ports.make = function(localRuntime) {
 
 		return {
 			stream: stream,
-			mailbox: {
-				ctor: 'Mailbox',
+			address: {
+				ctor: 'Address',
 				_0: send
 			}
 		};
@@ -229,7 +229,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 		outputValue: outputValue,
 		outputStream: outputStream,
 		outputVarying: outputVarying,
-		writableStream: writableStream,
+		mailbox: mailbox,
 		loopbackIn: loopbackIn,
 		loopbackOut: loopbackOut
 	};
