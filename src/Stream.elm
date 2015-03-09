@@ -9,7 +9,7 @@ module Stream
     , never
     , timestamp
     , Mailbox, Address, Message
-    , send, message, redirect
+    , send, message, forward
     ) where
 
 {-| Streams of events. Many interactions with the world can be formulated as
@@ -38,7 +38,7 @@ events to your application logic.
 @docs toVarying, fromVarying
 
 # Mailboxes
-@docs Mailbox, send, message, redirect
+@docs Mailbox, send, message, forward
 -}
 
 import Basics exposing ((|>), (>>), snd)
@@ -273,7 +273,7 @@ send (Address actuallySend) value =
       `onError` \_ -> succeed ()
 
 
-{-| Create an address that will redirect all messages somewhere else.
+{-| Create an address that will forward all messages along.
 
     type Action = Undo | Remove Int
 
@@ -281,16 +281,16 @@ send (Address actuallySend) value =
 
     removeAddress : Address Int
     removeAddress =
-        redirect Remove actionAddress
+        forward Remove actionAddress
 
 In this case we have a general `actionAddress` that many people may send
-messages to. The `removeAddress` is a redirect that tags all messages with
-the `Remove` tag before sending them along to the more general `actionAddress`.
-This means some parts of our application can know *only* about `removeAddress`
-and not care what other kinds of `Actions` are possible.
+messages to. The new `removeAddress` tags all messages with the `Remove` tag
+before forwarding them along to the more general `actionAddress`. This means
+some parts of our application can know *only* about `removeAddress` and not
+care what other kinds of `Actions` are possible.
 -}
-redirect : (a -> b) -> Address b -> Address a
-redirect f (Address send) =
+forward : (a -> b) -> Address b -> Address a
+forward f (Address send) =
     Address (\x -> send (f x))
 
 
