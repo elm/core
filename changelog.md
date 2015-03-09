@@ -1,56 +1,25 @@
 # 0.15
 
-### Add Promises / Improve HTTP support
+### Module Changes
 
-This release includes the `Promise` module which provides a general purpose
-way to model effects. Long term, the `Promise` API will allow us to describe
-*any* low-level browser API in a safe way.
+  * Rename `Json.Decode` to `JavaScript.Decode`
+  * Rename `Json.Encode` to `JavaScript.Encode`
+  * Move `Http` to `elm-http` package and totally redo API
+  * Split `Signal` into `Stream` and `Varying` modules
+  * Remove `WebSocket` module
+  * Add `Promise` module
 
-The biggest result right now is that the new `Http` module is much more
-flexible and easy to use. It has been moved out of the core libraries into
-`evancz/elm-http`.
+## Text in Collages
 
-The `Promise` module motivates many of the subsequent changes.
-
-
-### Signal becomes Stream/Varying
-
-The `Signal` module has been split into two separate concepts:
-
-  * `Stream` is a stream of discrete events. It has no initial value or
-    current value. It is nice for events like clicks or key presses.
-  * `Varying` is a value that varies. It is always defined, changing at
-    discrete moments. This is nice for things like `Mouse.position` or the
-    current state of your application.
-
-There is nothing fundamentally new here, the underlying implementation is
-pretty much unchanged. The big difference is that the `Signal` API has been
-split accross the `Stream` and `Varying` modules, hopefully clarifying things.
-
-### Channel becomes Mailbox
-
-As [architecture guidelines][arch] have developed, the concept of a `Channel`
-got a bit messy. It grew to include `LocalChannel` and had [more fundamental
-issues](https://github.com/elm-lang/elm-compiler/issues/889). This motivates
-the `Mailbox` abstraction.
-
-[arch]: https://github.com/evancz/elm-architecture-tutorial
+`Graphics.Collage` now has two new functions:
 
 ```elm
-type alias Mailbox a =
-    { address : Address a
-    , stream : Stream a
-    }
-
-send : Address a -> a -> Promise x ()
-
-forward : (a -> b) -> Address b -> Address a
+text : Text -> Form
+outlinedText : LineStyle -> Text -> Form
 ```
 
-A `Mailbox` has an `address` you can send values to, and a `stream` that
-receives all of those values. The `forward` function lets you create
-forwarding addresses that just send the message along, adding some extra
-information. This is very helpful for writing more modular code.
+These functions render text with the canvas, making things quite a bit faster.
+The underlying implementation of `Text` has also been improved dramatically.
 
 
 # 0.14
