@@ -1,6 +1,5 @@
 module Stream
     ( Stream
-    , WritableStream
     , toVarying, fromVarying
     , map
     , merge, mergeMany
@@ -9,6 +8,8 @@ module Stream
     , sample
     , never
     , timestamp
+    , Mailbox, Address, Message
+    , send, message, redirect
     ) where
 
 {-| Streams of events. Many interactions with the world can be formulated as
@@ -16,25 +17,22 @@ streams of events: mouse clicks, responses from servers, key presses, etc.
 
 This library provides the basic building blocks for routing these streams of
 events to your application logic.
+
+# Mailboxes
+@docs Mailbox, send, message, redirect
 -}
 
 import Basics exposing ((|>), (>>), snd)
 import List
-import Mailbox exposing (Mailbox)
 import Maybe exposing (Maybe(..))
 import Native.Signal
+import Promise exposing (Promise, onError, succeed)
 import Signal exposing (Varying)
 import Time exposing (Time)
 
 
 type alias Stream a =
     Signal.Stream a
-
-
-type alias WritableStream a =
-    { mailbox : Mailbox a
-    , stream : Stream a
-    }
 
 
 map : (a -> b) -> Stream a -> Stream b
@@ -127,6 +125,15 @@ filter isOk stream =
   filterMap (\v -> if isOk v then Just v else Nothing) stream
 
 
+{-| Filter out some events. If the incoming event is mapped to a `Nothing` it
+is dropped. If it is mapped to `Just` a value, we keep the value.
+
+    numbers : Stream Int
+    numbers =
+        filterMap (\raw -> Result.toMaybe (String.toInt raw)) userInput
+
+    userInput : Stream String
+-}
 filterMap : (a -> Maybe b) -> Stream a -> Stream b
 filterMap =
   Native.Signal.filterMap
@@ -179,6 +186,13 @@ sampleUpdate event state =
         }
 
 
+{-| A stream that never gets an update. This is useful when defining functions
+like `mergeMany` which needs to be defined even when no streams are given.
+
+    mergeMany : List (Stream a) -> Stream a
+    mergeMany streams =
+        List.foldr merge never streams
+-}
 never : Stream a
 never =
   Native.Signal.never
@@ -195,4 +209,81 @@ timestamp because they rely on the same underlying event (`Mouse.position`).
 timestamp : Stream a -> Stream (Time, a)
 timestamp =
   Native.Signal.timestamp
+
+
+-- MAILBOX
+
+{-| A `Mailbox` makes it possible to trigger new events from within your
+program. The most important part of a `Mailbox` is the `Address` that you can
+send values to. All of the values sent to the `Mailbox` will show up as events
+on the corresponding `Stream`. You can set up a `Mailbox` with the `loopback`
+keyword.
+
+    loopback numbers : Mailbox Int
+
+    report : Promise x ()
+    report =
+        send numbers.address 42
+-}
+type alias Mailbox a =
+    { address : Address a
+    , stream : Stream a
+    }
+
+
+type Address a =
+    Address (a -> Promise () ())
+
+
+{-| Send a message to an `Address`.
+
+    type Action = Undo | Remove Int
+
+    actionAddress : Address Action
+
+    requestUndo : Promise x ()
+    requestUndo =
+        send actionAddress Undo
+
+The `Stream` associated with `actionAddress` will receive the `Undo` message
+and push it through the Elm program.
+-}
+send : Address a -> a -> Promise x ()
+send (Address actuallySend) value =
+    actuallySend value
+      `onError` \_ -> succeed ()
+
+
+{-| Create an address that will redirect all messages somewhere else.
+
+    type Action = Undo | Remove Int
+
+    actionAddress : Address Action
+
+    removeAddress : Address Int
+    removeAddress =
+        redirect Remove actionAddress
+
+In this case we have a general `actionAddress` that many people may send
+messages to. The `removeAddress` is a redirect that tags all messages with
+the `Remove` tag before sending them along to the more general `actionAddress`.
+This means some parts of our application can know *only* about `removeAddress`
+and not care what other kinds of `Actions` are possible.
+-}
+redirect : (a -> b) -> Address b -> Address a
+redirect f (Address send) =
+    Address (\x -> send (f x))
+
+
+type Message = Message (Promise () ())
+
+
+{-| Create a message that may be sent to a `Mailbox` at a later time.
+
+Most importantly, this lets us create APIs that can send values to mailboxes
+*without* allowing people to run arbitrary promises.
+-}
+message : Address a -> a -> Message
+message (Address send) value =
+    Message (send value)
 
