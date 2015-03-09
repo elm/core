@@ -70,7 +70,12 @@ Elm.Native.Promise.make = function(localRuntime) {
 
 		function onComplete()
 		{
-			var result = workQueue.shift();
+			var queueResult = workQueue.shift();
+			var promise = queueResult.promise;
+			var result = promise.tag === 'Succeed'
+				? Result.Ok(promise.value)
+				: Result.Err(promise.value);
+
 			setTimeout(function() {
 				notify(result);
 				if (workQueue.length > 0)
@@ -108,6 +113,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 
 		if (result.status === 'done')
 		{
+			root.promise = result.promise;
 			onComplete();
 		}
 
