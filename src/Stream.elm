@@ -54,16 +54,44 @@ type alias Stream a =
     Signal.Stream a
 
 
+{-| Apply a function to events as they come in. This lets you transform
+streams.
+
+    type Action = MouseClick | TimeDelta Float
+
+    actions : Stream Action
+    actions =
+        map (always MouseClick) Mouse.clicks
+-}
 map : (a -> b) -> Stream a -> Stream b
 map =
   Native.Signal.streamMap
 
 
+{-| Convert a stream of values into a varying value that updates whenever an
+event comes in on the stream.
+
+    url : Varying String
+    url =
+      toVarying "waiting.gif" imageStream
+
+    constant : a -> Varying a
+    constant value =
+      toVarying value Stream.never
+-}
 toVarying : a -> Stream a -> Varying a
 toVarying =
   Native.Signal.streamToVarying
 
 
+{-| Get a stream that triggers whenever the varying value is *updated*. Note
+that an update may result in the same value as before, so the resulting
+`Stream` can have the same value twice in a row.
+
+    moves : Stream (Int,Int)
+    moves =
+      fromVarying Mouse.position
+-}
 fromVarying : Varying a -> Stream a
 fromVarying =
   Native.Signal.varyingToStream
@@ -72,12 +100,12 @@ fromVarying =
 {-| Merge two streams into one. This function is extremely useful for bringing
 together lots of different streams to feed into a `fold`.
 
-    type Action = MouseMove (Int,Int) | TimeDelta Float
+    type Action = MouseClick | TimeDelta Float
 
     actions : Stream Action
     actions =
         merge
-            (map MouseMove Mouse.position)
+            (map (always MouseClick) Mouse.clicks)
             (map TimeDelta (fps 40))
 
 If an event comes from either of the incoming streams, it flows out the
@@ -162,7 +190,9 @@ filterMap =
 For example, if you are operating on a time delta but want to take the current
 keyboard state into account.
 
-    sample (,) Keyboard.arrows (fps 60)
+    inputs : Stream ({ x:Int, y:Int }, Time)
+    inputs =
+        sample (,) Keyboard.arrows (fps 60)
 
 Now we get events exactly with the `(fps 60)` stream, but they are augmented
 with which arrows are pressed at the moment.
