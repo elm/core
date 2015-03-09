@@ -13,10 +13,29 @@ module Stream
     ) where
 
 {-| Streams of events. Many interactions with the world can be formulated as
-streams of events: mouse clicks, responses from servers, key presses, etc.
+a stream of discrete events: mouse clicks, responses from servers, key presses,
+etc.
 
 This library provides the basic building blocks for routing these streams of
 events to your application logic.
+
+# Mapping
+@docs map
+
+# Merging
+@docs merge, mergeMany
+
+# Folding
+@docs fold
+
+# Filtering
+@docs filterMap, filter, sample
+
+# Primitive Streams
+@docs never, timestamp
+
+# Conversions
+@docs toVarying, fromVarying
 
 # Mailboxes
 @docs Mailbox, send, message, redirect
