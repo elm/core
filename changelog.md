@@ -9,7 +9,7 @@
   * Remove `WebSocket` module
   * Add `Promise` module
 
-## Text in Collages
+### Text in Collages
 
 `Graphics.Collage` now has two new functions:
 
