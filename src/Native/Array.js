@@ -16,7 +16,7 @@ Elm.Native.Array.make = function(elm) {
     //         "lengths" is an array of accumulated lengths of the child nodes
 
     // M is the maximal table size. 32 seems fast. E is the allowed increase
-    // of search steps when concatting to find an index. Lower values will 
+    // of search steps when concatting to find an index. Lower values will
     // decrease balancing, but will increase search steps.
     var M = 32;
     var E = 2;
@@ -232,12 +232,23 @@ Elm.Native.Array.make = function(elm) {
 
     // Maps a function over the elements of an array.
     function map(f, a) {
-      var newA = { ctor:"_Array", height:a.height, table:new Array(a.table) };
-      if (a.height > 0) { newA.lengths = a.lengths; }
-      for (var i = 0; i < a.table.length; i++) {
-        newA.table[i] = a.height == 0 ? f(a.table[i]) : map(f, a.table[i]);
-      }
-      return newA;
+        var newA = {
+            ctor: "_Array",
+            height: a.height,
+            table: new Array(a.table.length)
+        };
+        if (a.height > 0)
+        {
+            newA.lengths = a.lengths;
+        }
+        for (var i = 0; i < a.table.length; i++)
+        {
+            newA.table[i] =
+                a.height == 0
+                    ? f(a.table[i])
+                    : map(f, a.table[i]);
+        }
+        return newA;
     }
 
     // Maps a function over the elements with their index as first argument.
@@ -246,14 +257,23 @@ Elm.Native.Array.make = function(elm) {
     }
 
     function indexedMap_(f, a, from) {
-      var newA = { ctor:"_Array", height:a.height, table:new Array(a.table) };
-      if (a.height > 0) { newA.lengths = a.lengths; }
-      for (var i = 0; i < a.table.length; i++) {
-        newA.table[i] = a.height == 0 ? A2(f, from + i, a.table[i])
-                                      : indexedMap_( f, a.table[i]
-                                                   , i == 0 ? 0 : a.lengths[i - 1]);
-      }
-      return newA;
+        var newA = {
+            ctor: "_Array",
+            height: a.height,
+            table: new Array(a.table.length)
+        };
+        if (a.height > 0)
+        {
+            newA.lengths = a.lengths;
+        }
+        for (var i = 0; i < a.table.length; i++)
+        {
+            newA.table[i] =
+                a.height == 0
+                    ? A2(f, from + i, a.table[i])
+                    : indexedMap_(f, a.table[i], i == 0 ? 0 : a.lengths[i - 1]);
+        }
+        return newA;
     }
 
     function foldl(f, b, a) {
