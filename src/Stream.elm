@@ -41,7 +41,7 @@ events to your application logic.
 @docs Mailbox, send, message, forward
 -}
 
-import Basics exposing ((|>), (>>), snd)
+import Basics exposing ((|>), (>>), (<<), fst, snd, flip)
 import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
@@ -207,25 +207,16 @@ sample f varying events =
             (map (\s -> (Just s, Nothing)) events)
             (map (\u -> (Nothing, Just u)) varyingUpdates)
   in
-      fold sampleUpdate { state = initialValue, trigger = Nothing } sampleEvents
-        |> fromVarying
+      map2 (flip SampleState << fst)
+          (fromVarying sampleEvents)
+          (fromVarying (fold (flip Maybe.withDefault << snd) initialValue sampleEvents))
         |> filterMap (\state -> Maybe.map (f state.state) state.trigger)
-
-
-type alias SampleEvent a b = (Maybe a, Maybe b)
 
 
 type alias SampleState a b =
     { state : b
     , trigger : Maybe a
     }
-
-
-sampleUpdate : SampleEvent a b -> SampleState a b -> SampleState a b
-sampleUpdate (ms,mu) state =
-        { state = Maybe.withDefault state.state mu
-        , trigger = ms
-        }
 
 
 {-| A stream that never gets an update. This is useful when defining functions
