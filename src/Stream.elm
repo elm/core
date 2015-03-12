@@ -203,16 +203,16 @@ sample f varying events =
           (Native.Signal.initialValue varying, fromVarying varying)
 
       sampleEvents =
-          Native.Signal.genericMerge (\s u -> (fst s, snd u))
-            (map (\s -> (Just s, Nothing)) events)
-            (map (\u -> (Nothing, Just u)) varyingUpdates)
+          Native.Signal.genericMerge (\u s -> (fst u, snd s))
+            (map (\u -> (Just u, Nothing)) varyingUpdates)
+            (map (\s -> (Nothing, Just s)) events)
   in
       fold sampleUpdate { state = initialValue, trigger = Nothing } sampleEvents
         |> fromVarying
         |> filterMap (\state -> Maybe.map (f state.state) state.trigger)
 
 
-type alias SampleEvent a b = (Maybe b, Maybe a)
+type alias SampleEvent a b = (Maybe a, Maybe b)
 
 
 type alias SampleState a b =
@@ -222,7 +222,7 @@ type alias SampleState a b =
 
 
 sampleUpdate : SampleEvent a b -> SampleState a b -> SampleState a b
-sampleUpdate (ms,mu) state =
+sampleUpdate (mu,ms) state =
         { state = Maybe.withDefault state.state mu
         , trigger = ms
         }
