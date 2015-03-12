@@ -55,7 +55,7 @@ Elm.Native.Time.make = function(localRuntime) {
 					delta: currentTime - state.time
 				};
 			}
-			else if (!state.isOn && event)
+			else if (!state.isOn && event._0)
 			{
 				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
 				return {
@@ -64,7 +64,7 @@ Elm.Native.Time.make = function(localRuntime) {
 					delta: null
 				};
 			}
-			else if (state.isOn && !event)
+			else if (state.isOn && !event._0)
 			{
 				clearTimeout(timeoutId);
 				return {
