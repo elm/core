@@ -212,16 +212,16 @@ sample f varying events =
         |> filterMap (\state -> Maybe.map (f state.state) state.trigger)
 
 
-type alias SampleEvent b a = (Maybe b, Maybe a)
+type alias SampleEvent a b = (Maybe b, Maybe a)
 
 
-type alias SampleState b a =
+type alias SampleState a b =
     { state : a
     , trigger : Maybe b
     }
 
 
-sampleUpdate : SampleEvent b a -> SampleState b a -> SampleState b a
+sampleUpdate : SampleEvent a b -> SampleState a b -> SampleState a b
 sampleUpdate (ms,mu) state =
         { state = Maybe.withDefault state.state mu
         , trigger = ms
