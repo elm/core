@@ -41,7 +41,7 @@ events to your application logic.
 @docs Mailbox, send, message, forward
 -}
 
-import Basics exposing ((|>), (>>), fst, snd)
+import Basics exposing ((|>))
 import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
@@ -203,32 +203,26 @@ sample f varying events =
           (Native.Signal.initialValue varying, fromVarying varying)
 
       sampleEvents =
-          Native.Signal.genericMerge (\u e -> { update = u.update, event = e.event })
-            (map (\u -> { update = Just u, event = Nothing } varyingUpdates)
-            (map (\e -> { update = Nothing, event = Just e } events)
+          Native.Signal.genericMerge (\(value,_) (_,event) -> (value,event))
+            (map (\value -> (Just value, Nothing)) varyingUpdates)
+            (map (\event -> (Nothing, Just event)) events)
   in
-      fold sampleUpdate { state = initialValue, trigger = Nothing } sampleEvents
+      fold sampleUpdate { value = initialValue, event = Nothing } sampleEvents
         |> fromVarying
-        |> filterMap (\state -> Maybe.map (f state.state) state.trigger)
+        |> filterMap (\state -> Maybe.map (f state.value) state.event)
 
 
-type alias SampleEvent a b =
-    { update : Maybe a
+type alias SampleState a b =
+    { value : a
     , event : Maybe b
     }
 
 
-type alias SampleState a b =
-    { state : a
-    , trigger : Maybe b
+sampleUpdate : (Maybe a, Maybe b) -> SampleState a b -> SampleState a b
+sampleUpdate (newState, event) state =
+    { value = Maybe.withDefault state.value newState
+    , event = event
     }
-
-
-sampleUpdate : SampleEvent a b -> SampleState a b -> SampleState a b
-sampleUpdate { update, event } state =
-        { state = Maybe.withDefault state.state update
-        , trigger = event
-        }
 
 
 {-| A stream that never gets an update. This is useful when defining functions
