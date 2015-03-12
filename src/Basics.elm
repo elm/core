@@ -163,7 +163,7 @@ rem =
 
     3^2 == 9
 -}
-(^) : number -> number -> number
+(^) : number -> number -> Float
 (^) =
   Native.Basics.exp
 
