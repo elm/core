@@ -34,28 +34,28 @@ Elm.Native.Time.make = function(localRuntime) {
 			delta: null
 		};
 
+		var timeoutId = 0;
+
 		if (emptyState.isOn)
 		{
-			localRuntime.setTimeout(notifyTicker, 0);
+			timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
 		}
-
-		var timeoutId = 0;
 
 		function fpsUpdate(rawEvent, state)
 		{
 			var currentTime = rawEvent._0;
 			var event = rawEvent._1;
 
-			if (event === null)
+			if (state.isOn && event === null)
 			{
 				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
 				return {
-					isOn: state.isOn,
+					isOn: true,
 					time: currentTime,
 					delta: currentTime - state.time
 				};
 			}
-			else if (!state.isOn && event._0)
+			else if (!state.isOn && event !== null && event._0)
 			{
 				timeoutId = localRuntime.setTimeout(notifyTicker, msPerFrame);
 				return {
@@ -64,15 +64,20 @@ Elm.Native.Time.make = function(localRuntime) {
 					delta: null
 				};
 			}
-			else if (state.isOn && !event._0)
+			else if (state.isOn && event !== null && !event._0)
 			{
 				clearTimeout(timeoutId);
 				return {
 					isOn: false,
-					time: currentTime,
-					delta: null
+					time: currentTime, // irrelevant
+					delta: currentTime - state.time
 				};
 			}
+			return {
+				isOn: state.isOn,
+				time: state.time, // only relevant if isOn is true
+				delta: null
+			};
 		}
 		var state = A3(NS.fold, F2(fpsUpdate), emptyState, timestampedEvents);
 		return A2(NS.filterMap, toDelta, state);
@@ -88,7 +93,7 @@ Elm.Native.Time.make = function(localRuntime) {
 
 	function toDelta(state)
 	{
-		if (state.isOn && state.delta !== null)
+		if (state.delta !== null)
 		{
 			return Maybe.Just(state.delta);
 		}
