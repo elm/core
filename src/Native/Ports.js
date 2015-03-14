@@ -227,7 +227,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 		inputStream: inputStream,
 		inputVarying: inputVarying,
 		outputValue: outputValue,
-		outputStream: INPUT
+		outputStream: outputStream,
 		outputVarying: outputVarying,
 		input: input,
 		loopbackIn: loopbackIn,
