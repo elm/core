@@ -13,9 +13,9 @@ Elm.Native.Ports.make = function(localRuntime) {
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
-	// WRITABLE STREAMS
+	// INPUT
 
-	function mailbox(name)
+	function input(name)
 	{
 		if (!NS)
 		{
@@ -71,7 +71,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 	}
 
 
-	// INPUTS
+	// FOREIGN INPUTS
 
 	function inputValue(name, type, converter)
 	{
@@ -166,7 +166,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 	}
 
 
-	// OUTPUTS
+	// FOREIGN OUTPUTS
 
 	function outputValue(name, converter, value)
 	{
@@ -227,9 +227,9 @@ Elm.Native.Ports.make = function(localRuntime) {
 		inputStream: inputStream,
 		inputVarying: inputVarying,
 		outputValue: outputValue,
-		outputStream: outputStream,
+		outputStream: INPUT
 		outputVarying: outputVarying,
-		mailbox: mailbox,
+		input: input,
 		loopbackIn: loopbackIn,
 		loopbackOut: loopbackOut
 	};

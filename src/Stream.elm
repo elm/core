@@ -8,7 +8,7 @@ module Stream
     , sample
     , never
     , timestamp
-    , Mailbox, Address, Message
+    , Input, Address, Message
     , send, message, forward
     ) where
 
@@ -37,8 +37,8 @@ events to your application logic.
 # Conversions
 @docs toVarying, fromVarying
 
-# Mailboxes
-@docs Mailbox, send, message, forward
+# Inputs
+@docs Input, send, message, forward
 -}
 
 import Basics exposing ((|>))
@@ -250,21 +250,20 @@ timestamp =
   Native.Signal.timestamp
 
 
--- MAILBOX
+-- INPUT
 
-{-| A `Mailbox` makes it possible to trigger new events from within your
-program. The most important part of a `Mailbox` is the `Address` that you can
-send values to. All of the values sent to the `Mailbox` will show up as events
-on the corresponding `Stream`. You can set up a `Mailbox` with the `loopback`
-keyword.
+{-| An `Input` is a way to trigger events in your program. The most important
+part of an `Input` is the `Address` that you can send values to. All of the
+values sent to the `Address` will show up as events on the corresponding
+`Stream`. You can set up an `Input` with the `input` keyword.
 
-    loopback numbers : Mailbox Int
+    input numbers : Input Int
 
     report : Promise x ()
     report =
         send numbers.address 42
 -}
-type alias Mailbox a =
+type alias Input a =
     { address : Address a
     , stream : Stream a
     }
@@ -317,9 +316,9 @@ forward f (Address send) =
 type Message = Message (Promise () ())
 
 
-{-| Create a message that may be sent to a `Mailbox` at a later time.
+{-| Create a message that may be sent to an `Input` at a later time.
 
-Most importantly, this lets us create APIs that can send values to mailboxes
+Most importantly, this lets us create APIs that can send values to inputs
 *without* allowing people to run arbitrary promises.
 -}
 message : Address a -> a -> Message
