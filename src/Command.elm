@@ -1,5 +1,5 @@
-module Promise
-    ( Promise
+module Command
+    ( Command
     , succeed, fail
     , map, map2, map3, map4, map5, andMap
     , sequence
@@ -25,44 +25,44 @@ module Promise
 @docs spawn, sleep
 -}
 
-import Native.Promise
+import Native.Command
 import List exposing ((::))
 import Result exposing (Result)
 import Signal exposing (Stream)
 import Time exposing (Time)
 
 
-type Promise x a = Promise
+type Command x a = Command
 
 
 -- BASICS
 
-succeed : a -> Promise x a
+succeed : a -> Command x a
 succeed =
-  Native.Promise.succeed
+  Native.Command.succeed
 
 
-fail : x -> Promise x a
+fail : x -> Command x a
 fail =
-  Native.Promise.fail
+  Native.Command.fail
 
 
 -- MAPPING
 
-map : (a -> b) -> Promise x a -> Promise x b
+map : (a -> b) -> Command x a -> Command x b
 map func promiseA =
   promiseA
     `andThen` \a -> succeed (func a)
 
 
-map2 : (a -> b -> result) -> Promise x a -> Promise x b -> Promise x result
+map2 : (a -> b -> result) -> Command x a -> Command x b -> Command x result
 map2 func promiseA promiseB =
   promiseA
     `andThen` \a -> promiseB
     `andThen` \b -> succeed (func a b)
 
 
-map3 : (a -> b -> c -> result) -> Promise x a -> Promise x b -> Promise x c -> Promise x result
+map3 : (a -> b -> c -> result) -> Command x a -> Command x b -> Command x c -> Command x result
 map3 func promiseA promiseB promiseC =
   promiseA
     `andThen` \a -> promiseB
@@ -70,7 +70,7 @@ map3 func promiseA promiseB promiseC =
     `andThen` \c -> succeed (func a b c)
 
 
-map4 : (a -> b -> c -> d -> result) -> Promise x a -> Promise x b -> Promise x c -> Promise x d -> Promise x result
+map4 : (a -> b -> c -> d -> result) -> Command x a -> Command x b -> Command x c -> Command x d -> Command x result
 map4 func promiseA promiseB promiseC promiseD =
   promiseA
     `andThen` \a -> promiseB
@@ -79,7 +79,7 @@ map4 func promiseA promiseB promiseC promiseD =
     `andThen` \d -> succeed (func a b c d)
 
 
-map5 : (a -> b -> c -> d -> e -> result) -> Promise x a -> Promise x b -> Promise x c -> Promise x d -> Promise x e -> Promise x result
+map5 : (a -> b -> c -> d -> e -> result) -> Command x a -> Command x b -> Command x c -> Command x d -> Command x e -> Command x result
 map5 func promiseA promiseB promiseC promiseD promiseE =
   promiseA
     `andThen` \a -> promiseB
@@ -89,42 +89,42 @@ map5 func promiseA promiseB promiseC promiseD promiseE =
     `andThen` \e -> succeed (func a b c d e)
 
 
-andMap : Promise x (a -> b) -> Promise x a -> Promise x b
+andMap : Command x (a -> b) -> Command x a -> Command x b
 andMap promiseFunc promiseValue =
   promiseFunc
     `andThen` \func -> promiseValue
     `andThen` \value -> succeed (func value)
 
 
-sequence : List (Promise x a) -> Promise x (List a)
+sequence : List (Command x a) -> Command x (List a)
 sequence promises =
   case promises of
     [] ->
         succeed []
 
-    promise :: remainingPromises ->
-        map2 (::) promise (sequence remainingPromises)
+    promise :: remainingCommands ->
+        map2 (::) promise (sequence remainingCommands)
 
 
--- interleave : List (Promise x a) -> Promise x (List a)
+-- interleave : List (Command x a) -> Command x (List a)
 
 
 
 -- CHAINING
 
-andThen : Promise x a -> (a -> Promise x b) -> Promise x b
+andThen : Command x a -> (a -> Command x b) -> Command x b
 andThen =
-  Native.Promise.andThen
+  Native.Command.andThen
 
 
 -- ERRORS
 
-onError : Promise x a -> (x -> Promise y a) -> Promise y a
+onError : Command x a -> (x -> Command y a) -> Command y a
 onError =
-  Native.Promise.catch_
+  Native.Command.catch_
 
 
-mapError : (x -> y) -> Promise x a -> Promise y a
+mapError : (x -> y) -> Command x a -> Command y a
 mapError f promise =
   promise `onError` \err -> fail (f err)
 
@@ -134,14 +134,14 @@ mapError f promise =
 type ID = ID Int
 
 
-spawn : Promise x a -> Promise y ID
+spawn : Command x a -> Command y ID
 spawn =
-  Native.Promise.spawn
+  Native.Command.spawn
 
 
--- kill : ID -> Promise x ()
+-- kill : ID -> Command x ()
 
 
-sleep : Time -> Promise x ()
+sleep : Time -> Command x ()
 sleep =
-  Native.Promise.sleep
+  Native.Command.sleep

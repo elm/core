@@ -45,7 +45,7 @@ import Basics exposing ((|>))
 import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
-import Promise exposing (Promise, onError, succeed)
+import Command exposing (Command, onError, succeed)
 import Signal exposing (Varying)
 import Time exposing (Time)
 
@@ -259,7 +259,7 @@ values sent to the `Address` will show up as events on the corresponding
 
     input numbers : Input Int
 
-    report : Promise x ()
+    report : Command x ()
     report =
         send numbers.address 42
 -}
@@ -270,7 +270,7 @@ type alias Input a =
 
 
 type Address a =
-    Address (a -> Promise () ())
+    Address (a -> Command () ())
 
 
 {-| Send a message to an `Address`.
@@ -279,14 +279,14 @@ type Address a =
 
     actionAddress : Address Action
 
-    requestUndo : Promise x ()
+    requestUndo : Command x ()
     requestUndo =
         send actionAddress Undo
 
 The `Stream` associated with `actionAddress` will receive the `Undo` message
 and push it through the Elm program.
 -}
-send : Address a -> a -> Promise x ()
+send : Address a -> a -> Command x ()
 send (Address actuallySend) value =
     actuallySend value
       `onError` \_ -> succeed ()
@@ -313,13 +313,13 @@ forward f (Address send) =
     Address (\x -> send (f x))
 
 
-type Message = Message (Promise () ())
+type Message = Message (Command () ())
 
 
 {-| Create a message that may be sent to an `Input` at a later time.
 
 Most importantly, this lets us create APIs that can send values to inputs
-*without* allowing people to run arbitrary promises.
+*without* allowing people to run arbitrary commands.
 -}
 message : Address a -> a -> Message
 message (Address send) value =

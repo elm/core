@@ -9,7 +9,7 @@ Elm.Native.Ports.make = function(localRuntime) {
 	}
 
 	var NS;
-	var Promise;
+	var Command;
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
@@ -21,19 +21,19 @@ Elm.Native.Ports.make = function(localRuntime) {
 		{
 			NS = Elm.Native.Signal.make(localRuntime);
 		}
-		if (!Promise)
+		if (!Command)
 		{
-			Promise = Elm.Native.Promise.make(localRuntime);
+			Command = Elm.Native.Command.make(localRuntime);
 		}
 
 		var stream = NS.input(name);
 
 		function send(value) {
-			return Promise.asyncFunction(function(callback) {
+			return Command.asyncFunction(function(callback) {
 				localRuntime.setTimeout(function() {
 					localRuntime.notify(stream.id, value);
 				}, 0);
-				callback(Promise.succeed(Utils.Tuple0));
+				callback(Command.succeed(Utils.Tuple0));
 			});
 		}
 
@@ -48,13 +48,13 @@ Elm.Native.Ports.make = function(localRuntime) {
 
 	var loopbackInputs = {};
 
-	function loopbackOut(name, promises)
+	function loopbackOut(name, commands)
 	{
-		if (!Promise)
+		if (!Command)
 		{
-			Promise = Elm.Native.Promise.make(localRuntime);
+			Command = Elm.Native.Command.make(localRuntime);
 		}
-		return Promise.runStream(name, promises, function(result) {
+		return Command.runStream(name, commands, function(result) {
 			localRuntime.notify(loopbackInputs[name].id, result);
 		});
 	}

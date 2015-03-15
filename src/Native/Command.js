@@ -1,11 +1,11 @@
-Elm.Native.Promise = {};
-Elm.Native.Promise.make = function(localRuntime) {
+Elm.Native.Command = {};
+Elm.Native.Command.make = function(localRuntime) {
 
 	localRuntime.Native = localRuntime.Native || {};
-	localRuntime.Native.Promise = localRuntime.Native.Promise || {};
-	if (localRuntime.Native.Promise.values)
+	localRuntime.Native.Command = localRuntime.Native.Command || {};
+	if (localRuntime.Native.Command.values)
 	{
-		return localRuntime.Native.Promise.values;
+		return localRuntime.Native.Command.values;
 	}
 
 	var Result = Elm.Result.make(localRuntime);
@@ -39,20 +39,20 @@ Elm.Native.Promise.make = function(localRuntime) {
 		};
 	}
 
-	function andThen(promise, callback)
+	function andThen(command, callback)
 	{
 		return {
 			tag: 'AndThen',
-			promise: promise,
+			command: command,
 			callback: callback
 		};
 	}
 
-	function catch_(promise, callback)
+	function catch_(command, callback)
 	{
 		return {
 			tag: 'Catch',
-			promise: promise,
+			command: command,
 			callback: callback
 		};
 	}
@@ -60,8 +60,8 @@ Elm.Native.Promise.make = function(localRuntime) {
 
 	// RUNNER
 
-	function runOne(promise) {
-		runPromise({ promise: promise }, function() {});
+	function runOne(command) {
+		runCommand({ command: command }, function() {});
 	}
 
 	function runStream(name, stream, notify)
@@ -71,65 +71,65 @@ Elm.Native.Promise.make = function(localRuntime) {
 		function onComplete()
 		{
 			var queueResult = workQueue.shift();
-			var promise = queueResult.promise;
-			var result = promise.tag === 'Succeed'
-				? Result.Ok(promise.value)
-				: Result.Err(promise.value);
+			var command = queueResult.command;
+			var result = command.tag === 'Succeed'
+				? Result.Ok(command.value)
+				: Result.Err(command.value);
 
 			setTimeout(function() {
 				notify(result);
 				if (workQueue.length > 0)
 				{
-					runPromise(workQueue[0], onComplete);
+					runCommand(workQueue[0], onComplete);
 				}
 			}, 0);
 		}
 
-		function register(promise)
+		function register(command)
 		{
-			var root = { promise: promise };
+			var root = { command: command };
 			workQueue.push(root);
 			if (workQueue.length === 1)
 			{
-				runPromise(root, onComplete);
+				runCommand(root, onComplete);
 			}
 		}
 
-		Signal.output('loopback-' + name + '-promises', register, stream);
+		Signal.output('loopback-' + name + '-commands', register, stream);
 	}
 
-	function mark(status, promise)
+	function mark(status, command)
 	{
-		return { status: status, promise: promise };
+		return { status: status, command: command };
 	}
 
-	function runPromise(root, onComplete)
+	function runCommand(root, onComplete)
 	{
-		var result = mark('runnable', root.promise);
+		var result = mark('runnable', root.command);
 		while (result.status === 'runnable')
 		{
-			result = stepPromise(onComplete, root, result.promise);
+			result = stepCommand(onComplete, root, result.command);
 		}
 
 		if (result.status === 'done')
 		{
-			root.promise = result.promise;
+			root.command = result.command;
 			onComplete();
 		}
 
 		if (result.status === 'blocked')
 		{
-			root.promise = result.promise;
+			root.command = result.command;
 		}
 	}
 
-	function stepPromise(onComplete, root, promise)
+	function stepCommand(onComplete, root, command)
 	{
-		var tag = promise.tag;
+		var tag = command.tag;
 
 		if (tag === 'Succeed' || tag === 'Fail')
 		{
-			return mark('done', promise);
+			return mark('done', command);
 		}
 
 		if (tag === 'Async')
@@ -138,7 +138,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 			var couldBeSync = true;
 			var wasSync = false;
 
-			promise.asyncFunction(function(result) {
+			command.asyncFunction(function(result) {
 				placeHolder.tag = result.tag;
 				placeHolder.value = result.value;
 				if (couldBeSync)
@@ -147,7 +147,7 @@ Elm.Native.Promise.make = function(localRuntime) {
 				}
 				else
 				{
-					runPromise(root, onComplete);
+					runCommand(root, onComplete);
 				}
 			});
 			couldBeSync = false;
@@ -156,30 +156,30 @@ Elm.Native.Promise.make = function(localRuntime) {
 
 		if (tag === 'AndThen' || tag === 'Catch')
 		{
-			var result = mark('runnable', promise.promise);
+			var result = mark('runnable', command.command);
 			while (result.status === 'runnable')
 			{
-				result = stepPromise(onComplete, root, result.promise);
+				result = stepCommand(onComplete, root, result.command);
 			}
 
 			if (result.status === 'done')
 			{
-				var activePromise = result.promise;
-				var activeTag = activePromise.tag;
+				var activeCommand = result.command;
+				var activeTag = activeCommand.tag;
 
 				var succeedChain = activeTag === 'Succeed' && tag === 'AndThen';
 				var failChain = activeTag === 'Fail' && tag === 'Catch';
 
 				return (succeedChain || failChain)
-					? mark('runnable', promise.callback(activePromise.value))
-					: mark('runnable', activePromise);
+					? mark('runnable', command.callback(activeCommand.value))
+					: mark('runnable', activeCommand);
 			}
 			if (result.status === 'blocked')
 			{
 				return mark('blocked', {
 					tag: tag,
-					promise: result.promise,
-					callback: promise.callback
+					command: result.command,
+					callback: command.callback
 				});
 			}
 		}
@@ -196,17 +196,17 @@ Elm.Native.Promise.make = function(localRuntime) {
 		});
 	}
 
-	function spawn(promise) {
+	function spawn(command) {
 		return asyncFunction(function(callback) {
 			var id = setTimeout(function() {
-				runOne(promise);
+				runOne(command);
 			}, 0);
 			callback(succeed(id));
 		});
 	}
 
 
-	return localRuntime.Native.Promise.values = {
+	return localRuntime.Native.Command.values = {
 		succeed: succeed,
 		fail: fail,
 		asyncFunction: asyncFunction,
