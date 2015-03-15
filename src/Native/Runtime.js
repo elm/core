@@ -423,9 +423,15 @@ if (!Elm.fullscreen) {
 		{
 			function similar(nodeOld,nodeNew)
 			{
-				var idOkay = nodeOld.id === nodeNew.id;
-				var lengthOkay = nodeOld.kids.length === nodeNew.kids.length;
-				return idOkay && lengthOkay;
+				if (nodeOld.id !== nodeNew.id)
+				{
+					return false;
+				}
+				if (nodeOld.isOutput)
+				{
+					return nodeNew.isOutput;
+				}
+				return nodeOld.kids.length === nodeNew.kids.length;
 			}
 			function swap(nodeOld,nodeNew)
 			{
@@ -463,8 +469,8 @@ if (!Elm.fullscreen) {
 					{
 						return false;
 					}
-					queueOld = queueOld.concat(nodeOld.kids);
-					queueNew = queueNew.concat(nodeNew.kids);
+					queueOld = queueOld.concat(nodeOld.kids || []);
+					queueNew = queueNew.concat(nodeNew.kids || []);
 					seen.push(nodeOld.id);
 				}
 			}
