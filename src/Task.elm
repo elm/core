@@ -1,5 +1,5 @@
-module Command
-    ( Command
+module Task
+    ( Task
     , succeed, fail
     , map, map2, map3, map4, map5, andMap
     , sequence
@@ -25,44 +25,44 @@ module Command
 @docs spawn, sleep
 -}
 
-import Native.Command
+import Native.Task
 import List exposing ((::))
 import Result exposing (Result)
 import Signal exposing (Stream)
 import Time exposing (Time)
 
 
-type Command x a = Command
+type Task x a = Task
 
 
 -- BASICS
 
-succeed : a -> Command x a
+succeed : a -> Task x a
 succeed =
-  Native.Command.succeed
+  Native.Task.succeed
 
 
-fail : x -> Command x a
+fail : x -> Task x a
 fail =
-  Native.Command.fail
+  Native.Task.fail
 
 
 -- MAPPING
 
-map : (a -> b) -> Command x a -> Command x b
+map : (a -> b) -> Task x a -> Task x b
 map func promiseA =
   promiseA
     `andThen` \a -> succeed (func a)
 
 
-map2 : (a -> b -> result) -> Command x a -> Command x b -> Command x result
+map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func promiseA promiseB =
   promiseA
     `andThen` \a -> promiseB
     `andThen` \b -> succeed (func a b)
 
 
-map3 : (a -> b -> c -> result) -> Command x a -> Command x b -> Command x c -> Command x result
+map3 : (a -> b -> c -> result) -> Task x a -> Task x b -> Task x c -> Task x result
 map3 func promiseA promiseB promiseC =
   promiseA
     `andThen` \a -> promiseB
@@ -70,7 +70,7 @@ map3 func promiseA promiseB promiseC =
     `andThen` \c -> succeed (func a b c)
 
 
-map4 : (a -> b -> c -> d -> result) -> Command x a -> Command x b -> Command x c -> Command x d -> Command x result
+map4 : (a -> b -> c -> d -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x result
 map4 func promiseA promiseB promiseC promiseD =
   promiseA
     `andThen` \a -> promiseB
@@ -79,7 +79,7 @@ map4 func promiseA promiseB promiseC promiseD =
     `andThen` \d -> succeed (func a b c d)
 
 
-map5 : (a -> b -> c -> d -> e -> result) -> Command x a -> Command x b -> Command x c -> Command x d -> Command x e -> Command x result
+map5 : (a -> b -> c -> d -> e -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x e -> Task x result
 map5 func promiseA promiseB promiseC promiseD promiseE =
   promiseA
     `andThen` \a -> promiseB
@@ -89,42 +89,42 @@ map5 func promiseA promiseB promiseC promiseD promiseE =
     `andThen` \e -> succeed (func a b c d e)
 
 
-andMap : Command x (a -> b) -> Command x a -> Command x b
+andMap : Task x (a -> b) -> Task x a -> Task x b
 andMap promiseFunc promiseValue =
   promiseFunc
     `andThen` \func -> promiseValue
     `andThen` \value -> succeed (func value)
 
 
-sequence : List (Command x a) -> Command x (List a)
+sequence : List (Task x a) -> Task x (List a)
 sequence promises =
   case promises of
     [] ->
         succeed []
 
-    promise :: remainingCommands ->
-        map2 (::) promise (sequence remainingCommands)
+    promise :: remainingTasks ->
+        map2 (::) promise (sequence remainingTasks)
 
 
--- interleave : List (Command x a) -> Command x (List a)
+-- interleave : List (Task x a) -> Task x (List a)
 
 
 
 -- CHAINING
 
-andThen : Command x a -> (a -> Command x b) -> Command x b
+andThen : Task x a -> (a -> Task x b) -> Task x b
 andThen =
-  Native.Command.andThen
+  Native.Task.andThen
 
 
 -- ERRORS
 
-onError : Command x a -> (x -> Command y a) -> Command y a
+onError : Task x a -> (x -> Task y a) -> Task y a
 onError =
-  Native.Command.catch_
+  Native.Task.catch_
 
 
-mapError : (x -> y) -> Command x a -> Command y a
+mapError : (x -> y) -> Task x a -> Task y a
 mapError f promise =
   promise `onError` \err -> fail (f err)
 
@@ -134,14 +134,14 @@ mapError f promise =
 type ID = ID Int
 
 
-spawn : Command x a -> Command y ID
+spawn : Task x a -> Task y ID
 spawn =
-  Native.Command.spawn
+  Native.Task.spawn
 
 
--- kill : ID -> Command x ()
+-- kill : ID -> Task x ()
 
 
-sleep : Time -> Command x ()
+sleep : Time -> Task x ()
 sleep =
-  Native.Command.sleep
+  Native.Task.sleep
