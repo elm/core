@@ -9,6 +9,20 @@
   * Remove `WebSocket` module
   * Add `Promise` module
 
+### Channels become Inputs
+
+Rather than creating `Channels` with expressions, we now create `Inputs` with
+declarations. It works like this:
+
+```elm
+type alias Input a = { address : Address a, stream : Stream a }
+
+input actions : Input Action
+```
+
+You can then send messages to the `Address` with functions like `Stream.send`
+and `Stream.message`, or create forwarding addresses with `Stream.forward`.
+
 ### Text in Collages
 
 `Graphics.Collage` now has two new functions:
