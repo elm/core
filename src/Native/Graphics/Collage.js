@@ -52,7 +52,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		ctx.fillStyle = sty === 'Solid'
 			? Color.toCss(style._0)
 			: sty === 'Texture'
-				? texture(redo, ctx, style._0)
+				? texture(ctx, style._0)
 				: gradient(ctx, style._0);
 	}
 
@@ -140,12 +140,15 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		return line(ctx, style, path);
 	}
 
-	function texture(redo, ctx, src)
+	function texture(ctx, src)
 	{
 		var img = new Image();
 		img.src = src;
-		img.onload = redo;
-		return ctx.createPattern(img, 'repeat');
+		img.onload = function() {
+			ctx.fillStyle = ctx.createPattern(img, 'repeat');
+			ctx.scale(1,-1);
+			ctx.fill();
+		};
 	}
 
 	function gradient(ctx, grad)
