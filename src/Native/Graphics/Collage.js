@@ -23,6 +23,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 	var Transform = Elm.Transform2D.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
+	var ImageCache = {};
 
 	function setStrokeStyle(ctx, style)
 	{
@@ -46,13 +47,13 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		ctx.strokeStyle = Color.toCss(style.color);
 	}
 
-	function setFillStyle(ctx, style)
+	function setFillStyle(redo, ctx, style)
 	{
 		var sty = style.ctor;
 		ctx.fillStyle = sty === 'Solid'
 			? Color.toCss(style._0)
 			: sty === 'Texture'
-				? texture(ctx, style._0)
+				? texture(redo, ctx, style._0)
 				: gradient(ctx, style._0);
 	}
 
@@ -140,15 +141,26 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		return line(ctx, style, path);
 	}
 
-	function texture(ctx, src)
+	function texture(redo, ctx, src)
 	{
-		var img = new Image();
-		img.src = src;
-		img.onload = function() {
-			ctx.fillStyle = ctx.createPattern(img, 'repeat');
-			ctx.scale(1,-1);
-			ctx.fill();
-		};
+		var img = getImage(redo, src);
+		return ctx.createPattern(img, 'repeat');
+	}
+
+	function getImage(redo, src)
+	{
+		var img = ImageCache[src];
+		if (!img)
+		{
+			img = ImageCache[src] = new Image();
+			img.src = src;
+			img.onload = function()
+			{
+				redo();
+				ImageCache[src] = null;
+			};
+		}
+		return img;
 	}
 
 	function gradient(ctx, grad)
@@ -179,7 +191,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	function drawShape(redo, ctx, style, path)
 	{
 		trace(ctx, path);
-		setFillStyle(ctx, style);
+		setFillStyle(redo, ctx, style);
 		ctx.scale(1,-1);
 		ctx.fill();
 	}
