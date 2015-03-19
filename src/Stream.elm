@@ -8,8 +8,6 @@ module Stream
     , sample
     , never
     , timestamp
-    , Input, Address, Message
-    , send, message, forward
     ) where
 
 {-| Streams of events. Many interactions with the world can be formulated as
@@ -36,9 +34,6 @@ events to your application logic.
 
 # Conversions
 @docs toVarying, fromVarying
-
-# Inputs
-@docs Input, send, message, forward
 -}
 
 import Basics exposing ((|>))
@@ -248,80 +243,3 @@ timestamp because they rely on the same underlying event (`Mouse.position`).
 timestamp : Stream a -> Stream (Time, a)
 timestamp =
   Native.Signal.timestamp
-
-
--- INPUT
-
-{-| An `Input` is a way to trigger events in your program. The most important
-part of an `Input` is the `Address` that you can send values to. All of the
-values sent to the `Address` will show up as events on the corresponding
-`Stream`. You can set up an `Input` with the `input` keyword.
-
-    input numbers : Input Int
-
-    report : Task x ()
-    report =
-        send numbers.address 42
--}
-type alias Input a =
-    { address : Address a
-    , stream : Stream a
-    }
-
-
-type Address a =
-    Address (a -> Task () ())
-
-
-{-| Send a message to an `Address`.
-
-    type Action = Undo | Remove Int
-
-    actionAddress : Address Action
-
-    requestUndo : Task x ()
-    requestUndo =
-        send actionAddress Undo
-
-The `Stream` associated with `actionAddress` will receive the `Undo` message
-and push it through the Elm program.
--}
-send : Address a -> a -> Task x ()
-send (Address actuallySend) value =
-    actuallySend value
-      `onError` \_ -> succeed ()
-
-
-{-| Create an address that will forward all messages along.
-
-    type Action = Undo | Remove Int
-
-    actionAddress : Address Action
-
-    removeAddress : Address Int
-    removeAddress =
-        forward Remove actionAddress
-
-In this case we have a general `actionAddress` that many people may send
-messages to. The new `removeAddress` tags all messages with the `Remove` tag
-before forwarding them along to the more general `actionAddress`. This means
-some parts of our application can know *only* about `removeAddress` and not
-care what other kinds of `Actions` are possible.
--}
-forward : (a -> b) -> Address b -> Address a
-forward f (Address send) =
-    Address (\x -> send (f x))
-
-
-type Message = Message (Task () ())
-
-
-{-| Create a message that may be sent to an `Input` at a later time.
-
-Most importantly, this lets us create APIs that can send values to inputs
-*without* allowing people to run arbitrary tasks.
--}
-message : Address a -> a -> Message
-message (Address send) value =
-    Message (send value)
-
