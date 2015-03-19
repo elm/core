@@ -145,3 +145,19 @@ spawn =
 sleep : Time -> Task x ()
 sleep =
   Native.Task.sleep
+
+
+
+{-- TASK MANAGERS
+
+type Manager
+
+runOne : Task x a -> Manager
+
+runSequential : Events (Task x a) -> Manager
+
+runLatest : Events (Task x a) -> Manager
+
+runConcurrent : Events (Task x a) -> Manager
+
+--}
