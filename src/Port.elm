@@ -4,6 +4,7 @@ module Port
     , send, message, forward
     ) where
 
+import Native.Port
 import Stream exposing (Stream)
 import Task exposing (Task)
 
