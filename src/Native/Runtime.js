@@ -105,8 +105,7 @@ if (!Elm.fullscreen) {
 				inputs: inputs,
 				timer: timer,
 				givenInputs: givenInputsTracker,
-				foreignInput: {},
-				foreignOutput: {},
+				ports: {}
 
 				isFullscreen: function() { return display === Display.FULLSCREEN; },
 				isEmbed: function() { return display === Display.COMPONENT; },
@@ -171,8 +170,7 @@ if (!Elm.fullscreen) {
 
 			return {
 				swap: swap,
-				inputs: elm.foreignInput,
-				outputs: elm.foreignOutput,
+				ports: elm.ports,
 				dispose: dispose
 			};
 		};

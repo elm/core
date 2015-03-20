@@ -75,7 +75,7 @@ Elm.Native.Port.make = function(localRuntime) {
 			}
 		}
 
-		localRuntime.foreignInput[name] = { send: send };
+		localRuntime.ports[name] = { send: send };
 
 		return {
 			_: {},
@@ -117,7 +117,7 @@ Elm.Native.Port.make = function(localRuntime) {
 		}
 		NS.output('output', notify, outboundPort.stream);
 
-		localRuntime.foreignOutput[name] = {
+		localRuntime.ports[name] = {
 			subscribe: subscribe,
 			unsubscribe: unsubscribe
 		};
