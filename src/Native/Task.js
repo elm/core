@@ -60,24 +60,19 @@ Elm.Native.Task.make = function(localRuntime) {
 
 	// RUNNER
 
-	function runOne(task) {
+	function perform(task) {
 		runTask({ task: task }, function() {});
 	}
 
-	function runStream(name, stream, notify)
+	function subscribe(stream, toTask)
 	{
 		var workQueue = [];
 
 		function onComplete()
 		{
-			var queueResult = workQueue.shift();
-			var task = queueResult.task;
-			var result = task.tag === 'Succeed'
-				? Result.Ok(task.value)
-				: Result.Err(task.value);
+			workQueue.shift();
 
 			setTimeout(function() {
-				notify(result);
 				if (workQueue.length > 0)
 				{
 					runTask(workQueue[0], onComplete);
@@ -85,9 +80,9 @@ Elm.Native.Task.make = function(localRuntime) {
 			}, 0);
 		}
 
-		function register(task)
+		function register(value)
 		{
-			var root = { task: task };
+			var root = { task: toTask(value) };
 			workQueue.push(root);
 			if (workQueue.length === 1)
 			{
@@ -95,7 +90,9 @@ Elm.Native.Task.make = function(localRuntime) {
 			}
 		}
 
-		Signal.output('loopback-' + name + '-tasks', register, stream);
+		Signal.output('subscription', register, stream);
+
+		return succeed(Utils.Tuple0);
 	}
 
 	function mark(status, task)
@@ -199,7 +196,7 @@ Elm.Native.Task.make = function(localRuntime) {
 	function spawn(task) {
 		return asyncFunction(function(callback) {
 			var id = setTimeout(function() {
-				runOne(task);
+				perform(task);
 			}, 0);
 			callback(succeed(id));
 		});
@@ -212,8 +209,8 @@ Elm.Native.Task.make = function(localRuntime) {
 		asyncFunction: asyncFunction,
 		andThen: F2(andThen),
 		catch_: F2(catch_),
-		runStream: runStream,
-		runOne: runOne,
+		subscribe: F2(subscribe),
+		perform: perform,
 		spawn: spawn,
 		sleep: sleep
 	};

@@ -5,7 +5,7 @@ module Task
     , sequence
     , andThen
     , onError, mapError
-    , ID, spawn, sleep
+    , ID, spawn, subscribe, sleep
     ) where
 {-|
 
@@ -137,6 +137,11 @@ type ID = ID Int
 spawn : Task x a -> Task y ID
 spawn =
   Native.Task.spawn
+
+
+subscribe : Stream a -> (a -> Task x b) -> Task y ID
+subscribe =
+  Native.Task.subscribe
 
 
 -- kill : ID -> Task x ()
