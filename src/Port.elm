@@ -6,7 +6,7 @@ module Port
 
 import Native.Port
 import Stream exposing (Stream)
-import Task exposing (Task)
+import Task exposing (Task, onError, succeed)
 
 
 -- PORTS
