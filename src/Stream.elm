@@ -40,7 +40,6 @@ import Basics exposing ((|>))
 import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
-import Task exposing (Task, onError, succeed)
 import Signal exposing (Varying)
 import Time exposing (Time)
 
