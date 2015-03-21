@@ -59,7 +59,7 @@ Elm.Native.Port.make = function(localRuntime) {
 			try
 			{
 				var elmValue = converter(jsValue);
-				Task.runOne(Task.spawn(inboundPort.send(elmValue)));
+				Task.perform(inboundPort.address._0(elmValue));
 			}
 			catch(e)
 			{
@@ -71,7 +71,7 @@ Elm.Native.Port.make = function(localRuntime) {
 					"    " + JSON.stringify(input.value) + "\n\n" +
 					"but it cannot be converted to the necessary type.\n" +
 					e.message
-				));
+				);
 			}
 		}
 
