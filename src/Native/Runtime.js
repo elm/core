@@ -105,7 +105,7 @@ if (!Elm.fullscreen) {
 				inputs: inputs,
 				timer: timer,
 				givenInputs: givenInputsTracker,
-				ports: {}
+				ports: {},
 
 				isFullscreen: function() { return display === Display.FULLSCREEN; },
 				isEmbed: function() { return display === Display.COMPONENT; },
