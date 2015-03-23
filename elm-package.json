@@ -42,5 +42,6 @@
         "Window"
     ],
     "native-modules": true,
-    "dependencies": {}
+    "dependencies": {},
+    "elm-version": "0.15.0 <= v < 0.16.0"
 }
