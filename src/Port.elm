@@ -2,11 +2,13 @@ module Port
     ( Port, InboundPort, OutboundPort
     , Address, Message
     , send, message, forward
+    , sendResults
     ) where
 
 import Native.Port
+import Result exposing (Result)
 import Stream exposing (Stream)
-import Task exposing (Task, onError, succeed)
+import Task exposing (Task, andThen, onError, succeed)
 
 
 -- PORTS
@@ -110,4 +112,6 @@ send (Address actuallySend) value =
       `onError` \_ -> succeed ()
 
 
--- sendStream : Address a -> Stream a -> Task.Manager
+sendResults : Address (Result x a) -> Stream (Task x a) -> Task y Task.ID
+sendResults address stream =
+    Task.subscribe stream (\task -> Task.toResult task `andThen` send address)
