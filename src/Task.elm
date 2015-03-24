@@ -5,6 +5,7 @@ module Task
     , sequence
     , andThen
     , onError, mapError
+    , toMaybe, fromMaybe, toResult, fromResult
     , ID, spawn, subscribe, sleep
     ) where
 {-|
@@ -19,7 +20,7 @@ module Task
 @docs andThen, sequence
 
 # Errors
-@docs onError, mapError
+@docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
 # Threads
 @docs spawn, sleep
@@ -27,7 +28,8 @@ module Task
 
 import Native.Task
 import List exposing ((::))
-import Result exposing (Result)
+import Maybe exposing (Maybe(Just,Nothing))
+import Result exposing (Result(Ok,Err))
 import Signal exposing (Stream)
 import Time exposing (Time)
 
@@ -127,6 +129,30 @@ onError =
 mapError : (x -> y) -> Task x a -> Task y a
 mapError f promise =
   promise `onError` \err -> fail (f err)
+
+
+toMaybe : Task x a -> Task y (Maybe a)
+toMaybe task =
+  map Just task `onError` (\_ -> succeed Nothing)
+
+
+fromMaybe : x -> Maybe a -> Task x a
+fromMaybe default maybe =
+  case maybe of
+    Just value -> succeed value
+    Nothing -> fail default
+
+
+toResult : Task x a -> Task y (Result x a)
+toResult task =
+  map Ok task `onError` (\msg -> succeed (Err msg))
+
+
+fromResult : Result x a -> Task x a
+fromResult result =
+  case result of
+    Ok value -> succeed value
+    Err msg -> fail msg
 
 
 -- THREADS
