@@ -6,7 +6,7 @@ module Task
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
-    , ID, spawn, subscribe, sleep
+    , ThreadID, spawn, subscribe, sleep
     ) where
 {-|
 
@@ -157,20 +157,20 @@ fromResult result =
 
 -- THREADS
 
-type ID = ID Int
+type ThreadID = ThreadID Int
 
 
-spawn : Task x a -> Task y ID
+spawn : Task x a -> Task y ThreadID
 spawn =
   Native.Task.spawn
 
 
-subscribe : Stream a -> (a -> Task x b) -> Task y ID
+subscribe : Stream a -> (a -> Task x b) -> Task y ThreadID
 subscribe =
   Native.Task.subscribe
 
 
--- kill : ID -> Task x ()
+-- kill : ThreadID -> Task x ()
 
 
 sleep : Time -> Task x ()
