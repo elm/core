@@ -5,6 +5,13 @@ module Port
     , sendResults
     ) where
 
+{-|
+
+@docs Port, InboundPort, OutboundPort
+
+@docs message, forward, send, sendResults
+-}
+
 import Native.Port
 import Result exposing (Result)
 import Stream exposing (Stream)
