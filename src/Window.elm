@@ -13,23 +13,23 @@ the whole window.
 
 import Basics exposing (fst,snd)
 import Native.Window
-import Varying exposing (Varying)
+import Signal exposing (Signal)
 
 
 {-| The current width and height of the window (i.e. the area viewable to the
 user, not including scroll bars). -}
-dimensions : Varying (Int,Int)
+dimensions : Signal (Int,Int)
 dimensions =
   Native.Window.dimensions
 
 
 {-| The current width of the window. -}
-width : Varying Int
+width : Signal Int
 width =
-  Varying.map fst dimensions
+  Signal.map fst dimensions
 
 
 {-| The current height of the window. -}
-height : Varying Int
+height : Signal Int
 height =
-  Varying.map snd dimensions
+  Signal.map snd dimensions

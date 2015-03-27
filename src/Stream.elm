@@ -1,6 +1,6 @@
 module Stream
     ( Stream
-    , toVarying, fromVarying
+    , toSignal, fromSignal
     , map
     , merge, mergeMany
     , fold
@@ -33,19 +33,19 @@ events to your application logic.
 @docs never, timestamp
 
 # Conversions
-@docs toVarying, fromVarying
+@docs toSignal, fromSignal
 -}
 
 import Basics exposing ((|>))
 import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
-import Signal exposing (Varying)
+import SignalTypes exposing (Signal)
 import Time exposing (Time)
 
 
 type alias Stream a =
-    Signal.Stream a
+    SignalTypes.Stream a
 
 
 {-| Apply a function to events as they come in. This lets you transform
@@ -62,33 +62,33 @@ map =
   Native.Signal.streamMap
 
 
-{-| Convert a stream of values into a varying value that updates whenever an
-event comes in on the stream.
+{-| Convert a stream of values into a signal that updates whenever an event
+comes in on the stream.
 
-    url : Varying String
+    url : Signal String
     url =
-      toVarying "waiting.gif" imageStream
+      toSignal "waiting.gif" imageStream
 
-    constant : a -> Varying a
+    constant : a -> Signal a
     constant value =
-      toVarying value Stream.never
+      toSignal value Stream.never
 -}
-toVarying : a -> Stream a -> Varying a
-toVarying =
-  Native.Signal.streamToVarying
+toSignal : a -> Stream a -> Signal a
+toSignal =
+  Native.Signal.streamToSignal
 
 
-{-| Get a stream that triggers whenever the varying value is *updated*. Note
+{-| Get a stream that triggers whenever the signal is *updated*. Note
 that an update may result in the same value as before, so the resulting
 `Stream` can have the same value twice in a row.
 
     moves : Stream (Int,Int)
     moves =
-      fromVarying Mouse.position
+      fromSignal Mouse.position
 -}
-fromVarying : Varying a -> Stream a
-fromVarying =
-  Native.Signal.varyingToStream
+fromSignal : Signal a -> Stream a
+fromSignal =
+  Native.Signal.signalToStream
 
 
 {-| Merge two streams into one. This function is extremely useful for bringing
@@ -131,10 +131,10 @@ mergeMany streams =
 
 
 {-| Create a past-dependent value. Each update from the incoming stream will
-be used to step the state forward. The outgoing varying represents the current
+be used to step the state forward. The outgoing signal represents the current
 state.
 
-    clickCount : Varying Int
+    clickCount : Signal Int
     clickCount =
         fold (\click total -> total + 1) 0 Mouse.clicks
 
@@ -145,7 +145,7 @@ state.
 So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
 is the time the program has been running, updated 40 times a second.
 -}
-fold : (a -> b -> b) -> b -> Stream a -> Varying b
+fold : (a -> b -> b) -> b -> Stream a -> Signal b
 fold =
   Native.Signal.fold
 
@@ -180,7 +180,7 @@ filterMap =
   Native.Signal.filterMap
 
 
-{-| Useful for augmenting a stream with information from a varying value.
+{-| Useful for augmenting a stream with information from a signal.
 For example, if you are operating on a time delta but want to take the current
 keyboard state into account.
 
@@ -191,18 +191,18 @@ keyboard state into account.
 Now we get events exactly with the `(fps 60)` stream, but they are augmented
 with which arrows are pressed at the moment.
 -}
-sample : (a -> b -> c) -> Varying a -> Stream b -> Stream c
-sample f varying events =
-  let (initialValue, varyingUpdates) =
-          (Native.Signal.initialValue varying, fromVarying varying)
+sample : (a -> b -> c) -> Signal a -> Stream b -> Stream c
+sample f signal events =
+  let (initialValue, signalUpdates) =
+          (Native.Signal.initialValue signal, fromSignal signal)
 
       sampleEvents =
           Native.Signal.genericMerge (\(value,_) (_,event) -> (value,event))
-            (map (\value -> (Just value, Nothing)) varyingUpdates)
+            (map (\value -> (Just value, Nothing)) signalUpdates)
             (map (\event -> (Nothing, Just event)) events)
   in
       fold sampleUpdate { value = initialValue, event = Nothing } sampleEvents
-        |> fromVarying
+        |> fromSignal
         |> filterMap (\state -> Maybe.map (f state.value) state.event)
 
 
@@ -231,7 +231,7 @@ never =
   Native.Signal.never
 
 
-{-| Add a timestamp to any signal. Timestamps increase monotonically. When you
+{-| Add a timestamp to any stream. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
 updates whenever `Mouse.x` updates.
 

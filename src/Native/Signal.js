@@ -88,11 +88,11 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	// CONVERSION
 
-	function streamToVarying(initial, stream)
+	function streamToSignal(initial, stream)
 	{
 		var node = {
 			id: Utils.guid(),
-			name: 'streamToVarying',
+			name: 'streamToSignal',
 			parents: [stream],
 			initialValue: initial,
 			value: initial,
@@ -114,12 +114,12 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
-	function varyingToStream(varying)
+	function signalToStream(signal)
 	{
 		var node = {
 			id: Utils.guid(),
-			name: 'varyingToStream',
-			parents: [varying],
+			name: 'signalToStream',
+			parents: [signal],
 			kids: []
 		};
 
@@ -127,20 +127,20 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			if (parentUpdate)
 			{
-				node.value = varying.value;
+				node.value = signal.value;
 			}
 			broadcastToKids(node, timestamp, parentUpdate);
 		}
 
-		varying.kids.push(node);
+		signal.kids.push(node);
 
 		return node;
 	}
 
 
-	function initialValue(varying)
+	function initialValue(signal)
 	{
-		return varying.initialValue;
+		return signal.initialValue;
 	}
 
 
@@ -424,8 +424,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 		never: never,
 		constant: constant,
 		output: output,
-		streamToVarying: F2(streamToVarying),
-		varyingToStream: varyingToStream,
+		streamToSignal: F2(streamToSignal),
+		signalToStream: signalToStream,
 		initialValue: initialValue,
 		streamMap: F2(streamMap),
 		map: F2(map),

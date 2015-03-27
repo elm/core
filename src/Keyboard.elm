@@ -28,7 +28,7 @@ import Basics exposing (always, (-))
 import Set
 import Stream exposing (Stream)
 import Native.Keyboard
-import Varying exposing (Varying)
+import Signal exposing (Signal)
 
 
 {-| Type alias to make it clearer what integers are supposed to represent
@@ -84,7 +84,7 @@ update event model =
 
 
 
-model : Varying Model
+model : Signal Model
 model =
   Stream.fold update empty rawEvents
 
@@ -127,61 +127,61 @@ toXY {up,down,left,right} keyCodes =
   * `{ x = 1, y = 1 }` when pressing the up and right arrows.
   * `{ x = 0, y =-1 }` when pressing the down, left, and right arrows.
 -}
-arrows : Varying { x:Int, y:Int }
+arrows : Signal { x:Int, y:Int }
 arrows =
-  Varying.map (toXY { up = 38, down = 40, left = 37, right = 39 }) keysDown
+  Signal.map (toXY { up = 38, down = 40, left = 37, right = 39 }) keysDown
 
 
 {-| Just like the arrows signal, but this uses keys w, a, s, and d,
 which are common controls for many computer games.
 -}
-wasd : Varying { x:Int, y:Int }
+wasd : Signal { x:Int, y:Int }
 wasd =
-  Varying.map (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
+  Signal.map (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
 
 
 {-| Whether an arbitrary key is pressed. -}
-isDown : KeyCode -> Varying Bool
+isDown : KeyCode -> Signal Bool
 isDown keyCode =
-  Varying.map (Set.member keyCode) keysDown
+  Signal.map (Set.member keyCode) keysDown
 
 
-alt : Varying Bool
+alt : Signal Bool
 alt =
-  Varying.map .alt model
+  Signal.map .alt model
 
 
-ctrl : Varying Bool
+ctrl : Signal Bool
 ctrl =
   isDown 17
 
 
 {-| The meta key is the Windows key on Windows and the Command key on Mac.
 -}
-meta : Varying Bool
+meta : Signal Bool
 meta =
-  Varying.map .meta model
+  Signal.map .meta model
 
 
-shift : Varying Bool
+shift : Signal Bool
 shift =
   isDown 16
 
 
-space : Varying Bool
+space : Signal Bool
 space =
   isDown 32
 
 
-enter : Varying Bool
+enter : Signal Bool
 enter =
   isDown 13
 
 
 {-| Set of keys that are currently down. -}
-keysDown : Varying (Set.Set KeyCode)
+keysDown : Signal (Set.Set KeyCode)
 keysDown =
-  Varying.map .keyCodes model
+  Signal.map .keyCodes model
 
 
 {-| The latest key that has been pressed. -}

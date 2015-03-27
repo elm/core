@@ -30,7 +30,7 @@ import Native.Task
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Result exposing (Result(Ok,Err))
-import Signal exposing (Stream)
+import SignalTypes exposing (Stream)
 import Time exposing (Time)
 
 

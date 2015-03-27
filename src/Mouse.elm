@@ -16,30 +16,30 @@ module Mouse
 import Basics exposing (fst, snd)
 import Native.Mouse
 import Stream exposing (Stream)
-import Varying exposing (Varying)
+import Signal exposing (Signal)
 
 
 {-| The current mouse position. -}
-position : Varying (Int,Int)
+position : Signal (Int,Int)
 position =
   Native.Mouse.position
 
 
 {-| The current x-coordinate of the mouse. -}
-x : Varying Int
+x : Signal Int
 x =
-  Varying.map fst position
+  Signal.map fst position
 
 
 {-| The current y-coordinate of the mouse. -}
-y : Varying Int
+y : Signal Int
 y =
-  Varying.map snd position
+  Signal.map snd position
 
 
 {-| The current state of the left mouse-button.
 True when the button is down, and false otherwise. -}
-isDown : Varying Bool
+isDown : Signal Bool
 isDown =
   Native.Mouse.isDown
 

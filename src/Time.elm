@@ -20,8 +20,8 @@ module Time
 
 import Basics exposing (..)
 import Native.Time
-import Signal exposing (Stream)
-import Varying exposing (Varying)
+import SignalTypes exposing (Stream)
+import Signal exposing (Signal)
 
 
 {-| Type alias to make it clearer when you are working with time values.
@@ -82,7 +82,7 @@ Note: Calling `fps 30` twice gives two independently running timers.
 -}
 fps : number -> Stream Time
 fps targetFrames =
-  fpsWhen targetFrames (Varying.constant True)
+  fpsWhen targetFrames (Signal.constant True)
 
 
 {-| Same as the `fps` function, but you can turn it on and off. Allows you
@@ -91,7 +91,7 @@ The first time delta after a pause is always zero, no matter how long
 the pause was. This way summing the deltas will actually give the amount
 of time that the output signal has been running.
 -}
-fpsWhen : number -> Varying Bool -> Stream Time
+fpsWhen : number -> Signal Bool -> Stream Time
 fpsWhen =
   Native.Time.fpsWhen
 
@@ -101,6 +101,6 @@ every `t`.
 
 Note: Calling `every 100` twice gives two independently running timers.
 -}
-every : Time -> Varying Time
+every : Time -> Signal Time
 every =
   Native.Time.every

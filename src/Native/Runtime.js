@@ -280,7 +280,7 @@ if (!Elm.fullscreen) {
 			// make sure the signal graph is actually a signal & extract the visual model
 			if (!('notify' in signalGraph))
 			{
-				signalGraph = Elm.Varying.make(elm).constant(signalGraph);
+				signalGraph = Elm.Signal.make(elm).constant(signalGraph);
 			}
 			var initialScene = signalGraph.value;
 
