@@ -85,7 +85,7 @@ head list =
 tail : List a -> Maybe (List a)
 tail list =
   case list of
-    x :: xs -> Just x
+    x :: xs -> Just xs
     [] -> Nothing
 
 
