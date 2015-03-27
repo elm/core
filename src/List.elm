@@ -1,6 +1,6 @@
 module List
     ( isEmpty, length, reverse, member
-    , head, filter, take, drop
+    , head, tail, filter, take, drop
     , repeat, (::), append, concat, intersperse
     , partition, unzip
     , map, map2, map3, map4, map5
@@ -17,7 +17,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, filter, take, drop
+@docs head, tail, filter, take, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
@@ -67,10 +67,23 @@ infixr 5 ::
 
 {-| Extract the first element of a list.
 
-    head [1,2,3] == 1
+    head [1,2,3] == Just 1
+    head [] == Nothing
 -}
 head : List a -> Maybe a
 head list =
+  case list of
+    x :: xs -> Just x
+    [] -> Nothing
+
+
+{-| Extract the rest of the list.
+
+    tail [1,2,3] == Just [2,3]
+    tail [] == Nothing
+-}
+tail : List a -> Maybe (List a)
+tail list =
   case list of
     x :: xs -> Just x
     [] -> Nothing
