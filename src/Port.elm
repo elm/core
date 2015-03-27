@@ -119,6 +119,6 @@ send (Address actuallySend) value =
       `onError` \_ -> succeed ()
 
 
-sendResults : Address (Result x a) -> Stream (Task x a) -> Task y Task.ID
+sendResults : Address (Result x a) -> Stream (Task x a) -> Task y Task.ThreadID
 sendResults address stream =
     Task.subscribe stream (\task -> Task.toResult task `andThen` send address)
