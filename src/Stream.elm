@@ -1,6 +1,6 @@
 module Stream
     ( Stream
-    , toVarying, fromVarying
+    , toSignal, fromSignal
     , map
     , merge, mergeMany
     , fold
@@ -9,7 +9,7 @@ module Stream
     , never
     , timestamp
     , Mailbox, Address, Message
-    , send, message, forward
+    , mailbox, send, message, forward
     ) where
 
 {-| Streams of events. Many interactions with the world can be formulated as
@@ -35,23 +35,20 @@ events to your application logic.
 @docs never, timestamp
 
 # Conversions
-@docs toVarying, fromVarying
-
-# Mailboxes
-@docs Mailbox, send, message, forward
+@docs toSignal, fromSignal
 -}
 
 import Basics exposing ((|>))
 import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
-import Promise exposing (Promise, onError, succeed)
-import Signal exposing (Varying)
+import SignalTypes exposing (Signal)
+import Task exposing (Task, onError)
 import Time exposing (Time)
 
 
 type alias Stream a =
-    Signal.Stream a
+    SignalTypes.Stream a
 
 
 {-| Apply a function to events as they come in. This lets you transform
@@ -68,33 +65,33 @@ map =
   Native.Signal.streamMap
 
 
-{-| Convert a stream of values into a varying value that updates whenever an
-event comes in on the stream.
+{-| Convert a stream of values into a signal that updates whenever an event
+comes in on the stream.
 
-    url : Varying String
+    url : Signal String
     url =
-      toVarying "waiting.gif" imageStream
+      toSignal "waiting.gif" imageStream
 
-    constant : a -> Varying a
+    constant : a -> Signal a
     constant value =
-      toVarying value Stream.never
+      toSignal value Stream.never
 -}
-toVarying : a -> Stream a -> Varying a
-toVarying =
-  Native.Signal.streamToVarying
+toSignal : a -> Stream a -> Signal a
+toSignal =
+  Native.Signal.streamToSignal
 
 
-{-| Get a stream that triggers whenever the varying value is *updated*. Note
+{-| Get a stream that triggers whenever the signal is *updated*. Note
 that an update may result in the same value as before, so the resulting
 `Stream` can have the same value twice in a row.
 
     moves : Stream (Int,Int)
     moves =
-      fromVarying Mouse.position
+      fromSignal Mouse.position
 -}
-fromVarying : Varying a -> Stream a
-fromVarying =
-  Native.Signal.varyingToStream
+fromSignal : Signal a -> Stream a
+fromSignal =
+  Native.Signal.signalToStream
 
 
 {-| Merge two streams into one. This function is extremely useful for bringing
@@ -137,10 +134,10 @@ mergeMany streams =
 
 
 {-| Create a past-dependent value. Each update from the incoming stream will
-be used to step the state forward. The outgoing varying represents the current
+be used to step the state forward. The outgoing signal represents the current
 state.
 
-    clickCount : Varying Int
+    clickCount : Signal Int
     clickCount =
         fold (\click total -> total + 1) 0 Mouse.clicks
 
@@ -151,7 +148,7 @@ state.
 So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
 is the time the program has been running, updated 40 times a second.
 -}
-fold : (a -> b -> b) -> b -> Stream a -> Varying b
+fold : (a -> b -> b) -> b -> Stream a -> Signal b
 fold =
   Native.Signal.fold
 
@@ -186,7 +183,7 @@ filterMap =
   Native.Signal.filterMap
 
 
-{-| Useful for augmenting a stream with information from a varying value.
+{-| Useful for augmenting a stream with information from a signal.
 For example, if you are operating on a time delta but want to take the current
 keyboard state into account.
 
@@ -197,18 +194,18 @@ keyboard state into account.
 Now we get events exactly with the `(fps 60)` stream, but they are augmented
 with which arrows are pressed at the moment.
 -}
-sample : (a -> b -> c) -> Varying a -> Stream b -> Stream c
-sample f varying events =
-  let (initialValue, varyingUpdates) =
-          (Native.Signal.initialValue varying, fromVarying varying)
+sample : (a -> b -> c) -> Signal a -> Stream b -> Stream c
+sample f signal events =
+  let (initialValue, signalUpdates) =
+          (Native.Signal.initialValue signal, fromSignal signal)
 
       sampleEvents =
           Native.Signal.genericMerge (\(value,_) (_,event) -> (value,event))
-            (map (\value -> (Just value, Nothing)) varyingUpdates)
+            (map (\value -> (Just value, Nothing)) signalUpdates)
             (map (\event -> (Nothing, Just event)) events)
   in
       fold sampleUpdate { value = initialValue, event = Nothing } sampleEvents
-        |> fromVarying
+        |> fromSignal
         |> filterMap (\state -> Maybe.map (f state.value) state.event)
 
 
@@ -237,7 +234,7 @@ never =
   Native.Signal.never
 
 
-{-| Add a timestamp to any signal. Timestamps increase monotonically. When you
+{-| Add a timestamp to any stream. Timestamps increase monotonically. When you
 create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
 updates whenever `Mouse.x` updates.
 
@@ -250,19 +247,12 @@ timestamp =
   Native.Signal.timestamp
 
 
--- MAILBOX
+-- MAILBOXES
 
-{-| A `Mailbox` makes it possible to trigger new events from within your
-program. The most important part of a `Mailbox` is the `Address` that you can
-send values to. All of the values sent to the `Mailbox` will show up as events
-on the corresponding `Stream`. You can set up a `Mailbox` with the `loopback`
-keyword.
+{-| An `Mailbox` is a communication hub. It is made up of
 
-    loopback numbers : Mailbox Int
-
-    report : Promise x ()
-    report =
-        send numbers.address 42
+  * an `Address` that you can send messages to
+  * a `Stream` of messages sent to the mailbox
 -}
 type alias Mailbox a =
     { address : Address a
@@ -271,58 +261,63 @@ type alias Mailbox a =
 
 
 type Address a =
-    Address (a -> Promise () ())
+    Address (a -> Task () ())
+
+
+mailbox : Task x (Mailbox a)
+mailbox =
+  Native.Signal.mailbox
+
+
+{-| Create a new address. This address will will tag each message it receives
+and then forward it along to some other address.
+
+    type Action = Undo | Remove Int
+
+    port actions : Mailbox Action
+
+    removeAddress : Address Int
+    removeAddress =
+        forwardTo actions.address Remove
+
+In this case we have a general `address` that many people may send
+messages to. The new `removeAddress` tags all messages with the `Remove` tag
+before forwarding them along to the more general `address`. This means
+some parts of our application can know *only* about `removeAddress` and not
+care what other kinds of `Actions` are possible.
+-}
+forwardTo : Address b -> (a -> b) -> Address a
+forwardTo (Address send) f =
+    Address (\x -> send (f x))
+
+
+type Message = Message (Task () ())
+
+
+{-| Create a message that may be sent to a `Mailbox` at a later time.
+
+Most importantly, this lets us create APIs that can send values to ports
+*without* allowing people to run arbitrary tasks.
+-}
+message : Address a -> a -> Message
+message (Address send) value =
+    Message (send value)
 
 
 {-| Send a message to an `Address`.
 
     type Action = Undo | Remove Int
 
-    actionAddress : Address Action
+    address : Address Action
 
-    requestUndo : Promise x ()
+    requestUndo : Task x ()
     requestUndo =
-        send actionAddress Undo
+        send address Undo
 
-The `Stream` associated with `actionAddress` will receive the `Undo` message
+The `Stream` associated with `address` will receive the `Undo` message
 and push it through the Elm program.
 -}
-send : Address a -> a -> Promise x ()
+send : Address a -> a -> Task x ()
 send (Address actuallySend) value =
     actuallySend value
       `onError` \_ -> succeed ()
-
-
-{-| Create an address that will forward all messages along.
-
-    type Action = Undo | Remove Int
-
-    actionAddress : Address Action
-
-    removeAddress : Address Int
-    removeAddress =
-        forward Remove actionAddress
-
-In this case we have a general `actionAddress` that many people may send
-messages to. The new `removeAddress` tags all messages with the `Remove` tag
-before forwarding them along to the more general `actionAddress`. This means
-some parts of our application can know *only* about `removeAddress` and not
-care what other kinds of `Actions` are possible.
--}
-forward : (a -> b) -> Address b -> Address a
-forward f (Address send) =
-    Address (\x -> send (f x))
-
-
-type Message = Message (Promise () ())
-
-
-{-| Create a message that may be sent to a `Mailbox` at a later time.
-
-Most importantly, this lets us create APIs that can send values to mailboxes
-*without* allowing people to run arbitrary promises.
--}
-message : Address a -> a -> Message
-message (Address send) value =
-    Message (send value)
-

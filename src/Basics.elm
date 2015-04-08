@@ -63,7 +63,6 @@ which happen to be radians.
 -}
 
 import Native.Basics
-import Native.Ports
 import Native.Show
 import Native.Utils
 import Native.Runtime

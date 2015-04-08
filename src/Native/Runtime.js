@@ -105,8 +105,7 @@ if (!Elm.fullscreen) {
 				inputs: inputs,
 				timer: timer,
 				givenInputs: givenInputsTracker,
-				foreignInput: {},
-				foreignOutput: {},
+				ports: {},
 
 				isFullscreen: function() { return display === Display.FULLSCREEN; },
 				isEmbed: function() { return display === Display.COMPONENT; },
@@ -171,8 +170,7 @@ if (!Elm.fullscreen) {
 
 			return {
 				swap: swap,
-				inputs: elm.foreignInput,
-				outputs: elm.foreignOutput,
+				ports: elm.ports,
 				dispose: dispose
 			};
 		};
@@ -282,7 +280,7 @@ if (!Elm.fullscreen) {
 			// make sure the signal graph is actually a signal & extract the visual model
 			if (!('notify' in signalGraph))
 			{
-				signalGraph = Elm.Varying.make(elm).constant(signalGraph);
+				signalGraph = Elm.Signal.make(elm).constant(signalGraph);
 			}
 			var initialScene = signalGraph.value;
 
@@ -423,9 +421,15 @@ if (!Elm.fullscreen) {
 		{
 			function similar(nodeOld,nodeNew)
 			{
-				var idOkay = nodeOld.id === nodeNew.id;
-				var lengthOkay = nodeOld.kids.length === nodeNew.kids.length;
-				return idOkay && lengthOkay;
+				if (nodeOld.id !== nodeNew.id)
+				{
+					return false;
+				}
+				if (nodeOld.isOutput)
+				{
+					return nodeNew.isOutput;
+				}
+				return nodeOld.kids.length === nodeNew.kids.length;
 			}
 			function swap(nodeOld,nodeNew)
 			{
@@ -463,8 +467,8 @@ if (!Elm.fullscreen) {
 					{
 						return false;
 					}
-					queueOld = queueOld.concat(nodeOld.kids);
-					queueNew = queueNew.concat(nodeNew.kids);
+					queueOld = queueOld.concat(nodeOld.kids || []);
+					queueNew = queueNew.concat(nodeNew.kids || []);
 					seen.push(nodeOld.id);
 				}
 			}

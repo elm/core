@@ -1,5 +1,5 @@
 {
-    "version": "1.1.0",
+    "version": "2.0.0",
     "summary": "Elm's standard libraries",
     "repository": "http://github.com/elm-lang/core.git",
     "license": "BSD3",
@@ -25,21 +25,23 @@
         "List",
         "Maybe",
         "Mouse",
-        "Promise",
+        "Port",
         "Random",
         "Regex",
         "Result",
         "Set",
+        "Signal",
         "Stream",
         "String",
+        "Task",
         "Text",
         "Time",
         "Touch",
         "Trampoline",
         "Transform2D",
-        "Varying",
         "Window"
     ],
     "native-modules": true,
-    "dependencies": {}
+    "dependencies": {},
+    "elm-version": "0.15.0 <= v < 0.16.0"
 }

@@ -9,6 +9,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
+	var Task = Elm.Native.Task.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
@@ -62,6 +63,30 @@ Elm.Native.Signal.make = function(localRuntime) {
 	var never = input('never');
 
 
+	function mailbox()
+	{
+		var stream = NS.input('mailbox');
+
+		function send(value) {
+			return Task.asyncFunction(function(callback) {
+				localRuntime.setTimeout(function() {
+					localRuntime.notify(stream.id, value);
+				}, 0);
+				callback(Task.succeed(Utils.Tuple0));
+			});
+		}
+
+		return Task.succeed({
+			_: {},
+			stream: stream,
+			address: {
+				ctor: 'Address',
+				_0: send
+			}
+		});
+	}
+
+
 	// OUTPUT
 
 	function output(name, handler, parent)
@@ -88,11 +113,11 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	// CONVERSION
 
-	function streamToVarying(initial, stream)
+	function streamToSignal(initial, stream)
 	{
 		var node = {
 			id: Utils.guid(),
-			name: 'streamToVarying',
+			name: 'streamToSignal',
 			parents: [stream],
 			initialValue: initial,
 			value: initial,
@@ -114,12 +139,12 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
-	function varyingToStream(varying)
+	function signalToStream(signal)
 	{
 		var node = {
 			id: Utils.guid(),
-			name: 'varyingToStream',
-			parents: [varying],
+			name: 'signalToStream',
+			parents: [signal],
 			kids: []
 		};
 
@@ -127,20 +152,20 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			if (parentUpdate)
 			{
-				node.value = varying.value;
+				node.value = signal.value;
 			}
 			broadcastToKids(node, timestamp, parentUpdate);
 		}
 
-		varying.kids.push(node);
+		signal.kids.push(node);
 
 		return node;
 	}
 
 
-	function initialValue(varying)
+	function initialValue(signal)
 	{
-		return varying.initialValue;
+		return signal.initialValue;
 	}
 
 
@@ -423,9 +448,10 @@ Elm.Native.Signal.make = function(localRuntime) {
 		input: input,
 		never: never,
 		constant: constant,
+		mailbox: mailbox,
 		output: output,
-		streamToVarying: F2(streamToVarying),
-		varyingToStream: varyingToStream,
+		streamToSignal: F2(streamToSignal),
+		signalToStream: signalToStream,
 		initialValue: initialValue,
 		streamMap: F2(streamMap),
 		map: F2(map),

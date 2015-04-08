@@ -132,7 +132,7 @@ Elm.Native.Show.make = function(localRuntime) {
 		if (type === 'object' && 'notify' in v && 'id' in v)
 		{
 			return 'initialValue' in v
-				? '<Varying>'
+				? '<Signal>'
 				: '<Stream>';
 		}
 		return "<internal structure>";
