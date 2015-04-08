@@ -8,6 +8,8 @@ module Stream
     , sample
     , never
     , timestamp
+    , Mailbox, Address, Message
+    , mailbox, send, message, forward
     ) where
 
 {-| Streams of events. Many interactions with the world can be formulated as
@@ -41,6 +43,7 @@ import List
 import Maybe exposing (Maybe(..))
 import Native.Signal
 import SignalTypes exposing (Signal)
+import Task exposing (Task, onError)
 import Time exposing (Time)
 
 
@@ -242,3 +245,79 @@ timestamp because they rely on the same underlying event (`Mouse.position`).
 timestamp : Stream a -> Stream (Time, a)
 timestamp =
   Native.Signal.timestamp
+
+
+-- MAILBOXES
+
+{-| An `Mailbox` is a communication hub. It is made up of
+
+  * an `Address` that you can send messages to
+  * a `Stream` of messages sent to the mailbox
+-}
+type alias Mailbox a =
+    { address : Address a
+    , stream : Stream a
+    }
+
+
+type Address a =
+    Address (a -> Task () ())
+
+
+mailbox : Task x (Mailbox a)
+mailbox =
+  Native.Signal.mailbox
+
+
+{-| Create a new address. This address will will tag each message it receives
+and then forward it along to some other address.
+
+    type Action = Undo | Remove Int
+
+    port actions : Mailbox Action
+
+    removeAddress : Address Int
+    removeAddress =
+        forwardTo actions.address Remove
+
+In this case we have a general `address` that many people may send
+messages to. The new `removeAddress` tags all messages with the `Remove` tag
+before forwarding them along to the more general `address`. This means
+some parts of our application can know *only* about `removeAddress` and not
+care what other kinds of `Actions` are possible.
+-}
+forwardTo : Address b -> (a -> b) -> Address a
+forwardTo (Address send) f =
+    Address (\x -> send (f x))
+
+
+type Message = Message (Task () ())
+
+
+{-| Create a message that may be sent to a `Mailbox` at a later time.
+
+Most importantly, this lets us create APIs that can send values to ports
+*without* allowing people to run arbitrary tasks.
+-}
+message : Address a -> a -> Message
+message (Address send) value =
+    Message (send value)
+
+
+{-| Send a message to an `Address`.
+
+    type Action = Undo | Remove Int
+
+    address : Address Action
+
+    requestUndo : Task x ()
+    requestUndo =
+        send address Undo
+
+The `Stream` associated with `address` will receive the `Undo` message
+and push it through the Elm program.
+-}
+send : Address a -> a -> Task x ()
+send (Address actuallySend) value =
+    actuallySend value
+      `onError` \_ -> succeed ()

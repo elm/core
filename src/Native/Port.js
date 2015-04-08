@@ -13,45 +13,15 @@ Elm.Native.Port.make = function(localRuntime) {
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
-	// INTERNAL
+	// INBOUND
 
-	function port(name)
+	function inbound(name, type, converter)
 	{
-		if (!NS)
-		{
-			NS = Elm.Native.Signal.make(localRuntime);
-		}
 		if (!Task)
 		{
 			Task = Elm.Native.Task.make(localRuntime);
 		}
 
-		var stream = NS.input(name);
-
-		function send(value) {
-			return Task.asyncFunction(function(callback) {
-				localRuntime.setTimeout(function() {
-					localRuntime.notify(stream.id, value);
-				}, 0);
-				callback(Task.succeed(Utils.Tuple0));
-			});
-		}
-
-		return {
-			_: {},
-			stream: stream,
-			address: {
-				ctor: 'Address',
-				_0: send
-			}
-		};
-	}
-
-
-	// INBOUND
-
-	function inbound(name, type, converter)
-	{
 		var inboundPort = port(name);
 
 		function send(jsValue)

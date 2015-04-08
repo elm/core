@@ -9,6 +9,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
+	var Task = Elm.Native.Task.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
@@ -60,6 +61,30 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 	var never = input('never');
+
+
+	function mailbox()
+	{
+		var stream = NS.input('mailbox');
+
+		function send(value) {
+			return Task.asyncFunction(function(callback) {
+				localRuntime.setTimeout(function() {
+					localRuntime.notify(stream.id, value);
+				}, 0);
+				callback(Task.succeed(Utils.Tuple0));
+			});
+		}
+
+		return Task.succeed({
+			_: {},
+			stream: stream,
+			address: {
+				ctor: 'Address',
+				_0: send
+			}
+		});
+	}
 
 
 	// OUTPUT
@@ -423,6 +448,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		input: input,
 		never: never,
 		constant: constant,
+		mailbox: mailbox,
 		output: output,
 		streamToSignal: F2(streamToSignal),
 		signalToStream: signalToStream,
