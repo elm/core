@@ -9,7 +9,7 @@ Elm.Native.Task.make = function(localRuntime) {
 	}
 
 	var Result = Elm.Result.make(localRuntime);
-	var Signal = Elm.Native.Signal.make(localRuntime);
+	var Signal;
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
@@ -90,9 +90,13 @@ Elm.Native.Task.make = function(localRuntime) {
 			}
 		}
 
+		if (!Signal)
+		{
+			Signal = Elm.Native.Signal.make(localRuntime);
+		}
 		Signal.output('perform-tasks-' + name, register, stream);
 
-		return succeed(Utils.Tuple0);
+		return signal;
 	}
 
 	function mark(status, task)
