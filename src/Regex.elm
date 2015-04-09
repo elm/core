@@ -1,5 +1,6 @@
 module Regex
-    ( regex, escape, caseInsensitive
+    ( Regex
+    , regex, escape, caseInsensitive
     , HowMany(..), Match
     , contains, find, replace, split
     ) where
