@@ -60,7 +60,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	function mailbox(base)
 	{
-		var signal = NS.input('mailbox', base);
+		var signal = input('mailbox', base);
 
 		function send(value) {
 			return Task.asyncFunction(function(callback) {
