@@ -71,14 +71,14 @@ Elm.Native.Signal.make = function(localRuntime) {
 			});
 		}
 
-		return Task.succeed({
+		return {
 			_: {},
 			signal: signal,
 			address: {
 				ctor: 'Address',
 				_0: send
 			}
-		});
+		};
 	}
 
 	function sendMessage(message)
