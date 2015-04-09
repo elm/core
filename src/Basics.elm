@@ -63,9 +63,10 @@ which happen to be radians.
 -}
 
 import Native.Basics
+import Native.Port
+import Native.Runtime
 import Native.Show
 import Native.Utils
-import Native.Runtime
 
 
 {-| Convert radians to standard Elm angles (radians). -}
