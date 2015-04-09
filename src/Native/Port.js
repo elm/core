@@ -9,7 +9,6 @@ Elm.Native.Port.make = function(localRuntime) {
 	}
 
 	var NS;
-	var Task;
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
@@ -17,49 +16,76 @@ Elm.Native.Port.make = function(localRuntime) {
 
 	function inbound(name, type, converter)
 	{
-		if (!Task)
+		if (!localRuntime.argTracker.name)
 		{
-			Task = Elm.Native.Task.make(localRuntime);
+			throw new Error(
+				"Port Error:\n" +
+				"No argument was given for the port named '" + name + "' with type:\n\n" +
+				"    " + type.split('\n').join('\n        ') + "\n\n" +
+				"You need to provide an initial value!\n\n" +
+				"Find out more about ports here <http://elm-lang.org/learn/Ports.elm>"
+			);
 		}
+		var arg = localRuntime.argTracker[name];
+		arg.used = true;
 
-		var inboundPort = port(name);
+		return jsToElm(name, type converter, arg.value);
+	}
+
+
+	function inboundSignal(name, type, converter)
+	{
+		var initialValue = inbound(name, type, converter);
+
+		if (!NS)
+		{
+			NS = Elm.Native.Signal.make(localRuntime);
+		}
+		var signal = NS.input('inbound-port-' + name, initialValue);
 
 		function send(jsValue)
 		{
-			try
-			{
-				var elmValue = converter(jsValue);
-				Task.perform(inboundPort.address._0(elmValue));
-			}
-			catch(e)
-			{
-				throw new Error(
-					"Port Error:\n" +
-					"Regarding the port named '" + name + "' with type:\n\n" +
-					"    " + type.split('\n').join('\n        ') + "\n\n" +
-					"You just sent the value:\n\n" +
-					"    " + JSON.stringify(input.value) + "\n\n" +
-					"but it cannot be converted to the necessary type.\n" +
-					e.message
-				);
-			}
+			var elmValue = jsToElm(name, type, converter, jsValue);
+			localRuntime.notify(signal.id, elmValue);
 		}
 
 		localRuntime.ports[name] = { send: send };
 
-		return {
-			_: {},
-			stream: inboundPort.stream
-		};
+		return signal;
+	}
+
+
+	function jsToElm(name, type, converter, value)
+	{
+		try
+		{
+			return converter(value);
+		}
+		catch(e)
+		{
+			throw new Error(
+				"Port Error:\n" +
+				"Regarding the port named '" + name + "' with type:\n\n" +
+				"    " + type.split('\n').join('\n        ') + "\n\n" +
+				"You just sent the value:\n\n" +
+				"    " + JSON.stringify(arg.value) + "\n\n" +
+				"but it cannot be converted to the necessary type.\n" +
+				e.message
+			);
+		}
 	}
 
 
 	// OUTBOUND
 
-	function outbound(name, converter)
+	function outbound(name, converter, elmValue)
 	{
-		var outboundPort = port(name);
+		localRuntime.ports[name] = converter(elmValue);
+	}
 
+
+	function outboundSignal(name, converter, signal)
+	{
 		var subscribers = [];
 
 		function subscribe(handler)
@@ -85,23 +111,22 @@ Elm.Native.Port.make = function(localRuntime) {
 		{
 			NS = Elm.Native.Signal.make(localRuntime);
 		}
-		NS.output('output', notify, outboundPort.stream);
+		NS.output('outbound-port-' + name, notify, signal);
 
 		localRuntime.ports[name] = {
 			subscribe: subscribe,
 			unsubscribe: unsubscribe
 		};
 
-		return {
-			_: {},
-			address: outboundPort.address
-		};
+		return signal;
 	}
 
 
 	return localRuntime.Native.Port.values = {
 		port: port,
 		inbound: inbound,
-		outbound: outbound
+		outbound: outbound,
+		inboundSignal: inboundSignal,
+		outboundSignal: outboundSignal
 	};
 };

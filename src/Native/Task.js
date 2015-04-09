@@ -64,7 +64,7 @@ Elm.Native.Task.make = function(localRuntime) {
 		runTask({ task: task }, function() {});
 	}
 
-	function subscribe(stream, toTask)
+	function performSignal(name, signal)
 	{
 		var workQueue = [];
 
@@ -80,9 +80,9 @@ Elm.Native.Task.make = function(localRuntime) {
 			}, 0);
 		}
 
-		function register(value)
+		function register(task)
 		{
-			var root = { task: toTask(value) };
+			var root = { task: task };
 			workQueue.push(root);
 			if (workQueue.length === 1)
 			{
@@ -90,7 +90,7 @@ Elm.Native.Task.make = function(localRuntime) {
 			}
 		}
 
-		Signal.output('subscription', register, stream);
+		Signal.output('perform-tasks-' + name, register, stream);
 
 		return succeed(Utils.Tuple0);
 	}
@@ -209,8 +209,8 @@ Elm.Native.Task.make = function(localRuntime) {
 		asyncFunction: asyncFunction,
 		andThen: F2(andThen),
 		catch_: F2(catch_),
-		subscribe: F2(subscribe),
 		perform: perform,
+		performSignal: performSignal,
 		spawn: spawn,
 		sleep: sleep
 	};

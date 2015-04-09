@@ -10,29 +10,29 @@ if (!Elm.fullscreen) {
 			NONE: 2
 		};
 
-		Elm.fullscreen = function(module, givenInputs)
+		Elm.fullscreen = function(module, args)
 		{
 			var container = document.createElement('div');
 			document.body.appendChild(container);
-			return init(Display.FULLSCREEN, container, module, givenInputs || {});
+			return init(Display.FULLSCREEN, container, module, args || {});
 		};
 
-		Elm.embed = function(module, container, givenInputs)
+		Elm.embed = function(module, container, args)
 		{
 			var tag = container.tagName;
 			if (tag !== 'DIV')
 			{
 				throw new Error('Elm.node must be given a DIV, not a ' + tag + '.');
 			}
-			return init(Display.COMPONENT, container, module, givenInputs || {});
+			return init(Display.COMPONENT, container, module, args || {});
 		};
 
-		Elm.worker = function(module, givenInputs)
+		Elm.worker = function(module, args)
 		{
-			return init(Display.NONE, {}, module, givenInputs || {});
+			return init(Display.NONE, {}, module, args || {});
 		};
 
-		function init(display, container, module, givenInputs, moduleToReplace)
+		function init(display, container, module, args, moduleToReplace)
 		{
 			// defining state needed for an instance of the Elm RTS
 			var inputs = [];
@@ -86,11 +86,11 @@ if (!Elm.fullscreen) {
 				listeners.push(listener);
 			}
 
-			var givenInputsTracker = {};
-			for (var name in givenInputs)
+			var argsTracker = {};
+			for (var name in args)
 			{
-				givenInputsTracker[name] = {
-					value: givenInputs[name],
+				argsTracker[name] = {
+					value: args[name],
 					used: false
 				};
 			}
@@ -104,7 +104,7 @@ if (!Elm.fullscreen) {
 				addListener: addListener,
 				inputs: inputs,
 				timer: timer,
-				givenInputs: givenInputsTracker,
+				argsTracker: argsTracker,
 				ports: {},
 
 				isFullscreen: function() { return display === Display.FULLSCREEN; },
@@ -116,7 +116,7 @@ if (!Elm.fullscreen) {
 			{
 				removeListeners(listeners);
 				var div = document.createElement('div');
-				var newElm = init(display, div, newModule, givenInputs, elm);
+				var newElm = init(display, div, newModule, args, elm);
 				inputs = [];
 				// elm.swap = newElm.swap;
 				return newElm;
@@ -177,16 +177,16 @@ if (!Elm.fullscreen) {
 
 		function checkInputs(elm)
 		{
-			var givenInputs = elm.givenInputs;
-			for (var name in givenInputs)
+			var argTracker = elm.argTracker;
+			for (var name in argTracker)
 			{
-				var input = givenInputs[name];
-				if (!input.used)
+				if (!argTracker[name].used)
 				{
 					throw new Error(
-						"Input Error:\nAn input named '" + name +
-						"' was given but is not declared by this module.\n" +
-						"Remove '" + name + "' from the module initialization code."
+						"Port Error:\nYou provided an argument named '" + name +
+						"' but there is no corresponding port!\n\n" +
+						"Maybe add a port '" + name + "' to your Elm module?\n" +
+						"Maybe remove the '" + name + "' argument from your initialization code in JS?"
 					);
 				}
 			}
