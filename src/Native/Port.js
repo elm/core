@@ -16,7 +16,7 @@ Elm.Native.Port.make = function(localRuntime) {
 
 	function inbound(name, type, converter)
 	{
-		if (!localRuntime.argTracker.name)
+		if (!localRuntime.argsTracker[name])
 		{
 			throw new Error(
 				"Port Error:\n" +
@@ -26,7 +26,7 @@ Elm.Native.Port.make = function(localRuntime) {
 				"Find out more about ports here <http://elm-lang.org/learn/Ports.elm>"
 			);
 		}
-		var arg = localRuntime.argTracker[name];
+		var arg = localRuntime.argsTracker[name];
 		arg.used = true;
 
 		return jsToElm(name, type, converter, arg.value);
