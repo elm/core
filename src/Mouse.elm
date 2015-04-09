@@ -15,7 +15,6 @@ module Mouse
 
 import Basics exposing (fst, snd)
 import Native.Mouse
-import Stream exposing (Stream)
 import Signal exposing (Signal)
 
 
@@ -45,7 +44,7 @@ isDown =
 
 
 {-| Always equal to unit. Event triggers on every mouse click. -}
-clicks : Stream ()
+clicks : Signal ()
 clicks =
   Native.Mouse.clicks
 
