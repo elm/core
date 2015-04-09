@@ -18,13 +18,12 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 	var Text = Elm.Native.Text.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
-	var Element = Elm.Graphics.Element.make(localRuntime);
-	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
+	var Element = Elm.Native.Graphics.Element.make(localRuntime);
 
 
 	function renderDropDown(model)
 	{
-		var drop = NativeElement.createNode('select');
+		var drop = Element.createNode('select');
 		drop.style.border = '0 solid';
 		drop.style.pointerEvents = 'auto';
 		drop.style.display = 'block';
@@ -35,7 +34,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 		for (var i = 0; i < values.length; ++i)
 		{
-			var option = NativeElement.createNode('option');
+			var option = Element.createNode('option');
 			var name = values[i]._0;
 			option.value = name;
 			option.innerHTML = name;
@@ -71,7 +70,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		}
 		for (; i < values.length; ++i)
 		{
-			var option = NativeElement.createNode('option');
+			var option = Element.createNode('option');
 			var name = values[i]._0;
 			option.value = name;
 			option.innerHTML = name;
@@ -96,7 +95,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 	function renderButton(model)
 	{
-		var node = NativeElement.createNode('button');
+		var node = Element.createNode('button');
 		node.style.display = 'block';
 		node.style.pointerEvents = 'auto';
 		node.elm_message = model.message;
@@ -136,13 +135,13 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 	function renderCustomButton(model)
 	{
-		var btn = NativeElement.createNode('div');
+		var btn = Element.createNode('div');
 		btn.style.pointerEvents = 'auto';
 		btn.elm_message = model.message;
 
-		btn.elm_up    = NativeElement.render(model.up);
-		btn.elm_hover = NativeElement.render(model.hover);
-		btn.elm_down  = NativeElement.render(model.down);
+		btn.elm_up    = Element.render(model.up);
+		btn.elm_hover = Element.render(model.hover);
+		btn.elm_down  = Element.render(model.down);
 
 		btn.elm_up.style.display = 'block';
 		btn.elm_hover.style.display = 'none';
@@ -198,9 +197,9 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		var styleHover = kids[1].style.display;
 		var styleDown  = kids[2].style.display;
 
-		NativeElement.updateAndReplace(kids[0], oldModel.up, newModel.up);
-		NativeElement.updateAndReplace(kids[1], oldModel.hover, newModel.hover);
-		NativeElement.updateAndReplace(kids[2], oldModel.down, newModel.down);
+		Element.updateAndReplace(kids[0], oldModel.up, newModel.up);
+		Element.updateAndReplace(kids[1], oldModel.hover, newModel.hover);
+		Element.updateAndReplace(kids[2], oldModel.down, newModel.down);
 
 		var kids = node.childNodes;
 		kids[0].style.display = styleUp;
@@ -236,7 +235,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 	function renderCheckbox(model)
 	{
-		var node = NativeElement.createNode('input');
+		var node = Element.createNode('input');
 		node.type = 'checkbox';
 		node.checked = model.checked;
 		node.style.display = 'block';
@@ -334,7 +333,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 	function renderField(model)
 	{
-		var field = NativeElement.createNode('input');
+		var field = Element.createNode('input');
 		updateFieldStyle(field.style, model.style);
 		field.style.borderStyle = 'solid';
 		field.style.pointerEvents = 'auto';
