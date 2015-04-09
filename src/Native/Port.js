@@ -29,7 +29,7 @@ Elm.Native.Port.make = function(localRuntime) {
 		var arg = localRuntime.argTracker[name];
 		arg.used = true;
 
-		return jsToElm(name, type converter, arg.value);
+		return jsToElm(name, type, converter, arg.value);
 	}
 
 
