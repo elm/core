@@ -30,15 +30,10 @@ Elm.Native.Signal.make = function(localRuntime) {
 		var node = {
 			id: Utils.guid(),
 			name: 'input-' + name,
+			value: base,
 			parents: [],
 			kids: []
 		};
-
-		if (typeof base !== 'undefined')
-		{
-			node.initialValue = base;
-			node.value = base;
-		}
 
 		node.notify = function(timestamp, targetId, value) {
 			var update = targetId === node.id;
@@ -60,17 +55,17 @@ Elm.Native.Signal.make = function(localRuntime) {
 		return input('constant', value);
 	}
 
-	var never = input('never');
 
+	// MAILBOX
 
-	function mailbox()
+	function mailbox(base)
 	{
-		var stream = NS.input('mailbox');
+		var signal = NS.input('mailbox', base);
 
 		function send(value) {
 			return Task.asyncFunction(function(callback) {
 				localRuntime.setTimeout(function() {
-					localRuntime.notify(stream.id, value);
+					localRuntime.notify(signal.id, value);
 				}, 0);
 				callback(Task.succeed(Utils.Tuple0));
 			});
@@ -78,12 +73,17 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 		return Task.succeed({
 			_: {},
-			stream: stream,
+			signal: signal,
 			address: {
 				ctor: 'Address',
 				_0: send
 			}
 		});
+	}
+
+	function sendMessage(message)
+	{
+		Task.perform(message._0);
 	}
 
 
@@ -111,101 +111,16 @@ Elm.Native.Signal.make = function(localRuntime) {
 		return node;
 	}
 
-	// CONVERSION
 
-	function streamToSignal(initial, stream)
-	{
-		var node = {
-			id: Utils.guid(),
-			name: 'streamToSignal',
-			parents: [stream],
-			initialValue: initial,
-			value: initial,
-			kids: []
-		};
-
-		node.notify = function(timestamp, parentUpdate, parentID)
-		{
-			if (parentUpdate)
-			{
-				node.value = stream.value;
-			}
-			broadcastToKids(node, timestamp, parentUpdate);
-		}
-
-		stream.kids.push(node);
-
-		return node;
-	}
-
-
-	function signalToStream(signal)
-	{
-		var node = {
-			id: Utils.guid(),
-			name: 'signalToStream',
-			parents: [signal],
-			kids: []
-		};
-
-		node.notify = function(timestamp, parentUpdate, parentID)
-		{
-			if (parentUpdate)
-			{
-				node.value = signal.value;
-			}
-			broadcastToKids(node, timestamp, parentUpdate);
-		}
-
-		signal.kids.push(node);
-
-		return node;
-	}
-
-
-	function initialValue(signal)
-	{
-		return signal.initialValue;
-	}
-
-
-	// STREAM MAP
-
-	function streamMap(func, stream)
-	{
-		var node = {
-			name: 'streamMap',
-			parents: [stream],
-			id: Utils.guid(),
-			kids: []
-		};
-
-		node.notify = function(timestamp, parentUpdate, parentID)
-		{
-			if (parentUpdate)
-			{
-				node.value = func(stream.value);
-			}
-			broadcastToKids(node, timestamp, parentUpdate);
-		}
-
-		stream.kids.push(node);
-
-		return node;
-	}
-
-
-	// VARYING MAP
+	// MAP
 
 	function mapMany(refreshValue, args)
 	{
-		var initialValue = refreshValue();
 		var node = {
 			id: Utils.guid(),
 			name: 'map' + args.length,
+			value: refreshValue(),
 			parents: args,
-			initialValue: initialValue,
-			value: initialValue,
 			kids: []
 		};
 
@@ -293,14 +208,13 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	// FOLD
 
-	function fold(update, state, stream)
+	function foldp(update, state, signal)
 	{
 		var node = {
 			id: Utils.guid(),
-			name: 'fold',
-			parents: [stream],
+			name: 'foldp',
+			parents: [signal],
 			kids: [],
-			initialValue: state,
 			value: state
 		};
 
@@ -308,12 +222,12 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			if (parentUpdate)
 			{
-				node.value = A2( update, stream.value, node.value );
+				node.value = A2( update, signal.value, node.value );
 			}
 			broadcastToKids(node, timestamp, parentUpdate);
 		};
 
-		stream.kids.push(node);
+		signal.kids.push(node);
 
 		return node;
 	}
@@ -321,31 +235,26 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	// TIME
 
-	function timestamp(stream)
+	function timestamp(signal)
 	{
 		var node = {
 			id: Utils.guid(),
 			name: 'timestamp',
-			parents: [stream],
+			value: Utils.Tuple2(localRuntime.timer.programStart, signal.value),
+			parents: [signal],
 			kids: []
 		};
-
-		if ('initialValue' in stream)
-		{
-			node.initialValue = Utils.Tuple2(localRuntime.timer.programStart, stream.initialValue);
-			node.value = node.initialValue;
-		}
 
 		node.notify = function(timestamp, parentUpdate, parentID)
 		{
 			if (parentUpdate)
 			{
-				node.value = Utils.Tuple2(timestamp, stream.value);
+				node.value = Utils.Tuple2(timestamp, signal.value);
 			}
 			broadcastToKids(node, timestamp, parentUpdate);
 		};
 
-		stream.kids.push(node);
+		signal.kids.push(node);
 
 		return node;
 	}
@@ -414,12 +323,14 @@ Elm.Native.Signal.make = function(localRuntime) {
 
  	// FILTERING
 
-	function filterMap(toMaybe, stream)
+	function filterMap(toMaybe, base, signal)
 	{
+		var maybe = toMaybe(signal.value);
 		var node = {
 			id: Utils.guid(),
 			name: 'filterMap',
-			parents: [stream],
+			value: maybe.ctor === 'Nothing' ? base : maybe._0,
+			parents: [signal],
 			kids: []
 		};
 
@@ -428,7 +339,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 			var update = false;
 			if (parentUpdate)
 			{
-				var maybe = toMaybe(stream.value);
+				var maybe = toMaybe(signal.value);
 				if (maybe.ctor === 'Just')
 				{
 					update = true;
@@ -438,7 +349,85 @@ Elm.Native.Signal.make = function(localRuntime) {
 			broadcastToKids(node, timestamp, update);
 		};
 
-		stream.kids.push(node);
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+ 	// SAMPLING
+
+	function sampleOn(ticker, signal)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'sampleOn',
+			value: signal.value,
+			parents: [ticker, signal],
+			kids: []
+		};
+
+		var signalTouch = false;
+		var tickerTouch = false;
+		var tickerUpdate = false;
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (parentID === ticker.id)
+			{
+				tickerTouch = true;
+				tickerUpdate = parentUpdate;
+			}
+			if (parentID === signal.id)
+			{
+				signalTouch = true;
+			}
+
+			if (tickerTouch && signalTouch)
+			{
+				if (tickerUpdate)
+				{
+					node.value = sig.value;
+				}
+				tickerTouch = false;
+				signalTouch = false;
+
+				broadcastToKids(node, timestamp, tickerUpdate);
+			}
+		};
+
+		ticker.kids.push(node);
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+ 	// DROP REPEATS
+
+	function dropRepeats(signal)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'dropRepeats',
+			value: signal.value,
+			parents: [signal],
+			kids: []
+		};
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			var update = false;
+			if (parentUpdate && !Utils.eq(node.value, signal.value))
+			{
+				node.value = signal.value;
+				update = true;
+			}
+				broadcastToKids(node, timestamp, update);
+			}
+		};
+
+		signal.kids.push(node);
 
 		return node;
 	}
@@ -446,22 +435,20 @@ Elm.Native.Signal.make = function(localRuntime) {
 
 	return localRuntime.Native.Signal.values = {
 		input: input,
-		never: never,
 		constant: constant,
 		mailbox: mailbox,
+		sendMessage: sendMessage,
 		output: output,
-		streamToSignal: F2(streamToSignal),
-		signalToStream: signalToStream,
-		initialValue: initialValue,
-		streamMap: F2(streamMap),
 		map: F2(map),
 		map2: F3(map2),
 		map3: F4(map3),
 		map4: F5(map4),
 		map5: F6(map5),
-		fold: F3(fold),
+		foldp: F3(foldp),
 		genericMerge: F3(genericMerge),
-		filterMap: F2(filterMap),
+		filterMap: F3(filterMap),
+		sampleOn: F2(sampleOn),
+		dropRepeats: dropRepeats,
 		timestamp: timestamp
 	};
 };
