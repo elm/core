@@ -14,6 +14,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 	var Color = Elm.Native.Color.make(localRuntime);
 	var List = Elm.Native.List.make(localRuntime);
+	var Signal = Elm.Native.Signal.make(localRuntime);
 	var Text = Elm.Native.Text.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
@@ -41,7 +42,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			drop.appendChild(option);
 		}
 		drop.addEventListener('change', function() {
-			drop.elm_handler(drop.elm_values[drop.selectedIndex]._1)();
+			Signal.sendMessage(drop.elm_handler(drop.elm_values[drop.selectedIndex]._1));
 		});
 
 		return drop;
@@ -99,8 +100,9 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		node.style.display = 'block';
 		node.style.pointerEvents = 'auto';
 		node.elm_message = model.message;
-		function click() {
-			node.elm_message();
+		function click()
+		{
+			Signal.sendMessage(node.elm_message);
 		}
 		node.addEventListener('click', click);
 		node.innerHTML = model.text;
@@ -172,7 +174,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		function up()
 		{
 			swap(btn.elm_hover, btn.elm_down, btn.elm_up);
-			btn.elm_message();
+			Signal.sendMessage(btn.elm_message);
 		}
 		function down()
 		{
@@ -242,7 +244,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		node.elm_handler = model.handler;
 		function change()
 		{
-			node.elm_handler(node.checked)();
+			Signal.sendMessage(node.elm_handler(node.checked));
 		}
 		node.addEventListener('change', change);
 		return node;
@@ -358,7 +360,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			var end = field.selectionEnd;
 			field.value = field.elm_old_value;
 
-			field.elm_handler({
+			Signal.sendMessage(field.elm_handler({
 				_:{},
 				string: next,
 				selection: {
@@ -367,7 +369,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 					end: end,
 					direction: { ctor: direction }
 				}
-			})();
+			}));
 		}
 
 		field.addEventListener('input', inputUpdate);
@@ -434,7 +436,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 	{
 		function onHover(bool)
 		{
-			handler(bool)();
+			Signal.sendMessage(handler(bool));
 		}
 		var props = Utils.replace([['hover',onHover]], elem.props);
 		return {
@@ -447,7 +449,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 	{
 		function onClick()
 		{
-			message();
+			Signal.sendMessage(message);
 		}
 		var props = Utils.replace([['click',onClick]], elem.props);
 		return {

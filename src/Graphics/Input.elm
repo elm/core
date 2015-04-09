@@ -17,7 +17,7 @@ To learn about text fields, see the
 import Graphics.Element exposing (Element)
 import Native.Graphics.Input
 import Native.Text
-import Port
+import Signal
 
 
 {-| Create a standard button. The following example begins making a basic
@@ -39,7 +39,7 @@ calculator:
 If the user presses the "+" button, `keys.signal` will update to `Plus`. If the
 users presses "2", `keys.signal` will update to `(Number 2)`.
 -}
-button : Port.Message -> String -> Element
+button : Signal.Message -> String -> Element
 button =
   Native.Graphics.Input.button
 
@@ -56,7 +56,7 @@ button =
             (image 100 40 "/button_hover.jpg")
             (image 100 40 "/button_down.jpg")
 -}
-customButton : Port.Message -> Element -> Element -> Element -> Element
+customButton : Signal.Message -> Element -> Element -> Element -> Element
 customButton =
   Native.Graphics.Input.customButton
 
@@ -75,7 +75,7 @@ customButton =
     main : Signal Element
     main = boxes <~ Signal.subscribe check
 -}
-checkbox : (Bool -> Port.Message) -> Bool -> Element
+checkbox : (Bool -> Signal.Message) -> Bool -> Element
 checkbox =
   Native.Graphics.Input.checkbox
 
@@ -100,7 +100,7 @@ favorite British sport:
 If the user selects "Football" from the drop down menue, `Signal.subscribe sport`
 will update to `Just Football`.
 -}
-dropDown : (a -> Port.Message) -> List (String, a) -> Element
+dropDown : (a -> Signal.Message) -> List (String, a) -> Element
 dropDown =
   Native.Graphics.Input.dropDown
 
@@ -119,7 +119,7 @@ we will create a hoverable picture called `cat`.
 When the mouse hovers above the `cat` element, `hover.signal` will become
 `True`. When the mouse leaves it, `hover.signal` will become `False`.
 -}
-hoverable : (Bool -> Port.Message) -> Element -> Element
+hoverable : (Bool -> Signal.Message) -> Element -> Element
 hoverable =
   Native.Graphics.Input.hoverable
 
@@ -148,6 +148,6 @@ an update containing the value `Cat`. When the user clicks on the `hat` element,
 distinguish which element was clicked. In a more complex example, they could be
 distinguished with IDs or more complex data structures.
 -}
-clickable : Port.Message -> Element -> Element
+clickable : Signal.Message -> Element -> Element
 clickable =
   Native.Graphics.Input.clickable
