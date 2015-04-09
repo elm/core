@@ -11,7 +11,7 @@ module Keyboard
 @docs KeyCode
 
 # Directions
-@docs arrows, wasd, Directions, toXY
+@docs arrows, wasd
 
 # Specific Keys
 The following signals are `True` when the particular key is pressed and `False`
@@ -26,7 +26,6 @@ otherwise.
 
 import Basics exposing (always, (-))
 import Set
-import Stream exposing (Stream)
 import Native.Keyboard
 import Signal exposing (Signal)
 
@@ -86,20 +85,25 @@ update event model =
 
 model : Signal Model
 model =
-  Stream.fold update empty rawEvents
+  Signal.foldp update empty rawEvents
 
 
-rawEvents : Stream Event
+rawEvents : Signal Event
 rawEvents =
-  Stream.mergeMany
-    [ Stream.map Up Native.Keyboard.ups
-    , Stream.map Down Native.Keyboard.downs
-    , Stream.map (always Blur) Native.Keyboard.blurs
+  Signal.mergeMany
+    [ Signal.map Up Native.Keyboard.ups
+    , Signal.map Down Native.Keyboard.downs
+    , Signal.map (always Blur) Native.Keyboard.blurs
     ]
 
 
 -- PUBLIC API
 
+{-| Key codes for different layouts. You can set it up to be WASD, arrow keys, etc.
+
+    arrowKeys = { up = 38, down = 40, left = 37, right = 39 }
+    wasdKeys = { up = 87, down = 83, left = 65, right = 68 }
+-}
 type alias Directions =
     { up : KeyCode
     , down : KeyCode
@@ -108,6 +112,14 @@ type alias Directions =
     }
 
 
+{-| Extract an x and y value representing directions from a set of key codes
+that are currently pressed. For example, you can use this to define `wasd`
+like this:
+
+    wasd : Signal { x : Int, y : Int }
+    wasd =
+        Signal.map (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
+-}
 toXY : Directions -> Set.Set KeyCode -> { x : Int, y : Int }
 toXY {up,down,left,right} keyCodes =
   let is keyCode =
@@ -185,7 +197,7 @@ keysDown =
 
 
 {-| The latest key that has been pressed. -}
-presses : Stream KeyCode
+presses : Signal KeyCode
 presses =
   Native.Keyboard.presses
 
