@@ -2,6 +2,7 @@ module Time
     ( Time, millisecond, second, minute, hour
     , inMilliseconds, inSeconds, inMinutes, inHours
     , fps, fpsWhen, every
+    , timestamp
     ) where
 
 {-| Library for working with time.
@@ -14,13 +15,12 @@ module Time
 @docs fps, fpsWhen, every
 
 # Timing
-@docs timestamp, delay, since
-
+@docs timestamp
 -}
 
 import Basics exposing (..)
+import Native.Signal
 import Native.Time
-import SignalTypes exposing (Stream)
 import Signal exposing (Signal)
 
 
@@ -80,7 +80,7 @@ current frame.
 
 Note: Calling `fps 30` twice gives two independently running timers.
 -}
-fps : number -> Stream Time
+fps : number -> Signal Time
 fps targetFrames =
   fpsWhen targetFrames (Signal.constant True)
 
@@ -91,7 +91,7 @@ The first time delta after a pause is always zero, no matter how long
 the pause was. This way summing the deltas will actually give the amount
 of time that the output signal has been running.
 -}
-fpsWhen : number -> Signal Bool -> Stream Time
+fpsWhen : number -> Signal Bool -> Signal Time
 fpsWhen =
   Native.Time.fpsWhen
 
@@ -104,3 +104,8 @@ Note: Calling `every 100` twice gives two independently running timers.
 every : Time -> Signal Time
 every =
   Native.Time.every
+
+
+timestamp : Signal a -> Signal (Time, a)
+timestamp =
+  Native.Signal.timestamp
