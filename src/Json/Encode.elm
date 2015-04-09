@@ -1,7 +1,7 @@
 
-module JavaScript.Encode where
+module Json.Encode where
 
-{-| Library for turning Elm values into JavaScript values.
+{-| Library for turning Elm values into Json values.
 
 # Encoding
 @docs encode
@@ -17,7 +17,7 @@ module JavaScript.Encode where
 -}
 
 import Array exposing (Array)
-import Native.JavaScript
+import Native.Json
 
 
 type Value = Value
@@ -43,43 +43,43 @@ the amount of indentation in the resulting string.
 -}
 encode : Int -> Value -> String
 encode =
-    Native.JavaScript.encode
+    Native.Json.encode
 
 
 string : String -> Value
 string =
-    Native.JavaScript.identity
+    Native.Json.identity
 
 int : Int -> Value
 int =
-    Native.JavaScript.identity
+    Native.Json.identity
 
 
 float : Float -> Value
 float =
-    Native.JavaScript.identity
+    Native.Json.identity
 
 
 bool : Bool -> Value
 bool =
-    Native.JavaScript.identity
+    Native.Json.identity
 
 
 null : Value
 null =
-    Native.JavaScript.encodeNull
+    Native.Json.encodeNull
 
 
 object : List (String, Value) -> Value
 object =
-    Native.JavaScript.encodeObject
+    Native.Json.encodeObject
 
 
 array : Array Value -> Value
 array =
-    Native.JavaScript.encodeArray
+    Native.Json.encodeArray
 
 
 list : List Value -> Value
 list =
-    Native.JavaScript.encodeList
+    Native.Json.encodeList
