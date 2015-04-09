@@ -423,8 +423,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 				node.value = signal.value;
 				update = true;
 			}
-				broadcastToKids(node, timestamp, update);
-			}
+			broadcastToKids(node, timestamp, update);
 		};
 
 		signal.kids.push(node);
