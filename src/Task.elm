@@ -6,7 +6,7 @@ module Task
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
-    , ThreadID, spawn, subscribe, sleep
+    , ThreadID, spawn, sleep
     ) where
 {-|
 
@@ -30,8 +30,6 @@ import Native.Task
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Result exposing (Result(Ok,Err))
-import SignalTypes exposing (Stream)
-import Time exposing (Time)
 
 
 type Task x a = Task
@@ -165,12 +163,9 @@ spawn =
   Native.Task.spawn
 
 
-subscribe : Stream a -> (a -> Task x b) -> Task y ThreadID
-subscribe =
-  Native.Task.subscribe
-
-
 -- kill : ThreadID -> Task x ()
+
+type alias Time = Float
 
 
 sleep : Time -> Task x ()
