@@ -46,10 +46,10 @@ Elm.Native.Text.make = function(localRuntime) {
 			for (var i = metaKeys.length; i--; )
 			{
 				var key = metaKeys[i];
-				value = props[key];
-				if (value)
+				var val = props[key];
+				if (val)
 				{
-					newProps[key] = value;
+					newProps[key] = val;
 				}
 			}
 		}
