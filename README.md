@@ -14,11 +14,11 @@ Every Elm project needs the core libraries. They provide basic functionality inc
 In all Elm files there is a small set of default imports:
 
 ```haskell
-import Basics (..)
-import List ( List, (::) )
-import Maybe ( Maybe( Just, Nothing ) )
-import Result ( Result( Ok, Err ) )
-import Signal ( Signal )
+import Basics exposing (..)
+import List exposing ( List, (::) )
+import Maybe exposing ( Maybe( Just, Nothing ) )
+import Result exposing ( Result( Ok, Err ) )
+import Signal exposing ( Signal )
 ```
 
 The intention is to include things that are both extremely useful and very
