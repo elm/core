@@ -46,7 +46,9 @@ Elm.Native.Port.make = function(localRuntime) {
 		function send(jsValue)
 		{
 			var elmValue = jsToElm(name, type, converter, jsValue);
-			localRuntime.notify(signal.id, elmValue);
+			setTimeout(function() {
+				localRuntime.notify(signal.id, elmValue);
+			}, 0);
 		}
 
 		localRuntime.ports[name] = { send: send };
