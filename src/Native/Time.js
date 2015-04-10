@@ -75,12 +75,6 @@ Elm.Native.Time.make = function(localRuntime)
 	}
 
 
-	function fps(t)
-	{
-		return fpsWhen(t, Signal.constant(true));
-	}
-
-
 	// EVERY
 
 	function every(t)
@@ -110,7 +104,6 @@ Elm.Native.Time.make = function(localRuntime)
 
 	return localRuntime.Native.Time.values = {
 		fpsWhen: F2(fpsWhen),
-		fps: fps,
 		every: every,
 		toDate: function(t) { return new window.Date(t); },
 		read: read
