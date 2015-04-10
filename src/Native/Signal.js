@@ -387,7 +387,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 			{
 				if (tickerUpdate)
 				{
-					node.value = sig.value;
+					node.value = signal.value;
 				}
 				tickerTouch = false;
 				signalTouch = false;
