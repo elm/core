@@ -12,7 +12,6 @@ Elm.Native.Time.make = function(localRuntime)
 	var Signal = Elm.Signal.make(localRuntime);
 	var NS = Elm.Native.Signal.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
 	// FRAMES PER SECOND
@@ -20,11 +19,11 @@ Elm.Native.Time.make = function(localRuntime)
 	function fpsWhen(desiredFPS, isOn)
 	{
 		var msPerFrame = 1000 / desiredFPS;
-		var ticker = NS.input('fps-' + desiredFPS, Utils.Tuple0);
+		var ticker = NS.input('fps-' + desiredFPS, null);
 
 		function notifyTicker()
 		{
-			localRuntime.notify(ticker.id, Utils.Tuple0);
+			localRuntime.notify(ticker.id, null);
 		}
 
 		function firstArg(x, y)
@@ -79,10 +78,10 @@ Elm.Native.Time.make = function(localRuntime)
 
 	function every(t)
 	{
-		var ticker = NS.input('every-' + t, Utils.Tuple0);
+		var ticker = NS.input('every-' + t, null);
 		function tellTime()
 		{
-			localRuntime.notify(ticker.id, Utils.Tuple0);
+			localRuntime.notify(ticker.id, null);
 		}
 		var clock = A2( Signal.map, fst, NS.timestamp(ticker) );
 		setInterval(tellTime, t);
