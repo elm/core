@@ -2,7 +2,7 @@ module Time
     ( Time, millisecond, second, minute, hour
     , inMilliseconds, inSeconds, inMinutes, inHours
     , fps, fpsWhen, every
-    , timestamp
+    , timestamp, delay, since
     ) where
 
 {-| Library for working with time.
@@ -15,7 +15,7 @@ module Time
 @docs fps, fpsWhen, every
 
 # Timing
-@docs timestamp
+@docs timestamp, delay, since
 -}
 
 import Basics exposing (..)
@@ -106,6 +106,42 @@ every =
   Native.Time.every
 
 
+{-| Add a timestamp to any signal. Timestamps increase monotonically. When you
+create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
+updates whenever `Mouse.x` updates.
+
+Timestamp updates are tied to individual events, so `(timestamp Mouse.x)` and
+`(timestamp Mouse.y)` will always have the same timestamp because they rely on
+the same underlying event (`Mouse.position`).
+-}
 timestamp : Signal a -> Signal (Time, a)
 timestamp =
   Native.Signal.timestamp
+
+
+{-| Delay a signal by a certain amount of time. So `(delay second Mouse.clicks)`
+will update one second later than any mouse click.
+-}
+delay : Time -> Signal a -> Signal a
+delay =
+  Native.Signal.delay
+
+
+{-| Takes a time `t` and any signal. The resulting boolean signal is true for
+time `t` after every event on the input signal. So ``(second `since`
+Mouse.clicks)`` would result in a signal that is true for one second after
+each mouse click and false otherwise.
+-}
+since : Time -> Signal a -> Signal Bool
+since time signal =
+  let
+    start =
+      Signal.map (always 1) signal
+
+    stop =
+      Signal.map (always -1) (delay time signal)
+
+    delaydiff =
+      Signal.foldp (+) 0 (Signal.merge start stop)
+  in
+      Signal.map ((/=) 0) delaydiff

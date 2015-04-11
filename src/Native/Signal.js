@@ -260,6 +260,23 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
+	function delay(time, signal)
+	{
+		var delayed = input('delay-input-' + time, signal.value);
+
+		function handler(value)
+		{
+			setTimeout(function() {
+				localRuntime.notify(delayed.id, value);
+			}, time);
+		}
+
+		output('delay-output-' + time, handler, signal);
+
+		return delayed;
+	}
+
+
 	// MERGING
 
 	function genericMerge(tieBreaker, leftStream, rightStream)
@@ -321,7 +338,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
- 	// FILTERING
+	// FILTERING
 
 	function filterMap(toMaybe, base, signal)
 	{
@@ -355,7 +372,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
- 	// SAMPLING
+	// SAMPLING
 
 	function sampleOn(ticker, signal)
 	{
@@ -403,7 +420,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
- 	// DROP REPEATS
+	// DROP REPEATS
 
 	function dropRepeats(signal)
 	{
@@ -448,6 +465,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		filterMap: F3(filterMap),
 		sampleOn: F2(sampleOn),
 		dropRepeats: dropRepeats,
-		timestamp: timestamp
+		timestamp: timestamp,
+		delay: delay
 	};
 };
