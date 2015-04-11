@@ -177,10 +177,10 @@ if (!Elm.fullscreen) {
 
 		function checkInputs(elm)
 		{
-			var argTracker = elm.argTracker;
-			for (var name in argTracker)
+			var argsTracker = elm.argsTracker;
+			for (var name in argsTracker)
 			{
-				if (!argTracker[name].used)
+				if (!argsTracker[name].used)
 				{
 					throw new Error(
 						"Port Error:\nYou provided an argument named '" + name +
