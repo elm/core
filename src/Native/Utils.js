@@ -48,11 +48,11 @@ Elm.Native.Utils.make = function(localRuntime) {
 					return false;
 				}
 			}
-			else if (typeof x === 'function')
-			{
-				throw new Error('Equality error: general function equality is ' +
-								'undecidable, and therefore, unsupported');
-			}
+			// else if (typeof x === 'function')
+			// {
+			// 	throw new Error('Equality error: general function equality is ' +
+			// 					'undecidable, and therefore, unsupported');
+			// }
 			else
 			{
 				return false;
