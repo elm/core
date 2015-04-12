@@ -22,6 +22,12 @@ Elm.Native.Date.make = function(localRuntime) {
 			: Result.Ok(date);
 	}
 
+	function newDate(year, monthName, day, hour, minute, second, millisecond)
+	{
+		var month = monthTable.indexOf(monthName.ctor);
+		return new window.Date(year, month, day, hour, minute, second, millisecond);
+	}
+
 	var dayTable = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 	var monthTable =
 		["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -30,6 +36,7 @@ Elm.Native.Date.make = function(localRuntime) {
 
 	return localRuntime.Native.Date.values = {
 		read    : readDate,
+		newDate : F7(newDate),
 		year    : function(d) { return d.getFullYear(); },
 		month   : function(d) { return { ctor:monthTable[d.getMonth()] }; },
 		day     : function(d) { return d.getDate(); },
