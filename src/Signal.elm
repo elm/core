@@ -303,7 +303,9 @@ type alias Mailbox a =
 type Address a =
     Address (a -> Task () ())
 
-
+{-| Create a new mailbox.
+    Note: This is an inherently impure function, so (mailbox ()) and (mailbox ()) produce two different mailboxes.
+-}
 mailbox : a -> Mailbox a
 mailbox =
   Native.Signal.mailbox
