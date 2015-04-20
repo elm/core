@@ -167,7 +167,7 @@ Elm.Native.Touch.make = function(localRuntime) {
             hasTap = false;
             return b;
         }
-        var sig2 = A3( Signal.keepIf, pred, {_:{},x:0,y:0}, sig);
+        var sig2 = A3( Signal.filter, pred, {_:{},x:0,y:0}, sig);
         sig2.defaultNumberOfKids = 0;
         return sig2;
     }();
