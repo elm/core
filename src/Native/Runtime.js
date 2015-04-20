@@ -157,6 +157,8 @@ if (!Elm.fullscreen) {
 			inputs = rootNode.kids;
 			filterListeners(inputs, listeners);
 
+			addReceivers(elm.ports);
+
 			if (typeof moduleToReplace !== 'undefined')
 			{
 				hotSwap(moduleToReplace, elm);
@@ -239,6 +241,31 @@ if (!Elm.fullscreen) {
 			{
 				var listener = listeners[i];
 				listener.domNode.removeEventListener(listener.eventName, listener.func);
+			}
+		}
+
+		// add receivers for built-in ports if they are defined
+		function addReceivers(ports)
+		{
+			if ('title' in ports)
+			{
+				if (typeof ports.title === 'string')
+				{
+					document.title = ports.title;
+				}
+				else
+				{
+					ports.title.subscribe(function(v) { document.title = v; });
+				}
+			}
+			if ('redirect' in ports)
+			{
+				ports.redirect.subscribe(function(v) {
+					if (v.length > 0)
+					{
+						window.location = v;
+					}
+				});
 			}
 		}
 
