@@ -466,6 +466,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 		sampleOn: F2(sampleOn),
 		dropRepeats: dropRepeats,
 		timestamp: timestamp,
-		delay: delay
+		delay: F2(delay)
 	};
 };
