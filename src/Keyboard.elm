@@ -199,5 +199,5 @@ keysDown =
 {-| The latest key that has been pressed. -}
 presses : Signal KeyCode
 presses =
-  Native.Keyboard.presses
+  Signal.map .keyCode Native.Keyboard.presses
 
