@@ -212,7 +212,7 @@ read as integers.
 
     numbers : Signal Int
     numbers =
-        filterMap toInt 0 numbers
+        filterMap toInt 0 userInput
 -}
 filterMap : (a -> Maybe b) -> b -> Signal a -> Signal b
 filterMap =
