@@ -2,7 +2,7 @@ module Task
     ( Task
     , succeed, fail
     , map, map2, map3, map4, map5, andMap
-    , sequence
+    , sequence, parallel
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
@@ -17,7 +17,7 @@ module Task
 @docs map, map2, map3, map4, map5, andMap
 
 # Chaining
-@docs andThen, sequence
+@docs andThen, sequence, parallel
 
 # Errors
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
@@ -105,6 +105,11 @@ sequence promises =
     promise :: remainingTasks ->
         map2 (::) promise (sequence remainingTasks)
 
+{-| Performs a list of tasks in parallel
+-}
+parallel : List (Task x a) -> Task y (List ThreadID)
+parallel =
+  sequence << List.map spawn
 
 -- interleave : List (Task x a) -> Task x (List a)
 
