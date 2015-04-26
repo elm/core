@@ -132,6 +132,11 @@ Elm.Native.Basics.make = function(localRuntime) {
 		round: Math.round,
 		toFloat: function(x) { return x; },
 		isNaN: isNaN,
-		isInfinite: isInfinite
+		isInfinite: isInfinite,
+
+		encodeURI: encodeURI,
+		encodeURIComponent: encodeURIComponent,
+		decodeURI: decodeURI,
+		decodeURIComponent: decodeURIComponent
 	};
 };
