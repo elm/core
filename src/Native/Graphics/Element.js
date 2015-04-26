@@ -202,14 +202,14 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	function tiledImage(src)
 	{
 		var div = createNode('div');
-		div.style.backgroundImage = 'url(' + src + ')';
+		div.style.backgroundImage = 'url("' + src + '")';
 		return div;
 	}
 
 	function fittedImage(w, h, src)
 	{
 		var div = createNode('div');
-		div.style.background = 'url(' + src + ') no-repeat center';
+		div.style.background = 'url("' + src + '") no-repeat center';
 		div.style.webkitBackgroundSize = 'cover';
 		div.style.MozBackgroundSize = 'cover';
 		div.style.OBackgroundSize = 'cover';
