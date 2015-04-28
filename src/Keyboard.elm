@@ -141,6 +141,7 @@ toXY {up,down,left,right} keyCodes =
 -}
 arrows : Signal { x:Int, y:Int }
 arrows =
+  Signal.dropRepeats <|
   Signal.map (toXY { up = 38, down = 40, left = 37, right = 39 }) keysDown
 
 
@@ -149,17 +150,20 @@ which are common controls for many computer games.
 -}
 wasd : Signal { x:Int, y:Int }
 wasd =
+  Signal.dropRepeats <|
   Signal.map (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
 
 
 {-| Whether an arbitrary key is pressed. -}
 isDown : KeyCode -> Signal Bool
 isDown keyCode =
+  Signal.dropRepeats <|
   Signal.map (Set.member keyCode) keysDown
 
 
 alt : Signal Bool
 alt =
+  Signal.dropRepeats <|
   Signal.map .alt model
 
 
@@ -172,6 +176,7 @@ ctrl =
 -}
 meta : Signal Bool
 meta =
+  Signal.dropRepeats <|
   Signal.map .meta model
 
 
@@ -193,6 +198,7 @@ enter =
 {-| Set of keys that are currently down. -}
 keysDown : Signal (Set.Set KeyCode)
 keysDown =
+  Signal.dropRepeats <|
   Signal.map .keyCodes model
 
 
