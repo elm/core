@@ -284,6 +284,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		var node = {
 			id: Utils.guid(),
 			name: 'merge',
+			value: A2(tieBreaker, leftStream.value, rightStream.value),
 			parents: [leftStream, rightStream],
 			kids: []
 		};
