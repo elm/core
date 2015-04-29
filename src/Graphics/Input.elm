@@ -1,6 +1,6 @@
 module Graphics.Input where
 {-| This module is for creating input widgets such as buttons and text fields.
-All functions in this library report to a [`Signal.Channel`](Signal#send).
+All functions in this library report to a [`Signal.Mailbox`](Signal#send).
 
 # Basic Input Elements
 
@@ -25,15 +25,15 @@ calculator:
 
     type Keys = Number Int | Plus | Minus | Clear
 
-    keys : Signal.Channel Keys
-    keys = Signal.channel Clear
+    keys : Signal.Mailbox Keys
+    keys = Signal.Mailbox Clear
 
     calculator : Element
     calculator =
         flow right
-          [ button (Signal.send keys (Number 1)) "1"
-          , button (Signal.send keys (Number 2)) "2"
-          , button (Signal.send keys    Plus   ) "+"
+          [ button (Signal.message keys.address (Number 1)) "1"
+          , button (Signal.message keys.address (Number 2)) "2"
+          , button (Signal.message keys.address    Plus   ) "+"
           ]
 
 If the user presses the "+" button, `keys.signal` will update to `Plus`. If the
@@ -46,12 +46,12 @@ button =
 
 {-| Same as `button` but lets you customize buttons to look however you want.
 
-    click : Signal.Channel ()
-    click = Signal.channel ()
+    click : Signal.Mailbox ()
+    click = Signal.Mailbox ()
 
     prettyButton : Element
     prettyButton =
-        customButton (Signal.send click ())
+        customButton (Signal.message click.address ())
             (image 100 40 "/button_up.jpg")
             (image 100 40 "/button_hover.jpg")
             (image 100 40 "/button_down.jpg")
@@ -63,17 +63,17 @@ customButton =
 
 {-| Create a checkbox. The following example creates three synced checkboxes:
 
-    check : Signal.Channel Bool
-    check = Signal.channel False
+    check : Signal.Mailbox Bool
+    check = Signal.Mailbox False
 
     boxes : Bool -> Element
     boxes checked =
-        let box = container 40 40 middle (checkbox (Signal.send check) checked)
+        let box = container 40 40 middle (checkbox (Signal.message check.address) checked)
         in
             flow right [ box, box, box ]
 
     main : Signal Element
-    main = boxes <~ Signal.subscribe check
+    main = boxes <~ check.signal
 -}
 checkbox : (Bool -> Signal.Message) -> Bool -> Element
 checkbox =
@@ -85,19 +85,19 @@ favorite British sport:
 
     type Sport = Football | Cricket | Snooker
 
-    sport : Signal.Channel (Maybe Sport)
-    sport = Signal.channel Nothing
+    sport : Signal.Mailbox (Maybe Sport)
+    sport = Signal.Mailbox Nothing
 
     sportDropDown : Element
     sportDropDown =
-        dropDown (Signal.send sport)
+        dropDown (Signal.message sport.address)
           [ (""        , Nothing)
           , ("Football", Just Football)
           , ("Cricket" , Just Cricket)
           , ("Snooker" , Just Snooker)
           ]
 
-If the user selects "Football" from the drop down menue, `Signal.subscribe sport`
+If the user selects "Football" from the drop down menue, `sport.signal`
 will update to `Just Football`.
 -}
 dropDown : (a -> Signal.Message) -> List (String, a) -> Element
@@ -108,13 +108,13 @@ dropDown =
 {-| Detect mouse hovers over a specific `Element`. In the following example,
 we will create a hoverable picture called `cat`.
 
-    hover : Signal.Channel Bool
-    hover = Signal.channel False
+    hover : Signal.Mailbox Bool
+    hover = Signal.Mailbox False
 
     cat : Element
     cat =
       image 30 30 "/cat.jpg"
-        |> hoverable (Signal.send hover)
+        |> hoverable (Signal.message hover.address)
 
 When the mouse hovers above the `cat` element, `hover.signal` will become
 `True`. When the mouse leaves it, `hover.signal` will become `False`.
@@ -129,18 +129,18 @@ we will create a clickable picture called `cat`.
 
     type Picture = Cat | Hat
 
-    picture : Signal.Channel Picture
-    picture = Signal.channel Cat
+    picture : Signal.Mailbox Picture
+    picture = Signal.Mailbox Cat
 
     cat : Element
     cat =
       image 30 30 "/cat.jpg"
-        |> clickable (Signal.send picture Cat)
+        |> clickable (Signal.message picture.address Cat)
 
     hat : Element
     hat =
       image 30 30 "/hat.jpg"
-        |> clickable (Signal.send picture Hat)
+        |> clickable (Signal.message picture.address Hat)
 
 When the user clicks on the `cat` element, `picture.signal` receives
 an update containing the value `Cat`. When the user clicks on the `hat` element,
