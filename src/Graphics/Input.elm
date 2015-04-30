@@ -1,6 +1,6 @@
 module Graphics.Input where
 {-| This module is for creating input widgets such as buttons and text fields.
-All functions in this library report to a [`Signal.Mailbox`](Signal#send).
+All functions in this library report to a [`Signal.Mailbox`](Signal#message).
 
 # Basic Input Elements
 
