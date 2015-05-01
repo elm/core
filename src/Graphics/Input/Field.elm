@@ -176,12 +176,12 @@ noContent =
 called `nameField`. As the user types their name, the field will be updated
 to match what they have entered.
 
-    name : Signal.Channel Content
-    name = Signal.channel noContent
+    name : Signal.Mailbox Content
+    name = Signal.Mailbox noContent
 
     nameField : Signal Element
     nameField =
-        field defaultStyle (Signal.send name) "Name" <~ Signal.subscribe name
+        field defaultStyle (Signal.message name.address) "Name" <~ name.signal
 
 When we use the `field` function, we first give it a visual style. This is
 the first argument so that it is easier to define your own custom field
