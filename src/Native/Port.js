@@ -70,7 +70,7 @@ Elm.Native.Port.make = function(localRuntime) {
 				"Regarding the port named '" + name + "' with type:\n\n" +
 				"    " + type.split('\n').join('\n        ') + "\n\n" +
 				"You just sent the value:\n\n" +
-				"    " + JSON.stringify(arg.value) + "\n\n" +
+				"    " + JSON.stringify(value) + "\n\n" +
 				"but it cannot be converted to the necessary type.\n" +
 				e.message
 			);
