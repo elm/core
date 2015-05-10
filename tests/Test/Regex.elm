@@ -1,11 +1,11 @@
 module Test.Regex (tests) where
 
-import Basics (..)
+import Basics exposing (..)
 
-import Regex (..)
+import Regex exposing (..)
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 tests : Test
 tests =

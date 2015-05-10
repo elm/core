@@ -1,10 +1,10 @@
 module Test.Equality (tests) where
 
-import Basics (..)
-import Maybe (..)
+import Basics exposing (..)
+import Maybe exposing (..)
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 type Different
     = A String 

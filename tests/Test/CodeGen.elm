@@ -1,11 +1,11 @@
 module Test.CodeGen (tests) where
 
-import Basics (..)
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import Basics exposing (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 import Maybe
-import Maybe (..)
+import Maybe exposing (..)
 
 casePrime m' =
     case m' of

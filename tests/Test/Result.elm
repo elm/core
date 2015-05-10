@@ -1,12 +1,12 @@
 module Test.Result (tests) where
 
-import Basics (..)
+import Basics exposing (..)
 import Result
-import Result (Result(..))
+import Result exposing (Result(..))
 import String
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 isEven n =
   if n % 2 == 0
