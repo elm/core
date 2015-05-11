@@ -1,13 +1,13 @@
 module Test.Set (tests) where
 
-import Basics (..)
+import Basics exposing (..)
 
 import Set
-import Set (Set)
+import Set exposing (Set)
 import List
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 set : Set Int
 set = Set.fromList [1..100]

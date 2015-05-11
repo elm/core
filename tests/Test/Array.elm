@@ -1,14 +1,14 @@
 module Test.Array (tests) where
 
 import Array
-import Basics (..)
+import Basics exposing (..)
 import List
-import List ((::))
-import Maybe (..)
+import List exposing ((::))
+import Maybe exposing (..)
 import Native.Array
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 mergeSplit : Int -> Array.Array a -> Array.Array a
 mergeSplit n arr =
