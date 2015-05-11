@@ -1,5 +1,6 @@
 module Json.Decode where
-{-| A way to turn Json values into Elm values.
+{-| A way to turn Json values into Elm values. A `Decoder a` represents a
+decoding operation that will either produce a value of type `a`, or fail.
 
 # Run a Decoder
 @docs decodeString, decodeValue
@@ -74,10 +75,11 @@ decodeString =
 really a helper function so you do not need to write `(:=)` so many times.
 
     -- object.target.value = 'hello'
-
     value : Decoder String
     value =
         at ["target", "value"] string
+
+It is defined as
 
     at fields decoder =
         List.foldr (:=) decoder fields
@@ -123,15 +125,15 @@ object2 =
     Native.Json.decodeObject2
 
 
-{-| Use two different decoders on a JS value. This is nice for extracting
+{-| Use three different decoders on a JS value. This is nice for extracting
 multiple fields from an object.
 
-    type alias Task = { task : String, id : Int, completed : Bool }
+    type alias Job = { name : String, id : Int, completed : Bool }
 
-    point : Decoder Task
+    point : Decoder Job
     point =
-        object3 Task
-          ("task" := string)
+        object3 Job
+          ("name" := string)
           ("id" := int)
           ("completed" := bool)
 -}
@@ -165,7 +167,8 @@ object8 =
     Native.Json.decodeObject8
 
 
-{-| Turn any object into a list of key-value pairs.
+{-| Turn any object into a list of key-value pairs. Fails if _any_ key can't be
+decoded with the given decoder.
 
     -- { tom: 89, sue: 92, bill: 97, ... }
     grades : Decoder (List (String, Int))
@@ -190,7 +193,7 @@ dict decoder =
 
 
 
-{-| Try out a couple different decoders. This is helpful when you are dealing
+{-| Try out multiple different decoders. This is helpful when you are dealing
 with something with a very strange shape and when `andThen` does not help
 narrow things down so you can be more targeted.
 
@@ -200,7 +203,7 @@ narrow things down so you can be more targeted.
     points =
         list point
 
-    point : (Float,Float)
+    point : Decoder (Float,Float)
     point =
         oneOf
         [ tuple2 (,) float float
@@ -264,7 +267,7 @@ bool =
     Native.Json.decodeBool
 
 
-{-| Extract a list from a JS array.
+{-| Extract a List from a JS array.
 
     -- [1,2,3,4]
 
@@ -290,15 +293,9 @@ array =
     Native.Json.decodeArray
 
 
-{-| Extract a null value. Primarily useful for creating *other* decoders.
-
-    nullOr : Decoder a -> Decoder (Maybe a)
-    nullOr decoder =
-        oneOf
-        [ null Nothing
-        , map Just decoder
-        ]
-
+{-| Decode null as the value given, and fail otherwise. Primarily useful for
+creating *other* decoders. Use [maybe](#maybe) for values that are _sometimes_
+null.
 
     numbers : Decoder [Int]
     numbers =
@@ -309,11 +306,16 @@ null =
     Native.Json.decodeNull
 
 
-{-| Great for handling optional fields. The following code decodes JSON
-objects that may not have a profession field.
+{-| Extract a Maybe value, wrapping successes with `Just` and turning any
+failure in `Nothing`. Great for handling fields that may be missing or null. The
+following code decodes JSON objects that may not have a profession field.
 
+    -- profession: Just "plumber"
     -- { name: "Tom", age: 31, profession: "plumber" }
+    -- profession: Nothing
     -- { name: "Sue", age: 42 }
+    -- { name: "Amy", age: 27, profession: null }
+    -- { name: "Joe", age: 36, profession: ["something", "unexpected"] }
 
     type alias Person =
         { name : String
@@ -400,7 +402,7 @@ to improve error messages when things go wrong. For example, the following
 decoder is able to provide a much more specific error message when `fail` is
 the last option.
 
-    point : (Float,Float)
+    point : Decoder (Float,Float)
     point =
         oneOf
         [ tuple2 (,) float float
@@ -434,12 +436,21 @@ succeed =
 
 -- TUPLES
 
+{-| Handle an array with exactly one element.
+
+    authorship : Decoder String
+    authorship =
+        oneOf
+          [ tuple1 (\author -> "Author: " ++ author) string
+          , list string |> map (\authors -> "Co-authors: " ++ String.join ", " authors)
+          ]
+-}
 tuple1 : (a -> value) -> Decoder a -> Decoder value
 tuple1 =
     Native.Json.decodeTuple1
 
 
-{-| Handle an array with exactly two values. Useful for points and simple
+{-| Handle an array with exactly two elements. Useful for points and simple
 pairs.
 
     -- [3,4] or [0,0]
@@ -459,7 +470,7 @@ tuple2 =
     Native.Json.decodeTuple2
 
 
-{-| Handle an array with exactly three values.
+{-| Handle an array with exactly three elements.
 
     -- [3,4,5] or [0,0,0]
     point3D : Decoder (Float,Float,Float)

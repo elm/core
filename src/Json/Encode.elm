@@ -55,6 +55,8 @@ int =
     Native.Json.identity
 
 
+{-| Encode a Float. `Infinity` and `NaN` are encoded as `null`.
+-}
 float : Float -> Value
 float =
     Native.Json.identity
