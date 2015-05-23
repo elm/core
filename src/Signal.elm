@@ -212,7 +212,7 @@ read as integers.
 
     numbers : Signal Int
     numbers =
-        filterMap toInt 0 numbers
+        filterMap toInt 0 userInput
 -}
 filterMap : (a -> Maybe b) -> b -> Signal a -> Signal b
 filterMap =
@@ -304,6 +304,14 @@ type Address a =
     Address (a -> Task () ())
 
 
+
+{-| Create a mailbox you can send messages to. The primary use case is
+receiving updates from tasks and UI elements. The argument is a default value
+for the custom signal.
+
+Note: Creating new signals is inherently impure, so `(mailbox ())` and
+`(mailbox ())` produce two different mailboxes.
+-}
 mailbox : a -> Mailbox a
 mailbox =
   Native.Signal.mailbox

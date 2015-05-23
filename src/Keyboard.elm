@@ -97,6 +97,11 @@ rawEvents =
     ]
 
 
+dropMap : (a -> b) -> Signal a -> Signal b
+dropMap f signal =
+  Signal.dropRepeats (Signal.map f signal)
+
+
 -- PUBLIC API
 
 {-| Key codes for different layouts. You can set it up to be WASD, arrow keys, etc.
@@ -141,7 +146,7 @@ toXY {up,down,left,right} keyCodes =
 -}
 arrows : Signal { x:Int, y:Int }
 arrows =
-  Signal.map (toXY { up = 38, down = 40, left = 37, right = 39 }) keysDown
+  dropMap (toXY { up = 38, down = 40, left = 37, right = 39 }) keysDown
 
 
 {-| Just like the arrows signal, but this uses keys w, a, s, and d,
@@ -149,18 +154,18 @@ which are common controls for many computer games.
 -}
 wasd : Signal { x:Int, y:Int }
 wasd =
-  Signal.map (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
+  dropMap (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
 
 
 {-| Whether an arbitrary key is pressed. -}
 isDown : KeyCode -> Signal Bool
 isDown keyCode =
-  Signal.map (Set.member keyCode) keysDown
+  dropMap (Set.member keyCode) keysDown
 
 
 alt : Signal Bool
 alt =
-  Signal.map .alt model
+  dropMap .alt model
 
 
 ctrl : Signal Bool
@@ -172,7 +177,7 @@ ctrl =
 -}
 meta : Signal Bool
 meta =
-  Signal.map .meta model
+  dropMap .meta model
 
 
 shift : Signal Bool
@@ -193,11 +198,11 @@ enter =
 {-| Set of keys that are currently down. -}
 keysDown : Signal (Set.Set KeyCode)
 keysDown =
-  Signal.map .keyCodes model
+  dropMap .keyCodes model
 
 
 {-| The latest key that has been pressed. -}
 presses : Signal KeyCode
 presses =
-  Native.Keyboard.presses
+  Signal.map .keyCode Native.Keyboard.presses
 

@@ -1,12 +1,12 @@
 module Test.Dict (tests) where
 
-import Basics (..)
+import Basics exposing (..)
 import Dict
 import List
-import Maybe (..)
+import Maybe exposing (..)
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 animals : Dict.Dict String String
 animals = Dict.fromList [ ("Tom", "cat"), ("Jerry", "mouse") ]

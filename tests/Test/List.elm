@@ -1,11 +1,11 @@
 module Test.List (tests) where
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
-import Basics (..)
-import Maybe (Maybe(Nothing, Just))
-import List (..)
+import Basics exposing (..)
+import Maybe exposing (Maybe(Nothing, Just))
+import List exposing (..)
 
 
 tests : Test
@@ -58,11 +58,6 @@ testListOfN n =
             if n == 0
             then assertEqual (Nothing) (head xs)
             else assertEqual (Just 1) (head xs)
-            
-        , test "uncons" <|
-            if n == 0
-            then assertEqual (Nothing) (uncons xs)
-            else assertEqual (Just (1, [2..n])) (uncons xs)
             
         , suite "filter"
             [ test "none" <| assertEqual ([]) (filter (\x -> x > n) xs)

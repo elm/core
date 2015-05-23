@@ -96,6 +96,8 @@ Elm.Native.Task.make = function(localRuntime) {
 		}
 		Signal.output('perform-tasks-' + name, register, signal);
 
+		register(signal.value);
+
 		return signal;
 	}
 
