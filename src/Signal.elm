@@ -317,7 +317,7 @@ mailbox =
   Native.Signal.mailbox
 
 
-{-| Create a new address. This address will will tag each message it receives
+{-| Create a new address. This address will tag each message it receives
 and then forward it along to some other address.
 
     type Action = Undo | Remove Int
