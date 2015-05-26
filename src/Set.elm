@@ -58,8 +58,7 @@ remove = Dict.remove
 {-| Determine if a set is empty.
 -}
 isEmpty : Set comparable -> Bool
-isEmpty array =
-    array == Dict.empty
+isEmpty = Dict.isEmpty
 
 {-| Determine if a value is in a set. -}
 member : comparable -> Set comparable -> Bool
