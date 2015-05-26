@@ -1,7 +1,7 @@
 module Dict
     ( Dict
     , empty, singleton, insert, update
-    , get, remove, member
+    , isEmpty, get, remove, member
     , filter
     , partition
     , foldl, foldr, map
@@ -21,7 +21,7 @@ equality with `(==)` is unreliable and should not be used.
 @docs empty, singleton, insert, update, remove
 
 # Query
-@docs member, get
+@docs isEmpty, member, get
 
 # Combine
 @docs union, intersect, diff
@@ -138,6 +138,15 @@ member key dict =
     case get key dict of
       Just _ -> True
       Nothing -> False
+
+
+{-| Determine if a dictionary is empty.
+
+    isEmpty empty == True
+-}
+isEmpty : Dict comparable v -> Bool
+isEmpty dict =
+    dict == empty
 
 
 ensureBlackRoot : Dict k v -> Dict k v

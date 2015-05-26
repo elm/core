@@ -2,7 +2,7 @@
 module Set
     ( Set
     , empty, singleton, insert, remove
-    , member
+    , isEmpty, member
     , foldl, foldr, map
     , filter, partition
     , union, intersect, diff
@@ -20,7 +20,7 @@ Insert, remove, and query operations all take *O(log n)* time. Set equality with
 @docs empty, singleton, insert, remove
 
 # Query
-@docs member
+@docs isEmpty, member
 
 # Combine
 @docs union, intersect, diff
@@ -54,6 +54,12 @@ insert k = Dict.insert k ()
 -}
 remove : comparable -> Set comparable -> Set comparable
 remove = Dict.remove
+
+{-| Determine if a set is empty.
+-}
+isEmpty : Set comparable -> Bool
+isEmpty array =
+    array == Dict.empty
 
 {-| Determine if a value is in a set. -}
 member : comparable -> Set comparable -> Bool

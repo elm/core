@@ -1,7 +1,7 @@
 module Array
     ( Array
     , empty, repeat, initialize, fromList
-    , length, push, append
+    , isEmpty, length, push, append
     , get, set
     , slice, toList, toIndexedList
     , map, indexedMap, filter, foldl, foldr
@@ -15,7 +15,7 @@ reads, updates, and appends.
 @docs empty, repeat, initialize, fromList
 
 # Basics
-@docs length, push, append
+@docs isEmpty, length, push, append
 
 # Get and Set
 @docs get, set
@@ -176,6 +176,14 @@ slice = Native.Array.slice
 -}
 length : Array a -> Int
 length = Native.Array.length
+
+{-| Determine if an array is empty.
+
+    isEmpty empty == True
+-}
+isEmpty : Array a -> Bool
+isEmpty array =
+    length array == 0
 
 {-| Append two arrays to a new one.
 
