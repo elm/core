@@ -82,19 +82,6 @@ empty : Dict comparable v
 empty = RBEmpty LBlack
 
 
-max : Dict k v -> (k, v)
-max dict =
-    case dict of
-      RBNode _ key value _ (RBEmpty _) ->
-          (key, value)
-
-      RBNode _ _ _ _ right ->
-          max right
-
-      RBEmpty _ ->
-          Native.Debug.crash "(max Empty) is not defined"
-
-
 {-| Get the value associated with a key. If the key is not found, return
 `Nothing`. This is useful when you are not sure if a key will be in the
 dictionary.
