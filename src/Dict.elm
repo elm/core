@@ -82,17 +82,17 @@ empty : Dict comparable v
 empty = RBEmpty LBlack
 
 
-max : Dict k v -> (k, v)
+max : Dict k v -> Maybe (k, v)
 max dict =
     case dict of
       RBNode _ key value _ (RBEmpty _) ->
-          (key, value)
+          Just (key, value)
 
       RBNode _ _ _ _ right ->
           max right
 
       RBEmpty _ ->
-          Native.Debug.crash "(max Empty) is not defined"
+          Nothing
 
 
 {-| Get the value associated with a key. If the key is not found, return
@@ -288,7 +288,7 @@ rem c l r =
 
       -- l and r are both RBNodes
       (RBNode cl kl vl ll rl, RBNode _ _ _ _ _) ->
-          let (k, v) = max l
+          let (k, v) = withDefault (kl, vl) (max rl)
               l'     = remove_max cl kl vl ll rl
           in
               bubble c k v l' r
