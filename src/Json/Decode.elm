@@ -294,12 +294,21 @@ array =
 
 
 {-| Decode null as the value given, and fail otherwise. Primarily useful for
-creating *other* decoders. Use [maybe](#maybe) for values that are _sometimes_
-null.
+creating *other* decoders.
 
     numbers : Decoder [Int]
     numbers =
         list (oneOf [ int, null 0 ])
+
+This decoder treats `null` as `Nothing`, and otherwise tries to produce a
+`Just`.
+
+    nullOr : Decoder a -> Decoder (Maybe a)
+    nullOr decoder =
+        oneOf
+        [ null Nothing
+        , map Just decoder
+        ]
 -}
 null : a -> Decoder a
 null =
@@ -307,8 +316,11 @@ null =
 
 
 {-| Extract a Maybe value, wrapping successes with `Just` and turning any
-failure in `Nothing`. Great for handling fields that may be missing or null. The
-following code decodes JSON objects that may not have a profession field.
+failure in `Nothing`. If you are expecting that a field can sometimes be `null`,
+it's better to check for it [explictly](#null), as this function will swallow
+erros from ill-formed JSON.
+
+The following code decodes JSON objects that may not have a profession field.
 
     -- profession: Just "plumber"
     -- { name: "Tom", age: 31, profession: "plumber" }
