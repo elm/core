@@ -288,9 +288,7 @@ rem c l r =
 
       -- l and r are both RBNodes
       (RBNode cl kl vl ll rl, RBNode cr kr vr lr rr) ->
-          let l = RBNode cl kl vl ll rl
-              r = RBNode cr kr vr lr rr
-              (k, v) = max l
+          let (k, v) = max l
               l'     = remove_max cl kl vl ll rl
           in
               bubble c k v l' r
