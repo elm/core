@@ -287,7 +287,7 @@ rem c l r =
                 reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
 
       -- l and r are both RBNodes
-      (RBNode cl kl vl ll rl, RBNode cr kr vr lr rr) ->
+      (RBNode cl kl vl ll rl, RBNode _ _ _ _ _) ->
           let (k, v) = max l
               l'     = remove_max cl kl vl ll rl
           in
