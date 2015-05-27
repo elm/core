@@ -177,7 +177,7 @@ called `nameField`. As the user types their name, the field will be updated
 to match what they have entered.
 
     name : Signal.Mailbox Content
-    name = Signal.Mailbox noContent
+    name = Signal.mailbox noContent
 
     nameField : Signal Element
     nameField =
