@@ -37,6 +37,7 @@ equality with `(==)` is unreliable and should not be used.
 
 import Basics exposing (..)
 import Maybe exposing (..)
+import Result exposing (..)
 import List exposing (..)
 import Native.Debug
 import String
@@ -82,17 +83,17 @@ empty : Dict comparable v
 empty = RBEmpty LBlack
 
 
-max : Dict k v -> Maybe (k, v)
+max : Dict k v -> Result String (k, v)
 max dict =
     case dict of
       RBNode _ key value _ (RBEmpty _) ->
-          Just (key, value)
+          Ok (key, value)
 
       RBNode _ _ _ _ right ->
           max right
 
       RBEmpty _ ->
-          Nothing
+          Err "(max Empty) is not defined"
 
 
 {-| Get the value associated with a key. If the key is not found, return
@@ -288,7 +289,7 @@ rem c l r =
 
       -- l and r are both RBNodes
       (RBNode cl kl vl ll rl, RBNode _ _ _ _ _) ->
-          let (k, v) = withDefault (kl, vl) (max rl)
+          let (k, v) = withDefault (kl, vl) (toMaybe (max rl))
               l'     = remove_max cl kl vl ll rl
           in
               bubble c k v l' r
