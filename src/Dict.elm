@@ -82,32 +82,6 @@ empty : Dict comparable v
 empty = RBEmpty LBlack
 
 
-min : Dict k v -> (k,v)
-min dict =
-    case dict of
-      RBNode _ key value (RBEmpty LBlack) _ ->
-          (key, value)
-
-      RBNode _ _ _ left _ ->
-          min left
-
-      RBEmpty LBlack ->
-          Native.Debug.crash "(min Empty) is not defined"
-
-
-max : Dict k v -> (k, v)
-max dict =
-    case dict of
-      RBNode _ key value _ (RBEmpty _) ->
-          (key, value)
-
-      RBNode _ _ _ _ right ->
-          max right
-
-      RBEmpty _ ->
-          Native.Debug.crash "(max Empty) is not defined"
-
-
 {-| Get the value associated with a key. If the key is not found, return
 `Nothing`. This is useful when you are not sure if a key will be in the
 dictionary.
@@ -300,13 +274,10 @@ rem c l r =
                 reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
 
       -- l and r are both RBNodes
-      (RBNode cl kl vl ll rl, RBNode cr kr vr lr rr) ->
-          let l = RBNode cl kl vl ll rl
-              r = RBNode cr kr vr lr rr
-              (k, v) = max l
-              l'     = remove_max cl kl vl ll rl
+      (RBNode cl kl vl ll rl, RBNode _ _ _ _ _) ->
+          let l'     = remove_max cl kl vl ll rl
           in
-              bubble c k v l' r
+              bubble c kl vl l' r
 
 
 -- Kills a BBlack or moves it upward, may leave behind NBlack
