@@ -26,7 +26,7 @@ calculator:
     type Keys = Number Int | Plus | Minus | Clear
 
     keys : Signal.Mailbox Keys
-    keys = Signal.Mailbox Clear
+    keys = Signal.mailbox Clear
 
     calculator : Element
     calculator =
@@ -47,7 +47,7 @@ button =
 {-| Same as `button` but lets you customize buttons to look however you want.
 
     click : Signal.Mailbox ()
-    click = Signal.Mailbox ()
+    click = Signal.mailbox ()
 
     prettyButton : Element
     prettyButton =
@@ -64,7 +64,7 @@ customButton =
 {-| Create a checkbox. The following example creates three synced checkboxes:
 
     check : Signal.Mailbox Bool
-    check = Signal.Mailbox False
+    check = Signal.mailbox False
 
     boxes : Bool -> Element
     boxes checked =
@@ -86,7 +86,7 @@ favorite British sport:
     type Sport = Football | Cricket | Snooker
 
     sport : Signal.Mailbox (Maybe Sport)
-    sport = Signal.Mailbox Nothing
+    sport = Signal.mailbox Nothing
 
     sportDropDown : Element
     sportDropDown =
@@ -109,7 +109,7 @@ dropDown =
 we will create a hoverable picture called `cat`.
 
     hover : Signal.Mailbox Bool
-    hover = Signal.Mailbox False
+    hover = Signal.mailbox False
 
     cat : Element
     cat =
@@ -130,7 +130,7 @@ we will create a clickable picture called `cat`.
     type Picture = Cat | Hat
 
     picture : Signal.Mailbox Picture
-    picture = Signal.Mailbox Cat
+    picture = Signal.mailbox Cat
 
     cat : Element
     cat =
