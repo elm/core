@@ -274,11 +274,10 @@ rem c l r =
                 reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
 
       -- l and r are both RBNodes
-      (RBNode cl kl vl ll rl, RBNode cr kr vr lr rr) ->
-          let (k, v) = (kl, vl)
-              l'     = remove_max cl kl vl ll rl
+      (RBNode cl kl vl ll rl, RBNode _ _ _ _ _) ->
+          let l'     = remove_max cl kl vl ll rl
           in
-              bubble c k v l' r
+              bubble c kl vl l' r
 
 
 -- Kills a BBlack or moves it upward, may leave behind NBlack
