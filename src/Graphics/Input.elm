@@ -1,4 +1,8 @@
-module Graphics.Input where
+module Graphics.Input
+    ( button, customButton, checkbox, dropDown
+    , hoverable, clickable
+    ) where
+
 {-| This module is for creating input widgets such as buttons and text fields.
 All functions in this library report to a [`Signal.Mailbox`](Signal#message).
 
