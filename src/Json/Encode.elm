@@ -1,5 +1,10 @@
-
-module Json.Encode where
+module Json.Encode
+    ( Value
+    , encode
+    , string, int, float, bool, null
+    , list, array
+    , object
+    ) where
 
 {-| Library for turning Elm values into Json values.
 
