@@ -101,7 +101,7 @@ Elm.Native.Array.make = function(localRuntime) {
 
 	function initialize(len, f)
 	{
-		if (len == 0)
+		if (len <= 0)
 		{
 			return empty;
 		}
