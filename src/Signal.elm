@@ -43,11 +43,13 @@ signals and time (e.g. timestamps) can be found in the [`Time`](Time) library.
 # Filters
 @docs filter, filterMap, dropRepeats, sampleOn
 
-# Mailboxes
-@docs Mailbox, Address, mailbox, Message, message, forwardTo, send
-
 # Constants
 @docs constant
+
+# Mailboxes
+Mailboxes are an advanced feature used by the Graphics.Input and Task libraries
+to send incoming data to signals.
+@docs Mailbox, Address, mailbox, Message, message, forwardTo, send
 
 -}
 
@@ -250,7 +252,7 @@ dropRepeats =
 
 
 {-| Sample from the second input every time an event occurs on the first input.
-For example, `(sampleOn Mouse.clicks (Time.every Time.second))` will give the
+For example, `sampleOn Mouse.clicks (Time.every Time.second)` will give the
 approximate time of the latest click. -}
 sampleOn : Signal a -> Signal b -> Signal b
 sampleOn =
@@ -300,10 +302,13 @@ infixl 4 ~
 
 -- MAILBOXES
 
-{-| An `Mailbox` is a communication hub. It is made up of
+{-| A `Mailbox` is made up of
 
   * an `Address` that you can send messages to
   * a `Signal` of messages sent to the mailbox
+
+  Values sent to an address (by means of the functions below) become events on
+  the associated signal for your program to use.
 -}
 type alias Mailbox a =
     { address : Address a
@@ -321,35 +326,39 @@ type Address a =
     Address (a -> Task () ())
 
 
+{-| Create a mailbox that you can send messages to. The argument is a default
+value for the custom signal.
 
-{-| Create a mailbox you can send messages to. The primary use case is
-receiving updates from tasks and UI elements. The argument is a default value
-for the custom signal.
-
-Note: Creating new signals is inherently impure, so `(mailbox ())` and
-`(mailbox ())` produce two different mailboxes.
+Note: Creating new signals is inherently impure, so calling `mailbox ()` twice
+results in two different mailboxes.
 -}
 mailbox : a -> Mailbox a
 mailbox =
   Native.Signal.mailbox
 
 
-{-| Create a new address. This address will tag each message it receives
-and then forward it along to some other address.
+{-| Create a new address without an associated signal. This address will
+transform each message it receives and then forward it along to the provided
+address.
 
-    type Action = Undo | Remove Int
+    type Action = Undo | Remove Int | NoOp -- possibly many more
 
-    port actions : Mailbox Action
+    actions : Mailbox Action
+    actions = mailbox NoOp
 
     removeAddress : Address Int
     removeAddress =
         forwardTo actions.address Remove
 
-In this case we have a general `address` that many people may send
+In this case we have the general `actions.address` that many people may send
 messages to. The new `removeAddress` tags all messages with the `Remove` tag
-before forwarding them along to the more general `address`. This means
-some parts of our application can know *only* about `removeAddress` and not
-care what other kinds of `Actions` are possible.
+before forwarding them along to the more general address. This means some parts
+of our application (e.g. the UI handling removals)  can know *only* about
+`removeAddress`, and not care what other kinds of `Action`s are possible.
+
+If multiple addresses forward to a single address, then all the events are
+merged.
+
 -}
 forwardTo : Address b -> (a -> b) -> Address a
 forwardTo (Address send) f =
@@ -365,8 +374,10 @@ type Message = Message (Task () ())
 
 {-| Create a message that may be sent to a `Mailbox` at a later time.
 
-Most importantly, this lets us create APIs that can send values to ports
-*without* allowing people to run arbitrary tasks.
+Many APIs use messages to send values to ports when some action happens (like a
+button press or HTTP response). Messages restrict these APIs to sending a value
+of known type. Without messages, we'd have to allow these APIs to run arbitrary
+tasks.
 -}
 message : Address a -> a -> Message
 message (Address send) value =
@@ -375,16 +386,18 @@ message (Address send) value =
 
 {-| Send a message to an `Address`.
 
-    type Action = Undo | Remove Int
+    type Action = Undo | Remove Int | NoOp -- possibly many more
 
-    address : Address Action
+    actions : Mailbox Action
+    actions = mailbox NoOp
 
-    requestUndo : Task x ()
-    requestUndo =
-        send address Undo
+    port requestUndo : Task x ()
+    port requestUndo =
+        send actions.address Undo
 
-The `Signal` associated with `address` will receive the `Undo` message
-and push it through the Elm program.
+The `port` keyword is required to run the task. When it runs (at program start),
+the `Undo` message is sent to `actions.signal`. In practice, you'll usually use
+`send` to send messages based on other events, rather than just once.
 -}
 send : Address a -> a -> Task x ()
 send (Address actuallySend) value =
