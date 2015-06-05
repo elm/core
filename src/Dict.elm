@@ -228,7 +228,7 @@ update k alter dict =
 {-| Create a dictionary with one key-value pair. -}
 singleton : comparable -> v -> Dict comparable v
 singleton key value =
-    insert key value (RBEmpty LBlack)
+    insert key value empty
 
 
 isBBlack : Dict k v -> Bool
