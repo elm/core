@@ -78,6 +78,7 @@ import Signal ( Signal )
   * Revamp `Input` concept as `Signal.Channel`
   * Remove `Signal.count`
   * Remove `Signal.countIf`
+  * Remove `Signal.combine`
 
 
 ### Randomness Done Right
