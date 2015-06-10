@@ -1,5 +1,5 @@
 module Json.Encode
-    ( Value
+    ( Value(..)
     , encode
     , string, int, float, bool, null
     , list, array
