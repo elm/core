@@ -325,12 +325,17 @@ Elm.Native.Utils.make = function(localRuntime) {
 		throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
 	}
 
+	function formatValue(value) {
+		// Explicity format undefined values as "undefined"
+		// because JSON.stringify(undefined) unhelpfully returns ""
+		return (value === undefined) ? "undefined" : JSON.stringify(value);
+	}
 
 	function badPort(expected, received)
 	{
 		var msg = indent([
 			'Expecting ' + expected + ' but was given ',
-			JSON.stringify(received)
+			formatValue(received)
 		]);
 		throw new Error('Runtime error when sending values through a port.' + msg);
 	}
