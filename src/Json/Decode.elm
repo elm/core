@@ -1,5 +1,5 @@
 module Json.Decode
-    ( Decoder(..), Value
+    ( Decoder, Value
     , decodeString, decodeValue
     , string, int, float, bool, null
     , list, array
