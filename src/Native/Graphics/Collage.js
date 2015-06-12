@@ -46,7 +46,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		ctx.strokeStyle = Color.toCss(style.color);
 	}
 
-	function setFillStyle(ctx, style)
+	function setFillStyle(redo, ctx, style)
 	{
 		var sty = style.ctor;
 		ctx.fillStyle = sty === 'Solid'
@@ -176,7 +176,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	function drawShape(redo, ctx, style, path)
 	{
 		trace(ctx, path);
-		setFillStyle(ctx, style);
+		setFillStyle(redo, ctx, style);
 		ctx.scale(1,-1);
 		ctx.fill();
 	}
