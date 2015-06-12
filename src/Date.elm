@@ -9,7 +9,7 @@ module Date
 issues with internationalization or locale formatting.
 
 # Conversions
-@docs fromString, toTime, fromTime
+@docs fromString, newDate, toTime, fromTime
 
 # Extractions
 @docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond
@@ -42,6 +42,13 @@ type Month
 fromString : String -> Result String Date
 fromString =
   Native.Date.read
+
+
+{-| Create a new date from a year, a month, a day, an hour, a minute, a second
+and a millisecond.
+-}
+newDate : Int -> Month -> Int -> Int -> Int -> Int -> Int -> Date
+newDate = Native.Date.newDate
 
 
 {-| Convert a date into a time since midnight (UTC) of 1 January 1990 (i.e.
