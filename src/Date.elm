@@ -3,6 +3,7 @@ module Date
     , year, month, Month(..)
     , day, dayOfWeek, Day(..)
     , hour, minute, second, millisecond
+    , currentDate
     ) where
 
 {-| Library for working with dates. Email the mailing list if you encounter
@@ -17,11 +18,15 @@ issues with internationalization or locale formatting.
 # Extractions
 @docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond
 
+# Realtime clock
+@docs currentDate
+
 -}
 
 import Native.Date
 import Time exposing (Time)
 import Result exposing (Result)
+import Task exposing (Task)
 
 
 {-| Representation of a date.
@@ -128,3 +133,8 @@ millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
 
+{-| Get the current date
+-}
+currentDate : Task () Date
+currentDate =
+  Native.Date.currentDate
