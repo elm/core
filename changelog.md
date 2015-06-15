@@ -40,6 +40,7 @@ The underlying implementation of `Text` has also been improved dramatically.
   * Change types of `head`, `tail`, `maximum`, `minimum` by wrapping output in `Maybe`
   * Move `leftAligned`, `centered`, `rightAligned` from `Text` to `Graphics.Element`
   * Move `asText` from `Text` to `Graphics.Element`, renaming it to `show` in the process
+  * Remove `Text.plainText` (can be replaced by `Graphics.Element.leftAligned << Text.fromString`)
 
 
 # 0.14
