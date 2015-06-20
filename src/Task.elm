@@ -8,7 +8,8 @@ module Task
     , toMaybe, fromMaybe, toResult, fromResult
     , ThreadID, spawn, sleep
     ) where
-{-|
+{-| Tasks make it easy to describe asynchronous operations that may fail, like HTTP requests or writing to a database.
+For more information, see the [Elm documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 
 # Basics
 @docs succeed, fail
