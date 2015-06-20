@@ -17,6 +17,9 @@ lists of comparable types.
 Insert, remove, and query operations all take *O(log n)* time. Dictionary
 equality with `(==)` is unreliable and should not be used.
 
+# Dictionaries
+@docs Dict
+
 # Build
 @docs empty, singleton, insert, update, remove
 
@@ -72,6 +75,10 @@ showLColor color =
       LBBlack -> "LBBlack"
 
 
+{-| A dictionary of keys and values. So a `(Dict String User)` is a dictionary
+that lets you look up a `String` (such as user names) and find the assotiated
+`User`.
+-}
 type Dict k v
     = RBNode NColor k v (Dict k v) (Dict k v)
     | RBEmpty LeafColor
@@ -187,7 +194,7 @@ showFlag f = case f of
 
 {-| Update the value of a dictionary for a specific key with a given function. -}
 update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
-update k alter dict = 
+update k alter dict =
   let up dict =
           case dict of
             RBEmpty LBlack ->
@@ -342,10 +349,10 @@ blackish t =
 
 
 balance_node : Dict k v -> Dict k v
-balance_node t = 
-  let assemble col xk xv yk yv zk zv a b c d = 
+balance_node t =
+  let assemble col xk xv yk yv zk zv a b c d =
         RBNode (lessBlack col) yk yv (RBNode Black xk xv a b) (RBNode Black zk zv c d)
-  in 
+  in
    if blackish t
    then case t of
      RBNode col zk zv (RBNode Red yk yv (RBNode Red xk xv a b) c) d ->
@@ -359,13 +366,13 @@ balance_node t =
 
      RBNode BBlack xk xv a (RBNode NBlack zk zv (RBNode Black yk yv b c) d) ->
        case d of
-         (RBNode Black _ _ _ _) -> 
+         (RBNode Black _ _ _ _) ->
            RBNode Black yk yv (RBNode Black xk xv a b) (balance Black zk zv c (redden d))
          _ -> t
 
      RBNode BBlack zk zv (RBNode NBlack xk xv a (RBNode Black yk yv b c)) d ->
        case a of
-         (RBNode Black _ _ _ _) -> 
+         (RBNode Black _ _ _ _) ->
            RBNode Black yk yv (balance Black xk xv (redden a) b) (RBNode Black zk zv c d)
          _ -> t
      _ -> t
