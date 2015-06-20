@@ -163,11 +163,13 @@ isDown keyCode =
   dropMap (Set.member keyCode) keysDown
 
 
+{-|-}
 alt : Signal Bool
 alt =
   dropMap .alt model
 
 
+{-|-}
 ctrl : Signal Bool
 ctrl =
   isDown 17
@@ -180,16 +182,19 @@ meta =
   dropMap .meta model
 
 
+{-|-}
 shift : Signal Bool
 shift =
   isDown 16
 
 
+{-|-}
 space : Signal Bool
 space =
   isDown 32
 
 
+{-|-}
 enter : Signal Bool
 enter =
   isDown 13
