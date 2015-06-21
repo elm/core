@@ -100,6 +100,11 @@ isEmpty xs =
       _  -> False
 
 
+{-| Figure out if a value is a member of the list.
+
+    member 9 [1,2,3,4] == False
+    member 4 [1,2,3,4] == True
+-}
 member : a -> List a -> Bool
 member x xs =
   any (\a -> a == x) xs
@@ -317,16 +322,23 @@ If one list is longer, the extra elements are dropped.
         map2 (,) lefts rights
 -}
 map2 : (a -> b -> result) -> List a -> List b -> List result
-map2 = Native.List.map2
+map2 =
+  Native.List.map2
 
+{-|-}
 map3 : (a -> b -> c -> result) -> List a -> List b -> List c -> List result
-map3 = Native.List.map3
+map3 =
+  Native.List.map3
 
+{-|-}
 map4 : (a -> b -> c -> d -> result) -> List a -> List b -> List c -> List d -> List result
-map4 = Native.List.map4
+map4 =
+  Native.List.map4
 
+{-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> List a -> List b -> List c -> List d -> List e -> List result
-map5 = Native.List.map5
+map5 =
+  Native.List.map5
 
 
 {-| Decompose a list of tuples into a tuple of lists.
