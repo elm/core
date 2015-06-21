@@ -53,11 +53,11 @@ module. It has a period of roughly 2.30584e18.
 
 # Generators
 
-@docs int, float, pair, list
+@docs Generator, int, float, pair, list
 
 # Running a Generator
 
-@docs generate, initialSeed
+@docs generate, Seed, initialSeed
 
 # Constants
 
@@ -84,26 +84,34 @@ sufficient randomness is not guaranteed.
 -}
 int : Int -> Int -> Generator Int
 int a b =
-  Generator <| \seed ->
-    let (lo,hi) = if a < b then (a,b) else (b,a)
+  Generator <| \(Seed seed) ->
+    let
+      (lo,hi) =
+        if a < b then (a,b) else (b,a)
 
-        k = hi - lo + 1
-        -- 2^31 - 87
-        base = 2147483561
-        n = iLogBase base k
+      k = hi - lo + 1
+      -- 2^31 - 87
+      base = 2147483561
+      n = iLogBase base k
 
-        f n acc state =
-            case n of
-              0 -> (acc, state)
-              _ -> let (x, state') = seed.next state
-                   in  f (n - 1) (x + acc * base) state'
+      f n acc state =
+        case n of
+          0 -> (acc, state)
+          _ ->
+            let
+              (x, state') = seed.next state
+            in
+              f (n - 1) (x + acc * base) state'
 
-        (v, state') = f n 1 seed.state
+      (v, state') =
+        f n 1 seed.state
     in
-        (lo + v % k, { seed | state <- state' })
+      ( lo + v % k
+      , Seed { seed | state <- state' }
+      )
 
 
-iLogBase : Int -> Int -> Int       
+iLogBase : Int -> Int -> Int
 iLogBase b i =
     if i < b then 1 else 1 + iLogBase b (i // b)
 
@@ -210,15 +218,20 @@ customGenerator generate =
     Generator generate
 
 
-{-| A `Generator` is a function that takes a seed, and then returns a random
-value and a new seed. The new seed is used to generate new random values.
+{-| A `Generator` is a value that can generate random values. So a
+(`Generator Int`) will generate integers and a (`Generator String`) will
+generate strings.
 -}
 type Generator a =
     Generator (Seed -> (a, Seed))
 
 type State = State Int Int
 
-type alias Seed =
+
+{-| A `Seed` helps you generate random values. Think of this as a "seed of
+randomness" that you can use along with a `Generator`.
+-}
+type Seed = Seed
     { state : State
     , next  : State -> (Int, State)
     , split : State -> (State, State)
@@ -253,7 +266,7 @@ the current time.
 -}
 initialSeed : Int -> Seed
 initialSeed n =
-    Seed (initState n) next split range
+    Seed { state = initState n, next = next, split = split, range = range }
 
 
 {-| Produce the initial generator state. Distinct arguments should be likely
@@ -266,7 +279,7 @@ initState s' =
         s1 = s %  (magicNum6-1)
         s2 = q %  (magicNum7-1)
     in
-        State (s1+1) (s2+1)                         
+        State (s1+1) (s2+1)
 
 
 magicNum0 = 40014
@@ -281,16 +294,16 @@ magicNum8 = 2147483562
 
 
 next : State -> (Int, State)
-next (State s1 s2) = 
+next (State s1 s2) =
     -- Div always rounds down and so random numbers are biased
     -- ideally we would use division that rounds towards zero so
     -- that in the negative case it rounds up and in the positive case
     -- it rounds down. Thus half the time it rounds up and half the time it
     -- rounds down
-    let k = s1 // magicNum1 
+    let k = s1 // magicNum1
         s1' = magicNum0 * (s1 - k * magicNum1) - k * magicNum2
-        s1'' = if s1' < 0 then s1' + magicNum6 else s1' 
-        k' = s2 // magicNum3 
+        s1'' = if s1' < 0 then s1' + magicNum6 else s1'
+        k' = s2 // magicNum3
         s2' = magicNum4 * (s2 - k' * magicNum3) - k' * magicNum5
         s2'' = if s2' < 0 then s2' + magicNum7 else s2'
         z = s1'' - s2''
