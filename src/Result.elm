@@ -58,6 +58,7 @@ map2 func ra rb =
       (_, Err x) -> Err x
 
 
+{-|-}
 map3 : (a -> b -> c -> value) -> Result x a -> Result x b -> Result x c -> Result x value
 map3 func ra rb rc =
     case (ra,rb,rc) of
@@ -67,6 +68,7 @@ map3 func ra rb rc =
       (_, _, Err x) -> Err x
 
 
+{-|-}
 map4 : (a -> b -> c -> d -> value) -> Result x a -> Result x b -> Result x c -> Result x d -> Result x value
 map4 func ra rb rc rd =
     case (ra,rb,rc,rd) of
@@ -77,6 +79,7 @@ map4 func ra rb rc rd =
       (_, _, _, Err x) -> Err x
 
 
+{-|-}
 map5 : (a -> b -> c -> d -> e -> value) -> Result x a -> Result x b -> Result x c -> Result x d -> Result x e -> Result x value
 map5 func ra rb rc rd re =
     case (ra,rb,rc,rd,re) of
