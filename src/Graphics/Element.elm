@@ -416,9 +416,11 @@ layers es =
 
 
 -- Repetitive things --
-
+{-| A pixel value. -}
 absolute : Int -> Pos
 absolute = Absolute
+
+{-| A percentage. -}
 relative : Float -> Pos
 relative = Relative
 
@@ -441,6 +443,12 @@ midTop      = { middle  | vertical <- P, y <- Absolute 0 }
 midBottom   : Position
 midBottom   = { midTop  | vertical <- N }
 
+{-| Position an `Element` in its containing `Element`. To place an element so that the
+middle of its left side was in the upper left corner of its containing element (0,0) in the browser's coordinate
+system, use:
+
+  midLeftAt 0 0 
+-}
 middleAt          : Pos -> Pos -> Position
 middleAt      x y = { horizontal = Z, vertical = Z, x = x, y = y }
 topLeftAt         : Pos -> Pos -> Position
