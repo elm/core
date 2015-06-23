@@ -10,7 +10,7 @@ module Char
 @docs isUpper, isLower, isDigit, isOctDigit, isHexDigit
 
 # Conversion
-@docs toUpper, toLower, toLocaleUpper, toLocaleLower, toCode, fromCode
+@docs toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
 
 -}
 
@@ -79,6 +79,8 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
+{-| A simple alias for integers.
+-}
 type alias KeyCode = Int
 
 

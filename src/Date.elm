@@ -8,6 +8,9 @@ module Date
 {-| Library for working with dates. Email the mailing list if you encounter
 issues with internationalization or locale formatting.
 
+# Dates
+@docs Date
+
 # Conversions
 @docs fromString, toTime, fromTime
 
@@ -21,6 +24,8 @@ import Time exposing (Time)
 import Result exposing (Result)
 
 
+{-| Representation of a date.
+-}
 type Date = Date
 
 

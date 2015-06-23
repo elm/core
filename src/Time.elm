@@ -38,36 +38,43 @@ millisecond =
   1
 
 
+{-|-}
 second : Time
 second =
   1000 * millisecond
 
 
+{-|-}
 minute : Time
 minute =
   60 * second
 
 
+{-|-}
 hour : Time
 hour =
   60 * minute
 
 
+{-|-}
 inMilliseconds : Time -> Float
 inMilliseconds t =
   t
 
 
+{-|-}
 inSeconds : Time -> Float
 inSeconds t =
   t / second
 
 
+{-|-}
 inMinutes : Time -> Float
 inMinutes t =
   t / minute
 
 
+{-|-}
 inHours : Time -> Float
 inHours t =
   t / hour

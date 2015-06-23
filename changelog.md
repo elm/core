@@ -41,6 +41,9 @@ The underlying implementation of `Text` has also been improved dramatically.
   * Move `leftAligned`, `centered`, `rightAligned` from `Text` to `Graphics.Element`
   * Move `asText` from `Text` to `Graphics.Element`, renaming it to `show` in the process
   * Remove `Text.plainText` (can be replaced by `Graphics.Element.leftAligned << Text.fromString`)
+  * Change type of `Keyboard.keysDown` from `Signal (List KeyCode)` to `Signal (Set KeyCode)`
+  * Remove `Keyboard.directions`
+  * Rename `Keyboard.lastPressed` to `Keyboard.presses`
 
 
 # 0.14
