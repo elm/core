@@ -2,6 +2,7 @@ module Random
     ( Generator, Seed
     , int, float
     , list, pair
+    , map, andThen
     , minInt, maxInt
     , generate, initialSeed
     , customGenerator
@@ -52,19 +53,15 @@ L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 module. It has a period of roughly 2.30584e18.
 
 # Generators
-
-@docs Generator, int, float, pair, list
+@docs Generator, int, float, pair, list, map, andThen
 
 # Running a Generator
-
 @docs generate, Seed, initialSeed
 
 # Constants
-
 @docs maxInt, minInt
 
 # Custom Generators
-
 @docs customGenerator
 
 -}
@@ -198,6 +195,54 @@ listHelp list n generate seed =
     else
         let (value, seed') = generate seed
         in  listHelp (value :: list) (n-1) generate seed'
+
+
+{-| Map a function over the value of an existing generator.
+
+    bool : Generator Bool
+    bool =
+      map ((==) 1) (int 0 1)
+
+    lowercaseLetter : Generator Char
+    lowercaseLetter =
+      map (\n -> Char.fromCode (n + 65)) (int 1 26)
+
+    uppercaseLetter : Generator Char
+    uppercaseLetter =
+      map (\n -> Char.fromCode (n + 65)) (int 1 26)
+
+-}
+map : (a -> b) -> Generator a -> Generator b
+map f (Generator generate) =
+  Generator <| \seed ->
+    let
+      (x, seed') =
+        generate seed
+    in
+      (f x, seed')
+
+
+{-| Chain random operations, threading through the seed. In the following
+example, we will generate a random letter by putting together uppercase and
+lowercase letters.
+
+    randomLetter : Generator Char
+    randomLetter =
+      bool `andThen` \b ->
+        if b then uppercaseLetter else lowercaseLetter
+
+    -- bool : Generator Bool
+    -- uppercaseLetter : Generator Char
+    -- lowercaseLetter : Generator Char
+-}
+andThen : Generator a -> (a -> Generator b) -> Generator b
+andThen (Generator generate) f =
+  Generator <| \seed ->
+    let
+      (a, seed') = generate seed
+        (Generator generateB) = f a
+    in
+      generateB seed'
 
 
 {-| Create a custom generator. You provide a function that takes a seed, and
