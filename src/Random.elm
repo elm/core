@@ -2,6 +2,7 @@ module Random
     ( Generator, Seed
     , int, float
     , list, pair
+    , map, andThen
     , minInt, maxInt
     , generate, initialSeed
     , customGenerator
@@ -52,22 +53,15 @@ L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 module. It has a period of roughly 2.30584e18.
 
 # Generators
-
-@docs int, float, pair, list
-
-# Helpers
-@docs map, andThen
+@docs int, float, pair, list, map, andThen
 
 # Running a Generator
-
 @docs generate, initialSeed
 
 # Constants
-
 @docs maxInt, minInt
 
 # Custom Generators
-
 @docs customGenerator
 
 -}
@@ -107,7 +101,7 @@ int a b =
         (lo + v % k, { seed | state <- state' })
 
 
-iLogBase : Int -> Int -> Int       
+iLogBase : Int -> Int -> Int
 iLogBase b i =
     if i < b then 1 else 1 + iLogBase b (i // b)
 
@@ -195,34 +189,54 @@ listHelp list n generate seed =
         let (value, seed') = generate seed
         in  listHelp (value :: list) (n-1) generate seed'
 
-{-| Map a function over the value of an existing generator. 
+
+{-| Map a function over the value of an existing generator.
 
     bool : Generator Bool
-    bool = Random.map ((==) 1) (int 0 1)
+    bool =
+      map ((==) 1) (int 0 1)
 
     lowercaseLetter : Generator Char
-    lowercaseLetter = Random.map (\n -> Char.fromCode (n + 65)) (int 1 26)
+    lowercaseLetter =
+      map (\n -> Char.fromCode (n + 65)) (int 1 26)
 
     uppercaseLetter : Generator Char
-    uppercaseLetter = Random.map (\n -> Char.fromCode (n + 65)) (int 1 26)
+    uppercaseLetter =
+      map (\n -> Char.fromCode (n + 65)) (int 1 26)
 
 -}
-
 map : (a -> b) -> Generator a -> Generator b
-map f (Generator generate) = Generator <| \seed ->
-  let (x, seed') = generate seed in (f x, seed')
+map f (Generator generate) =
+  Generator <| \seed ->
+    let
+      (x, seed') =
+        generate seed
+    in
+      (f x, seed')
 
-{-| Chain random operations, threading through the seed.
+
+{-| Chain random operations, threading through the seed. In the following
+example, we will generate a random letter by putting together uppercase and
+lowercase letters.
 
     randomLetter : Generator Char
-    randomLetter = bool `andThen` \b -> if b then uppercaseLetter else lowercaseLetter
--}
+    randomLetter =
+      bool `andThen` \b ->
+        if b then uppercaseLetter else lowercaseLetter
 
+    -- bool : Generator Bool
+    -- uppercaseLetter : Generator Char
+    -- lowercaseLetter : Generator Char
+-}
 andThen : Generator a -> (a -> Generator b) -> Generator b
-andThen (Generator generate) f =  Generator <| \seed ->
-  let (a, seed') = generate seed
-      (Generator generateB) = f a
-  in generateB seed'
+andThen (Generator generate) f =
+  Generator <| \seed ->
+    let
+      (a, seed') = generate seed
+        (Generator generateB) = f a
+    in
+      generateB seed'
+
 
 {-| Create a custom generator. You provide a function that takes a seed, and
 returns a random value and a new seed. You can use this to create custom
@@ -298,7 +312,7 @@ initState s' =
         s1 = s %  (magicNum6-1)
         s2 = q %  (magicNum7-1)
     in
-        State (s1+1) (s2+1)                         
+        State (s1+1) (s2+1)
 
 
 magicNum0 = 40014
@@ -313,16 +327,16 @@ magicNum8 = 2147483562
 
 
 next : State -> (Int, State)
-next (State s1 s2) = 
+next (State s1 s2) =
     -- Div always rounds down and so random numbers are biased
     -- ideally we would use division that rounds towards zero so
     -- that in the negative case it rounds up and in the positive case
     -- it rounds down. Thus half the time it rounds up and half the time it
     -- rounds down
-    let k = s1 // magicNum1 
+    let k = s1 // magicNum1
         s1' = magicNum0 * (s1 - k * magicNum1) - k * magicNum2
-        s1'' = if s1' < 0 then s1' + magicNum6 else s1' 
-        k' = s2 // magicNum3 
+        s1'' = if s1' < 0 then s1' + magicNum6 else s1'
+        k' = s2 // magicNum3
         s2' = magicNum4 * (s2 - k' * magicNum3) - k' * magicNum5
         s2'' = if s2' < 0 then s2' + magicNum7 else s2'
         z = s1'' - s2''
