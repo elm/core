@@ -17,7 +17,7 @@ corner as in some other graphics libraries. Furthermore, the y-axis points up,
 so moving a form 10 units in the y-axis will move it up on screen.
 
 # Unstructured Graphics
-@docs collage
+@docs collage, Form
 
 # Creating Forms
 @docs toForm, filled, textured, gradient, outlined, traced, text, outlinedText
@@ -33,10 +33,10 @@ it as a single unit.
 @docs group, groupTransform
 
 # Shapes
-@docs rect, oval, square, circle, ngon, polygon
+@docs Shape, rect, oval, square, circle, ngon, polygon
 
 # Paths
-@docs segment, path
+@docs Path, segment, path
 
 # Line Styles
 @docs solid, dashed, dotted, LineStyle, LineCap, LineJoin, defaultLine
@@ -53,6 +53,9 @@ import Color exposing (Color, black, Gradient)
 import Text exposing (Text)
 
 
+{-| A visual `Form` has a shape and texture. This can be anything from a red
+square to a circle textured with stripes.
+-}
 type alias Form =
     { theta : Float
     , scale : Float
@@ -273,7 +276,10 @@ collage =
   Native.Graphics.Collage.collage
 
 
-type Path = Path (List (Float,Float))
+{-| A 2D path. Paths are a sequence of points. They do not have a color.
+-}
+type Path =
+  Path (List (Float,Float))
 
 
 {-| Create a path that follows a sequence of points. -}
@@ -288,7 +294,11 @@ segment p1 p2 =
   Path [p1,p2]
 
 
-type Shape = Shape (List (Float,Float))
+{-| A 2D shape. Shapes are closed polygons. They do not have a color or
+texture, that information can be filled in later.
+-}
+type Shape =
+  Shape (List (Float,Float))
 
 
 {-| Create an arbitrary polygon by specifying its corners in order.

@@ -18,6 +18,9 @@ module Graphics.Element
 Each Element is a rectangle with a known width and height, making them easy to
 combine and position.
 
+# Elements
+@docs Element
+
 # Show Anything
 @docs show
 
@@ -37,7 +40,7 @@ you use determines the alignment of the text.
 @docs widthOf, heightOf, sizeOf
 
 # Layout
-@docs flow, up, down, left, right, inward, outward
+@docs flow, Direction, up, down, left, right, inward, outward
 
 ## Layout Aliases
 There are also some convenience functions for working
@@ -50,14 +53,12 @@ with `flow` in specific cases:
 
 ## Specific Positions
 
-To create a `Position` you can use any of the built-in positions
-which cover nine common positions.
-@docs middle, midTop, midBottom, midLeft, midRight, topLeft, topRight,
-      bottomLeft, bottomRight
+@docs Position, middle, midTop, midBottom, midLeft, midRight, topLeft,
+  topRight, bottomLeft, bottomRight
 
 If you need more precision, you can create custom positions.
 
-@docs absolute, relative, middleAt, midTopAt, midBottomAt, midLeftAt,
+@docs Pos, absolute, relative, middleAt, midTopAt, midBottomAt, midLeftAt,
       midRightAt, topLeftAt, topRightAt, bottomLeftAt, bottomRightAt
 -}
 
@@ -71,6 +72,10 @@ import Text exposing (Text)
 
 -- PRIMITIVES
 
+{-| A graphical element that can be rendered on screen. Every element is a
+rectangle with a known width and height, so they can be composed and stacked
+easily.
+-}
 type alias Element =
     { props : Properties
     , element : ElementPrim
@@ -213,7 +218,7 @@ newElement =
 
 type ElementPrim
     = Image ImageStyle Int Int String
-    | Container Position Element
+    | Container RawPosition Element
     | Flow Direction (List Element)
     | Spacer
     | RawHtml
@@ -250,6 +255,10 @@ croppedImage pos w h src =
     newElement w h (Image (Cropped pos) w h src)
 
 
+{-| Create a tiled image. Repeat the image to fill the given width and height.
+
+    tiledImage 100 100 "yogi.jpg"
+-}
 tiledImage : Int -> Int -> String -> Element
 tiledImage w h src =
     newElement w h (Image Tiled w h src)
@@ -308,9 +317,20 @@ show value =
 
 type Three = P | Z | N
 
+
+{-| Specifies a distance from a particular location within a `container`, like
+“20 pixels right and up from the center”.
+-}
 type Pos = Absolute Int | Relative Float
 
-type alias Position =
+
+{-| Specifies a position for an element within a `container`, like “the top
+left corner”.
+-}
+type Position = Position RawPosition
+
+
+type alias RawPosition =
     { horizontal : Three
     , vertical : Three
     , x : Pos
@@ -327,8 +347,8 @@ To center `element` exactly in a 300-by-300 square you would say:
 By setting the color of the container, you can create borders.
 -}
 container : Int -> Int -> Position -> Element -> Element
-container w h pos e =
-    newElement w h (Container pos e)
+container w h (Position rawPos) e =
+    newElement w h (Container rawPos e)
 
 
 {-| Create an empty box. This is useful for getting your spacing right and
@@ -339,6 +359,8 @@ spacer w h =
     newElement w h Spacer
 
 
+{-| Represents a `flow` direction for a list of elements.
+-}
 type Direction = DUp | DDown | DLeft | DRight | DIn | DOut
 
 
@@ -417,63 +439,155 @@ layers es =
 
 -- Repetitive things --
 
+{-|-}
 absolute : Int -> Pos
 absolute = Absolute
+
+
+{-|-}
 relative : Float -> Pos
 relative = Relative
 
-middle      : Position
-middle      = { horizontal=Z, vertical=Z, x=Relative 0.5, y=Relative 0.5 }
-topLeft     : Position
-topLeft     = { horizontal=N, vertical=P, x=Absolute 0, y=Absolute 0 }
-topRight    : Position
-topRight    = { topLeft | horizontal <- P }
-bottomLeft  : Position
-bottomLeft  = { topLeft | vertical <- N }
+
+{-|-}
+middle : Position
+middle =
+  Position { horizontal = Z, vertical = Z, x = Relative 0.5, y = Relative 0.5 }
+
+
+{-|-}
+topLeft : Position
+topLeft =
+  Position { horizontal = N, vertical = P, x = Absolute 0, y = Absolute 0 }
+
+
+{-|-}
+topRight : Position
+topRight =
+  Position { horizontal = P, vertical = P, x = Absolute 0, y = Absolute 0 }
+
+
+{-|-}
+bottomLeft : Position
+bottomLeft =
+  Position { horizontal = N, vertical = N, x = Absolute 0, y = Absolute 0 }
+
+
+{-|-}
 bottomRight : Position
-bottomRight = { bottomLeft | horizontal <- P }
-midLeft     : Position
-midLeft     = { middle  | horizontal <- N, x <- Absolute 0 }
-midRight    : Position
-midRight    = { midLeft | horizontal <- P }
-midTop      : Position
-midTop      = { middle  | vertical <- P, y <- Absolute 0 }
-midBottom   : Position
-midBottom   = { midTop  | vertical <- N }
+bottomRight =
+  Position { horizontal = P, vertical = N, x = Absolute 0, y = Absolute 0 }
 
-middleAt          : Pos -> Pos -> Position
-middleAt      x y = { horizontal = Z, vertical = Z, x = x, y = y }
-topLeftAt         : Pos -> Pos -> Position
-topLeftAt     x y = { horizontal = N, vertical = P, x = x, y = y }
-topRightAt        : Pos -> Pos -> Position
-topRightAt    x y = { horizontal = P, vertical = P, x = x, y = y }
-bottomLeftAt      : Pos -> Pos -> Position
-bottomLeftAt  x y = { horizontal = N, vertical = N, x = x, y = y }
-bottomRightAt     : Pos -> Pos -> Position
-bottomRightAt x y = { horizontal = P, vertical = N, x = x, y = y }
-midLeftAt         : Pos -> Pos -> Position
-midLeftAt     x y = { horizontal = N, vertical = Z, x = x, y = y }
-midRightAt        : Pos -> Pos -> Position
-midRightAt    x y = { horizontal = P, vertical = Z, x = x, y = y }
-midTopAt          : Pos -> Pos -> Position
-midTopAt      x y = { horizontal = Z, vertical = P, x = x, y = y }
-midBottomAt       : Pos -> Pos -> Position
-midBottomAt   x y = { horizontal = Z, vertical = N, x = x, y = y }
 
+{-|-}
+midLeft : Position
+midLeft =
+  Position { horizontal = N, vertical = Z, x = Absolute 0, y = Relative 0.5 }
+
+
+{-|-}
+midRight : Position
+midRight =
+  Position { horizontal = P, vertical = Z, x = Absolute 0, y = Relative 0.5 }
+
+
+{-|-}
+midTop : Position
+midTop =
+  Position { horizontal = Z, vertical = P, x = Relative 0.5, y = Absolute 0 }
+
+
+{-|-}
+midBottom : Position
+midBottom =
+  Position { horizontal = Z, vertical = N, x = Relative 0.5, y = Absolute 0 }
+
+
+{-|-}
+middleAt : Pos -> Pos -> Position
+middleAt x y =
+  Position { horizontal = Z, vertical = Z, x = x, y = y }
+
+
+{-|-}
+topLeftAt : Pos -> Pos -> Position
+topLeftAt x y =
+  Position { horizontal = N, vertical = P, x = x, y = y }
+
+
+{-|-}
+topRightAt : Pos -> Pos -> Position
+topRightAt x y =
+  Position { horizontal = P, vertical = P, x = x, y = y }
+
+
+{-|-}
+bottomLeftAt : Pos -> Pos -> Position
+bottomLeftAt x y =
+  Position { horizontal = N, vertical = N, x = x, y = y }
+
+
+{-|-}
+bottomRightAt : Pos -> Pos -> Position
+bottomRightAt x y =
+  Position { horizontal = P, vertical = N, x = x, y = y }
+
+
+{-|-}
+midLeftAt : Pos -> Pos -> Position
+midLeftAt x y =
+  Position { horizontal = N, vertical = Z, x = x, y = y }
+
+
+{-|-}
+midRightAt : Pos -> Pos -> Position
+midRightAt x y =
+  Position { horizontal = P, vertical = Z, x = x, y = y }
+
+
+{-|-}
+midTopAt : Pos -> Pos -> Position
+midTopAt x y =
+  Position { horizontal = Z, vertical = P, x = x, y = y }
+
+
+{-|-}
+midBottomAt : Pos -> Pos -> Position
+midBottomAt x y =
+  Position { horizontal = Z, vertical = N, x = x, y = y }
+
+
+{-|-}
 up : Direction
-up = DUp
+up =
+  DUp
 
+
+{-|-}
 down : Direction
-down = DDown
+down =
+  DDown
 
+
+{-|-}
 left : Direction
-left = DLeft
+left =
+  DLeft
 
+
+{-|-}
 right : Direction
-right = DRight
+right =
+  DRight
 
+
+{-|-}
 inward : Direction
-inward = DIn
+inward =
+  DIn
 
+
+{-|-}
 outward : Direction
-outward = DOut
+outward =
+  DOut
