@@ -353,7 +353,7 @@ address.
 In this case we have the general `actions.address` that many people may send
 messages to. The new `removeAddress` tags all messages with the `Remove` tag
 before forwarding them along to the more general address. This means some parts
-of our application (e.g. the UI handling removals)  can know *only* about
+of our application (e.g. the UI handling removals) can know *only* about
 `removeAddress`, and not care what other kinds of `Action`s are possible.
 
 If multiple addresses forward to a single address, then all the events are
