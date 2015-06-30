@@ -14,6 +14,9 @@ module Json.Decode
 {-| A way to turn Json values into Elm values. A `Decoder a` represents a
 decoding operation that will either produce a value of type `a`, or fail.
 
+# Decoders
+@docs Decoder, Value
+
 # Run a Decoder
 @docs decodeString, decodeValue
 
@@ -46,8 +49,16 @@ import Maybe exposing (Maybe)
 import Result exposing (Result)
 
 
+{-| Represents a way of decoding JSON values. If you have a `(Decoder (List String))`
+it will attempt to take some JSON value and turn it into a list of strings.
+These decoders are easy to put together so you can create more and more complex
+decoders.
+-}
 type Decoder a = Decoder
 
+
+{-| Represents a JavaScript value.
+-}
 type alias Value = JsEncode.Value
 
 
@@ -76,6 +87,12 @@ map =
     Native.Json.decodeObject1
 
 
+{-| Using a certain decoder, attempt to parse a JSON string. If the decoder
+fails, you will get a string message telling you why.
+
+    decodeString (tuple2 float float) "[3,4]"                  -- Ok (3,4)
+    decodeString (tuple2 float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
+-}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
     Native.Json.runDecoderString
@@ -118,6 +135,11 @@ at fields decoder =
     Native.Json.decodeField
 
 
+{-| Apply a function to a decoder. You can use this function as `map` if you
+must (which can be done with any `objectN` function actually).
+
+    object1 sqrt ("x" := float)
+-}
 object1 : (a -> value) -> Decoder a -> Decoder value
 object1 =
     Native.Json.decodeObject1
@@ -154,26 +176,31 @@ object3 =
     Native.Json.decodeObject3
 
 
+{-|-}
 object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 object4 =
     Native.Json.decodeObject4
 
 
+{-|-}
 object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 object5 =
     Native.Json.decodeObject5
 
 
+{-|-}
 object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 object6 =
     Native.Json.decodeObject6
 
 
+{-|-}
 object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 object7 =
     Native.Json.decodeObject7
 
 
+{-|-}
 object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 object8 =
     Native.Json.decodeObject8
@@ -381,11 +408,31 @@ value =
     Native.Json.decodeValue
 
 
+{-| Using a certain decoder, attempt to parse a raw `Json.Value`. You can pass
+a `Json.Value` into Elm through a port, so this can let you handle data with
+extra weird shapes or stuff that currently is not allowed through ports
+automatically.
+
+    port jsonValues : Signal Json.Value
+
+    shapes : Signal (Result String Shape)
+    shapes =
+      Signal.map (decodeValue shape) jsonValues
+
+    type Shape
+        = Rectangle Float Float
+        | Circle Float
+
+    shape : Decoder Shape  -- see definition in `andThen` docs
+-}
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
     Native.Json.runDecoderValue
 
 
+{-| Create a custom decoder that may do some fancy computation. See the `value`
+documentation for an example usage.
+-}
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
 customDecoder =
     Native.Json.customDecoder
@@ -507,26 +554,31 @@ tuple3 =
     Native.Json.decodeTuple3
 
 
+{-|-}
 tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 tuple4 =
     Native.Json.decodeTuple4
 
 
+{-|-}
 tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 tuple5 =
     Native.Json.decodeTuple5
 
 
+{-|-}
 tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 tuple6 =
     Native.Json.decodeTuple6
 
 
+{-|-}
 tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 tuple7 =
     Native.Json.decodeTuple7
 
 
+{-|-}
 tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 tuple8 =
     Native.Json.decodeTuple8
