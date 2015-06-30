@@ -30,22 +30,21 @@ guy, and if so, it places a bad guy at a randomly generated point.
 
     possiblyAddBadGuy : Model -> Model
     possiblyAddBadGuy model =
-        let (addProbability, seed') =
-              generate (float 0 1) model.seed
-        in
-            if addProbability < 0.9
-              then
-                { model |
-                    seed <- seed'
-                }
-              else
-                let (position, seed'') =
-                      generate (pair (float 0 100) (float 0 100)) seed'
-                in
-                    { model |
-                        badGuys <- position :: model.badGuys
-                        seed <- seed''
-                    }
+      let
+        (addProbability, seed') =
+          generate (float 0 1) model.seed
+      in
+        if addProbability < 0.9 then
+          { model | seed <- seed' }
+        else
+          let
+            (position, seed'') =
+              generate (pair (float 0 100) (float 0 100)) seed'
+          in
+            { model |
+                badGuys <- position :: model.badGuys,
+                seed <- seed''
+            }
 
 Details: This is an implemenation of the Portable Combined Generator of
 L'Ecuyer for 32-bit computers. It is almost a direct translation from the
@@ -110,17 +109,22 @@ int a b =
 
 iLogBase : Int -> Int -> Int
 iLogBase b i =
-    if i < b then 1 else 1 + iLogBase b (i // b)
+  if i < b then
+    1
+  else
+    1 + iLogBase b (i // b)
 
 
 {-| The maximum value for randomly generated 32-bit ints. -}
 maxInt : Int
-maxInt = 2147483647
+maxInt =
+  2147483647
 
 
 {-| The minimum value for randomly generated 32-bit ints. -}
 minInt : Int
-minInt = -2147483648
+minInt =
+  -2147483648
 
 
 {-| Create a generator that produces floats in a given range.
@@ -135,17 +139,20 @@ minInt = -2147483648
 float : Float -> Float -> Generator Float
 float a b =
   Generator <| \seed ->
-    let (lo, hi) = if a < b then (a,b) else (b,a)
+    let
+      (lo, hi) =
+        if a < b then (a,b) else (b,a)
 
-        (number, seed') =
-            generate (int minInt maxInt) seed
+      (number, seed') =
+        generate (int minInt maxInt) seed
 
-        negativeOneToOne =
-            toFloat number / toFloat (maxInt - minInt)
+      negativeOneToOne =
+        toFloat number / toFloat (maxInt - minInt)
 
-        scaled = (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
+      scaled =
+        (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
     in
-        (scaled, seed')
+      (scaled, seed')
 
 
 -- DATA STRUCTURES
@@ -162,10 +169,14 @@ wide and 200 pixels tall.
 pair : Generator a -> Generator b -> Generator (a,b)
 pair (Generator genLeft) (Generator genRight) =
   Generator <| \seed ->
-    let (left , seed' ) = genLeft seed
-        (right, seed'') = genRight seed'
+    let
+      (left, seed') =
+        genLeft seed
+
+      (right, seed'') =
+        genRight seed'
     in
-        ((left,right), seed'')
+      ((left,right), seed'')
 
 
 {-| Create a list of random values.
@@ -190,11 +201,14 @@ list n (Generator generate) =
 
 listHelp : List a -> Int -> (Seed -> (a,Seed)) -> Seed -> (List a, Seed)
 listHelp list n generate seed =
-    if n < 1
-    then (List.reverse list, seed)
-    else
-        let (value, seed') = generate seed
-        in  listHelp (value :: list) (n-1) generate seed'
+  if n < 1 then
+    (List.reverse list, seed)
+  else
+    let
+      (value, seed') =
+        generate seed
+    in
+      listHelp (value :: list) (n-1) generate seed'
 
 
 {-| Map a function over the value of an existing generator.
@@ -260,7 +274,7 @@ generators not covered by the basic functions in this library.
 -}
 customGenerator : (Seed -> (a, Seed)) -> Generator a
 customGenerator generate =
-    Generator generate
+  Generator generate
 
 
 {-| A `Generator` is a value that can generate random values. So a
@@ -282,6 +296,7 @@ type Seed = Seed
     , split : State -> (State, State)
     , range : State -> (Int,Int)
     }
+
 
 {-| Run a random value generator with a given seed. It will give you back a
 random value and a new seed.
@@ -319,12 +334,13 @@ to produce distinct generator states.
 -}
 initState : Int -> State
 initState s' =
-    let s = max s' -s'
-        q  = s // (magicNum6-1)
-        s1 = s %  (magicNum6-1)
-        s2 = q %  (magicNum7-1)
-    in
-        State (s1+1) (s2+1)
+  let
+    s = max s' -s'
+    q  = s // (magicNum6-1)
+    s1 = s %  (magicNum6-1)
+    s2 = q %  (magicNum7-1)
+  in
+    State (s1+1) (s2+1)
 
 
 magicNum0 = 40014
@@ -340,30 +356,37 @@ magicNum8 = 2147483562
 
 next : State -> (Int, State)
 next (State s1 s2) =
-    -- Div always rounds down and so random numbers are biased
-    -- ideally we would use division that rounds towards zero so
-    -- that in the negative case it rounds up and in the positive case
-    -- it rounds down. Thus half the time it rounds up and half the time it
-    -- rounds down
-    let k = s1 // magicNum1
-        s1' = magicNum0 * (s1 - k * magicNum1) - k * magicNum2
-        s1'' = if s1' < 0 then s1' + magicNum6 else s1'
-        k' = s2 // magicNum3
-        s2' = magicNum4 * (s2 - k' * magicNum3) - k' * magicNum5
-        s2'' = if s2' < 0 then s2' + magicNum7 else s2'
-        z = s1'' - s2''
-        z' = if z < 1 then z + magicNum8 else z
-    in
-        (z', State s1'' s2'')
+  -- Div always rounds down and so random numbers are biased
+  -- ideally we would use division that rounds towards zero so
+  -- that in the negative case it rounds up and in the positive case
+  -- it rounds down. Thus half the time it rounds up and half the time it
+  -- rounds down
+  let
+    k = s1 // magicNum1
+    s1' = magicNum0 * (s1 - k * magicNum1) - k * magicNum2
+    s1'' = if s1' < 0 then s1' + magicNum6 else s1'
+    k' = s2 // magicNum3
+    s2' = magicNum4 * (s2 - k' * magicNum3) - k' * magicNum5
+    s2'' = if s2' < 0 then s2' + magicNum7 else s2'
+    z = s1'' - s2''
+    z' = if z < 1 then z + magicNum8 else z
+  in
+    (z', State s1'' s2'')
 
 
 split : State -> (State, State)
 split (State s1 s2 as std) =
-    let new_s1 = if s1 == magicNum6-1 then 1 else s1 + 1
-        new_s2 = if s2 == 1 then magicNum7-1 else s2 - 1
-        (State t1 t2) = snd (next std)
-    in
-        (State new_s1 t2, State t1 new_s2)
+  let
+    new_s1 =
+      if s1 == magicNum6-1 then 1 else s1 + 1
+
+    new_s2 =
+      if s2 == 1 then magicNum7-1 else s2 - 1
+
+    (State t1 t2) =
+      snd (next std)
+  in
+    (State new_s1 t2, State t1 new_s2)
 
 
 range : State -> (Int,Int)
