@@ -14,7 +14,7 @@ if (!Elm.fullscreen) {
 		{
 			var container = document.createElement('div');
 			document.body.appendChild(container);
-			return init(Display.FULLSCREEN, container, module, args || {});
+			return init("Elm.fullscreen()", Display.FULLSCREEN, container, module, args || {});
 		};
 
 		Elm.embed = function(module, container, args)
@@ -24,15 +24,15 @@ if (!Elm.fullscreen) {
 			{
 				throw new Error('Elm.node must be given a DIV, not a ' + tag + '.');
 			}
-			return init(Display.COMPONENT, container, module, args || {});
+			return init("Elm.embed()", Display.COMPONENT, container, module, args || {});
 		};
 
 		Elm.worker = function(module, args)
 		{
-			return init(Display.NONE, {}, module, args || {});
+			return init("Elm.worker()", Display.NONE, {}, module, args || {});
 		};
 
-		function init(display, container, module, args, moduleToReplace)
+		function init(originalCall, display, container, module, args, moduleToReplace)
 		{
 			// defining state needed for an instance of the Elm RTS
 			var inputs = [];
@@ -131,8 +131,9 @@ if (!Elm.fullscreen) {
 			var Module = {};
 			try
 			{
+				checkModule(module, originalCall);
 				Module = module.make(elm);
-				checkInputs(elm);
+				checkInputs(elm, originalCall);
 			}
 			catch (error)
 			{
@@ -177,7 +178,32 @@ if (!Elm.fullscreen) {
 			};
 		};
 
-		function checkInputs(elm)
+		function checkModule(module, originalCall)
+		{
+			switch (typeof module)
+			{
+				case "undefined":
+					throw new Error(
+						"Port Error:\nThe first argument you passed to " + originalCall + " was undefined.\n\n" +
+						"This often means no module by that name was actually compiled.\n\n" +
+						"A good thing to check is that your module declaration matches what " +
+						"your first argument to " + originalCall + " is trying to reference.\n\n" +
+						"For example, if you are passing `Elm.Foo.Bar`, then the first " +
+						"line of your Bar.elm file should be `module Foo.Bar where`"
+					);
+				case "object":
+					if (typeof module.make !== "function")
+					{
+						throw new Error(
+							"Port Error:\nThe first argument you passed to " + originalCall + " was not actually an Elm module object.\n\n" +
+							"Please double-check your call to " + originalCall + " to make sure" +
+							"it is passing a proper Elm module instead of a different type of object."
+						);
+					}
+			}
+		}
+
+		function checkInputs(elm, originalCall)
 		{
 			var argsTracker = elm.argsTracker;
 			for (var name in argsTracker)
@@ -185,8 +211,8 @@ if (!Elm.fullscreen) {
 				if (!argsTracker[name].used)
 				{
 					throw new Error(
-						"Port Error:\nYou provided an argument named '" + name +
-						"' but there is no corresponding port!\n\n" +
+						"Port Error:\nYou provided an argument named '" + name + "' to " + originalCall +
+						" but there is no corresponding port!\n\n" +
 						"Maybe add a port '" + name + "' to your Elm module?\n" +
 						"Maybe remove the '" + name + "' argument from your initialization code in JS?"
 					);
