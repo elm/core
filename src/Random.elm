@@ -250,11 +250,14 @@ lowercase letters.
     -- lowercaseLetter : Generator Char
 -}
 andThen : Generator a -> (a -> Generator b) -> Generator b
-andThen (Generator generate) f =
+andThen (Generator generate) callback =
   Generator <| \seed ->
     let
-      (a, seed') = generate seed
-        (Generator generateB) = f a
+      (result, seed') =
+        generate seed
+
+      (Generator generateB) =
+        callback result
     in
       generateB seed'
 
