@@ -205,8 +205,7 @@ listHelp list n generate seed =
     (List.reverse list, seed)
   else
     let
-      (value, seed') =
-        generate seed
+      (value, seed') = generate seed
     in
       listHelp (value :: list) (n-1) generate seed'
 
@@ -254,7 +253,7 @@ andThen (Generator generate) f =
   Generator <| \seed ->
     let
       (a, seed') = generate seed
-        (Generator generateB) = f a
+      (Generator generateB) = f a
     in
       generateB seed'
 
