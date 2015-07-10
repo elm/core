@@ -86,7 +86,7 @@ constant =
 
     main : Signal Element
     main =
-        map toElement Mouse.position
+        map Graphics.Element.show Mouse.position
 -}
 map : (a -> result) -> Signal a -> Signal result
 map =
