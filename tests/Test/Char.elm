@@ -64,14 +64,14 @@ tests = suite "Char"
 
   , suite "isLower"
       [ test "a-z" <| assertEqual (True) (List.all isLower lower)
-      , test "A-Z" <| assertEqual (False) (List.all isLower upper)
-      , test "0-9" <| assertEqual (False) (List.all isLower dec)
+      , test "A-Z" <| assertEqual (False) (List.any isLower upper)
+      , test "0-9" <| assertEqual (False) (List.any isLower dec)
       ]
 
   , suite "isUpper"
-      [ test "a-z" <| assertEqual (False) (List.all isUpper lower)
+      [ test "a-z" <| assertEqual (False) (List.any isUpper lower)
       , test "A-Z" <| assertEqual (True) (List.all isUpper upper)
-      , test "0-9" <| assertEqual (False) (List.all isUpper dec)
+      , test "0-9" <| assertEqual (False) (List.any isUpper dec)
       ]
 
   , suite "isDigit"
@@ -87,8 +87,8 @@ tests = suite "Char"
       ]
 
   , suite "isOctDigit"
-      [ test "a-z" <| assertEqual (False) (List.all isOctDigit lower)
-      , test "A-Z" <| assertEqual (False) (List.all isOctDigit upper)
+      [ test "a-z" <| assertEqual (False) (List.any isOctDigit lower)
+      , test "A-Z" <| assertEqual (False) (List.any isOctDigit upper)
       , test "0-9" <| assertEqual (List.map (oneOf oct) dec) (List.map isOctDigit dec)
       ]
   ]
