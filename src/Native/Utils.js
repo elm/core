@@ -23,8 +23,12 @@ Elm.Native.Utils.make = function(localRuntime) {
 			{
 				continue;
 			}
-			if (typeof x === 'object')
+			if (typeof x === 'object' && typeof y === 'object')
 			{
+				if (x === null || y === null)
+				{
+					return false;
+				}
 				var c = 0;
 				for (var i in x)
 				{
