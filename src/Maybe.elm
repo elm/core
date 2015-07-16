@@ -1,4 +1,4 @@
-module Maybe (Maybe(Just,Nothing), andThen, map, withDefault, oneOf) where
+module Maybe (Maybe(Just,Nothing), andThen, map, withDefault, oneOf, maybe) where
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
 you with optional arguments, error handling, and records with optional fields.
@@ -45,6 +45,16 @@ withDefault default maybe =
     case maybe of
       Just value -> value
       Nothing -> default
+
+
+{-|
+  Applies a function to a Maybe, returning the result or the default value if the Maybe was Nothing.
+
+  maybe 100 ((+) 1) (Just 42)   -- 43
+  maybe 100 ((+) 1) Nothing     -- 100
+-}
+maybe : b -> (a -> b) -> Maybe a -> b
+maybe default function mval = withDefault default (map function mval)
 
 
 {-| Pick the first `Maybe` that actually has a value. Useful when you want to
