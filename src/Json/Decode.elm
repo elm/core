@@ -310,7 +310,7 @@ bool =
 
     -- [1,2,3,4]
 
-    numbers : Decoder [Int]
+    numbers : Decoder (List Int)
     numbers =
         list int
 -}
