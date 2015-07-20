@@ -222,7 +222,7 @@ keyValuePairs =
 {-| Turn any object into a dictionary of key-value pairs.
 
     -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
-    planetMasses : Decoder (Dict String Int)
+    planetMasses : Decoder (Dict String Float)
     planetMasses =
         dict float
 -}
