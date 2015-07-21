@@ -72,12 +72,14 @@ Elm.Native.Task.make = function(localRuntime) {
 		{
 			workQueue.shift();
 
-			setTimeout(function() {
-				if (workQueue.length > 0)
-				{
-					runTask(workQueue[0], onComplete);
-				}
-			}, 0);
+			if (workQueue.length > 0)
+			{
+				var task = workQueue[0];
+
+				setTimeout(function() {
+					runTask(task, onComplete);
+				}, 0);
+			}
 		}
 
 		function register(task)
