@@ -28,7 +28,7 @@ Elm.Native.Date.make = function(localRuntime) {
 		["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 		 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-	currentDate = Task .asyncFunction (
+	var currentDate = Task .asyncFunction (
 		function (callback) {
 			callback (Task.succeed (dateNow ()));
 		}
