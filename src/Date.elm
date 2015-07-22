@@ -3,7 +3,7 @@ module Date
     , year, month, Month(..)
     , day, dayOfWeek, Day(..)
     , hour, minute, second, millisecond
-    , currentDate
+    , current
     ) where
 
 {-| Library for working with dates. Email the mailing list if you encounter
@@ -19,7 +19,7 @@ issues with internationalization or locale formatting.
 @docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond
 
 # Realtime clock
-@docs currentDate
+@docs current
 
 -}
 
@@ -135,6 +135,6 @@ millisecond =
 
 {-| Get the current date
 -}
-currentDate : Task () Date
-currentDate =
-  Native.Date.currentDate
+current : Task () Date
+current =
+  Native.Date.current

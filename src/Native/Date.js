@@ -28,7 +28,7 @@ Elm.Native.Date.make = function(localRuntime) {
 		["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 		 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-	var currentDate = Task .asyncFunction (
+	var current = Task .asyncFunction (
 		function (callback) {
 			callback (Task.succeed (dateNow ()));
 		}
@@ -47,7 +47,7 @@ Elm.Native.Date.make = function(localRuntime) {
 		toTime  : function(d) { return d.getTime(); },
 		fromTime: function(t) { return new window.Date(t); },
 		dayOfWeek : function(d) { return { ctor:dayTable[d.getDay()] }; },
-		currentDate : currentDate
+		current : current
 	};
 
 };
