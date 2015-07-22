@@ -102,6 +102,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			if (parentUpdate)
 			{
+				node.value = parent.value;
 				handler(parent.value);
 			}
 		};
