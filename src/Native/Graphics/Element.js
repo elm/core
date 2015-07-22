@@ -23,7 +23,6 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	var Text = Elm.Native.Text.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
-
 	// CREATION
 
 	var createNode =
@@ -39,7 +38,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 			:
 				function(elementType)
 				{
-					var node = documentCreateElement(elementType);
+					var node = document.createElement(elementType);
 					node.style.padding = "0";
 					node.style.margin = "0";
 					return node;
@@ -62,7 +61,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				href: "",
 				tag: "",
 				hover: Utils.Tuple0,
-				click: Utils.Tuple0
+				click: Utils.Tuple0,
+                mousemove: Utils.Tuple0
 			}
 		};
 	}
@@ -103,6 +103,11 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		if (props.click.ctor !== '_Tuple0')
 		{
 			addClick(node, props.click);
+		}
+
+		if (props.mousemove.ctor !== '_Tuple0')
+		{
+			addMouseMove(node, props.mousemove);
 		}
 
 		if (props.href !== '')
@@ -181,6 +186,33 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 	}
 
+    function addMouseMove(e, handler)
+    {
+		e.style.pointerEvents = 'auto';
+		e.elm_mousemove_handler = handler;
+        function mousemove(evt)
+        {
+            // the pointer coords relative to the top left of the element.
+            var relative_pos = {
+                ctor: "_Tuple2",
+                _0: evt.clientX,
+                _1: evt.clientY
+            };
+            e.elm_mousemove_handler(relative_pos);
+        }
+        e.elm_mousemove = mousemove;
+        e.addEventListener('mousemove', mousemove)
+    }
+
+	function removeMouseMove(e)
+	{
+		e.elm_mousemove_handler = null;
+		if (e.elm_mousemove)
+		{
+			e.removeEventListener('mousemove', e.elm_mousemove);
+			e.elm_mousemove = null;
+		}
+	}
 
 	// IMAGES
 
@@ -550,6 +582,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var element = next.element;
 		var width = nextProps.width - (element.adjustWidth || 0);
 		var height = nextProps.height - (element.adjustHeight || 0);
+
 		if (width !== currProps.width)
 		{
 			node.style.width = (width|0) + 'px';
@@ -648,10 +681,32 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 			}
 		}
 
+        // update mousemove handlers
+        if (currProps.mousemove.ctor === '_Tuple0')
+        {
+            if (nextProps.mousemove.ctor !== '_Tuple0')
+            {
+                addMouseMove(node, nextProps.mousemove);
+            }
+        }
+		else
+		{
+			if (nextProps.mousemove.ctor === '_Tuple0')
+			{
+				removed = true;
+				removeMouseMove(node);
+			}
+			else
+			{
+				node.elm_mousemove_handler = nextProps.mousemove;
+			}
+		}
+
 		// stop capturing clicks if
 		if (removed
 			&& nextProps.hover.ctor === '_Tuple0'
-			&& nextProps.click.ctor === '_Tuple0')
+			&& nextProps.click.ctor === '_Tuple0'
+            && nextProps.mousemove.ctor === '_Tuple0')
 		{
 			node.style.pointerEvents = 'none';
 		}

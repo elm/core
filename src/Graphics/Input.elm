@@ -1,6 +1,6 @@
 module Graphics.Input
     ( button, customButton, checkbox, dropDown
-    , hoverable, clickable
+    , hoverable, clickable, localPosition
     ) where
 
 {-| This module is for creating input widgets such as buttons and text fields.
@@ -155,3 +155,12 @@ distinguished with IDs or more complex data structures.
 clickable : Signal.Message -> Element -> Element
 clickable =
   Native.Graphics.Input.clickable
+
+
+{-| Detects mouse movement relative to a specific `Element`. -}
+localPosition : ((Float, Float) -> Signal.Message) -> Element -> Element
+localPosition =
+  Native.Graphics.Input.localPosition
+
+
+
