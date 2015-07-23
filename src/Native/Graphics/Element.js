@@ -192,16 +192,18 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		e.elm_mousemove_handler = handler;
         function mousemove(evt)
         {
-            // the pointer coords relative to the top left of the element.
+            // Determine the mouse position relative to the top left corner of the element.
+            var elem_rect = e.getBoundingClientRect();
             var relative_pos = {
                 ctor: "_Tuple2",
-                _0: evt.clientX,
-                _1: evt.clientY
+                _0: evt.clientX - elem_rect.left,
+                _1: evt.clientY - elem_rect.top,
             };
             e.elm_mousemove_handler(relative_pos);
         }
         e.elm_mousemove = mousemove;
-        e.addEventListener('mousemove', mousemove)
+        // We want to trigger this event every time the mouse is moved within the window.
+        window.addEventListener('mousemove', mousemove);
     }
 
 	function removeMouseMove(e)

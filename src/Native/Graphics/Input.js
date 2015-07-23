@@ -461,7 +461,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
     {
         function onMouseMove(xy)
         {
-            console.log("onMouseMove: ", xy);
             Signal.sendMessage(handler(xy));
         }
         var props = Utils.replace([['mousemove',onMouseMove]], elem.props);

@@ -158,7 +158,7 @@ clickable =
 
 
 {-| Detects mouse movement relative to a specific `Element`. -}
-localPosition : ((Float, Float) -> Signal.Message) -> Element -> Element
+localPosition : ((Int, Int) -> Signal.Message) -> Element -> Element
 localPosition =
   Native.Graphics.Input.localPosition
 
