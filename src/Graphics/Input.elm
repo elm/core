@@ -157,7 +157,16 @@ clickable =
   Native.Graphics.Input.clickable
 
 
-{-| Detects mouse movement relative to a specific `Element`. -}
+{-| Detects mouse movement relative to the position of a specific `Element`.
+
+For example: if you call `localPosition` with an `Element` positioned at
+(100, 100), and the mouse is moved to the window position (110, 60), the
+resulting message would be (10, -40).
+
+This is useful for widgets that require the precise location of the mouse
+relative to the location of the widget (i.e. sliders, envelope editors,
+precision number dialers, etc).
+-}
 localPosition : ((Int, Int) -> Signal.Message) -> Element -> Element
 localPosition =
   Native.Graphics.Input.localPosition
