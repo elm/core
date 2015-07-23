@@ -62,7 +62,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				tag: "",
 				hover: Utils.Tuple0,
 				click: Utils.Tuple0,
-                mousemove: Utils.Tuple0
+				mousemove: Utils.Tuple0
 			}
 		};
 	}
@@ -186,25 +186,25 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 	}
 
-    function addMouseMove(e, handler)
-    {
+	function addMouseMove(e, handler)
+	{
 		e.style.pointerEvents = 'auto';
 		e.elm_mousemove_handler = handler;
-        function mousemove(evt)
-        {
-            // Determine the mouse position relative to the top left corner of the element.
-            var elem_rect = e.getBoundingClientRect();
-            var relative_pos = {
-                ctor: "_Tuple2",
-                _0: evt.clientX - elem_rect.left,
-                _1: evt.clientY - elem_rect.top,
-            };
-            e.elm_mousemove_handler(relative_pos);
-        }
-        e.elm_mousemove = mousemove;
-        // We want to trigger this event every time the mouse is moved within the window.
-        window.addEventListener('mousemove', mousemove);
-    }
+		function mousemove(evt)
+		{
+			// Determine the mouse position relative to the top left corner of the element.
+			var elem_rect = e.getBoundingClientRect();
+			var relative_pos = {
+				ctor: "_Tuple2",
+				_0: evt.clientX - elem_rect.left,
+				_1: evt.clientY - elem_rect.top,
+			};
+			e.elm_mousemove_handler(relative_pos);
+		}
+		e.elm_mousemove = mousemove;
+		// We want to trigger this event every time the mouse is moved within the window.
+		window.addEventListener('mousemove', mousemove);
+	}
 
 	function removeMouseMove(e)
 	{
@@ -683,14 +683,14 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 			}
 		}
 
-        // update mousemove handlers
-        if (currProps.mousemove.ctor === '_Tuple0')
-        {
-            if (nextProps.mousemove.ctor !== '_Tuple0')
-            {
-                addMouseMove(node, nextProps.mousemove);
-            }
-        }
+		// update mousemove handlers
+		if (currProps.mousemove.ctor === '_Tuple0')
+		{
+			if (nextProps.mousemove.ctor !== '_Tuple0')
+			{
+				addMouseMove(node, nextProps.mousemove);
+			}
+		}
 		else
 		{
 			if (nextProps.mousemove.ctor === '_Tuple0')
@@ -708,7 +708,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		if (removed
 			&& nextProps.hover.ctor === '_Tuple0'
 			&& nextProps.click.ctor === '_Tuple0'
-            && nextProps.mousemove.ctor === '_Tuple0')
+			&& nextProps.mousemove.ctor === '_Tuple0')
 		{
 			node.style.pointerEvents = 'none';
 		}
