@@ -66,7 +66,7 @@ oneOf maybes =
           Just _ -> maybe
 
 
-{-| Transform an `Maybe` value with a given function:
+{-| Transform a `Maybe` value with a given function:
 
     map sqrt (Just 9) == Just 3
     map sqrt Nothing == Nothing
