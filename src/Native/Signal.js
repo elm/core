@@ -95,6 +95,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 			id: Utils.guid(),
 			name: 'output-' + name,
 			parents: [parent],
+			value: parent.value,
 			isOutput: true
 		};
 
