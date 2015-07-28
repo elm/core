@@ -128,6 +128,9 @@ timestamp =
 
 {-| Delay a signal by a certain amount of time. So `(delay second Mouse.clicks)`
 will update one second later than any mouse click.
+
+Note: Even calling `delay` with the same number on the same signal twice
+gives two independently firing signals.
 -}
 delay : Time -> Signal a -> Signal a
 delay =
