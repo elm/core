@@ -29,7 +29,7 @@ import Maybe exposing (Maybe(Nothing))
 import Native.Text
 
 
-{-| Represents styled text. It can be rendered to with collages or with elements.
+{-| Represents styled text. It can be rendered with collages or with elements.
 -}
 type Text = Text
 
