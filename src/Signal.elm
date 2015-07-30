@@ -337,9 +337,10 @@ mailbox =
 {-| Create a new address. This address will tag each message it receives
 and then forward it along to some other address.
 
-    type Action = Undo | Remove Int
+    type Action = Undo | Remove Int | NoOp
 
-    port actions : Mailbox Action
+    actions : Mailbox Action
+    actions = mailbox NoOp
 
     removeAddress : Address Int
     removeAddress =
