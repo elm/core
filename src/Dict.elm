@@ -122,7 +122,7 @@ dictionary.
     animals = fromList [ ("Tom", Cat), ("Jerry", Mouse) ]
 
     get "Tom"   animals == Just Cat
-    get "Mouse" animals == Just Mouse
+    get "Jerry" animals == Just Mouse
     get "Spike" animals == Nothing
 
 -}
