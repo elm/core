@@ -11,7 +11,7 @@ Elm.Native.Date.make = function(localRuntime) {
 
 	function dateNow()
 	{
-		return new window.Date;
+		return new Date;
 	}
 
 	function readDate(str)
