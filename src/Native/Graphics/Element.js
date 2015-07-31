@@ -39,7 +39,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 			:
 				function(elementType)
 				{
-					var node = documentCreateElement(elementType);
+					var node = document.createElement(elementType);
 					node.style.padding = "0";
 					node.style.margin = "0";
 					return node;
