@@ -52,7 +52,7 @@ whatever is the topmost bit. This can be used to divide numbers by powers of two
      32 `shiftRight` 2 == 8
     -32 `shiftRight` 1 == -16
 
-This is called an [arithmatic right
+This is called an [arithmetic right
 shift](http://en.wikipedia.org/wiki/Bitwise_operation#Arithmetic_shift),
 often written (>>), and sometimes called a sign-propagating
 right shift because it fills empty spots with copies of the highest bit.
