@@ -11,12 +11,12 @@ Elm.Native.Date.make = function(localRuntime) {
 
 	function dateNow()
 	{
-		return new window.Date;
+		return new Date;
 	}
 
 	function readDate(str)
 	{
-		var date = new window.Date(str);
+		var date = new Date(str);
 		return isNaN(date.getTime())
 			? Result.Err("unable to parse '" + str + "' as a date")
 			: Result.Ok(date);
@@ -38,7 +38,7 @@ Elm.Native.Date.make = function(localRuntime) {
 		second  : function(d) { return d.getSeconds(); },
 		millisecond: function (d) { return d.getMilliseconds(); },
 		toTime  : function(d) { return d.getTime(); },
-		fromTime: function(t) { return new window.Date(t); },
+		fromTime: function(t) { return new Date(t); },
 		dayOfWeek : function(d) { return { ctor:dayTable[d.getDay()] }; }
 	};
 
