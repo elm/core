@@ -93,7 +93,7 @@ Elm.Native.Show.make = function(localRuntime) {
 			{
 				return "[]";
 			}
-			else if (v.ctor === "RBNode" || v.ctor === "RBEmpty")
+			else if (v.ctor === "RBNode" || v.ctor === "RBEmpty" || v.ctor === "Set_Internal")
 			{
 				if (!Dict)
 				{
@@ -103,12 +103,17 @@ Elm.Native.Show.make = function(localRuntime) {
 				{
 					List = Elm.List.make(localRuntime);
 				}
-				var list = Dict.toList(v);
-				var name = "Dict";
-				if (list.ctor === "::" && list._0._1.ctor === "_Tuple0")
+				var list;
+				var name;
+				if (v.ctor === "Set_Internal")
 				{
 					name = "Set";
-					list = A2(List.map, function(x){return x._0}, list);
+					list = A2(List.map, function(x){return x._0}, Dict.toList(v._0));
+				}
+				else
+				{
+					name = "Dict";
+					list = Dict.toList(v);
 				}
 				return name + ".fromList " + toString(list);
 			}
