@@ -13,6 +13,9 @@ Elm.Native.Json.make = function(localRuntime) {
 	var Result = Elm.Result.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
+	function isInteger (nVal) {
+		return typeof nVal === "number" && isFinite(nVal) && nVal > -9007199254740992 && nVal < 9007199254740992 && Math.floor(nVal) === nVal;
+	}
 
 	function crash(expected, actual) {
 		throw new Error(
@@ -50,7 +53,7 @@ Elm.Native.Json.make = function(localRuntime) {
 
 
 	function decodeInt(value) {
-		if (typeof value === 'number' && (value|0) === value) {
+		if (isInteger(value)) {
 			return value;
 		}
 		crash('an Int', value);
