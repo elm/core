@@ -100,7 +100,7 @@ isEmpty xs =
       _  -> False
 
 
-{-| Figure out if a value is a member of the list.
+{-| Figure out whether a list contains a value.
 
     member 9 [1,2,3,4] == False
     member 4 [1,2,3,4] == True
