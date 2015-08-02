@@ -99,14 +99,14 @@ Elm.Native.Show.make = function(localRuntime) {
 				{
 					Dict = Elm.Dict.make(localRuntime);
 				}
-				if (!List)
-				{
-					List = Elm.List.make(localRuntime);
-				}
 				var list;
 				var name;
 				if (v.ctor === "Set_Internal")
 				{
+					if (!List)
+					{
+						List = Elm.List.make(localRuntime);
+					}
 					name = "Set";
 					list = A2(List.map, function(x){return x._0}, Dict.toList(v._0));
 				}
