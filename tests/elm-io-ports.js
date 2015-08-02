@@ -2,6 +2,7 @@
 (function(){
     var stdin = process.stdin;
     var fs    = require('fs');
+    var Elm = require ('./test.js');
     var worker = Elm.worker(Elm.Main, {responses: null });
     var just = function(v) {
         return { 'Just': v};

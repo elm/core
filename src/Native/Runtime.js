@@ -501,6 +501,25 @@ if (!Elm.fullscreen) {
 			}
 			return true;
 		}
+
+		// If the program is being used with node, export the Elm object.
+		if (typeof module != 'undefined')
+		{
+			module.exports = Elm;
+			// If the elm file is being run directly.
+			if (!module.parent)
+			{
+				// Then it must have a Main module to be run automatically.
+				if ('Main' in Elm)
+				{
+					setImmediate(Elm.worker, Elm.Main);
+				}
+				else
+				{
+					throw new Error('You are trying to directly run an Elm program without a Main module.');
+				}
+			}
+		}
 	}());
 
 	function F2(fun)
