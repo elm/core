@@ -45,84 +45,84 @@ import List as List
 `(Set String)` is a set of strings.
 -}
 type Set t =
-  Set (Dict.Dict t ())
+  Set_Internal (Dict.Dict t ())
 
 
 {-| Create an empty set.
 -}
 empty : Set comparable
 empty =
-  Set Dict.empty
+  Set_Internal Dict.empty
 
 
 {-| Create a set with one value.
 -}
 singleton : comparable -> Set comparable
 singleton k =
-  Set <| Dict.singleton k ()
+  Set_Internal <| Dict.singleton k ()
 
 
 {-| Insert a value into a set.
 -}
 insert : comparable -> Set comparable -> Set comparable
-insert k (Set d) =
-  Set <| Dict.insert k () d
+insert k (Set_Internal d) =
+  Set_Internal <| Dict.insert k () d
 
 
 {-| Remove a value from a set. If the value is not found, no changes are made.
 -}
 remove : comparable -> Set comparable -> Set comparable
-remove k (Set d) =
-  Set <| Dict.remove k d
+remove k (Set_Internal d) =
+  Set_Internal <| Dict.remove k d
 
 
 {-| Determine if a set is empty.
 -}
 isEmpty : Set comparable -> Bool
-isEmpty (Set d) =
+isEmpty (Set_Internal d) =
   Dict.isEmpty d
 
 
 {-| Determine if a value is in a set.
 -}
 member : comparable -> Set comparable -> Bool
-member k (Set d) =
+member k (Set_Internal d) =
   Dict.member k d
 
 
 {-| Determine the number of elements in a set.
 -}
 size : Set comparable -> Int
-size (Set d) =
+size (Set_Internal d) =
   Dict.size d
 
 
 {-| Get the union of two sets. Keep all values.
 -}
 union : Set comparable -> Set comparable -> Set comparable
-union (Set d1) (Set d2) =
-  Set <| Dict.union d1 d2
+union (Set_Internal d1) (Set_Internal d2) =
+  Set_Internal <| Dict.union d1 d2
 
 
 {-| Get the intersection of two sets. Keeps values that appear in both sets.
 -}
 intersect : Set comparable -> Set comparable -> Set comparable
-intersect (Set d1) (Set d2) =
-  Set <| Dict.intersect d1 d2
+intersect (Set_Internal d1) (Set_Internal d2) =
+  Set_Internal <| Dict.intersect d1 d2
 
 
 {-| Get the difference between the first set and the second. Keeps values
 that do not appear in the second set.
 -}
 diff : Set comparable -> Set comparable -> Set comparable
-diff (Set d1) (Set d2) =
-  Set <| Dict.diff d1 d2
+diff (Set_Internal d1) (Set_Internal d2) =
+  Set_Internal <| Dict.diff d1 d2
 
 
 {-| Convert a set into a list.
 -}
 toList : Set comparable -> List comparable
-toList (Set d) =
+toList (Set_Internal d) =
   Dict.keys d
 
 
@@ -135,14 +135,14 @@ fromList xs = List.foldl insert empty xs
 {-| Fold over the values in a set, in order from lowest to highest.
 -}
 foldl : (comparable -> b -> b) -> b -> Set comparable -> b
-foldl f b (Set d) =
+foldl f b (Set_Internal d) =
   Dict.foldl (\k _ b -> f k b) b d
 
 
 {-| Fold over the values in a set, in order from highest to lowest.
 -}
 foldr : (comparable -> b -> b) -> b -> Set comparable -> b
-foldr f b (Set d) =
+foldr f b (Set_Internal d) =
   Dict.foldr (\k _ b -> f k b) b d
 
 
@@ -155,16 +155,16 @@ map f s = fromList (List.map f (toList s))
 {-| Create a new set consisting only of elements which satisfy a predicate.
 -}
 filter : (comparable -> Bool) -> Set comparable -> Set comparable
-filter p (Set d) =
-  Set <| Dict.filter (\k _ -> p k) d
+filter p (Set_Internal d) =
+  Set_Internal <| Dict.filter (\k _ -> p k) d
 
 
 {-| Create two new sets; the first consisting of elements which satisfy a
 predicate, the second consisting of elements which do not.
 -}
 partition : (comparable -> Bool) -> Set comparable -> (Set comparable, Set comparable)
-partition p (Set d) =
+partition p (Set_Internal d) =
   let
     (p1, p2) = Dict.partition (\k _ -> p k) d
   in
-    (Set p1, Set p2)
+    (Set_Internal p1, Set_Internal p2)
