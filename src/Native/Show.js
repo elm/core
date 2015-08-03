@@ -93,7 +93,7 @@ Elm.Native.Show.make = function(localRuntime) {
 			{
 				return "[]";
 			}
-			else if (v.ctor === "RBNode" || v.ctor === "RBEmpty" || v.ctor === "Set_Internal")
+			else if (v.ctor === "RBNode_elm_builtin" || v.ctor === "RBEmpty_elm_builtin" || v.ctor === "Set_elm_builtin")
 			{
 				if (!Dict)
 				{
@@ -101,7 +101,7 @@ Elm.Native.Show.make = function(localRuntime) {
 				}
 				var list;
 				var name;
-				if (v.ctor === "Set_Internal")
+				if (v.ctor === "Set_elm_builtin")
 				{
 					if (!List)
 					{
