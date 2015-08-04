@@ -12,9 +12,7 @@ if (!Elm.fullscreen) {
 
 		Elm.fullscreen = function(module, args)
 		{
-			var container = document.createElement('div');
-			document.body.appendChild(container);
-			return init(Display.FULLSCREEN, container, module, args || {});
+			return init(Display.FULLSCREEN, document.body, module, args || {});
 		};
 
 		Elm.embed = function(module, container, args)
