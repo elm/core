@@ -84,26 +84,31 @@ definition:
     andThen : Maybe a -> (a -> Maybe b) -> Maybe b
     andThen maybe callback =
         case maybe of
-          Just value -> callback value
-          Nothing -> Nothing
+            Just value ->
+                callback value
+
+            Nothing ->
+                Nothing
 
 This means we only continue with the callback if things are going well. For
-example, say you need to use (`toInt : String -> Maybe Int`) to parse a month
-and make sure it is between 1 and 12:
+example, say you need to use (`head : List Int -> Maybe Int`) to get the
+first month from a `List` and then make sure it is between 1 and 12:
 
     toValidMonth : Int -> Maybe Int
     toValidMonth month =
-        if month >= 1 && month <= 12
-            then Just month
-            else Nothing
+        if month >= 1 && month <= 12 then
+            Just month
+        else
+            Nothing
 
-    toMonth : String -> Maybe Int
-    toMonth rawString =
-        toInt rawString `andThen` toValidMonth
+    getFirstMonth : List Int -> Maybe Int
+    getFirstMonth months =
+        head months `andThen` toValidMonth
 
-If `toInt` fails and results in `Nothing` this entire chain of operations will
-short-circuit and result in `Nothing`. If `toValidMonth` results in `Nothing`,
-again the chain of computations will result in `Nothing`.
+If `head` fails and results in `Nothing` (because the `List` was empty`),
+this entire chain of operations will short-circuit and result in `Nothing`.
+If `toValidMonth` results in `Nothing`, again the chain of computations
+will result in `Nothing`.
 -}
 andThen : Maybe a -> (a -> Maybe b) -> Maybe b
 andThen maybeValue callback =
