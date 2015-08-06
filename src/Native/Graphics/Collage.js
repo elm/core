@@ -335,7 +335,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		}
 		if (theta !== 0)
 		{
-			ctx.rotate(theta);
+			ctx.rotate(theta % (Math.PI * 2));
 		}
 		if (scale !== 1)
 		{
