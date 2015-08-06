@@ -108,12 +108,11 @@ Elm.Native.Touch.make = function(localRuntime) {
 
     var mouseID = -1;
     function move(e) {
-        var point = Utils.getXY(e);
+        e.identifier = mouseID;
         for (var i = root.value.length; i--; ) {
             if (root.value[i].id === mouseID)
             {
-                root.value[i].x = point._0;
-                root.value[i].y = point._1;
+                root.value[i] = touch(e);
                 localRuntime.notify(root.id, root.value);
                 break;
             }
