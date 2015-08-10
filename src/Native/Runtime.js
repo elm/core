@@ -14,8 +14,9 @@ if (!Elm.fullscreen) {
 				connected = true;
 			}
 			var container = document.createElement('div');
-			if(connected) {
-				document.body.appendChild(container);
+			document.body.appendChild(container);
+			if(!connected) {
+				container.style.visibility = 'hidden';
 			}
 			return init(Display.FULLSCREEN, container, module, args || {});
 		};
