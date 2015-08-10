@@ -118,7 +118,8 @@ at fields decoder =
     List.foldr (:=) decoder fields
 
 
-{-| Decode an object if it has a certain field.
+{-| Applies the decoder to the field with the given name.
+Fails if the JSON object has no such field.
 
     nameAndAge : Decoder (String,Int)
     nameAndAge =
