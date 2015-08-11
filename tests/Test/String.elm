@@ -5,6 +5,7 @@ import Basics exposing (..)
 import List
 import Maybe exposing (..)
 import String
+import Result exposing (..)
 
 import ElmTest.Assertion exposing (..)
 import ElmTest.Test exposing (..)
@@ -36,5 +37,17 @@ tests =
         , test "slice 3" <| assertEqual "abc" (String.slice 0 -1 "abcd")
         , test "slice 4" <| assertEqual "cd" (String.slice -2 4 "abcd")
         ]
+
+      conversionTests = suite "Converting Strings"
+        [ test "toFloat 42" <| assertEqual (Ok 42) (String.toFloat "42")
+        , test "toFloat 42.42" <| assertEqual (Ok 42.42) (String.toFloat "42.42")
+        , test "toFloat .42" <| assertEqual (Ok 0.42) (String.toFloat ".42")
+        , test "toFloat 42." <| assertEqual (Ok 42) (String.toFloat "42.")
+        , test "toFloat ..42" <| assertEqual (Err "could not convert string '..42' to a Float") (String.toFloat "..42")
+        , test "toFloat ." <| assertEqual (Err "could not convert string '.' to a Float") (String.toFloat ".")
+        , test "toFloat .." <| assertEqual (Err "could not convert string '..' to a Float") (String.toFloat "..")
+        , test "toFloat a" <| assertEqual (Err "could not convert string 'a' to a Float") (String.toFloat "a")
+        ]
+
   in
-      suite "String" [ simpleTests, combiningTests ]
+      suite "String" [ simpleTests, combiningTests, conversionTests ]

@@ -252,15 +252,16 @@ Elm.Native.String.make = function(localRuntime) {
 			return Result.Err("could not convert string '" + s + "' to a Float" );
 		}
 		var start = 0;
-		if (s[0] == '-')
+		var dotCount = 0;
+		if (s[0] == '-' || s[0] == '.')
 		{
 			if (len === 1)
 			{
 				return Result.Err("could not convert string '" + s + "' to a Float" );
 			}
 			start = 1;
+			if (s[0] == '.') dotCount = 1;
 		}
-		var dotCount = 0;
 		for (var i = start; i < len; ++i)
 		{
 			if (Char.isDigit(s[i]))
