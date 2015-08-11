@@ -299,11 +299,13 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	// IMAGES
 
-	function drawImage(redo, ctx, form)
-	{
-		var img = new Image();
-		img.onload = redo;
-		img.src = form._3;
+	function drawImage(redo, ctx, form) {
+		if (!form._image) {
+			var img = new Image();
+			img.onload = redo;
+			img.src = form._3;
+			form._image = img;
+		}
 		var w = form._0,
 			h = form._1,
 			pos = form._2,
@@ -317,7 +319,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			destH = h;
 
 		ctx.scale(1,-1);
-		ctx.drawImage(img, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
+		ctx.drawImage(form._image, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
 	}
 
 	function renderForm(redo, ctx, form)
