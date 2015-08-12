@@ -8,16 +8,10 @@ if (!Elm.fullscreen) {
 			NONE: 2
 		};
 
-		Elm.fullscreen = function(module, args, connected)
+		Elm.fullscreen = function(module, args)
 		{
-			if(typeof connected == 'undefined') {
-				connected = true;
-			}
 			var container = document.createElement('div');
 			document.body.appendChild(container);
-			if(!connected) {
-				container.style.visibility = 'hidden';
-			}
 			return init(Display.FULLSCREEN, container, module, args || {});
 		};
 
