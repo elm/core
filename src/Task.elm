@@ -231,8 +231,8 @@ fromMaybe default maybe =
 of type `x` it promotes the failure to an `Err` and turns all successes into
 `Ok` something.
 
-    toMaybe (fail "file not found") == succeed (Err "file not found")
-    toMaybe (succeed 42)            == succeed (Ok 42)
+    toResult (fail "file not found") == succeed (Err "file not found")
+    toResult (succeed 42)            == succeed (Ok 42)
 
 This means you can handle the error with the `Result` module instead.
 -}
