@@ -10,7 +10,6 @@ Elm.Native.Show.make = function(localRuntime) {
 	var _Array;
 	var Dict;
 	var List;
-	var Utils = Elm.Native.Utils.make(localRuntime);
 
 	var toString = function(v)
 	{
@@ -108,7 +107,7 @@ Elm.Native.Show.make = function(localRuntime) {
 						List = Elm.List.make(localRuntime);
 					}
 					name = "Set";
-					list = A2(List.map, function(x){return x._0}, Dict.toList(v._0));
+					list = A2(List.map, function(x){return x._0;}, Dict.toList(v._0));
 				}
 				else
 				{
@@ -119,7 +118,7 @@ Elm.Native.Show.make = function(localRuntime) {
 			}
 			else if (v.ctor.slice(0,5) === "Text:")
 			{
-				return '<text>'
+				return '<text>';
 			}
 			else
 			{
@@ -151,7 +150,7 @@ Elm.Native.Show.make = function(localRuntime) {
 				  .replace(/\0/g, '\\0');
 		if (isChar)
 		{
-			return s.replace(/\'/g, "\\'")
+			return s.replace(/\'/g, "\\'");
 		}
 		else
 		{

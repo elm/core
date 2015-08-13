@@ -65,7 +65,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 	}
 	function isInfinite(n)
 	{
-		return n === Infinity || n === -Infinity
+		return n === Infinity || n === -Infinity;
 	}
 
 	function truncate(n)

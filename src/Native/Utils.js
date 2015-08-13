@@ -11,7 +11,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 	function eq(l,r)
 	{
-		var stack = [{'x': l, 'y': r}]
+		var stack = [{'x': l, 'y': r}];
 		while (stack.length > 0)
 		{
 			var front = stack.pop();
@@ -162,7 +162,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 	var count = 0;
 	function guid(_)
 	{
-		return count++
+		return count++;
 	}
 
 	function copy(oldRecord)

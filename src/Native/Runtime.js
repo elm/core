@@ -136,7 +136,7 @@ if (!Elm.fullscreen) {
 			}
 			catch (error)
 			{
-				if (typeof container.appendChild == 'undefined')
+				if (typeof container.appendChild === 'undefined')
 				{
 					console.error(error.message);
 				}
@@ -175,7 +175,7 @@ if (!Elm.fullscreen) {
 				ports: elm.ports,
 				dispose: dispose
 			};
-		};
+		}
 
 		function checkInputs(elm)
 		{
@@ -505,7 +505,7 @@ if (!Elm.fullscreen) {
 
 	function F2(fun)
 	{
-		function wrapper(a) { return function(b) { return fun(a,b) } }
+		function wrapper(a) { return function(b) { return fun(a,b); }; }
 		wrapper.arity = 2;
 		wrapper.func = fun;
 		return wrapper;
@@ -514,7 +514,7 @@ if (!Elm.fullscreen) {
 	function F3(fun)
 	{
 		function wrapper(a) {
-			return function(b) { return function(c) { return fun(a,b,c) }}
+			return function(b) { return function(c) { return fun(a,b,c); }; };
 		}
 		wrapper.arity = 3;
 		wrapper.func = fun;
@@ -524,7 +524,7 @@ if (!Elm.fullscreen) {
 	function F4(fun)
 	{
 		function wrapper(a) { return function(b) { return function(c) {
-			return function(d) { return fun(a,b,c,d) }}}
+			return function(d) { return fun(a,b,c,d); }; }; };
 		}
 		wrapper.arity = 4;
 		wrapper.func = fun;
@@ -534,7 +534,7 @@ if (!Elm.fullscreen) {
 	function F5(fun)
 	{
 		function wrapper(a) { return function(b) { return function(c) {
-			return function(d) { return function(e) { return fun(a,b,c,d,e) }}}}
+			return function(d) { return function(e) { return fun(a,b,c,d,e); }; }; }; };
 		}
 		wrapper.arity = 5;
 		wrapper.func = fun;
@@ -545,7 +545,7 @@ if (!Elm.fullscreen) {
 	{
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
-			return fun(a,b,c,d,e,f) }}}}}
+			return fun(a,b,c,d,e,f); }; }; }; }; };
 		}
 		wrapper.arity = 6;
 		wrapper.func = fun;
@@ -556,7 +556,7 @@ if (!Elm.fullscreen) {
 	{
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
-			return function(g) { return fun(a,b,c,d,e,f,g) }}}}}}
+			return function(g) { return fun(a,b,c,d,e,f,g); }; }; }; }; }; };
 		}
 		wrapper.arity = 7;
 		wrapper.func = fun;
@@ -568,7 +568,7 @@ if (!Elm.fullscreen) {
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
 			return function(g) { return function(h) {
-			return fun(a,b,c,d,e,f,g,h)}}}}}}}
+			return fun(a,b,c,d,e,f,g,h); }; }; }; }; }; }; };
 		}
 		wrapper.arity = 8;
 		wrapper.func = fun;
@@ -580,7 +580,7 @@ if (!Elm.fullscreen) {
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
 			return function(g) { return function(h) { return function(i) {
-			return fun(a,b,c,d,e,f,g,h,i) }}}}}}}}
+			return fun(a,b,c,d,e,f,g,h,i); }; }; }; }; }; }; }; };
 		}
 		wrapper.arity = 9;
 		wrapper.func = fun;

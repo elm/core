@@ -226,7 +226,7 @@ Elm.Native.String.make = function(localRuntime) {
 			return Result.Err("could not convert string '" + s + "' to an Int" );
 		}
 		var start = 0;
-		if (s[0] == '-')
+		if (s[0] === '-')
 		{
 			if (len === 1)
 			{
@@ -252,7 +252,7 @@ Elm.Native.String.make = function(localRuntime) {
 			return Result.Err("could not convert string '" + s + "' to a Float" );
 		}
 		var start = 0;
-		if (s[0] == '-')
+		if (s[0] === '-')
 		{
 			if (len === 1)
 			{

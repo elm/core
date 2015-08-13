@@ -278,7 +278,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	};
 	function needsReversal(dir)
 	{
-		return dir == 'DUp' || dir == 'DLeft' || dir == 'DIn';
+		return dir === 'DUp' || dir === 'DLeft' || dir === 'DIn';
 	}
 
 	function flow(dir,elist)
@@ -286,7 +286,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var array = List.toArray(elist);
 		var container = createNode('div');
 		var goDir = directionTable[dir];
-		if (goDir == goOut)
+		if (goDir === goOut)
 		{
 			container.style.pointerEvents = 'none';
 		}
@@ -334,6 +334,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 			case 'Z':
 				transform = 'translateX(' + ((-w/2)|0) + 'px) ';
+				break;
 
 			case 'N':
 				e.style.left = toPos(pos.x);
@@ -349,6 +350,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 			case 'Z':
 				transform += 'translateY(' + ((-h/2)|0) + 'px)';
+				break;
 
 			case 'P':
 				e.style.top = toPos(pos.y);
@@ -671,7 +673,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 			};
 			var pos = htmlHeight(0, raw);
 			return newElement(pos._0, pos._1, raw);
-		}
+		};
 	}
 
 	function markdown(text)
