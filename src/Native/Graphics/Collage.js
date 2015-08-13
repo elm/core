@@ -23,6 +23,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 	var Transform = Elm.Transform2D.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
+	var ImageCache = {};
 
 	function setStrokeStyle(ctx, style)
 	{
@@ -142,10 +143,24 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	function texture(redo, ctx, src)
 	{
-		var img = new Image();
-		img.src = src;
-		img.onload = redo;
+		var img = getImage(redo, src);
 		return ctx.createPattern(img, 'repeat');
+	}
+
+	function getImage(redo, src)
+	{
+		var img = ImageCache[src];
+		if (!img)
+		{
+			img = ImageCache[src] = new Image();
+			img.src = src;
+			img.onload = function()
+			{
+				redo();
+				ImageCache[src] = null;
+			};
+		}
+		return img;
 	}
 
 	function gradient(ctx, grad)
