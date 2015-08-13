@@ -334,7 +334,6 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 			case 'Z':
 				transform = 'translateX(' + ((-w/2)|0) + 'px) ';
-				break;
 
 			case 'N':
 				e.style.left = toPos(pos.x);
@@ -350,7 +349,6 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 			case 'Z':
 				transform += 'translateY(' + ((-h/2)|0) + 'px)';
-				break;
 
 			case 'P':
 				e.style.top = toPos(pos.y);
