@@ -78,10 +78,12 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	function line(ctx,style,path)
 	{
-		if (style.dashing.ctor === '[]') {
+		if (style.dashing.ctor === '[]')
+		{
 			trace(ctx, path);
 		}
-		else {
+		else
+		{
 			customLineHelp(ctx, style, path);
 		}
 		ctx.scale(1,-1);
