@@ -32,15 +32,6 @@ Elm.Native.Text.make = function(localRuntime) {
 
 	function addMeta(field, value, text)
 	{
-		var metaKeys = [
-			'font-size',
-			'font-family',
-			'font-style',
-			'font-weight',
-			'href',
-			'text-decoration',
-			'color'
-		];
 		var newProps = {};
 		var newText = {
 			ctor: 'Text:Meta',
@@ -65,6 +56,17 @@ Elm.Native.Text.make = function(localRuntime) {
 		newProps[field] = value;
 		return newText;
 	}
+
+	var metaKeys = [
+		'font-size',
+		'font-family',
+		'font-style',
+		'font-weight',
+		'href',
+		'text-decoration',
+		'color'
+	];
+
 
 	// conversions from Elm values to CSS
 
