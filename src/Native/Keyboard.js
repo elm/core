@@ -1,6 +1,6 @@
 Elm.Native.Keyboard = {};
-Elm.Native.Keyboard.make = function(localRuntime) {
 
+Elm.Native.Keyboard.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Keyboard = localRuntime.Native.Keyboard || {};
 	if (localRuntime.Native.Keyboard.values)

@@ -182,7 +182,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	{
 		trace(ctx, path);
 		setFillStyle(redo, ctx, style);
-		ctx.scale(1,-1);
+		ctx.scale(1, -1);
 		ctx.fill();
 	}
 

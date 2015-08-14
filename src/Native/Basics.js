@@ -1,6 +1,5 @@
 Elm.Native.Basics = {};
 Elm.Native.Basics.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Basics = localRuntime.Native.Basics || {};
 	if (localRuntime.Native.Basics.values)
@@ -12,7 +11,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 
 	function div(a, b)
 	{
-		return (a/b)|0;
+		return (a / b) | 0;
 	}
 	function rem(a, b)
 	{
@@ -22,10 +21,10 @@ Elm.Native.Basics.make = function(localRuntime) {
 	{
 		if (b === 0)
 		{
-			throw new Error("Cannot perform mod 0. Division by zero error.");
+			throw new Error('Cannot perform mod 0. Division by zero error.');
 		}
 		var r = a % b;
-		var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r+b) : -mod(-a,-b));
+		var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -mod(-a, -b));
 
 		return m === b ? 0 : m;
 	}
@@ -44,15 +43,15 @@ Elm.Native.Basics.make = function(localRuntime) {
 
 	function min(a, b)
 	{
-		return Utils.cmp(a,b) < 0 ? a : b;
+		return Utils.cmp(a, b) < 0 ? a : b;
 	}
 	function max(a, b)
 	{
-		return Utils.cmp(a,b) > 0 ? a : b;
+		return Utils.cmp(a, b) > 0 ? a : b;
 	}
 	function clamp(lo, hi, n)
 	{
-		return Utils.cmp(n,lo) < 0 ? lo : Utils.cmp(n,hi) > 0 ? hi : n;
+		return Utils.cmp(n, lo) < 0 ? lo : Utils.cmp(n, hi) > 0 ? hi : n;
 	}
 
 	function xor(a, b)
@@ -70,7 +69,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 
 	function truncate(n)
 	{
-		return n|0;
+		return n | 0;
 	}
 
 	function degrees(d)
@@ -91,7 +90,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 	{
 		var x = point._0;
 		var y = point._1;
-		return Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y,x));
+		return Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 	}
 
 	return localRuntime.Native.Basics.values = {
@@ -109,10 +108,10 @@ Elm.Native.Basics.make = function(localRuntime) {
 		atan: Math.atan,
 		atan2: F2(Math.atan2),
 
-		degrees:  degrees,
-		turns:  turns,
-		fromPolar:  fromPolar,
-		toPolar:  toPolar,
+		degrees: degrees,
+		turns: turns,
+		fromPolar: fromPolar,
+		toPolar: toPolar,
 
 		sqrt: Math.sqrt,
 		logBase: F2(logBase),

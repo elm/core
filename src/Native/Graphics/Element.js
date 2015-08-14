@@ -40,8 +40,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				function(elementType)
 				{
 					var node = document.createElement(elementType);
-					node.style.padding = "0";
-					node.style.margin = "0";
+					node.style.padding = '0';
+					node.style.margin = '0';
 					return node;
 				}
 			;
@@ -59,8 +59,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				height: height,
 				opacity: 1,
 				color: Maybe.Nothing,
-				href: "",
-				tag: "",
+				href: '',
+				tag: '',
 				hover: Utils.Tuple0,
 				click: Utils.Tuple0
 			}
@@ -77,8 +77,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var element = elem.element;
 		var width = props.width - (element.adjustWidth || 0);
 		var height = props.height - (element.adjustHeight || 0);
-		node.style.width  = (width |0) + 'px';
-		node.style.height = (height|0) + 'px';
+		node.style.width  = (width | 0) + 'px';
+		node.style.height = (height | 0) + 'px';
 
 		if (props.opacity !== 1)
 		{
@@ -195,7 +195,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				return fittedImage(props.width, props.height, img._3);
 
 			case 'Cropped':
-				return croppedImage(img,props.width,props.height,img._3);
+				return croppedImage(img, props.width, props.height, img._3);
 
 			case 'Tiled':
 				return tiledImage(img._3);
@@ -207,7 +207,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var img = createNode('img');
 		img.src = src;
 		img.name = src;
-		img.style.display = "block";
+		img.style.display = 'block';
 		return img;
 	}
 
@@ -233,15 +233,15 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	{
 		var pos = elem._0._0;
 		var e = createNode('div');
-		e.style.overflow = "hidden";
+		e.style.overflow = 'hidden';
 
 		var img = createNode('img');
 		img.onload = function() {
 			var sw = w / elem._1, sh = h / elem._2;
-			img.style.width = ((this.width * sw)|0) + 'px';
-			img.style.height = ((this.height * sh)|0) + 'px';
-			img.style.marginLeft = ((- pos._0 * sw)|0) + 'px';
-			img.style.marginTop = ((- pos._1 * sh)|0) + 'px';
+			img.style.width = ((this.width * sw) | 0) + 'px';
+			img.style.height = ((this.height * sh) | 0) + 'px';
+			img.style.marginLeft = ((- pos._0 * sw) | 0) + 'px';
+			img.style.marginTop = ((- pos._1 * sh) | 0) + 'px';
 		};
 		img.src = src;
 		img.name = src;
@@ -269,19 +269,19 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	}
 
 	var directionTable = {
-		DUp    : goDown,
-		DDown  : goDown,
-		DLeft  : goRight,
-		DRight : goRight,
-		DIn    : goOut,
-		DOut   : goOut
+		DUp: goDown,
+		DDown: goDown,
+		DLeft: goRight,
+		DRight: goRight,
+		DIn: goOut,
+		DOut: goOut
 	};
 	function needsReversal(dir)
 	{
 		return dir === 'DUp' || dir === 'DLeft' || dir === 'DIn';
 	}
 
-	function flow(dir,elist)
+	function flow(dir, elist)
 	{
 		var array = List.toArray(elist);
 		var container = createNode('div');
@@ -307,14 +307,14 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	function toPos(pos)
 	{
-		return pos.ctor === "Absolute"
-			? pos._0 + "px"
-			: (pos._0 * 100) + "%";
+		return pos.ctor === 'Absolute'
+			? pos._0 + 'px'
+			: (pos._0 * 100) + '%';
 	}
 
 	// must clear right, left, top, bottom, and transform
 	// before calling this function
-	function setPos(pos,elem,e)
+	function setPos(pos, elem, e)
 	{
 		var element = elem.element;
 		var props = elem.props;
@@ -333,7 +333,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				break;
 
 			case 'Z':
-				transform = 'translateX(' + ((-w/2)|0) + 'px) ';
+				transform = 'translateX(' + ((-w / 2) | 0) + 'px) ';
 
 			case 'N':
 				e.style.left = toPos(pos.x);
@@ -348,7 +348,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				break;
 
 			case 'Z':
-				transform += 'translateY(' + ((-h/2)|0) + 'px)';
+				transform += 'translateY(' + ((-h / 2) | 0) + 'px)';
 
 			case 'P':
 				e.style.top = toPos(pos.y);
@@ -371,7 +371,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		style.OTransform      = transform;
 	}
 
-	function container(pos,elem)
+	function container(pos, elem)
 	{
 		var e = render(elem);
 		setPos(pos, elem, e);
@@ -386,12 +386,11 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	function rawHtml(elem)
 	{
 		var html = elem.html;
-		var guid = elem.guid;
 		var align = elem.align;
 
 		var div = createNode('div');
 		div.innerHTML = html;
-		div.style.visibility = "hidden";
+		div.style.visibility = 'hidden';
 		if (align)
 		{
 			div.style.textAlign = align;
@@ -411,7 +410,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	function makeElement(e)
 	{
 		var elem = e.element;
-		switch(elem.ctor)
+		switch (elem.ctor)
 		{
 			case 'Image':
 				return image(e.props, elem);
@@ -466,11 +465,11 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var currE = curr.element;
 		switch(nextE.ctor)
 		{
-			case "Spacer":
+			case 'Spacer':
 				updateProps(node, curr, next);
 				return rootNode;
 
-			case "RawHtml":
+			case 'RawHtml':
 				if(currE.html.valueOf() !== nextE.html.valueOf())
 				{
 					node.innerHTML = nextE.html;
@@ -478,7 +477,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				updateProps(node, curr, next);
 				return rootNode;
 
-			case "Image":
+			case 'Image':
 				if (nextE._0.ctor === 'Plain')
 				{
 					if (nextE._3 !== currE._3)
@@ -495,7 +494,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				updateProps(node, curr, next);
 				return rootNode;
 
-			case "Flow":
+			case 'Flow':
 				var arr = List.toArray(nextE._1);
 				for (var i = arr.length; i--; )
 				{
@@ -524,14 +523,14 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				updateProps(node, curr, next);
 				return rootNode;
 
-			case "Container":
+			case 'Container':
 				var subNode = node.firstChild;
 				var newSubNode = updateAndReplace(subNode, currE._1, nextE._1);
 				setPos(nextE._0, nextE._1, newSubNode);
 				updateProps(node, curr, next);
 				return rootNode;
 
-			case "Custom":
+			case 'Custom':
 				if (currE.type === nextE.type)
 				{
 					var updatedNode = nextE.update(node, currE.model, nextE.model);
@@ -688,7 +687,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	var htmlHeight =
 		typeof document !== 'undefined'
 			? realHtmlHeight
-			: function(a, b) { return Utils.Tuple2(0,0); };
+			: function(a, b) { return Utils.Tuple2(0, 0); };
 
 	function realHtmlHeight(width, rawHtml)
 	{
@@ -697,20 +696,20 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		temp.innerHTML = rawHtml.html;
 		if (width > 0)
 		{
-			temp.style.width = width + "px";
+			temp.style.width = width + 'px';
 		}
-		temp.style.visibility = "hidden";
-		temp.style.styleFloat = "left";
-		temp.style.cssFloat   = "left";
+		temp.style.visibility = 'hidden';
+		temp.style.styleFloat = 'left';
+		temp.style.cssFloat = 'left';
 
 		document.body.appendChild(temp);
 
 		// get dimensions
 		var style = window.getComputedStyle(temp, null);
-		var w = Math.ceil(style.getPropertyValue("width").slice(0,-2) - 0);
-		var h = Math.ceil(style.getPropertyValue("height").slice(0,-2) - 0);
+		var w = Math.ceil(style.getPropertyValue('width').slice(0, -2) - 0);
+		var h = Math.ceil(style.getPropertyValue('height').slice(0, -2) - 0);
 		document.body.removeChild(temp);
-		return Utils.Tuple2(w,h);
+		return Utils.Tuple2(w, h);
 	}
 
 
@@ -728,5 +727,4 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		block: block,
 		markdown: markdown
 	};
-
 };

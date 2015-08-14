@@ -1,6 +1,6 @@
 Elm.Native.String = {};
-Elm.Native.String.make = function(localRuntime) {
 
+Elm.Native.String.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.String = localRuntime.Native.String || {};
 	if (localRuntime.Native.String.values)
@@ -23,18 +23,20 @@ Elm.Native.String.make = function(localRuntime) {
 	{
 		return str.length === 0;
 	}
-	function cons(chr,str)
+	function cons(chr, str)
 	{
 		return chr + str;
 	}
 	function uncons(str)
 	{
-		var hd;
-		return (hd = str[0])
-			? Maybe.Just(Utils.Tuple2(Utils.chr(hd), str.slice(1)))
-			: Maybe.Nothing;
+		var hd = str[0];
+		if (hd)
+		{
+			return Maybe.Just(Utils.Tuple2(Utils.chr(hd), str.slice(1)));
+		}
+		return Maybe.Nothing;
 	}
-	function append(a,b)
+	function append(a, b)
 	{
 		return a + b;
 	}
@@ -46,7 +48,7 @@ Elm.Native.String.make = function(localRuntime) {
 	{
 		return str.length;
 	}
-	function map(f,str)
+	function map(f, str)
 	{
 		var out = str.split('');
 		for (var i = out.length; i--; )
@@ -55,7 +57,7 @@ Elm.Native.String.make = function(localRuntime) {
 		}
 		return out.join('');
 	}
-	function filter(pred,str)
+	function filter(pred, str)
 	{
 		return str.split('').map(Utils.chr).filter(pred).join('');
 	}
@@ -63,7 +65,7 @@ Elm.Native.String.make = function(localRuntime) {
 	{
 		return str.split('').reverse().join('');
 	}
-	function foldl(f,b,str)
+	function foldl(f, b, str)
 	{
 		var len = str.length;
 		for (var i = 0; i < len; ++i)
@@ -72,7 +74,7 @@ Elm.Native.String.make = function(localRuntime) {
 		}
 		return b;
 	}
-	function foldr(f,b,str)
+	function foldr(f, b, str)
 	{
 		for (var i = str.length; i--; )
 		{
@@ -80,7 +82,6 @@ Elm.Native.String.make = function(localRuntime) {
 		}
 		return b;
 	}
-
 	function split(sep, str)
 	{
 		return List.fromArray(str.split(sep));
@@ -102,18 +103,17 @@ Elm.Native.String.make = function(localRuntime) {
 		}
 		return result;
 	}
-
 	function slice(start, end, str)
 	{
-		return str.slice(start,end);
+		return str.slice(start, end);
 	}
 	function left(n, str)
 	{
-		return n < 1 ? "" : str.slice(0,n);
+		return n < 1 ? '' : str.slice(0, n);
 	}
 	function right(n, str)
 	{
-		return n < 1 ? "" : str.slice(-n);
+		return n < 1 ? '' : str.slice(-n);
 	}
 	function dropLeft(n, str)
 	{
@@ -121,19 +121,18 @@ Elm.Native.String.make = function(localRuntime) {
 	}
 	function dropRight(n, str)
 	{
-		return n < 1 ? str : str.slice(0,-n);
+		return n < 1 ? str : str.slice(0, -n);
 	}
-
-	function pad(n,chr,str)
+	function pad(n, chr, str)
 	{
 		var half = (n - str.length) / 2;
-		return repeat(Math.ceil(half),chr) + str + repeat(half|0,chr);
+		return repeat(Math.ceil(half), chr) + str + repeat(half | 0, chr);
 	}
-	function padRight(n,chr,str)
+	function padRight(n, chr, str)
 	{
 		return str + repeat(n - str.length, chr);
 	}
-	function padLeft(n,chr,str)
+	function padLeft(n, chr, str)
 	{
 		return repeat(n - str.length, chr) + str;
 	}
@@ -144,11 +143,11 @@ Elm.Native.String.make = function(localRuntime) {
 	}
 	function trimLeft(str)
 	{
-		return str.replace(/^\s+/,"");
+		return str.replace(/^\s+/, '');
 	}
 	function trimRight(str)
 	{
-		return str.replace(/\s+$/,"");
+		return str.replace(/\s+$/, '');
 	}
 
 	function words(str)

@@ -1,6 +1,6 @@
 Elm.Native.Json = {};
-Elm.Native.Json.make = function(localRuntime) {
 
+Elm.Native.Json.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Json = localRuntime.Native.Json || {};
 	if (localRuntime.Native.Json.values) {
@@ -50,7 +50,7 @@ Elm.Native.Json.make = function(localRuntime) {
 
 
 	function decodeInt(value) {
-		if (typeof value === 'number' && (value|0) === value) {
+		if (typeof value === 'number' && (value | 0) === value) {
 			return value;
 		}
 		crash('an Int', value);
@@ -72,7 +72,7 @@ Elm.Native.Json.make = function(localRuntime) {
 			if (value instanceof Array) {
 				var len = value.length;
 				var array = new Array(len);
-				for (var i = len; i-- ; ) {
+				for (var i = len; i--; ) {
 					array[i] = decoder(value[i]);
 				}
 				return ElmArray.fromJSArray(array);
@@ -89,7 +89,7 @@ Elm.Native.Json.make = function(localRuntime) {
 			if (value instanceof Array) {
 				var len = value.length;
 				var list = List.Nil;
-				for (var i = len; i-- ; ) {
+				for (var i = len; i--; ) {
 					list = List.Cons( decoder(value[i]), list );
 				}
 				return list;
@@ -145,7 +145,7 @@ Elm.Native.Json.make = function(localRuntime) {
 				return keyValuePairs;
 			}
 
-			crash("an object", value);
+			crash('an object', value);
 		};
 	}
 
@@ -483,5 +483,4 @@ Elm.Native.Json.make = function(localRuntime) {
 		encodeObject: encodeObject
 
 	};
-
 };

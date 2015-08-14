@@ -1,6 +1,6 @@
 Elm.Native.Task = {};
-Elm.Native.Task.make = function(localRuntime) {
 
+Elm.Native.Task.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Task = localRuntime.Native.Task || {};
 	if (localRuntime.Native.Task.values)

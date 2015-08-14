@@ -128,7 +128,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			update: updateButton,
 			model: {
 				message: message,
-				text:text
+				text: text
 			}
 		});
 	}
@@ -181,9 +181,9 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		}
 
 		btn.addEventListener('mouseover', over);
-		btn.addEventListener('mouseout' , out);
+		btn.addEventListener('mouseout', out);
 		btn.addEventListener('mousedown', down);
-		btn.addEventListener('mouseup'  , up);
+		btn.addEventListener('mouseup', up);
 
 		return btn;
 	}
@@ -209,7 +209,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		return node;
 	}
 
-	function max3(a,b,c)
+	function max3(a, b, c)
 	{
 		var ab = a > b ? a : b;
 		return ab > c ? ab : c;
@@ -263,7 +263,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			type: 'CheckBox',
 			render: renderCheckbox,
 			update: updateCheckbox,
-			model: { handler:handler, checked:checked }
+			model: { handler: handler, checked: checked }
 		});
 	}
 
@@ -275,7 +275,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		}
 		else
 		{
-			setTimeout(function(){node.setSelectionRange(start, end, dir);}, 0);
+			setTimeout(function() {node.setSelectionRange(start, end, dir); }, 0);
 		}
 	}
 
@@ -319,7 +319,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		{
 			updateIfNeeded(css, 'font-family', Text.toTypefaces(textStyle.typeface));
 		}
-		if (textStyle.height.ctor !== "Nothing")
+		if (textStyle.height.ctor !== 'Nothing')
 		{
 			updateIfNeeded(css, 'font-size', textStyle.height._0 + 'px');
 		}
@@ -360,10 +360,10 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			field.value = field.elm_old_value;
 
 			Signal.sendMessage(field.elm_handler({
-				_:{},
+				_: {},
 				string: next,
 				selection: {
-					_:{},
+					_: {},
 					start: start,
 					end: end,
 					direction: { ctor: direction }
@@ -420,11 +420,11 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 				render: renderField,
 				update: updateField,
 				model: {
-					handler:handler,
-					placeHolder:placeHolder,
-					content:content,
-					style:style,
-					type:type
+					handler: handler,
+					placeHolder: placeHolder,
+					content: content,
+					style: style,
+					type: type
 				}
 			});
 		}
@@ -437,7 +437,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		{
 			Signal.sendMessage(handler(bool));
 		}
-		var props = Utils.replace([['hover',onHover]], elem.props);
+		var props = Utils.replace([['hover', onHover]], elem.props);
 		return {
 			props: props,
 			element: elem.element
@@ -450,7 +450,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		{
 			Signal.sendMessage(message);
 		}
-		var props = Utils.replace([['click',onClick]], elem.props);
+		var props = Utils.replace([['click', onClick]], elem.props);
 		return {
 			props: props,
 			element: elem.element
@@ -468,5 +468,4 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		hoverable: F2(hoverable),
 		clickable: F2(clickable)
 	};
-
 };

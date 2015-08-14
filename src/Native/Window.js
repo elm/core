@@ -1,7 +1,6 @@
 Elm.Native = Elm.Native || {};
 Elm.Native.Window = {};
-Elm.Native.Window.make = function(localRuntime) {
-
+Elm.Native.Window.make = function make(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Window = localRuntime.Native.Window || {};
 	if (localRuntime.Native.Window.values)
@@ -43,17 +42,17 @@ Elm.Native.Window.make = function(localRuntime) {
 			return;
 		}
 
-		setTimeout(function () {
+		setTimeout(function() {
 			// Check again to see if the dimensions have changed.
 			// It is conceivable that the dimensions have changed
 			// again while some other event was being processed.
-			var w = getWidth();
-			var h = getHeight();
+			w = getWidth();
+			h = getHeight();
 			if (dimensions.value._0 === w && dimensions.value._1 === h)
 			{
 				return;
 			}
-			localRuntime.notify(dimensions.id, Tuple2(w,h));
+			localRuntime.notify(dimensions.id, Tuple2(w, h));
 		}, 0);
 	}
 

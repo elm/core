@@ -36,5 +36,4 @@ Elm.Native.Color.make = function(localRuntime) {
 	return localRuntime.Native.Color.values = {
 		toCss: toCss
 	};
-
 };

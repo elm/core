@@ -1,6 +1,5 @@
 Elm.Native.Trampoline = {};
 Elm.Native.Trampoline.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Trampoline = localRuntime.Native.Trampoline || {};
 	if (localRuntime.Native.Trampoline.values)
@@ -12,14 +11,14 @@ Elm.Native.Trampoline.make = function(localRuntime) {
 	function trampoline(t)
 	{
 		var tramp = t;
-		while(true)
+		while (true)
 		{
-			switch(tramp.ctor)
+			switch (tramp.ctor)
 			{
-				case "Done":
+				case 'Done':
 					return tramp._0;
-				case "Continue":
-					tramp = tramp._0({ ctor: "_Tuple0" });
+				case 'Continue':
+					tramp = tramp._0({ ctor: '_Tuple0' });
 					continue;
 			}
 		}

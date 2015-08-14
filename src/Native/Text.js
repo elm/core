@@ -32,6 +32,15 @@ Elm.Native.Text.make = function(localRuntime) {
 
 	function addMeta(field, value, text)
 	{
+		var metaKeys = [
+			'font-size',
+			'font-family',
+			'font-style',
+			'font-weight',
+			'href',
+			'text-decoration',
+			'color'
+		];
 		var newProps = {};
 		var newText = {
 			ctor: 'Text:Meta',
@@ -56,17 +65,6 @@ Elm.Native.Text.make = function(localRuntime) {
 		newProps[field] = value;
 		return newText;
 	}
-
-	var metaKeys = [
-		'font-size',
-		'font-family',
-		'font-style',
-		'font-weight',
-		'href',
-		'text-decoration',
-		'color'
-	];
-
 
 	// conversions from Elm values to CSS
 
@@ -105,7 +103,7 @@ Elm.Native.Text.make = function(localRuntime) {
 		{
 			props['font-family'] = toTypefaces(style.typeface);
 		}
-		if (style.height.ctor !== "Nothing")
+		if (style.height.ctor !== 'Nothing')
 		{
 			props['font-size'] = style.height._0 + 'px';
 		}
@@ -213,11 +211,11 @@ Elm.Native.Text.make = function(localRuntime) {
 		{
 			return str;
 		}
-		str = str //.replace(/&/g,  "&#38;")
+		str = str //.replace(/&/g,  '&#38;')
 			.replace(/"/g,  '&#34;')
-			.replace(/'/g,  "&#39;")
-			.replace(/</g,  "&#60;")
-			.replace(/>/g,  "&#62;");
+			.replace(/'/g,  '&#39;')
+			.replace(/</g,  '&#60;')
+			.replace(/>/g,  '&#62;');
 		var arr = str.split('\n');
 		for (var i = arr.length; i--; )
 		{
@@ -235,13 +233,13 @@ Elm.Native.Text.make = function(localRuntime) {
 		var arr = s.split('');
 		if (arr[0] === ' ')
 		{
-			arr[0] = "&nbsp;";
+			arr[0] = '&nbsp;';
 		}
 		for (var i = arr.length; --i; )
 		{
-			if (arr[i][0] === ' ' && arr[i-1] === ' ')
+			if (arr[i][0] === ' ' && arr[i - 1] === ' ')
 			{
-				arr[i-1] = arr[i-1] + arr[i];
+				arr[i - 1] = arr[i - 1] + arr[i];
 				arr[i] = '';
 			}
 		}
@@ -258,9 +256,9 @@ Elm.Native.Text.make = function(localRuntime) {
 			}
 		}
 		arr = arr.join('');
-		if (arr[arr.length-1] === " ")
+		if (arr[arr.length - 1] === ' ')
 		{
-			return arr.slice(0,-1) + '&nbsp;';
+			return arr.slice(0, -1) + '&nbsp;';
 		}
 		return arr;
 	}

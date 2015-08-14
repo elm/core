@@ -1,6 +1,6 @@
 Elm.Native.Port = {};
-Elm.Native.Port.make = function(localRuntime) {
 
+Elm.Native.Port.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Port = localRuntime.Native.Port || {};
 	if (localRuntime.Native.Port.values)
@@ -9,8 +9,6 @@ Elm.Native.Port.make = function(localRuntime) {
 	}
 
 	var NS;
-	var Utils = Elm.Native.Utils.make(localRuntime);
-
 
 	// INBOUND
 
@@ -19,11 +17,11 @@ Elm.Native.Port.make = function(localRuntime) {
 		if (!localRuntime.argsTracker[name])
 		{
 			throw new Error(
-				"Port Error:\n" +
-				"No argument was given for the port named '" + name + "' with type:\n\n" +
-				"    " + type.split('\n').join('\n        ') + "\n\n" +
-				"You need to provide an initial value!\n\n" +
-				"Find out more about ports here <http://elm-lang.org/learn/Ports.elm>"
+				'Port Error:\n' +
+				'No argument was given for the port named \'' + name + '\' with type:\n\n' +
+				'    ' + type.split('\n').join('\n        ') + '\n\n' +
+				'You need to provide an initial value!\n\n' +
+				'Find out more about ports here <http://elm-lang.org/learn/Ports.elm>'
 			);
 		}
 		var arg = localRuntime.argsTracker[name];
@@ -66,12 +64,12 @@ Elm.Native.Port.make = function(localRuntime) {
 		catch(e)
 		{
 			throw new Error(
-				"Port Error:\n" +
-				"Regarding the port named '" + name + "' with type:\n\n" +
-				"    " + type.split('\n').join('\n        ') + "\n\n" +
-				"You just sent the value:\n\n" +
-				"    " + JSON.stringify(value) + "\n\n" +
-				"but it cannot be converted to the necessary type.\n" +
+				'Port Error:\n' +
+				'Regarding the port named \'' + name + '\' with type:\n\n' +
+				'    ' + type.split('\n').join('\n        ') + '\n\n' +
+				'You just sent the value:\n\n' +
+				'    ' + JSON.stringify(value) + '\n\n' +
+				'but it cannot be converted to the necessary type.\n' +
 				e.message
 			);
 		}

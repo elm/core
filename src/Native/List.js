@@ -37,12 +37,12 @@ Elm.Native.List.make = function(localRuntime) {
 		return out;
 	}
 
-	function range(lo,hi)
+	function range(lo, hi)
 	{
 		var lst = Nil;
 		if (lo <= hi)
 		{
-			do { lst = Cons(hi,lst); } while (hi-->lo);
+			do { lst = Cons(hi, lst); } while (hi-- > lo);
 		}
 		return lst;
 	}
@@ -147,14 +147,14 @@ Elm.Native.List.make = function(localRuntime) {
 
 	function sortBy(f, xs)
 	{
-		return fromArray(toArray(xs).sort(function(a,b){
+		return fromArray(toArray(xs).sort(function(a, b) {
 			return Utils.cmp(f(a), f(b));
 		}));
 	}
 
 	function sortWith(f, xs)
 	{
-		return fromArray(toArray(xs).sort(function(a,b){
+		return fromArray(toArray(xs).sort(function(a, b) {
 			var ord = f(a)(b).ctor;
 			return ord === 'EQ' ? 0 : ord === 'LT' ? -1 : 1;
 		}));

@@ -17,12 +17,12 @@ Elm.Native.Bitwise.make = function(localRuntime) {
 
 	return localRuntime.Native.Bitwise.values = {
 		and: F2(and),
-		or : F2(or ),
+		or : F2(or),
 		xor: F2(xor),
 		complement: not,
-		shiftLeft           : F2(sll),
+		shiftLeft: F2(sll),
 		shiftRightArithmatic: F2(sra),
-		shiftRightLogical   : F2(srl)
+		shiftRightLogical: F2(srl)
 	};
 
 };
