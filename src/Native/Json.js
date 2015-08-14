@@ -136,12 +136,11 @@ Elm.Native.Json.make = function(localRuntime) {
 
 			if (isObject) {
 				var keyValuePairs = List.Nil;
-				for (var key in value) {
-					if (value.hasOwnProperty(key)) {
-						var elmValue = decoder(value[key]);
-						var pair = Utils.Tuple2(key, elmValue);
-						keyValuePairs = List.Cons(pair, keyValuePairs);
-					}
+				for (var key in value)
+				{
+					var elmValue = decoder(value[key]);
+					var pair = Utils.Tuple2(key, elmValue);
+					keyValuePairs = List.Cons(pair, keyValuePairs);
 				}
 				return keyValuePairs;
 			}
