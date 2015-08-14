@@ -10,6 +10,9 @@ focuses on representing and manipulating strings of character strings, the
 `Text` library focuses on how those strings should look on screen. It lets
 you make text bold or italic, set the typeface, set the text size, etc.
 
+# Text
+@docs Text
+
 # Creating Text
 @docs fromString, empty, append, concat, join
 
@@ -26,6 +29,8 @@ import Maybe exposing (Maybe(Nothing))
 import Native.Text
 
 
+{-| Represents styled text. It can be rendered with collages or with elements.
+-}
 type Text = Text
 
 

@@ -1,27 +1,27 @@
 # 0.15
 
+### Syntax
+
+New `import` syntax with keyword `exposing`.
+
 ### Module Changes
 
-  * Rename `Json.Decode` to `JavaScript.Decode`
-  * Rename `Json.Encode` to `JavaScript.Encode`
   * Move `Http` to `elm-http` package and totally redo API
-  * Split `Signal` into `Stream` and `Varying` modules
   * Remove `WebSocket` module
-  * Add `Promise` module
+  * Add `Task` module
 
-### Channels become Inputs
+### Channels become Mailboxes
 
-Rather than creating `Channels` with expressions, we now create `Inputs` with
-declarations. It works like this:
+`Graphics.Input` now works with this API (from module `Signal`):
 
 ```elm
-type alias Input a = { address : Address a, stream : Stream a }
+type alias Mailbox a = { address : Address a, signal : Signal a }
 
-input actions : Input Action
+mailbox : a -> Mailbox a
 ```
 
-You can then send messages to the `Address` with functions like `Stream.send`
-and `Stream.message`, or create forwarding addresses with `Stream.forward`.
+You can then send messages to the `Address` with functions like `Signal.send`
+and `Signal.message`, or create forwarding addresses with `Signal.forwardTo`.
 
 ### Text in Collages
 
@@ -34,6 +34,16 @@ outlinedText : LineStyle -> Text -> Form
 
 These functions render text with the canvas, making things quite a bit faster.
 The underlying implementation of `Text` has also been improved dramatically.
+
+### Miscellaneous
+
+  * Change types of `head`, `tail`, `maximum`, `minimum` by wrapping output in `Maybe`
+  * Move `leftAligned`, `centered`, `rightAligned` from `Text` to `Graphics.Element`
+  * Move `asText` from `Text` to `Graphics.Element`, renaming it to `show` in the process
+  * Remove `Text.plainText` (can be replaced by `Graphics.Element.leftAligned << Text.fromString`)
+  * Change type of `Keyboard.keysDown` from `Signal (List KeyCode)` to `Signal (Set KeyCode)`
+  * Remove `Keyboard.directions`
+  * Rename `Keyboard.lastPressed` to `Keyboard.presses`
 
 
 # 0.14
@@ -78,6 +88,7 @@ import Signal ( Signal )
   * Revamp `Input` concept as `Signal.Channel`
   * Remove `Signal.count`
   * Remove `Signal.countIf`
+  * Remove `Signal.combine`
 
 
 ### Randomness Done Right

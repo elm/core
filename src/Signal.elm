@@ -25,6 +25,9 @@ As the `Html` changes, the user sees different things on screen automatically.
 Some useful functions for working with time (e.g. setting FPS) and combining
 signals and time (e.g. timestamps) can be found in the [`Time`](Time) library.
 
+# Signals
+@docs Signal
+
 # Merging
 @docs merge, mergeMany
 
@@ -41,7 +44,7 @@ signals and time (e.g. timestamps) can be found in the [`Time`](Time) library.
 @docs filter, filterMap, dropRepeats, sampleOn
 
 # Mailboxes
-@docs Mailbox, mailbox, message, forwardTo, send
+@docs Mailbox, Address, mailbox, Message, message, forwardTo, send
 
 # Constants
 @docs constant
@@ -57,6 +60,11 @@ import Native.Signal
 import Task exposing (Task, succeed, onError)
 
 
+{-| A value that changes over time. So a `(Signal Int))` is an integer that is
+varying as time passes, perhaps representing the current window width of the
+browser. Every signal is updated at discrete moments in response to events in
+the world.
+-}
 type Signal a = Signal
 
 
@@ -78,7 +86,7 @@ constant =
 
     main : Signal Element
     main =
-        map toElement Mouse.position
+        map Graphics.Element.show Mouse.position
 -}
 map : (a -> result) -> Signal a -> Signal result
 map =
@@ -103,16 +111,19 @@ map2 =
   Native.Signal.map2
 
 
+{-|-}
 map3 : (a -> b -> c -> result) -> Signal a -> Signal b -> Signal c -> Signal result
 map3 =
   Native.Signal.map3
 
 
+{-|-}
 map4 : (a -> b -> c -> d -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal result
 map4 =
   Native.Signal.map4
 
 
+{-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> Signal a -> Signal b -> Signal c -> Signal d -> Signal e -> Signal result
 map5 =
   Native.Signal.map5
@@ -300,6 +311,12 @@ type alias Mailbox a =
     }
 
 
+{-| An `Address` points to a specific signal. It allows you to feed values into
+signals, so you can provide your own signal updates.
+
+The primary use case is when a `Task` or UI element needs to talk back to the
+main part of your application.
+-}
 type Address a =
     Address (a -> Task () ())
 
@@ -320,9 +337,10 @@ mailbox =
 {-| Create a new address. This address will tag each message it receives
 and then forward it along to some other address.
 
-    type Action = Undo | Remove Int
+    type Action = Undo | Remove Int | NoOp
 
-    port actions : Mailbox Action
+    actions : Mailbox Action
+    actions = mailbox NoOp
 
     removeAddress : Address Int
     removeAddress =
@@ -339,6 +357,10 @@ forwardTo (Address send) f =
     Address (\x -> send (f x))
 
 
+{-| A `Message` is like an envelope that you have not yet put in a mailbox.
+The address is filled out and the envelope is filled, but it will be sent at
+some point in the future.
+-}
 type Message = Message (Task () ())
 
 

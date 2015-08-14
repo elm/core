@@ -1,4 +1,9 @@
-module Graphics.Input.Field where
+module Graphics.Input.Field
+    ( field, password, email
+    , Content, Selection, Direction(..), noContent
+    , defaultStyle, Style, Outline, noOutline, Highlight, noHighlight, Dimensions, uniformly
+    ) where
+
 {-| This library provides an API for creating and updating text fields.
 Text fields use exactly the same approach as [`Graphics.Input`](Graphics-Input)
 for modelling user input, allowing you to keep track of new events and update
@@ -177,7 +182,7 @@ called `nameField`. As the user types their name, the field will be updated
 to match what they have entered.
 
     name : Signal.Mailbox Content
-    name = Signal.Mailbox noContent
+    name = Signal.mailbox noContent
 
     nameField : Signal Element
     nameField =

@@ -28,6 +28,7 @@ tests =
         , test "initialize 3" <| assertEqual (Array.initialize 4 (always 0)) (Array.fromList [0,0,0,0])
         , test "initialize Empty" <| assertEqual (Array.initialize 0 identity) Array.empty
         , test "initialize 4" <| assertEqual (Array.initialize 2 (always 0)) (Array.fromList [0,0])
+        , test "initialize negative" <| assertEqual (Array.initialize -1 identity) Array.empty
         , test "repeat" <| assertEqual (Array.repeat 5 40) (Array.fromList [40,40,40,40,40])
         , test "repeat 2" <| assertEqual (Array.repeat 5 0) (Array.fromList [0,0,0,0,0])
         , test "repeat 3" <| assertEqual (Array.repeat 3 "cat") (Array.fromList ["cat","cat","cat"])

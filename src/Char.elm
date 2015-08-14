@@ -10,7 +10,7 @@ module Char
 @docs isUpper, isLower, isDigit, isOctDigit, isHexDigit
 
 # Conversion
-@docs toUpper, toLower, toLocaleUpper, toLocaleLower, toCode, fromCode
+@docs toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
 
 -}
 
@@ -19,7 +19,7 @@ import Basics exposing ((&&), (||), (>=), (<=))
 
 
 isBetween : Char -> Char -> Char -> Bool
-isBetween low high char = 
+isBetween low high char =
   let code = toCode char
   in
       (code >= toCode low) && (code <= toCode high)
@@ -51,7 +51,7 @@ isOctDigit =
 
 {-| True for ASCII hexadecimal digits `[0-9a-fA-F]`. -}
 isHexDigit : Char -> Bool
-isHexDigit char = 
+isHexDigit char =
   isDigit char || isBetween 'a' 'f' char || isBetween 'A' 'F' char
 
 
@@ -79,6 +79,8 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
+{-| A simple alias for integers.
+-}
 type alias KeyCode = Int
 
 

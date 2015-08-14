@@ -13,7 +13,7 @@ Every Elm project needs the core libraries. They provide basic functionality inc
 
 In all Elm files there is a small set of default imports:
 
-```haskell
+```elm
 import Basics exposing (..)
 import List exposing ( List, (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )

@@ -8,6 +8,9 @@ module Date
 {-| Library for working with dates. Email the mailing list if you encounter
 issues with internationalization or locale formatting.
 
+# Dates
+@docs Date
+
 # Conversions
 @docs fromString, toTime, fromTime
 
@@ -21,6 +24,8 @@ import Time exposing (Time)
 import Result exposing (Result)
 
 
+{-| Representation of a date.
+-}
 type Date = Date
 
 
@@ -44,7 +49,7 @@ fromString =
   Native.Date.read
 
 
-{-| Convert a date into a time since midnight (UTC) of 1 January 1990 (i.e.
+{-| Convert a date into a time since midnight (UTC) of 1 January 1970 (i.e.
 [UNIX time](http://en.wikipedia.org/wiki/Unix_time)). Given the date 23 June
 1990 at 11:45AM this returns the corresponding time.
 -}

@@ -101,16 +101,19 @@ toPolar =
   Native.Basics.toPolar
 
 
+{-|-}
 (+) : number -> number -> number
 (+) =
   Native.Basics.add
 
 
+{-|-}
 (-) : number -> number -> number
 (-) =
   Native.Basics.sub
 
 
+{-|-}
 (*) : number -> number -> number
 (*) =
   Native.Basics.mul
@@ -126,7 +129,7 @@ infixl 6 +
 infixl 6 -
 infixl 7 *
 infixl 7 /
-infixl 8 ^
+infixr 8 ^
 
 infixl 7 //
 infixl 7 %
@@ -168,26 +171,31 @@ rem =
   Native.Basics.exp
 
 
+{-|-}
 cos : Float -> Float
 cos =
   Native.Basics.cos
 
 
+{-|-}
 sin : Float -> Float
 sin =
   Native.Basics.sin
 
 
+{-|-}
 tan : Float -> Float
 tan =
   Native.Basics.tan
 
 
+{-|-}
 acos : Float -> Float
 acos =
   Native.Basics.acos
 
 
+{-|-}
 asin : Float -> Float
 asin =
   Native.Basics.asin
@@ -271,31 +279,37 @@ e =
   Native.Basics.e
 
 
+{-|-}
 (==) : a -> a -> Bool
 (==) =
   Native.Basics.eq
 
 
+{-|-}
 (/=) : a -> a -> Bool
 (/=) =
   Native.Basics.neq
 
 
+{-|-}
 (<) : comparable -> comparable -> Bool
 (<) =
   Native.Basics.lt
 
 
+{-|-}
 (>) : comparable -> comparable -> Bool
 (>) =
   Native.Basics.gt
 
 
+{-|-}
 (<=) : comparable -> comparable -> Bool
 (<=) =
   Native.Basics.le
 
 
+{-|-}
 (>=) : comparable -> comparable -> Bool
 (>=) =
   Native.Basics.ge
@@ -410,7 +424,7 @@ toFloat =
   Native.Basics.toFloat
 
 
-{- | Determine whether a float is an undefined or unrepresentable number.
+{-| Determine whether a float is an undefined or unrepresentable number.
 NaN stands for *not a number* and it is [a standardized part of floating point
 numbers](http://en.wikipedia.org/wiki/NaN).
 
@@ -424,7 +438,7 @@ isNaN =
   Native.Basics.isNaN
 
 
-{- | Determine whether a float is positive or negative infinity.
+{-| Determine whether a float is positive or negative infinity.
 
     isInfinite (0/0)     == False
     isInfinite (sqrt -1) == False

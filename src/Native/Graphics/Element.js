@@ -26,13 +26,25 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	// CREATION
 
-	function createNode(elementType)
-	{
-		var node = document.createElement(elementType);
-		node.style.padding = "0";
-		node.style.margin = "0";
-		return node;
-	}
+	var createNode =
+		typeof document === 'undefined'
+			?
+				function(_)
+				{
+					return {
+						style: {},
+						appendChild: function() {}
+					};
+				}
+			:
+				function(elementType)
+				{
+					var node = document.createElement(elementType);
+					node.style.padding = "0";
+					node.style.margin = "0";
+					return node;
+				}
+			;
 
 
 	function newElement(width, height, elementPrim)
@@ -266,7 +278,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	};
 	function needsReversal(dir)
 	{
-		return dir == 'DUp' || dir == 'DLeft' || dir == 'DIn';
+		return dir === 'DUp' || dir === 'DLeft' || dir === 'DIn';
 	}
 
 	function flow(dir,elist)
@@ -274,7 +286,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var array = List.toArray(elist);
 		var container = createNode('div');
 		var goDir = directionTable[dir];
-		if (goDir == goOut)
+		if (goDir === goOut)
 		{
 			container.style.pointerEvents = 'none';
 		}
@@ -659,7 +671,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 			};
 			var pos = htmlHeight(0, raw);
 			return newElement(pos._0, pos._1, raw);
-		}
+		};
 	}
 
 	function markdown(text)
@@ -673,7 +685,12 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		return newElement(pos._0, pos._1, raw);
 	}
 
-	function htmlHeight(width, rawHtml)
+	var htmlHeight =
+		typeof document !== 'undefined'
+			? realHtmlHeight
+			: function(a, b) { return Utils.Tuple2(0,0); };
+
+	function realHtmlHeight(width, rawHtml)
 	{
 		// create dummy node
 		var temp = document.createElement('div');

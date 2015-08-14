@@ -17,7 +17,7 @@ corner as in some other graphics libraries. Furthermore, the y-axis points up,
 so moving a form 10 units in the y-axis will move it up on screen.
 
 # Unstructured Graphics
-@docs collage
+@docs collage, Form
 
 # Creating Forms
 @docs toForm, filled, textured, gradient, outlined, traced, text, outlinedText
@@ -33,10 +33,10 @@ it as a single unit.
 @docs group, groupTransform
 
 # Shapes
-@docs rect, oval, square, circle, ngon, polygon
+@docs Shape, rect, oval, square, circle, ngon, polygon
 
 # Paths
-@docs segment, path
+@docs Path, segment, path
 
 # Line Styles
 @docs solid, dashed, dotted, LineStyle, LineCap, LineJoin, defaultLine
@@ -53,6 +53,9 @@ import Color exposing (Color, black, Gradient)
 import Text exposing (Text)
 
 
+{-| A visual `Form` has a shape and texture. This can be anything from a red
+square to a circle textured with stripes.
+-}
 type alias Form =
     { theta : Float
     , scale : Float
@@ -129,8 +132,8 @@ dotted clr =
 
 
 type BasicForm
-    = FPath LineStyle Path
-    | FShape ShapeStyle Shape
+    = FPath LineStyle (List (Float,Float))
+    | FShape ShapeStyle (List (Float,Float))
     | FOutlinedText LineStyle Text
     | FText Text
     | FImage Int Int (Int,Int) String
@@ -148,7 +151,7 @@ form f =
   { theta=0, scale=1, x=0, y=0, alpha=1, form=f }
 
 
-fill style shape =
+fill style (Shape shape) =
   form (FShape (Fill style) shape)
 
 
@@ -174,13 +177,13 @@ gradient grad shape =
 
 {-| Outline a shape with a given line style. -}
 outlined : LineStyle -> Shape -> Form
-outlined style shape =
+outlined style (Shape shape) =
   form (FShape (Line style) shape)
 
 
 {-| Trace a path with a given line style. -}
 traced : LineStyle -> Path -> Form
-traced style path =
+traced style (Path path) =
   form (FPath style path)
 
 
@@ -273,22 +276,29 @@ collage =
   Native.Graphics.Collage.collage
 
 
-type alias Path = List (Float,Float)
+{-| A 2D path. Paths are a sequence of points. They do not have a color.
+-}
+type Path =
+  Path (List (Float,Float))
 
 
 {-| Create a path that follows a sequence of points. -}
 path : List (Float,Float) -> Path
 path ps =
-  ps
+  Path ps
 
 
 {-| Create a path along a given line segment. -}
 segment : (Float,Float) -> (Float,Float) -> Path
 segment p1 p2 =
-  [p1,p2]
+  Path [p1,p2]
 
 
-type alias Shape = List (Float,Float)
+{-| A 2D shape. Shapes are closed polygons. They do not have a color or
+texture, that information can be filled in later.
+-}
+type Shape =
+  Shape (List (Float,Float))
 
 
 {-| Create an arbitrary polygon by specifying its corners in order.
@@ -297,7 +307,7 @@ of points does not need to start and end with the same position.
 -}
 polygon : List (Float,Float) -> Shape
 polygon points =
-  points
+  Shape points
 
 {-| A rectangle with a given width and height. -}
 rect : Float -> Float -> Shape
@@ -305,7 +315,7 @@ rect w h =
   let hw = w/2
       hh = h/2
   in
-      [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
+      Shape [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
 
 
 {-| A square with a given edge length. -}
@@ -323,7 +333,7 @@ oval w h =
       hh = h/2
       f i = (hw * cos (t*i), hh * sin (t*i))
   in
-      List.map f [0..n-1]
+      Shape <| List.map f [0..n-1]
 
 
 {-| A circle with a given radius. -}
@@ -344,7 +354,7 @@ ngon n r =
       t = 2 * pi / m
       f i = ( r * cos (t*i), r * sin (t*i) )
   in
-      List.map f [0..m-1]
+      Shape <| List.map f [0..m-1]
 
 {-| Create some text. Details like size and color are part of the `Text` value
 itself, so you can mix colors and sizes and fonts easily.

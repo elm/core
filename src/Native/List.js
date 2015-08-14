@@ -42,9 +42,9 @@ Elm.Native.List.make = function(localRuntime) {
 		var lst = Nil;
 		if (lo <= hi)
 		{
-			do { lst = Cons(hi,lst) } while (hi-->lo);
+			do { lst = Cons(hi,lst); } while (hi-->lo);
 		}
-		return lst
+		return lst;
 	}
 
 	// f defined similarly for both foldl and foldr (NB: different from Haskell)

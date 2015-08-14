@@ -38,36 +38,43 @@ millisecond =
   1
 
 
+{-|-}
 second : Time
 second =
   1000 * millisecond
 
 
+{-|-}
 minute : Time
 minute =
   60 * second
 
 
+{-|-}
 hour : Time
 hour =
   60 * minute
 
 
+{-|-}
 inMilliseconds : Time -> Float
 inMilliseconds t =
   t
 
 
+{-|-}
 inSeconds : Time -> Float
 inSeconds t =
   t / second
 
 
+{-|-}
 inMinutes : Time -> Float
 inMinutes t =
   t / minute
 
 
+{-|-}
 inHours : Time -> Float
 inHours t =
   t / hour
@@ -121,6 +128,9 @@ timestamp =
 
 {-| Delay a signal by a certain amount of time. So `(delay second Mouse.clicks)`
 will update one second later than any mouse click.
+
+Note: Even calling `delay` with the same number on the same signal twice
+gives two independently firing signals.
 -}
 delay : Time -> Signal a -> Signal a
 delay =

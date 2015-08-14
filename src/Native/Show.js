@@ -10,7 +10,6 @@ Elm.Native.Show.make = function(localRuntime) {
 	var _Array;
 	var Dict;
 	var List;
-	var Utils = Elm.Native.Utils.make(localRuntime);
 
 	var toString = function(v)
 	{
@@ -93,28 +92,33 @@ Elm.Native.Show.make = function(localRuntime) {
 			{
 				return "[]";
 			}
-			else if (v.ctor === "RBNode" || v.ctor === "RBEmpty")
+			else if (v.ctor === "RBNode_elm_builtin" || v.ctor === "RBEmpty_elm_builtin" || v.ctor === "Set_elm_builtin")
 			{
 				if (!Dict)
 				{
 					Dict = Elm.Dict.make(localRuntime);
 				}
-				if (!List)
+				var list;
+				var name;
+				if (v.ctor === "Set_elm_builtin")
 				{
-					List = Elm.List.make(localRuntime);
-				}
-				var list = Dict.toList(v);
-				var name = "Dict";
-				if (list.ctor === "::" && list._0._1.ctor === "_Tuple0")
-				{
+					if (!List)
+					{
+						List = Elm.List.make(localRuntime);
+					}
 					name = "Set";
-					list = A2(List.map, function(x){return x._0}, list);
+					list = A2(List.map, function(x){return x._0;}, Dict.toList(v._0));
+				}
+				else
+				{
+					name = "Dict";
+					list = Dict.toList(v);
 				}
 				return name + ".fromList " + toString(list);
 			}
 			else if (v.ctor.slice(0,5) === "Text:")
 			{
-				return '<text>'
+				return '<text>';
 			}
 			else
 			{
@@ -131,9 +135,7 @@ Elm.Native.Show.make = function(localRuntime) {
 		}
 		if (type === 'object' && 'notify' in v && 'id' in v)
 		{
-			return 'initialValue' in v
-				? '<Signal>'
-				: '<Stream>';
+			return '<Signal>';
 		}
 		return "<internal structure>";
 	};
@@ -148,7 +150,7 @@ Elm.Native.Show.make = function(localRuntime) {
 				  .replace(/\0/g, '\\0');
 		if (isChar)
 		{
-			return s.replace(/\'/g, "\\'")
+			return s.replace(/\'/g, "\\'");
 		}
 		else
 		{

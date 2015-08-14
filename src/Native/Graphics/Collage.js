@@ -46,7 +46,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		ctx.strokeStyle = Color.toCss(style.color);
 	}
 
-	function setFillStyle(ctx, style)
+	function setFillStyle(redo, ctx, style)
 	{
 		var sty = style.ctor;
 		ctx.fillStyle = sty === 'Solid'
@@ -78,9 +78,14 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	function line(ctx,style,path)
 	{
-		(style.dashing.ctor === '[]')
-			? trace(ctx, path)
-			: customLineHelp(ctx, style, path);
+		if (style.dashing.ctor === '[]')
+		{
+			trace(ctx, path);
+		}
+		else
+		{
+			customLineHelp(ctx, style, path);
+		}
 		ctx.scale(1,-1);
 		ctx.stroke();
 	}
@@ -176,7 +181,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	function drawShape(redo, ctx, style, path)
 	{
 		trace(ctx, path);
-		setFillStyle(ctx, style);
+		setFillStyle(redo, ctx, style);
 		ctx.scale(1,-1);
 		ctx.fill();
 	}
@@ -335,7 +340,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		}
 		if (theta !== 0)
 		{
-			ctx.rotate(theta);
+			ctx.rotate(theta % (Math.PI * 2));
 		}
 		if (scale !== 1)
 		{
@@ -386,7 +391,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	   var scale = form.scale;
 	   var matrix = A6( Transform.matrix, scale, 0, 0, scale, form.x, form.y );
 
-	   var theta = form.theta
+	   var theta = form.theta;
 	   if (theta !== 0)
 	   {
 		   matrix = A2( Transform.multiply, matrix, Transform.rotation(theta) );

@@ -103,7 +103,7 @@ Elm.Native.Time.make = function(localRuntime)
 	return localRuntime.Native.Time.values = {
 		fpsWhen: F2(fpsWhen),
 		every: every,
-		toDate: function(t) { return new window.Date(t); },
+		toDate: function(t) { return new Date(t); },
 		read: read
 	};
 

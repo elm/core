@@ -7,6 +7,7 @@ import Regex exposing (..)
 import ElmTest.Assertion exposing (..)
 import ElmTest.Test exposing (..)
 
+
 tests : Test
 tests =
   let simpleTests = suite "Simple Stuff"
