@@ -1,7 +1,6 @@
 Elm.Native = Elm.Native || {};
 Elm.Native.Utils = {};
 Elm.Native.Utils.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Utils = localRuntime.Native.Utils || {};
 	if (localRuntime.Native.Utils.values)
@@ -9,7 +8,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return localRuntime.Native.Utils.values;
 	}
 
-	function eq(l,r)
+	function eq(l, r)
 	{
 		var stack = [{'x': l, 'y': r}];
 		while (stack.length > 0)
@@ -21,7 +20,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 			{
 				continue;
 			}
-			if (typeof x === "object")
+			if (typeof x === 'object')
 			{
 				var c = 0;
 				for (var i in x)
@@ -63,16 +62,16 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 	// code in Generate/JavaScript.hs depends on the particular
 	// integer values assigned to LT, EQ, and GT
-	var LT = -1, EQ = 0, GT = 1, ord = ['LT','EQ','GT'];
+	var LT = -1, EQ = 0, GT = 1, ord = ['LT', 'EQ', 'GT'];
 
-	function compare(x,y)
+	function compare(x, y)
 	{
 		return {
-			ctor: ord[cmp(x,y)+1]
+			ctor: ord[cmp(x, y) + 1]
 		};
 	}
 
-	function cmp(x,y) {
+	function cmp(x, y) {
 		var ord;
 		if (typeof x !== 'object')
 		{
@@ -88,11 +87,11 @@ Elm.Native.Utils.make = function(localRuntime) {
 					? LT
 					: GT;
 		}
-		else if (x.ctor === "::" || x.ctor === "[]")
+		else if (x.ctor === '::' || x.ctor === '[]')
 		{
 			while (true)
 			{
-				if (x.ctor === "[]" && y.ctor === "[]")
+				if (x.ctor === '[]' && y.ctor === '[]')
 				{
 					return EQ;
 				}
@@ -109,7 +108,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 				y = y._1;
 			}
 		}
-		else if (x.ctor.slice(0,6) === '_Tuple')
+		else if (x.ctor.slice(0, 6) === '_Tuple')
 		{
 			var n = x.ctor.slice(6) - 0;
 			var err = 'cannot compare tuples with more than 6 elements.';
@@ -133,13 +132,13 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 
 	var Tuple0 = {
-		ctor: "_Tuple0"
+		ctor: '_Tuple0'
 	};
 
-	function Tuple2(x,y)
+	function Tuple2(x, y)
 	{
 		return {
-			ctor: "_Tuple2",
+			ctor: '_Tuple2',
 			_0: x,
 			_1: y
 		};
@@ -251,27 +250,27 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 	//// LIST STUFF ////
 
-	var Nil = { ctor:'[]' };
+	var Nil = { ctor: '[]' };
 
-	function Cons(hd,tl)
+	function Cons(hd, tl)
 	{
 		return {
-			ctor: "::",
+			ctor: '::',
 			_0: hd,
 			_1: tl
 		};
 	}
 
-	function append(xs,ys)
+	function append(xs, ys)
 	{
 		// append Strings
-		if (typeof xs === "string")
+		if (typeof xs === 'string')
 		{
 			return xs + ys;
 		}
 
 		// append Text
-		if (xs.ctor.slice(0,5) === 'Text:')
+		if (xs.ctor.slice(0, 5) === 'Text:')
 		{
 			return {
 				ctor: 'Text:Append',
@@ -279,7 +278,6 @@ Elm.Native.Utils.make = function(localRuntime) {
 				_1: ys
 			};
 		}
-
 
 
 		// append Lists

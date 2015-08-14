@@ -1,7 +1,7 @@
 Elm.Native.Time = {};
+
 Elm.Native.Time.make = function(localRuntime)
 {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Time = localRuntime.Native.Time || {};
 	if (localRuntime.Native.Time.values)
@@ -42,7 +42,7 @@ Elm.Native.Time.make = function(localRuntime)
 
 		var timeoutId;
 
-		function update(input,state)
+		function update(input, state)
 		{
 			var currentTime = input._0;
 			var isOn = input._1;
@@ -68,7 +68,7 @@ Elm.Native.Time.make = function(localRuntime)
 		return A2(
 			NS.map,
 			function(state) { return state.delta; },
-			A3(NS.foldp, F2(update), update(input.value,initialState), input)
+			A3(NS.foldp, F2(update), update(input.value, initialState), input)
 		);
 	}
 
@@ -82,7 +82,7 @@ Elm.Native.Time.make = function(localRuntime)
 		{
 			localRuntime.notify(ticker.id, null);
 		}
-		var clock = A2( NS.map, fst, NS.timestamp(ticker) );
+		var clock = A2(NS.map, fst, NS.timestamp(ticker));
 		setInterval(tellTime, t);
 		return clock;
 	}
@@ -106,5 +106,4 @@ Elm.Native.Time.make = function(localRuntime)
 		toDate: function(t) { return new Date(t); },
 		read: read
 	};
-
 };

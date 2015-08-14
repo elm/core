@@ -76,7 +76,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		}
 	}
 
-	function line(ctx,style,path)
+	function line(ctx, style, path)
 	{
 		if (style.dashing.ctor === '[]')
 		{
@@ -86,7 +86,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		{
 			customLineHelp(ctx, style, path);
 		}
-		ctx.scale(1,-1);
+		ctx.scale(1, -1);
 		ctx.stroke();
 	}
 
@@ -104,10 +104,10 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			return;
 		}
 		var x0 = points[i]._0, y0 = points[i]._1;
-		var x1=0, y1=0, dx=0, dy=0, remaining=0, nx=0, ny=0;
+		var x1 = 0, y1 = 0, dx = 0, dy = 0, remaining = 0;
 		var pindex = 0, plen = pattern.length;
 		var draw = true, segmentLength = pattern[0];
-		ctx.moveTo(x0,y0);
+		ctx.moveTo(x0, y0);
 		while (i--)
 		{
 			x1 = points[i]._0;
@@ -182,7 +182,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	{
 		trace(ctx, path);
 		setFillStyle(redo, ctx, style);
-		ctx.scale(1,-1);
+		ctx.scale(1, -1);
 		ctx.fill();
 	}
 
@@ -269,7 +269,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			return [{
 				text: text._0,
 				color: context.color,
-				height: context['font-size'].slice(0,-2) | 0,
+				height: context['font-size'].slice(0, -2) | 0,
 				font: toFont(context)
 			}];
 		}
@@ -316,12 +316,12 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			srcY = pos._1,
 			srcW = w,
 			srcH = h,
-			destX = -w/2,
-			destY = -h/2,
+			destX = -w / 2,
+			destY = -h / 2,
 			destW = w,
 			destH = h;
 
-		ctx.scale(1,-1);
+		ctx.scale(1, -1);
 		ctx.drawImage(img, srcX, srcY, srcW, srcH, destX, destY, destW, destH);
 	}
 
@@ -344,7 +344,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		}
 		if (scale !== 1)
 		{
-			ctx.scale(scale,scale);
+			ctx.scale(scale, scale);
 		}
 		if (form.alpha !== 1)
 		{
@@ -509,13 +509,13 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		};
 	}
 
-	function makeCanvas(w,h)
+	function makeCanvas(w, h)
 	{
 		var canvas = NativeElement.createNode('canvas');
 		canvas.style.width  = w + 'px';
 		canvas.style.height = h + 'px';
-		canvas.style.display = "block";
-		canvas.style.position = "absolute";
+		canvas.style.display = 'block';
+		canvas.style.position = 'absolute';
 		var ratio = window.devicePixelRatio || 1;
 		canvas.width  = w * ratio;
 		canvas.height = h * ratio;
@@ -531,7 +531,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		return div;
 	}
 
-	function nodeStepper(w,h,div)
+	function nodeStepper(w, h, div)
 	{
 		var kids = div.childNodes;
 		var i = 0;
@@ -566,7 +566,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 				}
 				div.removeChild(node);
 			}
-			var canvas = makeCanvas(w,h);
+			var canvas = makeCanvas(w, h);
 			div.appendChild(canvas);
 			// we have added a new node, so we must step our position
 			++i;
@@ -616,7 +616,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		var h = model.h;
 
 		var forms = formStepper(model.forms);
-		var nodes = nodeStepper(w,h,div);
+		var nodes = nodeStepper(w, h, div);
 		var ctx = null;
 		var formType = '';
 
@@ -647,19 +647,18 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	}
 
 
-	function collage(w,h,forms)
+	function collage(w, h, forms)
 	{
 		return A3(NativeElement.newElement, w, h, {
 			ctor: 'Custom',
 			type: 'Collage',
 			render: render,
 			update: update,
-			model: {w:w, h:h, forms:forms}
+			model: {w: w, h: h, forms: forms}
 		});
 	}
 
 	return localRuntime.Native.Graphics.Collage.values = {
 		collage: F3(collage)
 	};
-
 };

@@ -1,6 +1,4 @@
-
 if (!Elm.fullscreen) {
-
 	(function() {
 		'use strict';
 
@@ -208,7 +206,7 @@ if (!Elm.fullscreen) {
 				code.appendChild(document.createElement('br'));
 			}
 			code.appendChild(document.createElement('br'));
-			code.appendChild(document.createTextNode("Open the developer console for more details."));
+			code.appendChild(document.createTextNode('Open the developer console for more details.'));
 			return code;
 		}
 
@@ -339,7 +337,7 @@ if (!Elm.fullscreen) {
 			var _requestAnimationFrame =
 				typeof requestAnimationFrame !== 'undefined'
 					? requestAnimationFrame
-					: function(cb) { setTimeout(cb, 1000/60); }
+					: function(cb) { setTimeout(cb, 1000 / 60); }
 					;
 
 			// domUpdate is called whenever the main Signal changes.
@@ -392,8 +390,8 @@ if (!Elm.fullscreen) {
 						// request, yet somehow we are actively fulfilling a
 						// request?
 						throw new Error(
-							"Unexpected draw callback.\n" +
-							"Please report this to <https://github.com/elm-lang/core/issues>."
+							'Unexpected draw callback.\n' +
+							'Please report this to <https://github.com/elm-lang/core/issues>.'
 						);
 
 					case PENDING_REQUEST:
@@ -446,7 +444,7 @@ if (!Elm.fullscreen) {
 		// structure.
 		function hotSwap(from, to)
 		{
-			function similar(nodeOld,nodeNew)
+			function similar(nodeOld, nodeNew)
 			{
 				if (nodeOld.id !== nodeNew.id)
 				{
@@ -458,7 +456,7 @@ if (!Elm.fullscreen) {
 				}
 				return nodeOld.kids.length === nodeNew.kids.length;
 			}
-			function swap(nodeOld,nodeNew)
+			function swap(nodeOld, nodeNew)
 			{
 				nodeNew.value = nodeOld.value;
 				return true;
@@ -514,7 +512,7 @@ if (!Elm.fullscreen) {
 	function F3(fun)
 	{
 		function wrapper(a) {
-			return function(b) { return function(c) { return fun(a,b,c); }; };
+			return function(b) { return function(c) { return fun(a, b, c); }; };
 		}
 		wrapper.arity = 3;
 		wrapper.func = fun;
@@ -524,7 +522,7 @@ if (!Elm.fullscreen) {
 	function F4(fun)
 	{
 		function wrapper(a) { return function(b) { return function(c) {
-			return function(d) { return fun(a,b,c,d); }; }; };
+			return function(d) { return fun(a, b, c, d); }; }; };
 		}
 		wrapper.arity = 4;
 		wrapper.func = fun;
@@ -534,7 +532,7 @@ if (!Elm.fullscreen) {
 	function F5(fun)
 	{
 		function wrapper(a) { return function(b) { return function(c) {
-			return function(d) { return function(e) { return fun(a,b,c,d,e); }; }; }; };
+			return function(d) { return function(e) { return fun(a, b, c, d, e); }; }; }; };
 		}
 		wrapper.arity = 5;
 		wrapper.func = fun;
@@ -545,7 +543,7 @@ if (!Elm.fullscreen) {
 	{
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
-			return fun(a,b,c,d,e,f); }; }; }; }; };
+			return fun(a, b, c, d, e, f); }; }; }; }; };
 		}
 		wrapper.arity = 6;
 		wrapper.func = fun;
@@ -556,7 +554,7 @@ if (!Elm.fullscreen) {
 	{
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
-			return function(g) { return fun(a,b,c,d,e,f,g); }; }; }; }; }; };
+			return function(g) { return fun(a, b, c, d, e, f, g); }; }; }; }; }; };
 		}
 		wrapper.arity = 7;
 		wrapper.func = fun;
@@ -568,7 +566,7 @@ if (!Elm.fullscreen) {
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
 			return function(g) { return function(h) {
-			return fun(a,b,c,d,e,f,g,h); }; }; }; }; }; }; };
+			return fun(a, b, c, d, e, f, g, h); }; }; }; }; }; }; };
 		}
 		wrapper.arity = 8;
 		wrapper.func = fun;
@@ -580,59 +578,59 @@ if (!Elm.fullscreen) {
 		function wrapper(a) { return function(b) { return function(c) {
 			return function(d) { return function(e) { return function(f) {
 			return function(g) { return function(h) { return function(i) {
-			return fun(a,b,c,d,e,f,g,h,i); }; }; }; }; }; }; }; };
+			return fun(a, b, c, d, e, f, g, h, i); }; }; }; }; }; }; }; };
 		}
 		wrapper.arity = 9;
 		wrapper.func = fun;
 		return wrapper;
 	}
 
-	function A2(fun,a,b)
+	function A2(fun, a, b)
 	{
 		return fun.arity === 2
-			? fun.func(a,b)
+			? fun.func(a, b)
 			: fun(a)(b);
 	}
-	function A3(fun,a,b,c)
+	function A3(fun, a, b, c)
 	{
 		return fun.arity === 3
-			? fun.func(a,b,c)
+			? fun.func(a, b, c)
 			: fun(a)(b)(c);
 	}
-	function A4(fun,a,b,c,d)
+	function A4(fun, a, b, c, d)
 	{
 		return fun.arity === 4
-			? fun.func(a,b,c,d)
+			? fun.func(a, b, c, d)
 			: fun(a)(b)(c)(d);
 	}
-	function A5(fun,a,b,c,d,e)
+	function A5(fun, a, b, c, d, e)
 	{
 		return fun.arity === 5
-			? fun.func(a,b,c,d,e)
+			? fun.func(a, b, c, d, e)
 			: fun(a)(b)(c)(d)(e);
 	}
-	function A6(fun,a,b,c,d,e,f)
+	function A6(fun, a, b, c, d, e, f)
 	{
 		return fun.arity === 6
-			? fun.func(a,b,c,d,e,f)
+			? fun.func(a, b, c, d, e, f)
 			: fun(a)(b)(c)(d)(e)(f);
 	}
-	function A7(fun,a,b,c,d,e,f,g)
+	function A7(fun, a, b, c, d, e, f, g)
 	{
 		return fun.arity === 7
-			? fun.func(a,b,c,d,e,f,g)
+			? fun.func(a, b, c, d, e, f, g)
 			: fun(a)(b)(c)(d)(e)(f)(g);
 	}
-	function A8(fun,a,b,c,d,e,f,g,h)
+	function A8(fun, a, b, c, d, e, f, g, h)
 	{
 		return fun.arity === 8
-			? fun.func(a,b,c,d,e,f,g,h)
+			? fun.func(a, b, c, d, e, f, g, h)
 			: fun(a)(b)(c)(d)(e)(f)(g)(h);
 	}
-	function A9(fun,a,b,c,d,e,f,g,h,i)
+	function A9(fun, a, b, c, d, e, f, g, h, i)
 	{
 		return fun.arity === 9
-			? fun.func(a,b,c,d,e,f,g,h,i)
+			? fun.func(a, b, c, d, e, f, g, h, i)
 			: fun(a)(b)(c)(d)(e)(f)(g)(h)(i);
 	}
 }

@@ -34,7 +34,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 
 	function find(n, re, str)
 	{
-		n = n.ctor === "All" ? Infinity : n._0;
+		n = n.ctor === 'All' ? Infinity : n._0;
 		var out = [];
 		var number = 0;
 		var string = str;
@@ -54,7 +54,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 					: Maybe.Just(submatch);
 			}
 			out.push({
-				_:{},
+				_: {},
 				match: result[0],
 				submatches: List.fromArray(subs),
 				index: result.index,
@@ -68,7 +68,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 
 	function replace(n, re, replacer, string)
 	{
-		n = n.ctor === "All" ? Infinity : n._0;
+		n = n.ctor === 'All' ? Infinity : n._0;
 		var count = 0;
 		function jsReplacer(match)
 		{
@@ -76,7 +76,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 			{
 				return match;
 			}
-			var i = arguments.length-3;
+			var i = arguments.length - 3;
 			var submatches = new Array(i);
 			while (i > 0)
 			{
@@ -86,11 +86,11 @@ Elm.Native.Regex.make = function(localRuntime) {
 					: Maybe.Just(submatch);
 			}
 			return replacer({
-				_:{},
-				match:match,
-				submatches:List.fromArray(submatches),
-				index:arguments[i-1],
-				number:count
+				_: {},
+				match: match,
+				submatches: List.fromArray(submatches),
+				index: arguments[i - 1],
+				number: count
 			});
 		}
 		return string.replace(re, jsReplacer);
@@ -98,7 +98,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 
 	function split(n, re, str)
 	{
-		n = n.ctor === "All" ? Infinity : n._0;
+		n = n.ctor === 'All' ? Infinity : n._0;
 		if (n === Infinity)
 		{
 			return List.fromArray(str.split(re));

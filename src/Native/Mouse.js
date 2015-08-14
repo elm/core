@@ -1,7 +1,6 @@
 Elm.Native = Elm.Native || {};
 Elm.Native.Mouse = {};
 Elm.Native.Mouse.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Mouse = localRuntime.Native.Mouse || {};
 	if (localRuntime.Native.Mouse.values)
@@ -12,7 +11,7 @@ Elm.Native.Mouse.make = function(localRuntime) {
 	var NS = Elm.Native.Signal.make(localRuntime);
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
-	var position = NS.input('Mouse.position', Utils.Tuple2(0,0));
+	var position = NS.input('Mouse.position', Utils.Tuple2(0, 0));
 
 	var isDown = NS.input('Mouse.isDown', false);
 

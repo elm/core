@@ -14,51 +14,51 @@ Elm.Native.Show.make = function(localRuntime) {
 	var toString = function(v)
 	{
 		var type = typeof v;
-		if (type === "function")
+		if (type === 'function')
 		{
 			var name = v.func ? v.func.name : v.name;
 			return '<function' + (name === '' ? '' : ': ') + name + '>';
 		}
-		else if (type === "boolean")
+		else if (type === 'boolean')
 		{
-			return v ? "True" : "False";
+			return v ? 'True' : 'False';
 		}
-		else if (type === "number")
+		else if (type === 'number')
 		{
-			return v + "";
+			return v + '';
 		}
 		else if ((v instanceof String) && v.isChar)
 		{
-			return "'" + addSlashes(v, true) + "'";
+			return '\'' + addSlashes(v, true) + '\'';
 		}
-		else if (type === "string")
+		else if (type === 'string')
 		{
 			return '"' + addSlashes(v, false) + '"';
 		}
-		else if (type === "object" && '_' in v && probablyPublic(v))
+		else if (type === 'object' && '_' in v && probablyPublic(v))
 		{
 			var output = [];
 			for (var k in v._)
 			{
 				for (var i = v._[k].length; i--; )
 				{
-					output.push(k + " = " + toString(v._[k][i]));
+					output.push(k + ' = ' + toString(v._[k][i]));
 				}
 			}
 			for (var k in v)
 			{
 				if (k === '_') continue;
-				output.push(k + " = " + toString(v[k]));
+				output.push(k + ' = ' + toString(v[k]));
 			}
 			if (output.length === 0)
 			{
-				return "{}";
+				return '{}';
 			}
-			return "{ " + output.join(", ") + " }";
+			return '{ ' + output.join(', ') + ' }';
 		}
-		else if (type === "object" && 'ctor' in v)
+		else if (type === 'object' && 'ctor' in v)
 		{
-			if (v.ctor.substring(0,6) === "_Tuple")
+			if (v.ctor.substring(0, 6) === '_Tuple')
 			{
 				var output = [];
 				for (var k in v)
@@ -66,33 +66,33 @@ Elm.Native.Show.make = function(localRuntime) {
 					if (k === 'ctor') continue;
 					output.push(toString(v[k]));
 				}
-				return "(" + output.join(",") + ")";
+				return '(' + output.join(',') + ')';
 			}
-			else if (v.ctor === "_Array")
+			else if (v.ctor === '_Array')
 			{
 				if (!_Array)
 				{
 					_Array = Elm.Array.make(localRuntime);
 				}
 				var list = _Array.toList(v);
-				return "Array.fromList " + toString(list);
+				return 'Array.fromList ' + toString(list);
 			}
-			else if (v.ctor === "::")
+			else if (v.ctor === '::')
 			{
 				var output = '[' + toString(v._0);
 				v = v._1;
-				while (v.ctor === "::")
+				while (v.ctor === '::')
 				{
-					output += "," + toString(v._0);
+					output += ',' + toString(v._0);
 					v = v._1;
 				}
 				return output + ']';
 			}
-			else if (v.ctor === "[]")
+			else if (v.ctor === '[]')
 			{
-				return "[]";
+				return '"[]';
 			}
-			else if (v.ctor === "RBNode_elm_builtin" || v.ctor === "RBEmpty_elm_builtin" || v.ctor === "Set_elm_builtin")
+			else if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
 			{
 				if (!Dict)
 				{
@@ -100,29 +100,29 @@ Elm.Native.Show.make = function(localRuntime) {
 				}
 				var list;
 				var name;
-				if (v.ctor === "Set_elm_builtin")
+				if (v.ctor === 'Set_elm_builtin')
 				{
 					if (!List)
 					{
 						List = Elm.List.make(localRuntime);
 					}
-					name = "Set";
-					list = A2(List.map, function(x){return x._0;}, Dict.toList(v._0));
+					name = 'Set';
+					list = A2(List.map, function(x) {return x._0; }, Dict.toList(v._0));
 				}
 				else
 				{
-					name = "Dict";
+					name = 'Dict';
 					list = Dict.toList(v);
 				}
-				return name + ".fromList " + toString(list);
+				return name + '.fromList ' + toString(list);
 			}
-			else if (v.ctor.slice(0,5) === "Text:")
+			else if (v.ctor.slice(0, 5) === 'Text:')
 			{
 				return '<text>';
 			}
 			else
 			{
-				var output = "";
+				var output = '';
 				for (var i in v)
 				{
 					if (i === 'ctor') continue;
@@ -137,7 +137,7 @@ Elm.Native.Show.make = function(localRuntime) {
 		{
 			return '<Signal>';
 		}
-		return "<internal structure>";
+		return '<internal structure>';
 	};
 
 	function addSlashes(str, isChar)
@@ -150,7 +150,7 @@ Elm.Native.Show.make = function(localRuntime) {
 				  .replace(/\0/g, '\\0');
 		if (isChar)
 		{
-			return s.replace(/\'/g, "\\'");
+			return s.replace(/\'/g, '\\\'');
 		}
 		else
 		{

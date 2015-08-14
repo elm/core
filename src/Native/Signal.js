@@ -1,6 +1,6 @@
 Elm.Native.Signal = {};
-Elm.Native.Signal.make = function(localRuntime) {
 
+Elm.Native.Signal.make = function(localRuntime) {
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Signal = localRuntime.Native.Signal || {};
 	if (localRuntime.Native.Signal.values)
@@ -171,7 +171,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			return A2( func, a.value, b.value );
 		}
-		return mapMany(refreshValue, [a,b]);
+		return mapMany(refreshValue, [a, b]);
 	}
 
 
@@ -181,7 +181,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			return A3( func, a.value, b.value, c.value );
 		}
-		return mapMany(refreshValue, [a,b,c]);
+		return mapMany(refreshValue, [a, b, c]);
 	}
 
 
@@ -191,7 +191,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			return A4( func, a.value, b.value, c.value, d.value );
 		}
-		return mapMany(refreshValue, [a,b,c,d]);
+		return mapMany(refreshValue, [a, b, c, d]);
 	}
 
 
@@ -201,9 +201,8 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			return A5( func, a.value, b.value, c.value, d.value, e.value );
 		}
-		return mapMany(refreshValue, [a,b,c,d,e]);
+		return mapMany(refreshValue, [a, b, c, d, e]);
 	}
-
 
 
 	// FOLD

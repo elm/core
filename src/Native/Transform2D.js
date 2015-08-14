@@ -1,6 +1,5 @@
 Elm.Native.Transform2D = {};
 Elm.Native.Transform2D.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Transform2D = localRuntime.Native.Transform2D || {};
 	if (localRuntime.Native.Transform2D.values)
@@ -35,7 +34,7 @@ Elm.Native.Transform2D.make = function(localRuntime) {
 	//
 	//  new A([ m11, m12, dx, m21, m22, dy ])
 
-	var identity = new A([1,0,0,0,1,0]);
+	var identity = new A([1, 0, 0, 0, 1, 0]);
 	function matrix(m11, m12, m21, m22, dx, dy)
 	{
 		return new A([m11, m12, dx, m21, m22, dy]);
@@ -48,13 +47,13 @@ Elm.Native.Transform2D.make = function(localRuntime) {
 		return new A([c, -s, 0, s, c, 0]);
 	}
 
-	function rotate(t,m)
+	function rotate(t, m)
 	{
 		var c = Math.cos(t);
 		var s = Math.sin(t);
 		var m11 = m[0], m12 = m[1], m21 = m[3], m22 = m[4];
-		return new A([m11*c + m12*s, -m11*s + m12*c, m[2],
-					  m21*c + m22*s, -m21*s + m22*c, m[5]]);
+		return new A([m11 * c + m12 * s, -m11 * s + m12 * c, m[2],
+					  m21 * c + m22 * s, -m21 * s + m22 * c, m[5]]);
 	}
 	/*
 	function move(xy,m) {
@@ -84,29 +83,28 @@ Elm.Native.Transform2D.make = function(localRuntime) {
 	{
 		var m11 = m[0], m12 = m[1], m21 = m[3], m22 = m[4], mdx = m[2], mdy = m[5];
 		var n11 = n[0], n12 = n[1], n21 = n[3], n22 = n[4], ndx = n[2], ndy = n[5];
-		return new A([m11*n11 + m12*n21,
-					  m11*n12 + m12*n22,
-					  m11*ndx + m12*ndy + mdx,
-					  m21*n11 + m22*n21,
-					  m21*n12 + m22*n22,
-					  m21*ndx + m22*ndy + mdy]);
+		return new A([m11 * n11 + m12 * n21,
+					  m11 * n12 + m12 * n22,
+					  m11 * ndx + m12 * ndy + mdx,
+					  m21 * n11 + m22 * n21,
+					  m21 * n12 + m22 * n22,
+					  m21 * ndx + m22 * ndy + mdy]);
 	}
 
 	return localRuntime.Native.Transform2D.values = {
-		identity:identity,
-		matrix:F6(matrix),
-		rotation:rotation,
-		multiply:F2(multiply)
+		identity: identity,
+		matrix: F6(matrix),
+		rotation: rotation,
+		multiply: F2(multiply)
 		/*
-		transform:F7(transform),
-		rotate:F2(rotate),
-		move:F2(move),
-		scale:F2(scale),
-		scaleX:F2(scaleX),
-		scaleY:F2(scaleY),
-		reflectX:reflectX,
-		reflectY:reflectY
+		transform: F7(transform),
+		rotate: F2(rotate),
+		move: F2(move),
+		scale: F2(scale),
+		scaleX: F2(scaleX),
+		scaleY: F2(scaleY),
+		reflectX: reflectX,
+		reflectY: reflectY
 		*/
 	};
-
 };
