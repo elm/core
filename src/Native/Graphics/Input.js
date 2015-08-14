@@ -457,6 +457,19 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		};
 	}
 
+	function localPosition(handler, elem)
+	{
+		function onMouseMove(xy)
+		{
+			Signal.sendMessage(handler(xy));
+		}
+		var props = Utils.replace([['mousemove',onMouseMove]], elem.props);
+		return {
+			props: props,
+			element: elem.element
+		};
+	}
+
 	return Elm.Native.Graphics.Input.values = {
 		button: F2(button),
 		customButton: F4(customButton),
@@ -466,7 +479,8 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		email: mkField('email'),
 		password: mkField('password'),
 		hoverable: F2(hoverable),
-		clickable: F2(clickable)
+		clickable: F2(clickable),
+		localPosition: F2(localPosition)
 	};
 
 };
