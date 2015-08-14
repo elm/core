@@ -463,7 +463,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 		var nextE = next.element;
 		var currE = curr.element;
-		switch(nextE.ctor)
+		switch (nextE.ctor)
 		{
 			case 'Spacer':
 				updateProps(node, curr, next);
@@ -485,7 +485,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 						node.src = nextE._3;
 					}
 				}
-				else if (!Utils.eq(nextE,currE)
+				else if (!Utils.eq(nextE, currE)
 					|| next.props.width !== curr.props.width
 					|| next.props.height !== curr.props.height)
 				{
@@ -515,7 +515,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				var goDir = directionTable[dir];
 				var toReverse = needsReversal(dir);
 				var len = kids.length;
-				for (var i = len; i-- ;)
+				for (var i = len; i--; )
 				{
 					var subNode = kids[toReverse ? len - i - 1 : i];
 					goDir(updateAndReplace(subNode, currs[i], nexts[i]));
@@ -551,11 +551,11 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		var height = nextProps.height - (element.adjustHeight || 0);
 		if (width !== currProps.width)
 		{
-			node.style.width = (width|0) + 'px';
+			node.style.width = (width | 0) + 'px';
 		}
 		if (height !== currProps.height)
 		{
-			node.style.height = (height|0) + 'px';
+			node.style.height = (height | 0) + 'px';
 		}
 
 		if (nextProps.opacity !== currProps.opacity)
@@ -664,8 +664,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		return function(text)
 		{
 			var raw = {
-				ctor :'RawHtml',
-				html : Text.renderHtml(text),
+				ctor: 'RawHtml',
+				html: Text.renderHtml(text),
 				align: align
 			};
 			var pos = htmlHeight(0, raw);
@@ -676,7 +676,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	function markdown(text)
 	{
 		var raw = {
-			ctor:'RawHtml',
+			ctor: 'RawHtml',
 			html: text,
 			align: null
 		};

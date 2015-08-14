@@ -206,7 +206,7 @@ if (!Elm.fullscreen) {
 				code.appendChild(document.createElement('br'));
 			}
 			code.appendChild(document.createElement('br'));
-			code.appendChild(document.createTextNode("Open the developer console for more details."));
+			code.appendChild(document.createTextNode('Open the developer console for more details.'));
 			return code;
 		}
 
@@ -444,7 +444,7 @@ if (!Elm.fullscreen) {
 		// structure.
 		function hotSwap(from, to)
 		{
-			function similar(nodeOld,nodeNew)
+			function similar(nodeOld, nodeNew)
 			{
 				if (nodeOld.id !== nodeNew.id)
 				{
@@ -456,7 +456,7 @@ if (!Elm.fullscreen) {
 				}
 				return nodeOld.kids.length === nodeNew.kids.length;
 			}
-			function swap(nodeOld,nodeNew)
+			function swap(nodeOld, nodeNew)
 			{
 				nodeNew.value = nodeOld.value;
 				return true;
@@ -600,7 +600,7 @@ if (!Elm.fullscreen) {
 	function A4(fun, a, b, c, d)
 	{
 		return fun.arity === 4
-			? fun.func(a,b,c,d)
+			? fun.func(a, b, c, d)
 			: fun(a)(b)(c)(d);
 	}
 	function A5(fun, a, b, c, d, e)

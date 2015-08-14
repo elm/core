@@ -205,7 +205,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
-
 	// FOLD
 
 	function foldp(update, state, signal)

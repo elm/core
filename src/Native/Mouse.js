@@ -1,7 +1,6 @@
 Elm.Native = Elm.Native || {};
 Elm.Native.Mouse = {};
 Elm.Native.Mouse.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Mouse = localRuntime.Native.Mouse || {};
 	if (localRuntime.Native.Mouse.values)

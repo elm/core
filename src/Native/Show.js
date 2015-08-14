@@ -66,7 +66,7 @@ Elm.Native.Show.make = function(localRuntime) {
 					if (k === 'ctor') continue;
 					output.push(toString(v[k]));
 				}
-				return "(" + output.join(',') + ')';
+				return '(' + output.join(',') + ')';
 			}
 			else if (v.ctor === '_Array')
 			{

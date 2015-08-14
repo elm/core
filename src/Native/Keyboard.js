@@ -45,5 +45,4 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 		blurs: blurs,
 		presses: presses
 	};
-
 };

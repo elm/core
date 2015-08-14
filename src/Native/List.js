@@ -199,27 +199,26 @@ Elm.Native.List.make = function(localRuntime) {
 
 
 	Elm.Native.List.values = {
-		Nil:Nil,
-		Cons:Cons,
-		cons:F2(Cons),
-		toArray:toArray,
-		fromArray:fromArray,
-		range:range,
+		Nil: Nil,
+		Cons: Cons,
+		cons: F2(Cons),
+		toArray: toArray,
+		fromArray: fromArray,
+		range: range,
 
-		foldl:F3(foldl),
-		foldr:F3(foldr),
+		foldl: F3(foldl),
+		foldr: F3(foldr),
 
-		any:F2(any),
-		map2:F3(map2),
-		map3:F4(map3),
-		map4:F5(map4),
-		map5:F6(map5),
-		sortBy:F2(sortBy),
-		sortWith:F2(sortWith),
-		take:F2(take),
-		drop:F2(drop),
-		repeat:F2(repeat)
+		any: F2(any),
+		map2: F3(map2),
+		map3: F4(map3),
+		map4: F5(map4),
+		map5: F6(map5),
+		sortBy: F2(sortBy),
+		sortWith: F2(sortWith),
+		take: F2(take),
+		drop: F2(drop),
+		repeat: F2(repeat)
 	};
 	return localRuntime.Native.List.values = Elm.Native.List.values;
-
 };
