@@ -161,7 +161,7 @@ Elm.Native.Text.make = function(localRuntime) {
 
 	function color(color, text)
 	{
-		return addMeta('color', toCss(color), text);;
+		return addMeta('color', toCss(color), text);
 	}
 
 
@@ -186,7 +186,7 @@ Elm.Native.Text.make = function(localRuntime) {
 
 	function renderMeta(metas, string)
 	{
-		var href = metas['href'];
+		var href = metas.href;
 		if (href)
 		{
 			string = '<a href="' + href + '">' + string + '</a>';
@@ -209,7 +209,7 @@ Elm.Native.Text.make = function(localRuntime) {
 
 	function properEscape(str)
 	{
-		if (str.length == 0)
+		if (str.length === 0)
 		{
 			return str;
 		}
@@ -228,18 +228,18 @@ Elm.Native.Text.make = function(localRuntime) {
 
 	function makeSpaces(s)
 	{
-		if (s.length == 0)
+		if (s.length === 0)
 		{
 			return s;
 		}
 		var arr = s.split('');
-		if (arr[0] == ' ')
+		if (arr[0] === ' ')
 		{
-			arr[0] = "&nbsp;"
+			arr[0] = "&nbsp;";
 		}
 		for (var i = arr.length; --i; )
 		{
-			if (arr[i][0] == ' ' && arr[i-1] == ' ')
+			if (arr[i][0] === ' ' && arr[i-1] === ' ')
 			{
 				arr[i-1] = arr[i-1] + arr[i];
 				arr[i] = '';
@@ -247,7 +247,7 @@ Elm.Native.Text.make = function(localRuntime) {
 		}
 		for (var i = arr.length; i--; )
 		{
-			if (arr[i].length > 1 && arr[i][0] == ' ')
+			if (arr[i].length > 1 && arr[i][0] === ' ')
 			{
 				var spaces = arr[i].split('');
 				for (var j = spaces.length - 2; j >= 0; j -= 2)

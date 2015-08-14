@@ -23,7 +23,7 @@ Elm.Native.Touch.make = function(localRuntime) {
             this.values.push(value);
         };
         this.lookup = function(key) {
-            var i = this.keys.indexOf(key)
+            var i = this.keys.indexOf(key);
             return i >= 0 ? this.values[i] : {x:0,y:0,t:0};
         };
         this.remove = function(key) {

@@ -136,7 +136,8 @@ Elm.Native.Json.make = function(localRuntime) {
 
 			if (isObject) {
 				var keyValuePairs = List.Nil;
-				for (var key in value) {
+				for (var key in value)
+				{
 					var elmValue = decoder(value[key]);
 					var pair = Utils.Tuple2(key, elmValue);
 					keyValuePairs = List.Cons(pair, keyValuePairs);
@@ -351,26 +352,26 @@ Elm.Native.Json.make = function(localRuntime) {
 				throw new Error('custom decoder failed: ' + result._0);
 			}
 			return result._0;
-		}
+		};
 	}
 
 	function andThen(decode, callback) {
 		return function(value) {
 			var result = decode(value);
 			return callback(result)(value);
-		}
+		};
 	}
 
 	function fail(msg) {
 		return function(value) {
 			throw new Error(msg);
-		}
+		};
 	}
 
 	function succeed(successValue) {
 		return function(value) {
 			return successValue;
-		}
+		};
 	}
 
 
@@ -389,7 +390,7 @@ Elm.Native.Json.make = function(localRuntime) {
 				temp = temp._1;
 			}
 			throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
-		}
+		};
 	}
 
 	function get(decoder, value) {

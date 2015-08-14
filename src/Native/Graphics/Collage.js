@@ -78,9 +78,14 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	function line(ctx,style,path)
 	{
-		(style.dashing.ctor === '[]')
-			? trace(ctx, path)
-			: customLineHelp(ctx, style, path);
+		if (style.dashing.ctor === '[]')
+		{
+			trace(ctx, path);
+		}
+		else
+		{
+			customLineHelp(ctx, style, path);
+		}
 		ctx.scale(1,-1);
 		ctx.stroke();
 	}
@@ -386,7 +391,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	   var scale = form.scale;
 	   var matrix = A6( Transform.matrix, scale, 0, 0, scale, form.x, form.y );
 
-	   var theta = form.theta
+	   var theta = form.theta;
 	   if (theta !== 0)
 	   {
 		   matrix = A2( Transform.multiply, matrix, Transform.rotation(theta) );
