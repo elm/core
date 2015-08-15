@@ -40,6 +40,7 @@ equality with `(==)` is unreliable and should not be used.
 
 import Basics exposing (..)
 import Maybe exposing (..)
+import Result exposing (..)
 import List exposing (..)
 import Native.Debug
 import String
@@ -89,30 +90,17 @@ empty : Dict comparable v
 empty = RBEmpty_elm_builtin LBlack
 
 
-min : Dict k v -> (k,v)
-min dict =
-    case dict of
-      RBNode_elm_builtin _ key value (RBEmpty_elm_builtin LBlack) _ ->
-          (key, value)
-
-      RBNode_elm_builtin _ _ _ left _ ->
-          min left
-
-      RBEmpty_elm_builtin LBlack ->
-          Native.Debug.crash "(min Empty) is not defined"
-
-
-max : Dict k v -> (k, v)
+max : Dict k v -> Result String (k, v)
 max dict =
     case dict of
       RBNode_elm_builtin _ key value _ (RBEmpty_elm_builtin _) ->
-          (key, value)
+          Ok (key, value)
 
       RBNode_elm_builtin _ _ _ _ right ->
           max right
 
       RBEmpty_elm_builtin _ ->
-          Native.Debug.crash "(max Empty) is not defined"
+          Err "(max Empty) is not defined"
 
 
 {-| Get the value associated with a key. If the key is not found, return
@@ -318,10 +306,8 @@ rem c l r =
                 reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
 
       -- l and r are both RBNodes
-      (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin cr kr vr lr rr) ->
-          let l = RBNode_elm_builtin cl kl vl ll rl
-              r = RBNode_elm_builtin cr kr vr lr rr
-              (k, v) = max l
+      (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
+          let (k, v) = withDefault (kl, vl) (toMaybe (max rl))
               l'     = remove_max cl kl vl ll rl
           in
               bubble c k v l' r
