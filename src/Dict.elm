@@ -318,10 +318,8 @@ rem c l r =
                 reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
 
       -- l and r are both RBNodes
-      (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin cr kr vr lr rr) ->
-          let l = RBNode_elm_builtin cl kl vl ll rl
-              r = RBNode_elm_builtin cr kr vr lr rr
-              (k, v) = max l
+      (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
+          let (k, v) = max l
               l'     = remove_max cl kl vl ll rl
           in
               bubble c k v l' r
