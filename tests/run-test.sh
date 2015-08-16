@@ -14,5 +14,4 @@ rm -rf $CORE_PACKAGE_DIR
 ln -s $CORE_GIT_DIR $CORE_PACKAGE_DIR
 
 elm-make --yes --output test.js Test.elm
-cat elm-io-ports.js >> test.js
-node test.js
+node elm-io-ports.js
