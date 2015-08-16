@@ -8,7 +8,8 @@ Elm.Native.List.make = function(localRuntime) {
 	}
 	if ('values' in Elm.Native.List)
 	{
-		return localRuntime.Native.List.values = Elm.Native.List.values;
+		localRuntime.Native.List.values = Elm.Native.List.values;
+		return localRuntime.Native.List.values;
 	}
 
 	var Utils = Elm.Native.Utils.make(localRuntime);
@@ -129,7 +130,7 @@ Elm.Native.List.make = function(localRuntime) {
 	function map5(f, vs, ws, xs, ys, zs)
 	{
 		var arr = [];
-		while (   vs.ctor !== '[]'
+		while (vs.ctor !== '[]'
 			   && ws.ctor !== '[]'
 			   && xs.ctor !== '[]'
 			   && ys.ctor !== '[]'
@@ -156,7 +157,15 @@ Elm.Native.List.make = function(localRuntime) {
 	{
 		return fromArray(toArray(xs).sort(function(a, b) {
 			var ord = f(a)(b).ctor;
-			return ord === 'EQ' ? 0 : ord === 'LT' ? -1 : 1;
+			if (ord === 'EQ')
+			{
+				return 0;
+			}
+			if (ord === 'LT')
+			{
+				return -1;
+			}
+			return 1;
 		}));
 	}
 
@@ -220,5 +229,6 @@ Elm.Native.List.make = function(localRuntime) {
 		drop: F2(drop),
 		repeat: F2(repeat)
 	};
-	return localRuntime.Native.List.values = Elm.Native.List.values;
+	localRuntime.Native.List.values = Elm.Native.List.values;
+	return localRuntime.Native.List.values;
 };

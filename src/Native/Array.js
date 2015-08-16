@@ -1,6 +1,5 @@
 Elm.Native.Array = {};
 Elm.Native.Array.make = function(localRuntime) {
-
 	localRuntime.Native = localRuntime.Native || {};
 	localRuntime.Native.Array = localRuntime.Native.Array || {};
 	if (localRuntime.Native.Array.values)
@@ -9,7 +8,8 @@ Elm.Native.Array.make = function(localRuntime) {
 	}
 	if ('values' in Elm.Native.Array)
 	{
-		return localRuntime.Native.Array.values = Elm.Native.Array.values;
+		localRuntime.Native.Array.values = Elm.Native.Array.values;
+		return localRuntime.Native.Array.values;
 	}
 
 	var List = Elm.Native.List.make(localRuntime);
@@ -105,7 +105,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		{
 			return empty;
 		}
-		var h = Math.floor( Math.log(len) / Math.log(M) );
+		var h = Math.floor(Math.log(len) / Math.log(M));
 		return initialize_(f, h, 0, len);
 	}
 
@@ -116,7 +116,7 @@ Elm.Native.Array.make = function(localRuntime) {
 			var table = new Array((to - from) % (M + 1));
 			for (var i = 0; i < table.length; i++)
 			{
-			  table[i] = f(from + i);
+				table[i] = f(from + i);
 			}
 			return {
 				ctor: '_Array',
@@ -131,7 +131,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		for (var i = 0; i < table.length; i++)
 		{
 			table[i] = initialize_(f, h - 1, from + (i * step), Math.min(from + ((i + 1) * step), to));
-			lengths[i] = length(table[i]) + (i > 0 ? lengths[i-1] : 0);
+			lengths[i] = length(table[i]) + (i > 0 ? lengths[i - 1] : 0);
 		}
 		return {
 			ctor: '_Array',
@@ -199,10 +199,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		{
 			return head.table[0];
 		}
-		else
-		{
-			return head;
-		}
+		return head;
 	}
 
 	// Push a node into a higher node as a child.
@@ -439,7 +436,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		// Handle leaf level.
 		if (a.height === 0)
 		{
-			var newA = { ctor:'_Array', height:0 };
+			var newA = { ctor: '_Array', height: 0 };
 			newA.table = a.table.slice(0, to);
 			return newA;
 		}
@@ -479,7 +476,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		// Handle leaf level.
 		if (a.height === 0)
 		{
-			var newA = { ctor:'_Array', height:0 };
+			var newA = { ctor: '_Array', height: 0 };
 			newA.table = a.table.slice(from, a.table.length + 1);
 			return newA;
 		}
@@ -513,7 +510,7 @@ Elm.Native.Array.make = function(localRuntime) {
 	}
 
 	// Appends two trees.
-	function append(a,b)
+	function append(a, b)
 	{
 		if (a.table.length === 0)
 		{
@@ -788,7 +785,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		}
 
 		// Shift the untouched slots to the left
-		while (read < a.table.length + b.table.length )
+		while (read < a.table.length + b.table.length)
 		{
 			saveSlot(newA, newB, write, get2(a.table, b.table, read));
 			read++;
@@ -831,10 +828,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		{
 			return array.table.length;
 		}
-		else
-		{
-			return array.lengths[array.lengths.length - 1];
-		}
+		return array.lengths[array.lengths.length - 1];
 	}
 
 	// Calculates in which slot of "table" the item probably is, then
@@ -976,5 +970,7 @@ Elm.Native.Array.make = function(localRuntime) {
 		fromJSArray: fromJSArray
 	};
 
-	return localRuntime.Native.Array.values = Elm.Native.Array.values;
+	localRuntime.Native.Array.values = Elm.Native.Array.values;
+
+	return localRuntime.Native.Array.values;
 };

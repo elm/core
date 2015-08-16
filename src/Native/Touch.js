@@ -150,7 +150,7 @@ Elm.Native.Touch.make = function(localRuntime) {
 	});
 
 	function dependency(f) {
-		var sig = A2( Signal.map, f, root );
+		var sig = A2(Signal.map, f, root);
 		root.defaultNumberOfKids += 1;
 		sig.defaultNumberOfKids = 0;
 		return sig;
@@ -171,5 +171,7 @@ Elm.Native.Touch.make = function(localRuntime) {
 		return sig2;
 	}();
 
-	return localRuntime.Native.Touch.values = { touches: touches, taps: taps };
+	localRuntime.Native.Touch.values = { touches: touches, taps: taps };
+
+	return localRuntime.Native.Touch.values;
 };

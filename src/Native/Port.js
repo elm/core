@@ -121,11 +121,12 @@ Elm.Native.Port.make = function(localRuntime) {
 		return signal;
 	}
 
-
-	return localRuntime.Native.Port.values = {
+	localRuntime.Native.Port.values = {
 		inbound: inbound,
 		outbound: outbound,
 		inboundSignal: inboundSignal,
 		outboundSignal: outboundSignal
 	};
+
+	return localRuntime.Native.Port.values;
 };

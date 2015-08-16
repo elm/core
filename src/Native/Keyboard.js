@@ -39,10 +39,12 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 	var blurs = keyStream(window, 'blur', function() { return null; });
 
 
-	return localRuntime.Native.Keyboard.values = {
+	localRuntime.Native.Keyboard.values = {
 		downs: downs,
 		ups: ups,
 		blurs: blurs,
 		presses: presses
 	};
+
+	return localRuntime.Native.Keyboard.values;
 };

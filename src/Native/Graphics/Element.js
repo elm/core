@@ -470,7 +470,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				return rootNode;
 
 			case 'RawHtml':
-				if(currE.html.valueOf() !== nextE.html.valueOf())
+				if (currE.html.valueOf() !== nextE.html.valueOf())
 				{
 					node.innerHTML = nextE.html;
 				}

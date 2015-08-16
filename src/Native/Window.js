@@ -56,12 +56,12 @@ Elm.Native.Window.make = function make(localRuntime) {
 		}, 0);
 	}
 
-
 	localRuntime.addListener([dimensions.id], window, 'resize', resizeIfNeeded);
 
-
-	return localRuntime.Native.Window.values = {
+	localRuntime.Native.Window.values = {
 		dimensions: dimensions,
 		resizeIfNeeded: resizeIfNeeded
 	};
+
+	return localRuntime.Native.Window.values;
 };

@@ -56,11 +56,13 @@ Elm.Native.Debug.make = function(localRuntime) {
 		return value;
 	}
 
-	return localRuntime.Native.Debug.values = {
+	localRuntime.Native.Debug.values = {
 		crash: crash,
 		tracePath: F2(tracePath),
 		log: F2(log),
 		watch: F2(watch),
 		watchSummary: F3(watchSummary)
 	};
+
+	return localRuntime.Native.Debug.values;
 };

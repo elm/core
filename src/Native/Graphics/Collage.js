@@ -22,7 +22,6 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	var List = Elm.Native.List.make(localRuntime);
 	var NativeElement = Elm.Native.Graphics.Element.make(localRuntime);
 	var Transform = Elm.Transform2D.make(localRuntime);
-	var Utils = Elm.Native.Utils.make(localRuntime);
 
 	function setStrokeStyle(ctx, style)
 	{
@@ -76,20 +75,6 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		}
 	}
 
-	function line(ctx, style, path)
-	{
-		if (style.dashing.ctor === '[]')
-		{
-			trace(ctx, path);
-		}
-		else
-		{
-			customLineHelp(ctx, style, path);
-		}
-		ctx.scale(1, -1);
-		ctx.stroke();
-	}
-
 	function customLineHelp(ctx, style, path)
 	{
 		var points = List.toArray(path);
@@ -137,6 +122,20 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			x0 = x1;
 			y0 = y1;
 		}
+	}
+
+	function line(ctx, style, path)
+	{
+		if (style.dashing.ctor === '[]')
+		{
+			trace(ctx, path);
+		}
+		else
+		{
+			customLineHelp(ctx, style, path);
+		}
+		ctx.scale(1, -1);
+		ctx.stroke();
 	}
 
 	function drawLine(ctx, style, path)
@@ -215,7 +214,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		var maxHeight = 0;
 		var numChunks = textChunks.length;
 
-		ctx.scale(1,-1);
+		ctx.scale(1, -1);
 
 		for (var i = numChunks; i--; )
 		{
@@ -288,7 +287,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 			'font-weight': props['font-weight'] || ctx['font-weight'],
 			'font-size': props['font-size'] || ctx['font-size'],
 			'font-family': props['font-family'] || ctx['font-family'],
-			'color': props['color'] || ctx['color']
+			'color': props.color || ctx.color
 		};
 	}
 
@@ -389,12 +388,12 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	function formToMatrix(form)
 	{
 	   var scale = form.scale;
-	   var matrix = A6( Transform.matrix, scale, 0, 0, scale, form.x, form.y );
+	   var matrix = A6(Transform.matrix, scale, 0, 0, scale, form.x, form.y);
 
 	   var theta = form.theta;
 	   if (theta !== 0)
 	   {
-		   matrix = A2( Transform.multiply, matrix, Transform.rotation(theta) );
+		   matrix = A2(Transform.multiply, matrix, Transform.rotation(theta));
 	   }
 
 	   return matrix;
@@ -412,20 +411,20 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 	function makeTransform(w, h, form, matrices)
 	{
 		var props = form.form._0.props;
-		var m = A6( Transform.matrix, 1, 0, 0, -1,
-					(w - props.width ) / 2,
-					(h - props.height) / 2 );
+		var m = A6(Transform.matrix, 1, 0, 0, -1,
+					(w - props.width) / 2,
+					(h - props.height) / 2);
 		var len = matrices.length;
 		for (var i = 0; i < len; ++i)
 		{
-			m = A2( Transform.multiply, m, matrices[i] );
+			m = A2(Transform.multiply, m, matrices[i]);
 		}
-		m = A2( Transform.multiply, m, formToMatrix(form) );
+		m = A2(Transform.multiply, m, formToMatrix(form));
 
 		return 'matrix(' +
-			str( m[0]) + ', ' + str( m[3]) + ', ' +
+			str(m[0])  + ', ' + str(m[3]) + ', ' +
 			str(-m[1]) + ', ' + str(-m[4]) + ', ' +
-			str( m[2]) + ', ' + str( m[5]) + ')';
+			str(m[2])  + ', ' + str(m[5]) + ')';
 	}
 
 	function stepperHelp(list)
@@ -458,7 +457,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		{
 			var len = ps.length;
 			var formType = '';
-			for (var i = 0; i < len; ++i )
+			for (var i = 0; i < len; ++i)
 			{
 				if (formType = ps[i].peekNext()) return formType;
 			}
@@ -539,8 +538,8 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 		function transform(transforms, ctx)
 		{
-			ctx.translate( w / 2 * ratio, h / 2 * ratio );
-			ctx.scale( ratio, -ratio );
+			ctx.translate(w / 2 * ratio, h / 2 * ratio);
+			ctx.scale(ratio, -ratio);
 			var len = transforms.length;
 			for (var i = 0; i < len; ++i)
 			{
@@ -658,7 +657,9 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		});
 	}
 
-	return localRuntime.Native.Graphics.Collage.values = {
+	localRuntime.Native.Graphics.Collage.values = {
 		collage: F3(collage)
 	};
+
+	return localRuntime.Native.Graphics.Collage.values;
 };

@@ -120,18 +120,15 @@ Elm.Native.Show.make = function(localRuntime) {
 			{
 				return '<text>';
 			}
-			else
+			var output = '';
+			for (var i in v)
 			{
-				var output = '';
-				for (var i in v)
-				{
-					if (i === 'ctor') continue;
-					var str = toString(v[i]);
-					var parenless = str[0] === '{' || str[0] === '<' || str.indexOf(' ') < 0;
-					output += ' ' + (parenless ? str : '(' + str + ')');
-				}
-				return v.ctor + output;
+				if (i === 'ctor') continue;
+				var str = toString(v[i]);
+				var parenless = str[0] === '{' || str[0] === '<' || str.indexOf(' ') < 0;
+				output += ' ' + (parenless ? str : '(' + str + ')');
 			}
+			return v.ctor + output;
 		}
 		if (type === 'object' && 'notify' in v && 'id' in v)
 		{
@@ -152,10 +149,7 @@ Elm.Native.Show.make = function(localRuntime) {
 		{
 			return s.replace(/\'/g, '\\\'');
 		}
-		else
-		{
-			return s.replace(/\"/g, '\\"');
-		}
+		return s.replace(/\"/g, '\\"');
 	}
 
 	function probablyPublic(v)
@@ -189,7 +183,9 @@ Elm.Native.Show.make = function(localRuntime) {
 		return true;
 	}
 
-	return localRuntime.Native.Show.values = {
+	localRuntime.Native.Show.values = {
 		toString: toString
 	};
+
+	return localRuntime.Native.Show.values;
 };

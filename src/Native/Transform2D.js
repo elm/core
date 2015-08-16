@@ -91,7 +91,7 @@ Elm.Native.Transform2D.make = function(localRuntime) {
 					  m21 * ndx + m22 * ndy + mdy]);
 	}
 
-	return localRuntime.Native.Transform2D.values = {
+	localRuntime.Native.Transform2D.values = {
 		identity: identity,
 		matrix: F6(matrix),
 		rotation: rotation,
@@ -107,4 +107,6 @@ Elm.Native.Transform2D.make = function(localRuntime) {
 		reflectY: reflectY
 		*/
 	};
+
+	return localRuntime.Native.Transform2D.values;
 };

@@ -23,7 +23,7 @@ Elm.Native.Date.make = function(localRuntime) {
 		 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 
-	return localRuntime.Native.Date.values = {
+	localRuntime.Native.Date.values = {
 		read: readDate,
 		year: function(d) { return d.getFullYear(); },
 		month: function(d) { return { ctor: monthTable[d.getMonth()] }; },
@@ -36,4 +36,5 @@ Elm.Native.Date.make = function(localRuntime) {
 		fromTime: function(t) { return new Date(t); },
 		dayOfWeek: function(d) { return { ctor: dayTable[d.getDay()] }; }
 	};
+	return localRuntime.Native.Date.values;
 };

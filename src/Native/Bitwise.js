@@ -15,7 +15,7 @@ Elm.Native.Bitwise.make = function(localRuntime) {
 	function sra(a, offset) { return a >> offset; }
 	function srl(a, offset) { return a >>> offset; }
 
-	return localRuntime.Native.Bitwise.values = {
+	localRuntime.Native.Bitwise.values = {
 		and: F2(and),
 		or: F2(or),
 		xor: F2(xor),
@@ -24,4 +24,6 @@ Elm.Native.Bitwise.make = function(localRuntime) {
 		shiftRightArithmatic: F2(sra),
 		shiftRightLogical: F2(srl)
 	};
+
+	return localRuntime.Native.Bitwise.values;
 };

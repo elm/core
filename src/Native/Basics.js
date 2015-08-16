@@ -51,7 +51,15 @@ Elm.Native.Basics.make = function(localRuntime) {
 	}
 	function clamp(lo, hi, n)
 	{
-		return Utils.cmp(n, lo) < 0 ? lo : Utils.cmp(n, hi) > 0 ? hi : n;
+		if (Utils.cmp(n, lo) < 0)
+		{
+			return lo;
+		}
+		if (Utils.cmp(n, hi) > 0)
+		{
+			return hi;
+		}
+		return n;
 	}
 
 	function xor(a, b)
@@ -93,7 +101,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 		return Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 	}
 
-	return localRuntime.Native.Basics.values = {
+	localRuntime.Native.Basics.values = {
 		div: F2(div),
 		rem: F2(rem),
 		mod: F2(mod),
@@ -133,4 +141,6 @@ Elm.Native.Basics.make = function(localRuntime) {
 		isNaN: isNaN,
 		isInfinite: isInfinite
 	};
+
+	return localRuntime.Native.Basics.values;
 };

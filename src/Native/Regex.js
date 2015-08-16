@@ -8,7 +8,8 @@ Elm.Native.Regex.make = function(localRuntime) {
 	}
 	if ('values' in Elm.Native.Regex)
 	{
-		return localRuntime.Native.Regex.values = Elm.Native.Regex.values;
+		localRuntime.Native.Regex.values = Elm.Native.Regex.values;
+		return localRuntime.Native.Regex.values;
 	}
 
 	var List = Elm.Native.List.make(localRuntime);
@@ -117,7 +118,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 		return List.fromArray(out);
 	}
 
-	return Elm.Native.Regex.values = {
+	Elm.Native.Regex.values = {
 		regex: regex,
 		caseInsensitive: caseInsensitive,
 		escape: escape,
@@ -127,4 +128,6 @@ Elm.Native.Regex.make = function(localRuntime) {
 		replace: F4(replace),
 		split: F3(split)
 	};
+
+	return Elm.Native.Regex.values;
 };
