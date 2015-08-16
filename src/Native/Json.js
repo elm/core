@@ -50,9 +50,18 @@ Elm.Native.Json.make = function(localRuntime) {
 
 
 	function decodeInt(value) {
-		if (typeof value === 'number' && (value | 0) === value) {
+		if (typeof value !== 'number') {
+			crash('an Int', value);
+		}
+
+		if (value < 2147483647 && value > -2147483647 && (value | 0) === value) {
 			return value;
 		}
+
+		if (isFinite(value) && !(value % 1)) {
+			return value;
+		}
+
 		crash('an Int', value);
 	}
 
