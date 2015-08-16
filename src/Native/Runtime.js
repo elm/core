@@ -297,7 +297,7 @@ if (!Elm.fullscreen) {
 		{
 			if (!('main' in Module))
 			{
-				throw new Error('\main\' is missing! What do I display?!');
+				throw new Error('\'main\' is missing! What do I display?!');
 			}
 
 			var signalGraph = Module.main;
