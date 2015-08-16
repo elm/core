@@ -89,19 +89,6 @@ empty : Dict comparable v
 empty = RBEmpty_elm_builtin LBlack
 
 
-min : Dict k v -> (k,v)
-min dict =
-    case dict of
-      RBNode_elm_builtin _ key value (RBEmpty_elm_builtin LBlack) _ ->
-          (key, value)
-
-      RBNode_elm_builtin _ _ _ left _ ->
-          min left
-
-      RBEmpty_elm_builtin LBlack ->
-          Native.Debug.crash "(min Empty) is not defined"
-
-
 maxWithDefault : k -> v -> Dict k v -> (k, v)
 maxWithDefault k v r =
     case r of
