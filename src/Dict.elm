@@ -102,17 +102,14 @@ min dict =
           Native.Debug.crash "(min Empty) is not defined"
 
 
-max : Dict k v -> (k, v)
-max dict =
-    case dict of
-      RBNode_elm_builtin _ key value _ (RBEmpty_elm_builtin _) ->
-          (key, value)
-
-      RBNode_elm_builtin _ _ _ _ right ->
-          max right
-
+maxWithDefault : k -> v -> Dict k v -> (k, v)
+maxWithDefault k v r =
+    case r of
       RBEmpty_elm_builtin _ ->
-          Native.Debug.crash "(max Empty) is not defined"
+          (k, v)
+
+      RBNode_elm_builtin _ kr vr _ rr ->
+          maxWithDefault kr vr rr
 
 
 {-| Get the value associated with a key. If the key is not found, return
@@ -318,10 +315,8 @@ rem c l r =
                 reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
 
       -- l and r are both RBNodes
-      (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin cr kr vr lr rr) ->
-          let l = RBNode_elm_builtin cl kl vl ll rl
-              r = RBNode_elm_builtin cr kr vr lr rr
-              (k, v) = max l
+      (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
+          let (k, v) = maxWithDefault kl vl rl
               l'     = remove_max cl kl vl ll rl
           in
               bubble c k v l' r
