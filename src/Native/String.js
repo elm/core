@@ -98,9 +98,9 @@ Elm.Native.String.make = function(localRuntime) {
 		var result = '';
 		var n2 = n;
 		var string = str;
-		while (n > 0)
+		while (n2 > 0)
 		{
-			if (n & 1)
+			if (n2 & 1)
 			{
 				result += string;
 			}
