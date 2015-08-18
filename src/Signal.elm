@@ -391,3 +391,20 @@ send : Address a -> a -> Task x ()
 send (Address actuallySend) value =
     actuallySend value
       `onError` \_ -> succeed ()
+
+
+{-| Send a Message to an Address.
+
+    type Action = Undo | Remove Int
+
+    address : Address Action
+
+    undoMessage = message address Undo
+
+    requestUndo : Task () ()
+    requestUndo =
+        sendMessage undoMessage
+-}
+sendMessage : Message -> Task () ()
+sendMessage (Message message) =
+    message
