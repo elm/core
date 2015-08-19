@@ -357,7 +357,7 @@ null =
 {-| Extract a Maybe value, wrapping successes with `Just` and turning any
 failure in `Nothing`. If you are expecting that a field can sometimes be `null`,
 it's better to check for it [explictly](#null), as this function will swallow
-erros from ill-formed JSON.
+errors from ill-formed JSON.
 
 The following code decodes JSON objects that may not have a profession field.
 
