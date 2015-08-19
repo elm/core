@@ -11,6 +11,7 @@ Elm.Native.Time.make = function(localRuntime)
 
 	var NS = Elm.Native.Signal.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
+    var Task = Elm.Native.Task.make(localRuntime);
 
 
 	// FRAMES PER SECOND
@@ -73,6 +74,13 @@ Elm.Native.Time.make = function(localRuntime)
 	}
 
 
+    // CURRENT TIME
+
+    var getCurrentTime = Task.asyncFunction(function(callback) {
+        return callback(Task.succeed(Date.now()));
+    });
+
+
 	// EVERY
 
 	function every(t)
@@ -102,6 +110,7 @@ Elm.Native.Time.make = function(localRuntime)
 
 	return localRuntime.Native.Time.values = {
 		fpsWhen: F2(fpsWhen),
+        getCurrentTime: getCurrentTime,
 		every: every,
 		toDate: function(t) { return new Date(t); },
 		read: read

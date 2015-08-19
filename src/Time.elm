@@ -3,6 +3,7 @@ module Time
     , inMilliseconds, inSeconds, inMinutes, inHours
     , fps, fpsWhen, every
     , timestamp, delay, since
+    , getCurrent
     ) where
 
 {-| Library for working with time.
@@ -16,12 +17,16 @@ module Time
 
 # Timing
 @docs timestamp, delay, since
+
+# Task
+@docs getCurrent
 -}
 
 import Basics exposing (..)
 import Native.Signal
 import Native.Time
 import Signal exposing (Signal)
+import Task exposing (Task)
 
 
 {-| Type alias to make it clearer when you are working with time values.
@@ -155,3 +160,11 @@ since time signal =
       Signal.foldp (+) 0 (Signal.merge start stop)
   in
       Signal.map ((/=) 0) delaydiff
+
+
+{-| This task results in the current time. Whenever the task is performed, it
+will look at the current time and give it to you.
+-}
+getCurrent : Task x Time
+getCurrent =
+  Native.Time.getCurrentTime
