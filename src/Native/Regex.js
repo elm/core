@@ -72,7 +72,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 		var count = 0;
 		function jsReplacer(match)
 		{
-			if (count++ > n)
+			if (count++ >= n)
 			{
 				return match;
 			}
