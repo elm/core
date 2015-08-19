@@ -325,7 +325,8 @@ Elm.Native.Utils.make = function(localRuntime) {
 		throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
 	}
 
-	function formatValue(value) {
+	function formatValue(value)
+	{
 		// Explicity format undefined values as "undefined"
 		// because JSON.stringify(undefined) unhelpfully returns ""
 		return (value === undefined) ? "undefined" : JSON.stringify(value);
