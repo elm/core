@@ -391,17 +391,20 @@ formatted data. For example, this lets you create a parser for "variadic" lists
 where the first few types are different, followed by 0 or more of the same
 type.
 
-    variadic2 : (a -> b -> List c -> value) -> Decoder a -> Decoder b -> Decoder (List c) -> Decoder value
-    variadic2 f a b cs =
-        customDecoder (list value) \jsonList ->
-            case jsonList of
-              one :: two :: rest ->
-                  Result.map3 f
-                    (decodeValue a one)
-                    (decodeValue b two)
-                    (decodeValue cs rest)
+    variadic2 : (a -> b -> List c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
+    variadic2 f a b c =
+        let
+            combineResults = List.foldr (Result.map2 (::)) (Ok [])
+        in
+            customDecoder (list value) (\jsonList ->
+                case jsonList of
+                  one :: two :: rest ->
+                      Result.map3 f
+                        (decodeValue a one)
+                        (decodeValue b two)
+                        (combineResults (List.map (decodeValue c) rest))
 
-              _ -> Result.Err "expecting at least two elements in the array"
+                  _ -> Result.Err "expecting at least two elements in the array")
 -}
 value : Decoder Value
 value =
