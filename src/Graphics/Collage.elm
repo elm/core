@@ -220,9 +220,8 @@ groupTransform matrix fs =
   form (FGroup matrix fs)
 
 
-{-| Move a form by the given amount. This is a relative translation so
-`(move (10,10) form)` would move `form` ten pixels up and ten pixels to the
-right.
+{-| Move a form by the given amount (x, y). This is a relative translation so
+`(move (5,10) form)` would move `form` five pixels to the right and ten pixels up.
 -}
 move : (Float,Float) -> Form -> Form
 move (x,y) f =
