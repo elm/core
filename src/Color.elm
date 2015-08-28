@@ -189,9 +189,12 @@ rgbToHsl red green blue =
 
     hue =
       degrees 60 *
-        if  | cMax == r -> ((g - b) / c) `fmod` 6
-            | cMax == g -> ((b - r) / c) + 2
-            | cMax == b -> ((r - g) / c) + 4
+        if cMax == r then
+          ((g - b) / c) `fmod` 6
+        else if cMax == g then
+          ((b - r) / c) + 2
+        else {- cMax == b -}
+          ((r - g) / c) + 4
 
     lightness =
       (cMax + cMin) / 2
@@ -214,14 +217,14 @@ hslToRgb hue saturation lightness =
     x = chroma * (1 - abs (fmod hue' 2 - 1))
 
     (r,g,b) =
-      if  | hue' < 0  -> (0, 0, 0)
-          | hue' < 1  -> (chroma, x, 0)
-          | hue' < 2  -> (x, chroma, 0)
-          | hue' < 3  -> (0, chroma, x)
-          | hue' < 4  -> (0, x, chroma)
-          | hue' < 5  -> (x, 0, chroma)
-          | hue' < 6  -> (chroma, 0, x)
-          | otherwise -> (0, 0, 0)
+      if hue' < 0 then (0, 0, 0)
+      else if hue' < 1 then (chroma, x, 0)
+      else if hue' < 2 then (x, chroma, 0)
+      else if hue' < 3 then (0, chroma, x)
+      else if hue' < 4 then (0, x, chroma)
+      else if hue' < 5 then (x, 0, chroma)
+      else if hue' < 6 then (chroma, 0, x)
+      else (0, 0, 0)
 
     m = lightness - chroma / 2
   in

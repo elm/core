@@ -100,7 +100,7 @@ type alias LineStyle =
 You can use record updates to build the line style you
 want. For example, to make a thicker line, you could say:
 
-    { defaultLine | width <- 10 }
+    { defaultLine | width = 10 }
 -}
 defaultLine : LineStyle
 defaultLine =
@@ -116,19 +116,19 @@ defaultLine =
 {-| Create a solid line style with a given color. -}
 solid : Color -> LineStyle
 solid  clr =
-  { defaultLine | color <- clr }
+  { defaultLine | color = clr }
 
 
 {-| Create a dashed line style with a given color. Dashing equals `[8,4]`. -}
 dashed : Color -> LineStyle
 dashed clr =
-  { defaultLine | color <- clr, dashing <- [8,4] }
+  { defaultLine | color = clr, dashing = [8,4] }
 
 
 {-| Create a dotted line style with a given color. Dashing equals `[3,3]`. -}
 dotted : Color -> LineStyle
 dotted clr =
-  { defaultLine | color <- clr, dashing <- [3,3] }
+  { defaultLine | color = clr, dashing = [3,3] }
 
 
 type BasicForm
@@ -225,7 +225,7 @@ groupTransform matrix fs =
 -}
 move : (Float,Float) -> Form -> Form
 move (x,y) f =
-  { f | x <- f.x + x, y <- f.y + y }
+  { f | x = f.x + x, y = f.y + y }
 
 
 {-| Move a shape in the x direction. This is relative so `(moveX 10 form)` moves
@@ -233,7 +233,7 @@ move (x,y) f =
 -}
 moveX : Float -> Form -> Form
 moveX x f =
-  { f | x <- f.x + x }
+  { f | x = f.x + x }
 
 
 {-| Move a shape in the y direction. This is relative so `(moveY 10 form)` moves
@@ -241,7 +241,7 @@ moveX x f =
 -}
 moveY : Float -> Form -> Form
 moveY y f =
-  { f | y <- f.y + y }
+  { f | y = f.y + y }
 
 
 {-| Scale a form by a given factor. Scaling by 2 doubles both dimensions,
@@ -249,7 +249,7 @@ and quadruples the area.
 -}
 scale : Float -> Form -> Form
 scale s f =
-  { f | scale <- f.scale * s }
+  { f | scale = f.scale * s }
 
 
 {-| Rotate a form by a given angle. Rotate takes standard Elm angles (radians)
@@ -258,13 +258,13 @@ you would say, `(rotate (degrees 30) form)`.
 -}
 rotate : Float -> Form -> Form
 rotate t f =
-  { f | theta <- f.theta + t }
+  { f | theta = f.theta + t }
 
 
 {-| Set the alpha of a `Form`. The default is 1, and 0 is totally transparent. -}
 alpha : Float -> Form -> Form
 alpha a f =
-  { f | alpha <- a }
+  { f | alpha = a }
 
 
 {-| A collage is a collection of 2D forms. There are no strict positioning
