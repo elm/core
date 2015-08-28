@@ -35,15 +35,15 @@ guy, and if so, it places a bad guy at a randomly generated point.
           generate (float 0 1) model.seed
       in
         if addProbability < 0.9 then
-          { model | seed <- seed' }
+          { model | seed = seed' }
         else
           let
             (position, seed'') =
               generate (pair (float 0 100) (float 0 100)) seed'
           in
             { model |
-                badGuys <- position :: model.badGuys,
-                seed <- seed''
+                badGuys = position :: model.badGuys,
+                seed = seed''
             }
 
 Details: This is an implemenation of the Portable Combined Generator of
@@ -103,7 +103,7 @@ int a b =
         f n 1 seed.state
     in
       ( lo + v % k
-      , Seed { seed | state <- state' }
+      , Seed { seed | state = state' }
       )
 
 

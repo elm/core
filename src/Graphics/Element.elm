@@ -130,18 +130,18 @@ width nw e =
             case e.element of
               Image _ w h _ ->
                   { p |
-                      height <- round (toFloat h / toFloat w * toFloat nw)
+                      height = round (toFloat h / toFloat w * toFloat nw)
                   }
 
               RawHtml ->
                   { p |
-                      height <- snd (Native.Graphics.Element.htmlHeight nw e.element)
+                      height = snd (Native.Graphics.Element.htmlHeight nw e.element)
                   }
 
               _ -> p
     in
         { element = e.element
-        , props = { props | width <- nw }
+        , props = { props | width = nw }
         }
 
 
@@ -153,12 +153,12 @@ height nh e =
             case e.element of
               Image _ w h _ ->
                   { p |
-                      width <- round (toFloat w / toFloat h * toFloat nh)
+                      width = round (toFloat w / toFloat h * toFloat nh)
                   }
               _ -> p
     in
         { element = e.element
-        , props = { p | height <- nh }
+        , props = { p | height = nh }
         }
 
 
@@ -176,7 +176,7 @@ opacity o e =
     let p = e.props
     in
         { element = e.element
-        , props = { p | opacity <- o }
+        , props = { p | opacity = o }
         }
 
 
@@ -184,7 +184,7 @@ opacity o e =
 color : Color -> Element -> Element
 color c e = let p = e.props in
             { element = e.element
-            , props = { p | color <- Just c}
+            , props = { p | color = Just c}
             }
 
 
@@ -197,7 +197,7 @@ tag name e =
     let p = e.props
     in
         { element = e.element
-        , props = { p | tag <- name }
+        , props = { p | tag = name }
         }
 
 
@@ -207,7 +207,7 @@ link href e =
     let p = e.props
     in
         { element = e.element
-        , props = { p | href <- href }
+        , props = { p | href = href }
         }
 
 
