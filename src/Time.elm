@@ -31,7 +31,7 @@ type alias Time = Float
 
 
 {-| Units of time, making it easier to specify things like a half-second
-`(500 * milliseconds)` without remembering Elm&rsquo;s underlying units of time.
+`(500 * millisecond)` without remembering Elm&rsquo;s underlying units of time.
 -}
 millisecond : Time
 millisecond =
