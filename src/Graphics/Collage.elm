@@ -206,6 +206,7 @@ toForm e =
 
 {-| Flatten many forms into a single `Form`. This lets you move and rotate them
 as a single unit, making it possible to build small, modular components.
+Forms will be drawn in the order that they are listed, as in `collage`.
 -}
 group : List Form -> Form
 group fs =
@@ -213,7 +214,8 @@ group fs =
 
 
 {-| Flatten many forms into a single `Form` and then apply a matrix
-transformation.
+transformation. Forms will be drawn in the order that they are listed, as in
+`collage`.
 -}
 groupTransform : Transform2D -> List Form -> Form
 groupTransform matrix fs =
@@ -269,6 +271,8 @@ alpha a f =
 
 {-| A collage is a collection of 2D forms. There are no strict positioning
 relationships between forms, so you are free to do all kinds of 2D graphics.
+The forms are drawn in the order of the list, i.e., `collage w h [a, b]` will
+draw `b` on top of `a`.
 -}
 collage : Int -> Int -> List Form -> Element
 collage =
