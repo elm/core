@@ -134,13 +134,13 @@ if (!Elm.fullscreen) {
 			}
 			catch (error)
 			{
-				if (typeof container.appendChild === 'undefined')
+				if (typeof container.appendChild === "function")
 				{
-					console.error(error.message);
+					container.appendChild(errorNode(error.message));
 				}
 				else
 				{
-					container.appendChild(errorNode(error.message));
+					console.error(error.message);
 				}
 				throw error;
 			}
