@@ -116,7 +116,7 @@ if (!Elm.fullscreen) {
 				var div = document.createElement('div');
 				var newElm = init(display, div, newModule, args, elm);
 				inputs = [];
-				// elm.swap = newElm.swap;
+
 				return newElm;
 			}
 
