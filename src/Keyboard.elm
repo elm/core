@@ -30,9 +30,10 @@ import Native.Keyboard
 import Signal exposing (Signal)
 
 
-{-| Type alias to make it clearer what integers are supposed to represent
-in this library. Use `Char.toCode` and `Char.fromCode` to convert key codes
-to characters. Use the uppercase character with `toCode`.
+{-| Type alias to make it clearer what integers are supposed to
+represent in this library. Use [`Char.toCode`](Char#toCode) and
+[`Char.fromCode`](Char#fromCode) to convert key codes to
+characters. Use the uppercase character with `toCode`.
 -}
 type alias KeyCode = Int
 

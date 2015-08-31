@@ -5,9 +5,10 @@ module Transform2D
     , scale, scaleX, scaleY
     ) where
 
-{-| A library for performing [2D matrix transformations][affine].
-It is used primarily with the `groupTransform` function from `Graphics.Collage` and
-allows you to do things like rotation, scaling, translation, shearing, and reflection.
+{-| A library for performing [2D matrix transformations][affine].  It
+is used primarily with the `groupTransform` function from
+[`Graphics.Collage`](Graphics-Collage) and allows you to do things
+like rotation, scaling, translation, shearing, and reflection.
 
 Note that all the matrices in this library are 3x3 matrices of homogeneous
 coordinates, used for [affine transformations][affine]. Since the bottom row as

@@ -300,7 +300,7 @@ infixl 4 ~
 
 -- MAILBOXES
 
-{-| An `Mailbox` is a communication hub. It is made up of
+{-| A `Mailbox` is a communication hub. It is made up of
 
   * an `Address` that you can send messages to
   * a `Signal` of messages sent to the mailbox
