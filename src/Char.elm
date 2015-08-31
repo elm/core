@@ -1,6 +1,6 @@
 module Char
     ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
-    , toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
+    , toUpper, toLower, toLocaleUpper, toLocaleLower, toCode, fromCode
     ) where
 
 {-| Functions for working with characters. Character literals are enclosed in
@@ -10,12 +10,13 @@ module Char
 @docs isUpper, isLower, isDigit, isOctDigit, isHexDigit
 
 # Conversion
-@docs toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
+@docs toUpper, toLower, toLocaleUpper, toLocaleLower, toCode, fromCode
 
 -}
 
 import Native.Char
 import Basics exposing ((&&), (||), (>=), (<=))
+import Keyboard exposing (KeyCode)
 
 
 isBetween : Char -> Char -> Char -> Bool
@@ -77,11 +78,6 @@ toLocaleUpper =
 toLocaleLower : Char -> Char
 toLocaleLower =
   Native.Char.toLocaleLower
-
-
-{-| A simple alias for integers.
--}
-type alias KeyCode = Int
 
 
 {-| Convert to unicode. Used with the `Keyboard` library, which expects the
