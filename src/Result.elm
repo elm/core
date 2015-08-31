@@ -3,6 +3,7 @@ module Result
     , map, map2, map3, map4, map5
     , andThen
     , toMaybe, fromMaybe, formatError
+    , fromOk
     ) where
 
 {-| A `Result` is the result of a computation that may fail. This is a great
@@ -21,7 +22,10 @@ way to manage errors in Elm.
 @docs toMaybe, fromMaybe, formatError
 -}
 
-import Maybe exposing ( Maybe(Just, Nothing) )
+import Basics exposing ((<<))
+import Maybe exposing ( Maybe(Just, Nothing)
+                      , withDefault
+                      )
 
 
 {-| A `Result` is either `Ok` meaning the computation succeeded, or it is an
@@ -183,3 +187,10 @@ fromMaybe err maybe =
     case maybe of
       Just v  -> Ok v
       Nothing -> Err err
+
+{-| The fromOk function extracts the element out of a Ok, with a default.
+
+    fromOk 0.0 << String.toFloat
+-}
+fromOk : a -> Result e a -> a
+fromOk d = withDefault d << toMaybe
