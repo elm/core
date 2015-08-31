@@ -30,9 +30,9 @@ sometimes, but does not absolutely need it.
 type Maybe a = Just a | Nothing
 
 
-{-| Provide a default value, turning an optional value into a normal value.
-This comes in handy when paired with functions like `Dict.get` which gives back
-a `Maybe`.
+{-| Provide a default value, turning an optional value into a normal
+value.  This comes in handy when paired with functions like
+[`Dict.get`](dict#get) which gives back a `Maybe`.
 
     withDefault 100 (Just 42)   -- 42
     withDefault 100 Nothing     -- 100

@@ -100,7 +100,7 @@ noHighlight =
 
 
 {-| Describe the style of a text box. `style` describes the style of the text
-itself using [`Text.Style`](/Text#Style). `highlight` describes the glowing blue
+itself using [`Text.Style`](Text#Style). `highlight` describes the glowing blue
 highlight that shows up when the field has focus. `outline` describes the line
 surrounding the text field, and `padding` adds whitespace between the `outline`
 and the text.

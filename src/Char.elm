@@ -80,8 +80,8 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
-{-| Convert to unicode. Used with the `Keyboard` library, which expects the
-input to be uppercase.
+{-| Convert to unicode. Used with the [`Keyboard`](Keyboard) library,
+which expects the input to be uppercase.
 -}
 toCode : Char -> KeyCode
 toCode =
