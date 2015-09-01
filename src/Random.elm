@@ -46,7 +46,7 @@ guy, and if so, it places a bad guy at a randomly generated point.
                 seed = seed''
             }
 
-Details: This is an implemenation of the Portable Combined Generator of
+Details: This is an implementation of the Portable Combined Generator of
 L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 [System.Random](http://hackage.haskell.org/package/random-1.0.1.1/docs/System-Random.html)
 module. It has a period of roughly 2.30584e18.

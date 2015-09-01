@@ -89,13 +89,13 @@ turns =
   Native.Basics.turns
 
 
-{-| Convert polar coordinates (r,&theta;) to cartesian coordinates (x,y). -}
+{-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
 fromPolar : (Float,Float) -> (Float,Float)
 fromPolar =
   Native.Basics.fromPolar
 
 
-{-| Convert cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
+{-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
 toPolar : (Float,Float) -> (Float,Float)
 toPolar =
   Native.Basics.toPolar
@@ -211,7 +211,7 @@ atan =
   Native.Basics.atan
 
 
-{-| This helps you find the angle of a cartesian coordinate.
+{-| This helps you find the angle of a Cartesian coordinate.
 You will almost certainly want to use this instead of `atan`.
 So `atan2 y x` computes *atan(y/x)* but also keeps track of which
 quadrant the angle should really be in. The result will be between
