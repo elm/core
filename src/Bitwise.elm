@@ -16,22 +16,22 @@ module Bitwise
 
 import Native.Bitwise
 
-{-| Bitwise AND
+{-| Bitwise AND.
 -}
 and : Int -> Int -> Int
 and = Native.Bitwise.and
 
-{-| Bitwise OR
+{-| Bitwise OR.
 -}
 or : Int -> Int -> Int
 or = Native.Bitwise.or
 
-{-| Bitwise XOR
+{-| Bitwise XOR.
 -}
 xor : Int -> Int -> Int
 xor = Native.Bitwise.xor
 
-{-| Flip each bit individually, often called bitwise NOT
+{-| Flip each bit individually, often called bitwise NOT.
 -}
 complement : Int -> Int
 complement = Native.Bitwise.complement
