@@ -161,7 +161,7 @@ filled color shape =
   fill (Solid color) shape
 
 
-{-| Create a textured shape. The texture is described by some url and is
+{-| Create a textured shape. The texture is described by some URL and is
 tiled to fill the entire shape.
 -}
 textured : String -> Shape -> Form
@@ -195,7 +195,7 @@ sprite w h pos src =
   form (FImage w h pos src)
 
 
-{-| Turn any `Element` into a `Form`. This lets you use text, gifs, and video
+{-| Turn any `Element` into a `Form`. This lets you use text, GIFs, and video
 in your collage. This means you can move, rotate, and scale
 an `Element` however you want.
 -}

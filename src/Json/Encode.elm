@@ -6,7 +6,7 @@ module Json.Encode
     , object
     ) where
 
-{-| Library for turning Elm values into Json values.
+{-| Library for turning Elm values into JSON values.
 
 # Encoding
 @docs encode, Value

@@ -101,7 +101,7 @@ favorite British sport:
           , ("Snooker" , Just Snooker)
           ]
 
-If the user selects "Football" from the drop down menue, `sport.signal`
+If the user selects "Football" from the drop down menu, `sport.signal`
 will update to `Just Football`.
 -}
 dropDown : (a -> Signal.Message) -> List (String, a) -> Element
