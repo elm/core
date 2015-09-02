@@ -498,7 +498,7 @@ missing.
 
     point3D : Decoder (Float,Float,Float)
     point3D =
-        object (,,)
+        object3 (,,)
           ("x" := float)
           ("y" := float)
           (oneOf [ "z" := float, succeed 0 ])
