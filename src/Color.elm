@@ -85,7 +85,7 @@ hsla hue saturation lightness alpha =
 
 
 {-| Create [HSL colors](http://en.wikipedia.org/wiki/HSL_and_HSV). This gives
-you access to colors more like a color wheel, where all hues are aranged in a
+you access to colors more like a color wheel, where all hues are arranged in a
 circle that you specify with standard Elm angles (radians).
 
     red   = hsl (degrees   0) 1 0.5

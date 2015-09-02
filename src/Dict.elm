@@ -76,7 +76,7 @@ showLColor color =
 
 
 {-| A dictionary of keys and values. So a `(Dict String User)` is a dictionary
-that lets you look up a `String` (such as user names) and find the assotiated
+that lets you look up a `String` (such as user names) and find the associated
 `User`.
 -}
 type Dict k v

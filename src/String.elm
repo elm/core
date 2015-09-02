@@ -345,7 +345,7 @@ toList : String -> List Char
 toList = Native.String.toList
 
 {-| Convert a list of characters into a String. Can be useful if you
-want to create a string primarly by consing, perhaps for decoding
+want to create a string primarily by consing, perhaps for decoding
 something.
 
     fromList ['a','b','c'] == "abc"

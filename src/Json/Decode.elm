@@ -11,7 +11,7 @@ module Json.Decode
     , value, customDecoder
     ) where
 
-{-| A way to turn Json values into Elm values. A `Decoder a` represents a
+{-| A way to turn JSON values into Elm values. A `Decoder a` represents a
 decoding operation that will either produce a value of type `a`, or fail.
 
 # Decoders
@@ -356,7 +356,7 @@ null =
 
 {-| Extract a Maybe value, wrapping successes with `Just` and turning any
 failure in `Nothing`. If you are expecting that a field can sometimes be `null`,
-it's better to check for it [explictly](#null), as this function will swallow
+it's better to check for it [explicitly](#null), as this function will swallow
 errors from ill-formed JSON.
 
 The following code decodes JSON objects that may not have a profession field.

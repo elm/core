@@ -113,12 +113,12 @@ every =
   Native.Time.every
 
 
-{-| Add a timestamp to any signal. Timestamps increase monotonically. When you
-create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
+{-| Add a time stamp to any signal. Time stamps increase monotonically. When you
+create `(timestamp Mouse.x)`, an initial time stamp is produced. The time stamp
 updates whenever `Mouse.x` updates.
 
-Timestamp updates are tied to individual events, so `(timestamp Mouse.x)` and
-`(timestamp Mouse.y)` will always have the same timestamp because they rely on
+Time stamp updates are tied to individual events, so `(timestamp Mouse.x)` and
+`(timestamp Mouse.y)` will always have the same time stamp because they rely on
 the same underlying event (`Mouse.position`).
 -}
 timestamp : Signal a -> Signal (Time, a)
