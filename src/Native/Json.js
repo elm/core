@@ -99,7 +99,7 @@ Elm.Native.Json.make = function(localRuntime) {
 				var len = value.length;
 				var list = List.Nil;
 				for (var i = len; i--; ) {
-					list = List.Cons( decoder(value[i]), list );
+					list = List.Cons(decoder(value[i]), list);
 				}
 				return list;
 			}
@@ -129,7 +129,7 @@ Elm.Native.Json.make = function(localRuntime) {
 			if (subValue !== undefined) {
 				return decoder(subValue);
 			}
-			crash("an object with field '" + field + "'", value);
+			crash('an object with field \'' + field + '\'', value);
 		};
 	}
 
@@ -166,31 +166,31 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeObject2(f, d1, d2) {
 		return function(value) {
-			return A2( f, d1(value), d2(value) );
+			return A2(f, d1(value), d2(value));
 		};
 	}
 
 	function decodeObject3(f, d1, d2, d3) {
 		return function(value) {
-			return A3( f, d1(value), d2(value), d3(value) );
+			return A3(f, d1(value), d2(value), d3(value));
 		};
 	}
 
 	function decodeObject4(f, d1, d2, d3, d4) {
 		return function(value) {
-			return A4( f, d1(value), d2(value), d3(value), d4(value) );
+			return A4(f, d1(value), d2(value), d3(value), d4(value));
 		};
 	}
 
 	function decodeObject5(f, d1, d2, d3, d4, d5) {
 		return function(value) {
-			return A5( f, d1(value), d2(value), d3(value), d4(value), d5(value) );
+			return A5(f, d1(value), d2(value), d3(value), d4(value), d5(value));
 		};
 	}
 
 	function decodeObject6(f, d1, d2, d3, d4, d5, d6) {
 		return function(value) {
-			return A6( f,
+			return A6(f,
 				d1(value),
 				d2(value),
 				d3(value),
@@ -203,7 +203,7 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeObject7(f, d1, d2, d3, d4, d5, d6, d7) {
 		return function(value) {
-			return A7( f,
+			return A7(f,
 				d1(value),
 				d2(value),
 				d3(value),
@@ -217,7 +217,7 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
 		return function(value) {
-			return A8( f,
+			return A8(f,
 				d1(value),
 				d2(value),
 				d3(value),
@@ -235,48 +235,48 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeTuple1(f, d1) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 1 ) {
+			if (!(value instanceof Array) || value.length !== 1) {
 				crash('a Tuple of length 1', value);
 			}
-			return f( d1(value[0]) );
+			return f(d1(value[0]));
 		};
 	}
 
 	function decodeTuple2(f, d1, d2) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 2 ) {
+			if (!(value instanceof Array) || value.length !== 2) {
 				crash('a Tuple of length 2', value);
 			}
-			return A2( f, d1(value[0]), d2(value[1]) );
+			return A2(f, d1(value[0]), d2(value[1]));
 		};
 	}
 
 	function decodeTuple3(f, d1, d2, d3) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 3 ) {
+			if (!(value instanceof Array) || value.length !== 3) {
 				crash('a Tuple of length 3', value);
 			}
-			return A3( f, d1(value[0]), d2(value[1]), d3(value[2]) );
+			return A3(f, d1(value[0]), d2(value[1]), d3(value[2]));
 		};
 	}
 
 
 	function decodeTuple4(f, d1, d2, d3, d4) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 4 ) {
+			if (!(value instanceof Array) || value.length !== 4) {
 				crash('a Tuple of length 4', value);
 			}
-			return A4( f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]) );
+			return A4(f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]));
 		};
 	}
 
 
 	function decodeTuple5(f, d1, d2, d3, d4, d5) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 5 ) {
+			if (!(value instanceof Array) || value.length !== 5) {
 				crash('a Tuple of length 5', value);
 			}
-			return A5( f,
+			return A5(f,
 				d1(value[0]),
 				d2(value[1]),
 				d3(value[2]),
@@ -289,10 +289,10 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeTuple6(f, d1, d2, d3, d4, d5, d6) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 6 ) {
+			if (!(value instanceof Array) || value.length !== 6) {
 				crash('a Tuple of length 6', value);
 			}
-			return A6( f,
+			return A6(f,
 				d1(value[0]),
 				d2(value[1]),
 				d3(value[2]),
@@ -305,10 +305,10 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 7 ) {
+			if (!(value instanceof Array) || value.length !== 7) {
 				crash('a Tuple of length 7', value);
 			}
-			return A7( f,
+			return A7(f,
 				d1(value[0]),
 				d2(value[1]),
 				d3(value[2]),
@@ -323,10 +323,10 @@ Elm.Native.Json.make = function(localRuntime) {
 
 	function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8) {
 		return function(value) {
-			if ( !(value instanceof Array) || value.length !== 8 ) {
+			if (!(value instanceof Array) || value.length !== 8) {
 				crash('a Tuple of length 8', value);
 			}
-			return A8( f,
+			return A8(f,
 				d1(value[0]),
 				d2(value[1]),
 				d3(value[2]),
@@ -439,7 +439,7 @@ Elm.Native.Json.make = function(localRuntime) {
 		return obj;
 	}
 
-	return localRuntime.Native.Json.values = {
+	localRuntime.Native.Json.values = {
 		encode: F2(encode),
 		runDecoderString: F2(runDecoderString),
 		runDecoderValue: F2(runDecoderValue),
@@ -490,6 +490,7 @@ Elm.Native.Json.make = function(localRuntime) {
 		encodeArray: ElmArray.toJSArray,
 		encodeList: List.toArray,
 		encodeObject: encodeObject
-
 	};
+
+	return localRuntime.Native.Json.values;
 };

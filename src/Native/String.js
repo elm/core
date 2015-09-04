@@ -9,7 +9,8 @@ Elm.Native.String.make = function(localRuntime) {
 	}
 	if ('values' in Elm.Native.String)
 	{
-		return localRuntime.Native.String.values = Elm.Native.String.values;
+		localRuntime.Native.String.values = Elm.Native.String.values;
+		return localRuntime.Native.String.values;
 	}
 
 
@@ -68,19 +69,21 @@ Elm.Native.String.make = function(localRuntime) {
 	function foldl(f, b, str)
 	{
 		var len = str.length;
+		var b2 = b;
 		for (var i = 0; i < len; ++i)
 		{
-			b = A2(f, Utils.chr(str[i]), b);
+			b2 = A2(f, Utils.chr(str[i]), b2);
 		}
-		return b;
+		return b2;
 	}
 	function foldr(f, b, str)
 	{
+		var b2 = b;
 		for (var i = str.length; i--; )
 		{
-			b = A2(f, Utils.chr(str[i]), b);
+			b2 = A2(f, Utils.chr(str[i]), b2);
 		}
-		return b;
+		return b2;
 	}
 	function split(sep, str)
 	{
@@ -93,13 +96,15 @@ Elm.Native.String.make = function(localRuntime) {
 	function repeat(n, str)
 	{
 		var result = '';
-		while (n > 0)
+		var n2 = n;
+		var string = str;
+		while (n2 > 0)
 		{
-			if (n & 1)
+			if (n2 & 1)
 			{
-				result += str;
+				result += string;
 			}
-			n >>= 1, str += str;
+			n2 >>= 1, string += string;
 		}
 		return result;
 	}
@@ -222,14 +227,14 @@ Elm.Native.String.make = function(localRuntime) {
 		var len = s.length;
 		if (len === 0)
 		{
-			return Result.Err("could not convert string '" + s + "' to an Int" );
+			return Result.Err('could not convert string \'' + s + '\' to an Int');
 		}
 		var start = 0;
 		if (s[0] === '-')
 		{
 			if (len === 1)
 			{
-				return Result.Err("could not convert string '" + s + "' to an Int" );
+				return Result.Err('could not convert string \'' + s + '\' to an Int');
 			}
 			start = 1;
 		}
@@ -237,7 +242,7 @@ Elm.Native.String.make = function(localRuntime) {
 		{
 			if (!Char.isDigit(s[i]))
 			{
-				return Result.Err("could not convert string '" + s + "' to an Int" );
+				return Result.Err('could not convert string \'' + s + '\' to an Int');
 			}
 		}
 		return Result.Ok(parseInt(s, 10));
@@ -248,14 +253,14 @@ Elm.Native.String.make = function(localRuntime) {
 		var len = s.length;
 		if (len === 0)
 		{
-			return Result.Err("could not convert string '" + s + "' to a Float" );
+			return Result.Err('could not convert string \'' + s + '\' to a Float');
 		}
 		var start = 0;
 		if (s[0] === '-')
 		{
 			if (len === 1)
 			{
-				return Result.Err("could not convert string '" + s + "' to a Float" );
+				return Result.Err('could not convert string \'' + s + '\' to a Float');
 			}
 			start = 1;
 		}
@@ -274,7 +279,7 @@ Elm.Native.String.make = function(localRuntime) {
 					continue;
 				}
 			}
-			return Result.Err("could not convert string '" + s + "' to a Float" );
+			return Result.Err('could not convert string \'' + s + '\' to a Float');
 		}
 		return Result.Ok(parseFloat(s));
 	}
@@ -288,7 +293,7 @@ Elm.Native.String.make = function(localRuntime) {
 		return List.toArray(chars).join('');
 	}
 
-	return Elm.Native.String.values = {
+	Elm.Native.String.values = {
 		isEmpty: isEmpty,
 		cons: F2(cons),
 		uncons: uncons,
@@ -338,4 +343,6 @@ Elm.Native.String.make = function(localRuntime) {
 		toList: toList,
 		fromList: fromList
 	};
+
+	return Elm.Native.String.values;
 };

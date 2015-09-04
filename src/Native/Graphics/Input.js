@@ -457,7 +457,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		};
 	}
 
-	return Elm.Native.Graphics.Input.values = {
+	Elm.Native.Graphics.Input.values = {
 		button: F2(button),
 		customButton: F4(customButton),
 		checkbox: F2(checkbox),
@@ -468,4 +468,6 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		hoverable: F2(hoverable),
 		clickable: F2(clickable)
 	};
+
+	return Elm.Native.Graphics.Input.values;
 };

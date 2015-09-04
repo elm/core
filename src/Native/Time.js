@@ -72,6 +72,10 @@ Elm.Native.Time.make = function(localRuntime)
 		);
 	}
 
+	function fst(pair)
+	{
+		return pair._0;
+	}
 
 	// EVERY
 
@@ -87,23 +91,18 @@ Elm.Native.Time.make = function(localRuntime)
 		return clock;
 	}
 
-
-	function fst(pair)
-	{
-		return pair._0;
-	}
-
-
 	function read(s)
 	{
 		var t = Date.parse(s);
 		return isNaN(t) ? Maybe.Nothing : Maybe.Just(t);
 	}
 
-	return localRuntime.Native.Time.values = {
+	localRuntime.Native.Time.values = {
 		fpsWhen: F2(fpsWhen),
 		every: every,
 		toDate: function(t) { return new Date(t); },
 		read: read
 	};
+
+	return localRuntime.Native.Time.values;
 };

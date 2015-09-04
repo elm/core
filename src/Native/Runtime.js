@@ -183,10 +183,10 @@ if (!Elm.fullscreen) {
 				if (!argsTracker[name].used)
 				{
 					throw new Error(
-						"Port Error:\nYou provided an argument named '" + name +
-						"' but there is no corresponding port!\n\n" +
-						"Maybe add a port '" + name + "' to your Elm module?\n" +
-						"Maybe remove the '" + name + "' argument from your initialization code in JS?"
+						'Port Error:\nYou provided an argument named \'' + name +
+						'\' but there is no corresponding port!\n\n' +
+						'Maybe add a port \'' + name + '\' to your Elm module?\n' +
+						'Maybe remove the \'' + name + '\' argument from your initialization code in JS?'
 					);
 				}
 			}
@@ -297,7 +297,7 @@ if (!Elm.fullscreen) {
 		{
 			if (!('main' in Module))
 			{
-				throw new Error("'main' is missing! What do I display?!");
+				throw new Error('\'main\' is missing! What do I display?!');
 			}
 
 			var signalGraph = Module.main;
@@ -503,7 +503,7 @@ if (!Elm.fullscreen) {
 
 	function F2(fun)
 	{
-		function wrapper(a) { return function(b) { return fun(a,b); }; }
+		function wrapper(a) { return function(b) { return fun(a, b); }; }
 		wrapper.arity = 2;
 		wrapper.func = fun;
 		return wrapper;

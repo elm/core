@@ -30,6 +30,16 @@ Elm.Native.Text.make = function(localRuntime) {
 		};
 	}
 
+	var metaKeys = [
+		'font-size',
+		'font-family',
+		'font-style',
+		'font-weight',
+		'href',
+		'text-decoration',
+		'color'
+	];
+
 	function addMeta(field, value, text)
 	{
 		var newProps = {};
@@ -75,51 +85,55 @@ Elm.Native.Text.make = function(localRuntime) {
 		var typefaces = List.toArray(list);
 		for (var i = typefaces.length; i--; )
 		{
-			var typeface = typefaces[i];
-			if (typeface.indexOf(' ') > -1)
+			var typefaceValue = typefaces[i];
+			if (typefaceValue.indexOf(' ') > -1)
 			{
-				typefaces[i] = "'" + typeface + "'";
+				typefaces[i] = '\'' + typefaceValue + '\'';
 			}
 		}
 		return typefaces.join(',');
 	}
 
-	function toLine(line)
+	function toLine(lineValue)
 	{
-		var ctor = line.ctor;
-		return ctor === 'Under'
-			? 'underline'
-			: ctor === 'Over'
-				? 'overline'
-				: 'line-through';
+		var ctor = lineValue.ctor;
+		if (ctor === 'Under')
+		{
+			return 'underline';
+		}
+		if (ctor === 'Over')
+		{
+			return 'overline';
+		}
+		return 'line-through';
 	}
 
 	// setting styles of Text
 
-	function style(style, text)
+	function style(styleValue, text)
 	{
-		var newText = addMeta('color', toCss(style.color), text);
+		var newText = addMeta('color', toCss(styleValue.color), text);
 		var props = newText._0;
 
-		if (style.typeface.ctor !== '[]')
+		if (styleValue.typeface.ctor !== '[]')
 		{
-			props['font-family'] = toTypefaces(style.typeface);
+			props['font-family'] = toTypefaces(styleValue.typeface);
 		}
-		if (style.height.ctor !== 'Nothing')
+		if (styleValue.height.ctor !== 'Nothing')
 		{
-			props['font-size'] = style.height._0 + 'px';
+			props['font-size'] = styleValue.height._0 + 'px';
 		}
-		if (style.bold)
+		if (styleValue.bold)
 		{
 			props['font-weight'] = 'bold';
 		}
-		if (style.italic)
+		if (styleValue.italic)
 		{
 			props['font-style'] = 'italic';
 		}
-		if (style.line.ctor !== 'Nothing')
+		if (styleValue.line.ctor !== 'Nothing')
 		{
-			props['text-decoration'] = toLine(style.line._0);
+			props['text-decoration'] = toLine(styleValue.line._0);
 		}
 		return newText;
 	}
@@ -154,77 +168,18 @@ Elm.Native.Text.make = function(localRuntime) {
 		return addMeta('href', href, text);
 	}
 
-	function line(line, text)
+	function line(lineValue, text)
 	{
-		return addMeta('text-decoration', toLine(line), text);
+		return addMeta('text-decoration', toLine(lineValue), text);
 	}
 
-	function color(color, text)
+	function color(colorValue, text)
 	{
-		return addMeta('color', toCss(color), text);
+		return addMeta('color', toCss(colorValue), text);
 	}
 
 
 	// RENDER
-
-	function renderHtml(text)
-	{
-		var tag = text.ctor;
-		if (tag === 'Text:Append')
-		{
-			return renderHtml(text._0) + renderHtml(text._1);
-		}
-		if (tag === 'Text:Text')
-		{
-			return properEscape(text._0);
-		}
-		if (tag === 'Text:Meta')
-		{
-			return renderMeta(text._0, renderHtml(text._1));
-		}
-	}
-
-	function renderMeta(metas, string)
-	{
-		var href = metas.href;
-		if (href)
-		{
-			string = '<a href="' + href + '">' + string + '</a>';
-		}
-		var styles = '';
-		for (var key in metas)
-		{
-			if (key === 'href')
-			{
-				continue;
-			}
-			styles += key + ':' + metas[key] + ';';
-		}
-		if (styles)
-		{
-			string = '<span style="' + styles + '">' + string + '</span>';
-		}
-		return string;
-	}
-
-	function properEscape(str)
-	{
-		if (str.length === 0)
-		{
-			return str;
-		}
-		str = str //.replace(/&/g,  '&#38;')
-			.replace(/"/g,  '&#34;')
-			.replace(/'/g,  '&#39;')
-			.replace(/</g,  '&#60;')
-			.replace(/>/g,  '&#62;');
-		var arr = str.split('\n');
-		for (var i = arr.length; i--; )
-		{
-			arr[i] = makeSpaces(arr[i]);
-		}
-		return arr.join('<br/>');
-	}
 
 	function makeSpaces(s)
 	{
@@ -265,8 +220,67 @@ Elm.Native.Text.make = function(localRuntime) {
 		return arr;
 	}
 
+	function properEscape(str)
+	{
+		if (str.length === 0)
+		{
+			return str;
+		}
+		var s = str // .replace(/&/g,  '&#38;')
+			.replace(/"/g,  '&#34;')
+			.replace(/'/g,  '&#39;')
+			.replace(/</g,  '&#60;')
+			.replace(/>/g,  '&#62;');
+		var arr = s.split('\n');
+		for (var i = arr.length; i--; )
+		{
+			arr[i] = makeSpaces(arr[i]);
+		}
+		return arr.join('<br/>');
+	}
 
-	return localRuntime.Native.Text.values = {
+	function renderMeta(metas, str)
+	{
+		var href = metas.href;
+		var string;
+		if (href)
+		{
+			string = '<a href="' + href + '">' + str + '</a>';
+		}
+		var styles = '';
+		for (var key in metas)
+		{
+			if (key === 'href')
+			{
+				continue;
+			}
+			styles += key + ':' + metas[key] + ';';
+		}
+		if (styles)
+		{
+			string = '<span style="' + styles + '">' + string + '</span>';
+		}
+		return string;
+	}
+
+	function renderHtml(text)
+	{
+		var tag = text.ctor;
+		if (tag === 'Text:Append')
+		{
+			return renderHtml(text._0) + renderHtml(text._1);
+		}
+		if (tag === 'Text:Text')
+		{
+			return properEscape(text._0);
+		}
+		if (tag === 'Text:Meta')
+		{
+			return renderMeta(text._0, renderHtml(text._1));
+		}
+	}
+
+	localRuntime.Native.Text.values = {
 		fromString: fromString,
 		append: F2(append),
 
@@ -284,4 +298,6 @@ Elm.Native.Text.make = function(localRuntime) {
 		toLine: toLine,
 		renderHtml: renderHtml
 	};
+
+	return localRuntime.Native.Text.values;
 };

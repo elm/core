@@ -8,7 +8,6 @@ Elm.Native.Task.make = function(localRuntime) {
 		return localRuntime.Native.Task.values;
 	}
 
-	var Result = Elm.Result.make(localRuntime);
 	var Signal;
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
@@ -60,72 +59,9 @@ Elm.Native.Task.make = function(localRuntime) {
 
 	// RUNNER
 
-	function perform(task) {
-		runTask({ task: task }, function() {});
-	}
-
-	function performSignal(name, signal)
-	{
-		var workQueue = [];
-
-		function onComplete()
-		{
-			workQueue.shift();
-
-			if (workQueue.length > 0)
-			{
-				var task = workQueue[0];
-
-				setTimeout(function() {
-					runTask(task, onComplete);
-				}, 0);
-			}
-		}
-
-		function register(task)
-		{
-			var root = { task: task };
-			workQueue.push(root);
-			if (workQueue.length === 1)
-			{
-				runTask(root, onComplete);
-			}
-		}
-
-		if (!Signal)
-		{
-			Signal = Elm.Native.Signal.make(localRuntime);
-		}
-		Signal.output('perform-tasks-' + name, register, signal);
-
-		register(signal.value);
-
-		return signal;
-	}
-
 	function mark(status, task)
 	{
 		return { status: status, task: task };
-	}
-
-	function runTask(root, onComplete)
-	{
-		var result = mark('runnable', root.task);
-		while (result.status === 'runnable')
-		{
-			result = stepTask(onComplete, root, result.task);
-		}
-
-		if (result.status === 'done')
-		{
-			root.task = result.task;
-			onComplete();
-		}
-
-		if (result.status === 'blocked')
-		{
-			root.task = result.task;
-		}
 	}
 
 	function stepTask(onComplete, root, task)
@@ -190,6 +126,68 @@ Elm.Native.Task.make = function(localRuntime) {
 		}
 	}
 
+	function runTask(root, onComplete)
+	{
+		var result = mark('runnable', root.task);
+		while (result.status === 'runnable')
+		{
+			result = stepTask(onComplete, root, result.task);
+		}
+
+		if (result.status === 'done')
+		{
+			root.task = result.task;
+			onComplete();
+		}
+
+		if (result.status === 'blocked')
+		{
+			root.task = result.task;
+		}
+	}
+
+	function perform(task) {
+		runTask({ task: task }, function() {});
+	}
+
+	function performSignal(name, signal)
+	{
+		var workQueue = [];
+
+		function onComplete()
+		{
+			workQueue.shift();
+
+			if (workQueue.length > 0)
+			{
+				var task = workQueue[0];
+
+				setTimeout(function() {
+					runTask(task, onComplete);
+				}, 0);
+			}
+		}
+
+		function register(task)
+		{
+			var root = { task: task };
+			workQueue.push(root);
+			if (workQueue.length === 1)
+			{
+				runTask(root, onComplete);
+			}
+		}
+
+		if (!Signal)
+		{
+			Signal = Elm.Native.Signal.make(localRuntime);
+		}
+		Signal.output('perform-tasks-' + name, register, signal);
+
+		register(signal.value);
+
+		return signal;
+	}
 
 	// THREADS
 
@@ -210,8 +208,7 @@ Elm.Native.Task.make = function(localRuntime) {
 		});
 	}
 
-
-	return localRuntime.Native.Task.values = {
+	localRuntime.Native.Task.values = {
 		succeed: succeed,
 		fail: fail,
 		asyncFunction: asyncFunction,
@@ -222,4 +219,6 @@ Elm.Native.Task.make = function(localRuntime) {
 		spawn: spawn,
 		sleep: sleep
 	};
+
+	return localRuntime.Native.Task.values
 };

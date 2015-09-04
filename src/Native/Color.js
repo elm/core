@@ -27,13 +27,12 @@ Elm.Native.Color.make = function(localRuntime) {
 		{
 			return format + '(' + colors + ')';
 		}
-		else
-		{
-			return format + 'a(' + colors + ', ' + c._3 + ')';
-		}
+		return format + 'a(' + colors + ', ' + c._3 + ')';
 	}
 
-	return localRuntime.Native.Color.values = {
+	localRuntime.Native.Color.values = {
 		toCss: toCss
 	};
+
+	return localRuntime.Native.Color.values;
 };

@@ -199,7 +199,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 	function replace(keyValuePairs, oldRecord)
 	{
 		var record = copy(oldRecord);
-		for (var i = keyValuePairs.length; i--; )
+		for (var i = keyValuePairs.length; i--;)
 		{
 			var pair = keyValuePairs[i];
 			record[pair[0]] = pair[1];
@@ -333,8 +333,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 		throw new Error('Runtime error when sending values through a port.' + msg);
 	}
 
-
-	return localRuntime.Native.Utils.values = {
+	localRuntime.Native.Utils.values = {
 		eq: eq,
 		cmp: cmp,
 		compare: F2(compare),
@@ -357,4 +356,6 @@ Elm.Native.Utils.make = function(localRuntime) {
 		badIf: badIf,
 		badPort: badPort
 	};
+
+	return localRuntime.Native.Utils.values;
 };

@@ -34,9 +34,11 @@ Elm.Native.Mouse.make = function(localRuntime) {
 		localRuntime.notify(position.id, Utils.getXY(e));
 	});
 
-	return localRuntime.Native.Mouse.values = {
+	localRuntime.Native.Mouse.values = {
 		position: position,
 		isDown: isDown,
 		clicks: clicks
 	};
+
+	return localRuntime.Native.Mouse.values;
 };

@@ -169,7 +169,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		function refreshValue()
 		{
-			return A2( func, a.value, b.value );
+			return A2(func, a.value, b.value);
 		}
 		return mapMany(refreshValue, [a, b]);
 	}
@@ -179,7 +179,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		function refreshValue()
 		{
-			return A3( func, a.value, b.value, c.value );
+			return A3(func, a.value, b.value, c.value);
 		}
 		return mapMany(refreshValue, [a, b, c]);
 	}
@@ -189,7 +189,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		function refreshValue()
 		{
-			return A4( func, a.value, b.value, c.value, d.value );
+			return A4(func, a.value, b.value, c.value, d.value);
 		}
 		return mapMany(refreshValue, [a, b, c, d]);
 	}
@@ -199,7 +199,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	{
 		function refreshValue()
 		{
-			return A5( func, a.value, b.value, c.value, d.value, e.value );
+			return A5(func, a.value, b.value, c.value, d.value, e.value);
 		}
 		return mapMany(refreshValue, [a, b, c, d, e]);
 	}
@@ -221,7 +221,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			if (parentUpdate)
 			{
-				node.value = A2( update, signal.value, node.value );
+				node.value = A2(update, signal.value, node.value);
 			}
 			broadcastToKids(node, timestamp, parentUpdate);
 		};
@@ -449,7 +449,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 	}
 
 
-	return localRuntime.Native.Signal.values = {
+	localRuntime.Native.Signal.values = {
 		input: input,
 		constant: constant,
 		mailbox: mailbox,
@@ -468,4 +468,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 		timestamp: timestamp,
 		delay: F2(delay)
 	};
+
+	return localRuntime.Native.Signal.values;
 };
