@@ -299,7 +299,7 @@ int =
 
     checked : Decoder Bool
     checked =
-        "checked" := true
+        "checked" := bool
 -}
 bool : Decoder Bool
 bool =
