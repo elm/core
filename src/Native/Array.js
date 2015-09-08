@@ -418,6 +418,19 @@ Elm.Native.Array.make = function(localRuntime) {
 	// optimized.
 	function slice(from, to, a)
 	{
+		// if the start of the slice goes past the end of the array, 
+		// then just return empty
+		// -1 since array is 0 based
+		if (from >= length(a)){
+			return empty;
+		}
+
+		// if the end of the slice goes past the end of the, 
+		// just make to the length of the array
+		if (to >= length(a)){
+			to = length(a);
+		}
+		
 		if (from < 0)
 		{
 			from += length(a);
