@@ -105,7 +105,13 @@ Elm.Native.Array.make = function(localRuntime) {
 		{
 			return empty;
 		}
-		var h = Math.floor( Math.log(len) / Math.log(M) );
+		
+		var h = 0;
+		
+		if (len != 1)
+		{
+			h = Math.floor( Math.log(len - 1) / Math.log(M) );
+		}
 		return initialize_(f, h, 0, len);
 	}
 
