@@ -418,7 +418,7 @@ if (!Elm.fullscreen) {
 			function draw()
 			{
 				update(elm.node.firstChild, savedScene, scheduledScene);
-				if (elm.Native.Window)
+				if (elm.Native.Window && elm.Native.Window.values)
 				{
 					elm.Native.Window.values.resizeIfNeeded();
 				}
@@ -429,7 +429,7 @@ if (!Elm.fullscreen) {
 
 			// must check for resize after 'renderer' is created so
 			// that changes show up.
-			if (elm.Native.Window)
+			if (elm.Native.Window && elm.Native.Window.values)
 			{
 				elm.Native.Window.values.resizeIfNeeded();
 			}
