@@ -426,8 +426,8 @@ Elm.Native.Array.make = function(localRuntime) {
 		}
 
 		// if the end of the slice goes past the end of the, 
-		// just make to the length of the array
-		if (to >= length(a)){
+		// just make `to` the length of the array
+		if (to >= length(a) - 1){
 			to = length(a);
 		}
 		
