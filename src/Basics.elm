@@ -1,7 +1,7 @@
 module Basics
     ( (==), (/=)
     , (<), (>), (<=), (>=), max, min, Order (..), compare
-    , not, (&&), (||), xor, otherwise
+    , not, (&&), (||), xor
     , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
     , pi, cos, sin, tan, acos, asin, atan, atan2
     , round, floor, ceiling, truncate, toFloat
@@ -28,7 +28,7 @@ are your tuples so big?
 @docs (<), (>), (<=), (>=), max, min, Order, compare
 
 # Booleans
-@docs not, (&&), (||), xor, otherwise
+@docs not, (&&), (||), xor
 
 # Mathematics
 @docs (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
@@ -384,12 +384,6 @@ xor =
 not : Bool -> Bool
 not =
   Native.Basics.not
-
-
-{-| Equal to `True`. Useful as the last case of a multi-way-if. -}
-otherwise : Bool
-otherwise =
-  True
 
 
 -- Conversions
