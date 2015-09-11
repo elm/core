@@ -218,7 +218,19 @@ all pred xs =
     any isEven [] == False
 -}
 any : (a -> Bool) -> List a -> Bool
-any = Native.List.any
+any isOkay list =
+  case list of
+    [] ->
+      False
+
+    x :: xs ->
+      -- note: (isOkay x || any isOkay xs) would not get TCO
+      if isOkay x then
+        True
+
+      else
+        any isOkay xs
+
 
 
 {-| Put two lists together.
@@ -374,19 +386,42 @@ intersperse sep xs =
 take : Int -> List a -> List a
 take = Native.List.take
 
+
 {-| Drop the first *n* members of a list.
 
     drop 2 [1,2,3,4] == [3,4]
 -}
 drop : Int -> List a -> List a
-drop = Native.List.drop
+drop n list =
+  if n <= 0 then
+    list
+
+  else
+    case list of
+      [] ->
+        list
+
+      x :: xs ->
+        drop (n-1) xs
+
 
 {-| Create a list with *n* copies of a value:
 
     repeat 3 (0,0) == [(0,0),(0,0),(0,0)]
 -}
 repeat : Int -> a -> List a
-repeat = Native.List.repeat
+repeat n value =
+  repeatHelp [] n value
+
+
+repeatHelp :: List a -> Int -> a -> List a
+repeatHelp result n value =
+  if n <= 0 then
+    result
+
+  else
+    repeatHelp (value :: result) (n-1) value
+
 
 {-| Sort values from lowest to highest
 
