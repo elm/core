@@ -1,10 +1,10 @@
 module Test.Bitwise (tests) where
 
-import Basics (..)
+import Basics exposing (..)
 import Bitwise
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
 
 tests : Test
 tests =

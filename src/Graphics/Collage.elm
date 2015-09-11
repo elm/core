@@ -1,4 +1,12 @@
-module Graphics.Collage where
+module Graphics.Collage
+    ( collage, Form
+    , toForm, filled, textured, gradient, outlined, traced, text, outlinedText
+    , move, moveX, moveY, scale, rotate, alpha
+    , group, groupTransform
+    , Shape, rect, oval, square, circle, ngon, polygon
+    , Path, segment, path
+    , solid, dashed, dotted, LineStyle, LineCap(..), LineJoin(..), defaultLine
+    ) where
 
 {-| The collage API is for freeform graphics. You can move, rotate, scale, etc.
 all sorts of forms including lines, shapes, images, and elements.
@@ -9,42 +17,45 @@ corner as in some other graphics libraries. Furthermore, the y-axis points up,
 so moving a form 10 units in the y-axis will move it up on screen.
 
 # Unstructured Graphics
-@docs collage
- 
+@docs collage, Form
+
 # Creating Forms
 @docs toForm, filled, textured, gradient, outlined, traced, text, outlinedText
- 
+
 # Transforming Forms
 @docs move, moveX, moveY, scale, rotate, alpha
- 
+
 # Grouping Forms
 Grouping forms makes it easier to write modular graphics code. You can create
 a form that is a composite of many subforms. From there it is easy to transform
 it as a single unit.
 
 @docs group, groupTransform
- 
+
 # Shapes
-@docs rect, oval, square, circle, ngon, polygon
+@docs Shape, rect, oval, square, circle, ngon, polygon
 
 # Paths
-@docs segment, path
- 
+@docs Path, segment, path
+
 # Line Styles
 @docs solid, dashed, dotted, LineStyle, LineCap, LineJoin, defaultLine
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import List
-import Transform2D (Transform2D)
+import Transform2D exposing (Transform2D)
 import Transform2D as T
 import Native.Graphics.Collage
-import Graphics.Element (Element)
-import Color (Color, black, Gradient)
-import Text (Text)
+import Graphics.Element exposing (Element)
+import Color exposing (Color, black, Gradient)
+import Text exposing (Text)
 
 
+{-| A visual `Form` has a shape and texture. This can be anything from a red
+square to a circle textured with stripes.
+-}
 type alias Form =
     { theta : Float
     , scale : Float
@@ -89,7 +100,7 @@ type alias LineStyle =
 You can use record updates to build the line style you
 want. For example, to make a thicker line, you could say:
 
-    { defaultLine | width <- 10 }
+    { defaultLine | width = 10 }
 -}
 defaultLine : LineStyle
 defaultLine =
@@ -105,24 +116,24 @@ defaultLine =
 {-| Create a solid line style with a given color. -}
 solid : Color -> LineStyle
 solid  clr =
-  { defaultLine | color <- clr }
+  { defaultLine | color = clr }
 
 
 {-| Create a dashed line style with a given color. Dashing equals `[8,4]`. -}
 dashed : Color -> LineStyle
 dashed clr =
-  { defaultLine | color <- clr, dashing <- [8,4] }
+  { defaultLine | color = clr, dashing = [8,4] }
 
 
 {-| Create a dotted line style with a given color. Dashing equals `[3,3]`. -}
 dotted : Color -> LineStyle
 dotted clr =
-  { defaultLine | color <- clr, dashing <- [3,3] }
+  { defaultLine | color = clr, dashing = [3,3] }
 
 
 type BasicForm
-    = FPath LineStyle Path
-    | FShape ShapeStyle Shape
+    = FPath LineStyle (List (Float,Float))
+    | FShape ShapeStyle (List (Float,Float))
     | FOutlinedText LineStyle Text
     | FText Text
     | FImage Int Int (Int,Int) String
@@ -140,7 +151,7 @@ form f =
   { theta=0, scale=1, x=0, y=0, alpha=1, form=f }
 
 
-fill style shape =
+fill style (Shape shape) =
   form (FShape (Fill style) shape)
 
 
@@ -166,13 +177,13 @@ gradient grad shape =
 
 {-| Outline a shape with a given line style. -}
 outlined : LineStyle -> Shape -> Form
-outlined style shape =
+outlined style (Shape shape) =
   form (FShape (Line style) shape)
 
 
 {-| Trace a path with a given line style. -}
 traced : LineStyle -> Path -> Form
-traced style path =
+traced style (Path path) =
   form (FPath style path)
 
 
@@ -195,6 +206,7 @@ toForm e =
 
 {-| Flatten many forms into a single `Form`. This lets you move and rotate them
 as a single unit, making it possible to build small, modular components.
+Forms will be drawn in the order that they are listed, as in `collage`.
 -}
 group : List Form -> Form
 group fs =
@@ -202,20 +214,20 @@ group fs =
 
 
 {-| Flatten many forms into a single `Form` and then apply a matrix
-transformation.
+transformation. Forms will be drawn in the order that they are listed, as in
+`collage`.
 -}
 groupTransform : Transform2D -> List Form -> Form
 groupTransform matrix fs =
   form (FGroup matrix fs)
 
 
-{-| Move a form by the given amount. This is a relative translation so
-`(move (10,10) form)` would move `form` ten pixels up and ten pixels to the
-right.
+{-| Move a form by the given amount (x, y). This is a relative translation so
+`(move (5,10) form)` would move `form` five pixels to the right and ten pixels up.
 -}
 move : (Float,Float) -> Form -> Form
 move (x,y) f =
-  { f | x <- f.x + x, y <- f.y + y }
+  { f | x = f.x + x, y = f.y + y }
 
 
 {-| Move a shape in the x direction. This is relative so `(moveX 10 form)` moves
@@ -223,7 +235,7 @@ move (x,y) f =
 -}
 moveX : Float -> Form -> Form
 moveX x f =
-  { f | x <- f.x + x }
+  { f | x = f.x + x }
 
 
 {-| Move a shape in the y direction. This is relative so `(moveY 10 form)` moves
@@ -231,7 +243,7 @@ moveX x f =
 -}
 moveY : Float -> Form -> Form
 moveY y f =
-  { f | y <- f.y + y }
+  { f | y = f.y + y }
 
 
 {-| Scale a form by a given factor. Scaling by 2 doubles both dimensions,
@@ -239,7 +251,7 @@ and quadruples the area.
 -}
 scale : Float -> Form -> Form
 scale s f =
-  { f | scale <- f.scale * s }
+  { f | scale = f.scale * s }
 
 
 {-| Rotate a form by a given angle. Rotate takes standard Elm angles (radians)
@@ -248,39 +260,48 @@ you would say, `(rotate (degrees 30) form)`.
 -}
 rotate : Float -> Form -> Form
 rotate t f =
-  { f | theta <- f.theta + t }
+  { f | theta = f.theta + t }
 
 
 {-| Set the alpha of a `Form`. The default is 1, and 0 is totally transparent. -}
 alpha : Float -> Form -> Form
 alpha a f =
-  { f | alpha <- a }
+  { f | alpha = a }
 
 
 {-| A collage is a collection of 2D forms. There are no strict positioning
 relationships between forms, so you are free to do all kinds of 2D graphics.
+The forms are drawn in the order of the list, i.e., `collage w h [a, b]` will
+draw `b` on top of `a`.
 -}
 collage : Int -> Int -> List Form -> Element
 collage =
   Native.Graphics.Collage.collage
 
 
-type alias Path = List (Float,Float)
+{-| A 2D path. Paths are a sequence of points. They do not have a color.
+-}
+type Path =
+  Path (List (Float,Float))
 
 
 {-| Create a path that follows a sequence of points. -}
 path : List (Float,Float) -> Path
 path ps =
-  ps
+  Path ps
 
 
 {-| Create a path along a given line segment. -}
 segment : (Float,Float) -> (Float,Float) -> Path
 segment p1 p2 =
-  [p1,p2]
+  Path [p1,p2]
 
 
-type alias Shape = List (Float,Float)
+{-| A 2D shape. Shapes are closed polygons. They do not have a color or
+texture, that information can be filled in later.
+-}
+type Shape =
+  Shape (List (Float,Float))
 
 
 {-| Create an arbitrary polygon by specifying its corners in order.
@@ -289,7 +310,7 @@ of points does not need to start and end with the same position.
 -}
 polygon : List (Float,Float) -> Shape
 polygon points =
-  points
+  Shape points
 
 {-| A rectangle with a given width and height. -}
 rect : Float -> Float -> Shape
@@ -297,7 +318,7 @@ rect w h =
   let hw = w/2
       hh = h/2
   in
-      [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
+      Shape [ (0-hw,0-hh), (0-hw,hh), (hw,hh), (hw,0-hh) ]
 
 
 {-| A square with a given edge length. -}
@@ -315,7 +336,7 @@ oval w h =
       hh = h/2
       f i = (hw * cos (t*i), hh * sin (t*i))
   in
-      List.map f [0..n-1]
+      Shape <| List.map f [0..n-1]
 
 
 {-| A circle with a given radius. -}
@@ -336,7 +357,7 @@ ngon n r =
       t = 2 * pi / m
       f i = ( r * cos (t*i), r * sin (t*i) )
   in
-      List.map f [0..m-1]
+      Shape <| List.map f [0..m-1]
 
 {-| Create some text. Details like size and color are part of the `Text` value
 itself, so you can mix colors and sizes and fonts easily.

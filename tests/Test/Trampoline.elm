@@ -1,12 +1,12 @@
 module Test.Trampoline (tests) where
 
-import Basics (..)
+import Basics exposing (..)
 
 import List
-import Trampoline (..)
+import Trampoline exposing (..)
 
-import ElmTest.Assertion (..)
-import ElmTest.Test (..)
+import ElmTest.Assertion exposing (..)
+import ElmTest.Test exposing (..)
     
 badSum : Int -> Int
 badSum n =

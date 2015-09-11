@@ -1,5 +1,5 @@
 {
-    "version": "1.1.0",
+    "version": "2.1.0",
     "summary": "Elm's standard libraries",
     "repository": "http://github.com/elm-lang/core.git",
     "license": "BSD3",
@@ -19,7 +19,6 @@
         "Graphics.Collage",
         "Graphics.Input",
         "Graphics.Input.Field",
-        "Http",
         "Json.Decode",
         "Json.Encode",
         "Keyboard",
@@ -32,14 +31,15 @@
         "Set",
         "Signal",
         "String",
+        "Task",
         "Text",
         "Time",
         "Touch",
         "Trampoline",
         "Transform2D",
-        "WebSocket",
         "Window"
     ],
     "native-modules": true,
-    "dependencies": {}
+    "dependencies": {},
+    "elm-version": "0.15.0 <= v < 0.16.0"
 }

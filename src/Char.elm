@@ -1,6 +1,7 @@
 module Char
     ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
-    , toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
+    , toUpper, toLower, toLocaleUpper, toLocaleLower
+    , KeyCode, toCode, fromCode
     ) where
 
 {-| Functions for working with characters. Character literals are enclosed in
@@ -10,16 +11,19 @@ module Char
 @docs isUpper, isLower, isDigit, isOctDigit, isHexDigit
 
 # Conversion
-@docs toUpper, toLower, toLocaleUpper, toLocaleLower, toCode, fromCode
+@docs toUpper, toLower, toLocaleUpper, toLocaleLower
+
+# Key Codes
+@docs KeyCode, toCode, fromCode
 
 -}
 
 import Native.Char
-import Basics ((&&), (||), (>=), (<=))
+import Basics exposing ((&&), (||), (>=), (<=))
 
 
 isBetween : Char -> Char -> Char -> Bool
-isBetween low high char = 
+isBetween low high char =
   let code = toCode char
   in
       (code >= toCode low) && (code <= toCode high)
@@ -51,7 +55,7 @@ isOctDigit =
 
 {-| True for ASCII hexadecimal digits `[0-9a-fA-F]`. -}
 isHexDigit : Char -> Bool
-isHexDigit char = 
+isHexDigit char =
   isDigit char || isBetween 'a' 'f' char || isBetween 'A' 'F' char
 
 
@@ -79,11 +83,15 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
+{-| In this library, we use integers to represent the key codes coming from the
+keyboard. You can use [`toCode`](#toCode) and [`fromCode`](#fromCode)
+to convert between key codes and characters.
+-}
 type alias KeyCode = Int
 
 
-{-| Convert to unicode. Used with the `Keyboard` library, which expects the
-input to be uppercase.
+{-| Convert to unicode. Used with the [`Keyboard`](Keyboard) library,
+which expects the input to be uppercase.
 -}
 toCode : Char -> KeyCode
 toCode =

@@ -11,18 +11,25 @@ the whole window.
 
 -}
 
-import Signal (Signal)
+import Basics exposing (fst,snd)
 import Native.Window
+import Signal exposing (Signal)
+
 
 {-| The current width and height of the window (i.e. the area viewable to the
 user, not including scroll bars). -}
 dimensions : Signal (Int,Int)
-dimensions = Native.Window.dimensions
+dimensions =
+  Native.Window.dimensions
+
 
 {-| The current width of the window. -}
 width : Signal Int
-width = Native.Window.width
+width =
+  Signal.map fst dimensions
+
 
 {-| The current height of the window. -}
 height : Signal Int
-height = Native.Window.height
+height =
+  Signal.map snd dimensions

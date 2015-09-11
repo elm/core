@@ -1,14 +1,14 @@
 module Main where
 
-import Basics (..)
-import Signal (..)
+import Basics exposing (..)
+import Signal exposing (..)
 
 import ElmTest.Assertion as A
 import ElmTest.Run as R
-import ElmTest.Runner.Console (runDisplay)
-import ElmTest.Test (..)
-import IO.IO (..)
-import IO.Runner (Request, Response)
+import ElmTest.Runner.Console exposing (runDisplay)
+import ElmTest.Test exposing (..)
+import IO.IO exposing (..)
+import IO.Runner exposing (Request, Response)
 import IO.Runner as Run
 
 import Test.Array as Array
@@ -18,6 +18,7 @@ import Test.Char as Char
 import Test.CodeGen as CodeGen
 import Test.Dict as Dict
 import Test.Equality as Equality
+import Test.Json as Json
 import Test.List as List
 import Test.Result as Result
 import Test.Set as Set
@@ -35,6 +36,7 @@ tests =
     , CodeGen.tests
     , Dict.tests
     , Equality.tests
+    , Json.tests
     , List.tests
     , Result.tests
     , Set.tests

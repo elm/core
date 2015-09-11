@@ -1,5 +1,21 @@
-module Json.Decode where
-{-| A way to turn JSON strings and JS values into Elm values.
+module Json.Decode
+    ( Decoder, Value
+    , decodeString, decodeValue
+    , string, int, float, bool, null
+    , list, array
+    , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
+    , (:=), at
+    , object1, object2, object3, object4, object5, object6, object7, object8
+    , keyValuePairs, dict
+    , maybe, oneOf, map, fail, succeed, andThen
+    , value, customDecoder
+    ) where
+
+{-| A way to turn Json values into Elm values. A `Decoder a` represents a
+decoding operation that will either produce a value of type `a`, or fail.
+
+# Decoders
+@docs Decoder, Value
 
 # Run a Decoder
 @docs decodeString, decodeValue
@@ -25,18 +41,25 @@ module Json.Decode where
 
 
 import Native.Json
-import Array (Array)
-import Dict
-import Dict (Dict)
-import Json.Encode as JsonEncode
+import Array exposing (Array)
+import Dict exposing (Dict)
+import Json.Encode as JsEncode
 import List
-import Maybe (Maybe)
-import Result (Result)
+import Maybe exposing (Maybe)
+import Result exposing (Result)
 
 
+{-| Represents a way of decoding JSON values. If you have a `(Decoder (List String))`
+it will attempt to take some JSON value and turn it into a list of strings.
+These decoders are easy to put together so you can create more and more complex
+decoders.
+-}
 type Decoder a = Decoder
 
-type alias Value = JsonEncode.Value
+
+{-| Represents a JavaScript value.
+-}
+type alias Value = JsEncode.Value
 
 
 {-| Transform the value returned by a decoder. Most useful when paired with
@@ -64,6 +87,12 @@ map =
     Native.Json.decodeObject1
 
 
+{-| Using a certain decoder, attempt to parse a JSON string. If the decoder
+fails, you will get a string message telling you why.
+
+    decodeString (tuple2 float float) "[3,4]"                  -- Ok (3,4)
+    decodeString (tuple2 float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
+-}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
     Native.Json.runDecoderString
@@ -75,10 +104,11 @@ decodeString =
 really a helper function so you do not need to write `(:=)` so many times.
 
     -- object.target.value = 'hello'
-
     value : Decoder String
     value =
         at ["target", "value"] string
+
+It is defined as
 
     at fields decoder =
         List.foldr (:=) decoder fields
@@ -105,6 +135,11 @@ at fields decoder =
     Native.Json.decodeField
 
 
+{-| Apply a function to a decoder. You can use this function as `map` if you
+must (which can be done with any `objectN` function actually).
+
+    object1 sqrt ("x" := float)
+-}
 object1 : (a -> value) -> Decoder a -> Decoder value
 object1 =
     Native.Json.decodeObject1
@@ -124,15 +159,15 @@ object2 =
     Native.Json.decodeObject2
 
 
-{-| Use two different decoders on a JS value. This is nice for extracting
+{-| Use three different decoders on a JS value. This is nice for extracting
 multiple fields from an object.
 
-    type alias Task = { task : String, id : Int, completed : Bool }
+    type alias Job = { name : String, id : Int, completed : Bool }
 
-    point : Decoder Task
+    point : Decoder Job
     point =
-        object3 Task
-          ("task" := string)
+        object3 Job
+          ("name" := string)
           ("id" := int)
           ("completed" := bool)
 -}
@@ -141,32 +176,38 @@ object3 =
     Native.Json.decodeObject3
 
 
+{-|-}
 object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 object4 =
     Native.Json.decodeObject4
 
 
+{-|-}
 object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 object5 =
     Native.Json.decodeObject5
 
 
+{-|-}
 object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 object6 =
     Native.Json.decodeObject6
 
 
+{-|-}
 object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 object7 =
     Native.Json.decodeObject7
 
 
+{-|-}
 object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 object8 =
     Native.Json.decodeObject8
 
 
-{-| Turn any object into a list of key-value pairs.
+{-| Turn any object into a list of key-value pairs. Fails if _any_ key can't be
+decoded with the given decoder.
 
     -- { tom: 89, sue: 92, bill: 97, ... }
     grades : Decoder (List (String, Int))
@@ -181,7 +222,7 @@ keyValuePairs =
 {-| Turn any object into a dictionary of key-value pairs.
 
     -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
-    planetMasses : Decoder (Dict String Int)
+    planetMasses : Decoder (Dict String Float)
     planetMasses =
         dict float
 -}
@@ -191,7 +232,7 @@ dict decoder =
 
 
 
-{-| Try out a couple different decoders. This is helpful when you are dealing
+{-| Try out multiple different decoders. This is helpful when you are dealing
 with something with a very strange shape and when `andThen` does not help
 narrow things down so you can be more targeted.
 
@@ -201,7 +242,7 @@ narrow things down so you can be more targeted.
     points =
         list point
 
-    point : (Float,Float)
+    point : Decoder (Float,Float)
     point =
         oneOf
         [ tuple2 (,) float float
@@ -258,18 +299,18 @@ int =
 
     checked : Decoder Bool
     checked =
-        "checked" := true
+        "checked" := bool
 -}
 bool : Decoder Bool
 bool =
     Native.Json.decodeBool
 
 
-{-| Extract a list from a JS array.
+{-| Extract a List from a JS array.
 
     -- [1,2,3,4]
 
-    numbers : Decoder [Int]
+    numbers : Decoder (List Int)
     numbers =
         list int
 -}
@@ -291,7 +332,15 @@ array =
     Native.Json.decodeArray
 
 
-{-| Extract a null value. Primarily useful for creating *other* decoders.
+{-| Decode null as the value given, and fail otherwise. Primarily useful for
+creating *other* decoders.
+
+    numbers : Decoder [Int]
+    numbers =
+        list (oneOf [ int, null 0 ])
+
+This decoder treats `null` as `Nothing`, and otherwise tries to produce a
+`Just`.
 
     nullOr : Decoder a -> Decoder (Maybe a)
     nullOr decoder =
@@ -299,22 +348,25 @@ array =
         [ null Nothing
         , map Just decoder
         ]
-
-
-    numbers : Decoder [Int]
-    numbers =
-        list (oneOf [ int, null 0 ])
 -}
 null : a -> Decoder a
 null =
     Native.Json.decodeNull
 
 
-{-| Great for handling optional fields. The following code decodes JSON
-objects that may not have a profession field.
+{-| Extract a Maybe value, wrapping successes with `Just` and turning any
+failure in `Nothing`. If you are expecting that a field can sometimes be `null`,
+it's better to check for it [explicitly](#null), as this function will swallow
+errors from ill-formed JSON.
 
+The following code decodes JSON objects that may not have a profession field.
+
+    -- profession: Just "plumber"
     -- { name: "Tom", age: 31, profession: "plumber" }
+    -- profession: Nothing
     -- { name: "Sue", age: 42 }
+    -- { name: "Amy", age: 27, profession: null }
+    -- { name: "Joe", age: 36, profession: ["something", "unexpected"] }
 
     type alias Person =
         { name : String
@@ -333,34 +385,57 @@ maybe : Decoder a -> Decoder (Maybe a)
 maybe =
     Native.Json.decodeMaybe
 
-  
+
 {-| Bring in an arbitrary JSON value. Useful if you need to work with crazily
 formatted data. For example, this lets you create a parser for "variadic" lists
 where the first few types are different, followed by 0 or more of the same
 type.
 
-    variadic2 : (a -> b -> List c -> value) -> Decoder a -> Decoder b -> Decoder (List c) -> Decoder value
-    variadic2 f a b cs =
-        customDecoder (list value) \jsonList ->
-            case jsonList of
-              one :: two :: rest ->
-                  Result.map3 f
-                    (decodeValue a one)
-                    (decodeValue b two)
-                    (decodeValue cs rest)
+    variadic2 : (a -> b -> List c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
+    variadic2 f a b c =
+        let
+            combineResults = List.foldr (Result.map2 (::)) (Ok [])
+        in
+            customDecoder (list value) (\jsonList ->
+                case jsonList of
+                  one :: two :: rest ->
+                      Result.map3 f
+                        (decodeValue a one)
+                        (decodeValue b two)
+                        (combineResults (List.map (decodeValue c) rest))
 
-              _ -> Result.Err "expecting at least two elements in the array"
+                  _ -> Result.Err "expecting at least two elements in the array")
 -}
 value : Decoder Value
 value =
     Native.Json.decodeValue
 
 
+{-| Using a certain decoder, attempt to parse a raw `Json.Value`. You can pass
+a `Json.Value` into Elm through a port, so this can let you handle data with
+extra weird shapes or stuff that currently is not allowed through ports
+automatically.
+
+    port jsonValues : Signal Json.Value
+
+    shapes : Signal (Result String Shape)
+    shapes =
+      Signal.map (decodeValue shape) jsonValues
+
+    type Shape
+        = Rectangle Float Float
+        | Circle Float
+
+    shape : Decoder Shape  -- see definition in `andThen` docs
+-}
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
     Native.Json.runDecoderValue
 
 
+{-| Create a custom decoder that may do some fancy computation. See the `value`
+documentation for an example usage.
+-}
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
 customDecoder =
     Native.Json.customDecoder
@@ -401,7 +476,7 @@ to improve error messages when things go wrong. For example, the following
 decoder is able to provide a much more specific error message when `fail` is
 the last option.
 
-    point : (Float,Float)
+    point : Decoder (Float,Float)
     point =
         oneOf
         [ tuple2 (,) float float
@@ -423,7 +498,7 @@ missing.
 
     point3D : Decoder (Float,Float,Float)
     point3D =
-        object (,,)
+        object3 (,,)
           ("x" := float)
           ("y" := float)
           (oneOf [ "z" := float, succeed 0 ])
@@ -435,12 +510,21 @@ succeed =
 
 -- TUPLES
 
+{-| Handle an array with exactly one element.
+
+    authorship : Decoder String
+    authorship =
+        oneOf
+          [ tuple1 (\author -> "Author: " ++ author) string
+          , list string |> map (\authors -> "Co-authors: " ++ String.join ", " authors)
+          ]
+-}
 tuple1 : (a -> value) -> Decoder a -> Decoder value
 tuple1 =
     Native.Json.decodeTuple1
 
 
-{-| Handle an array with exactly two values. Useful for points and simple
+{-| Handle an array with exactly two elements. Useful for points and simple
 pairs.
 
     -- [3,4] or [0,0]
@@ -460,7 +544,7 @@ tuple2 =
     Native.Json.decodeTuple2
 
 
-{-| Handle an array with exactly three values.
+{-| Handle an array with exactly three elements.
 
     -- [3,4,5] or [0,0,0]
     point3D : Decoder (Float,Float,Float)
@@ -473,26 +557,31 @@ tuple3 =
     Native.Json.decodeTuple3
 
 
+{-|-}
 tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 tuple4 =
     Native.Json.decodeTuple4
 
 
+{-|-}
 tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 tuple5 =
     Native.Json.decodeTuple5
 
 
+{-|-}
 tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 tuple6 =
     Native.Json.decodeTuple6
 
 
+{-|-}
 tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 tuple7 =
     Native.Json.decodeTuple7
 
 
+{-|-}
 tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 tuple8 =
     Native.Json.decodeTuple8

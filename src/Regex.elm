@@ -1,5 +1,6 @@
 module Regex
-    ( regex, escape, caseInsensitive
+    ( Regex
+    , regex, escape, caseInsensitive
     , HowMany(..), Match
     , contains, find, replace, split
     ) where
@@ -8,7 +9,7 @@ module Regex
 same kind of regular expressions accepted by JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions).
 
 # Create
-@docs regex, escape, caseInsensitive
+@docs Regex, regex, escape, caseInsensitive
 
 # Helpful Data Structures
 
@@ -22,17 +23,23 @@ and [`replace`](#replace).
 
 -}
 
-import Maybe (Maybe)
+import Maybe exposing (Maybe)
 import Native.Regex
 
+
+{-| A regular expression, describing a certain set of strings.
+-}
 type Regex = Regex
+
 
 {-| Escape strings to be regular expressions, making all special characters
 safe. So `regex (escape "^a+")` will match exactly `"^a+"` instead of a series
 of `a`&rsquo;s that start at the beginning of the line.
 -}
 escape : String -> String
-escape = Native.Regex.escape
+escape =
+  Native.Regex.escape
+
 
 {-| Create a Regex that matches patterns [as specified in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Writing_a_Regular_Expression_Pattern).
 
@@ -41,12 +48,16 @@ letter `w` which is probably not what you want. You probably want `"\\w"`
 instead, which escapes the backslash.
 -}
 regex : String -> Regex
-regex = Native.Regex.regex
+regex =
+  Native.Regex.regex
+
 
 
 {-| Make a regex case insensitive -}
 caseInsensitive : Regex -> Regex
-caseInsensitive = Native.Regex.caseInsensitive
+caseInsensitive =
+  Native.Regex.caseInsensitive
+
 
 {-| Check to see if a Regex is contained in a string.
 
@@ -57,7 +68,9 @@ caseInsensitive = Native.Regex.caseInsensitive
     contains (regex "z+") "aabbcc" == False
 -}
 contains : Regex -> String -> Bool
-contains = Native.Regex.contains
+contains =
+  Native.Regex.contains
+
 
 {-| A `Match` represents all of the details about a particular match in a string.
 Here are details on each field:
@@ -83,11 +96,13 @@ type alias Match =
     , number : Int
     }
 
+
 {-| `HowMany` is used to specify how many matches you want to make. So
 `replace All` would replace every match, but `replace (AtMost 2)` would
 replace at most two matches (i.e. zero, one, two, but never three or more).
 -}
 type HowMany = All | AtMost Int
+
 
 {-| Find matches in a string:
 
@@ -102,7 +117,9 @@ type HowMany = All | AtMost Int
       -- map .submatches places == [ [Just "boat"], [Just "lake"] ]
 -}
 find : HowMany -> Regex -> String -> List Match
-find = Native.Regex.find
+find =
+  Native.Regex.find
+
 
 {-| Replace matches. The function from `Match` to `String` lets
 you use the details of a specific match when making replacements.
@@ -116,7 +133,9 @@ you use the details of a specific match when making replacements.
       -- reverseWords "deliver mined parts" == "reviled denim strap"
 -}
 replace : HowMany -> Regex -> (Match -> String) -> String -> String
-replace = Native.Regex.replace
+replace =
+  Native.Regex.replace
+
 
 {-| Split a string, using the regex as the separator.
 
@@ -125,4 +144,5 @@ replace = Native.Regex.replace
     split All (regex ",") "a,b,c,d" == ["a","b","c","d"]
 -}
 split : HowMany -> Regex -> String -> List String
-split = Native.Regex.split
+split =
+  Native.Regex.split

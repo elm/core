@@ -13,7 +13,7 @@ module Debug
 @docs watch, watchSummary, trace
 -}
 
-import Graphics.Collage (Form)
+import Graphics.Collage exposing (Form)
 import Native.Debug
 
 
@@ -56,12 +56,17 @@ crash = Native.Debug.crash
 
 {-| Watch a particular value in the debugger. Say we want to know the value of
 a variable called `velocity` because it may not be updated correctly. Adding
-`Debug.watch` allows us to name the value and show it with the debugger.
+`Debug.watch` allows us to name the value and show it with the debugger. The
+result of evaluating such an expression is unchanged.
 
 	  Debug.watch "velocity" velocity == velocity
 
-Notice that the result of evaluating this expression is exactly the same as
-not having the expression at all. That means it's easy to add to any value.
+That means it's easy to add `Debug.watch` to any value.
+
+Note that calling `Debug.watch` on a signal is not useful. Instead, it needs
+to be mapped into the signal (to act on the contained value). So if you want
+to watch a timer signal, instead of `Debug.watch "time" <| Time.every 1000`
+you need `Debug.watch "time" <~ Time.every 1000`.
 -}
 watch : String -> a -> a
 watch = Native.Debug.watch

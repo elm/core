@@ -39,8 +39,8 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 
 import Native.String
 import Char
-import Maybe (Maybe)
-import Result (Result)
+import Maybe exposing (Maybe)
+import Result exposing (Result)
 
 
 {-| Determine if a string is empty.
@@ -138,7 +138,7 @@ foldr = Native.String.foldr
     split "," "cat,dog,cow"        == ["cat","dog","cow"]
     split "/" "home/evan/Desktop/" == ["home","evan","Desktop", ""]
 
-Use `Regex.split` if you need something more flexible.
+Use [`Regex.split`](Regex#split) if you need something more flexible.
 -}
 split : String -> String -> List String
 split = Native.String.split
@@ -282,7 +282,7 @@ all = Native.String.all
     contains "hat" "theory" == False
     contains "THE" "theory" == False
 
-Use `Regex.contains` if you need something more flexible.
+Use [`Regex.contains`](Regex#contains) if you need something more flexible.
 -}
 contains : String -> String -> Bool
 contains = Native.String.contains
@@ -345,7 +345,7 @@ toList : String -> List Char
 toList = Native.String.toList
 
 {-| Convert a list of characters into a String. Can be useful if you
-want to create a string primarly by consing, perhaps for decoding
+want to create a string primarily by consing, perhaps for decoding
 something.
 
     fromList ['a','b','c'] == "abc"

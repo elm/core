@@ -1,6 +1,6 @@
 module List
     ( isEmpty, length, reverse, member
-    , head, uncons, filter, take, drop
+    , head, tail, filter, take, drop
     , repeat, (::), append, concat, intersperse
     , partition, unzip
     , map, map2, map3, map4, map5
@@ -17,7 +17,7 @@ list must have the same type.
 @docs isEmpty, length, reverse, member
 
 # Sub-lists
-@docs head, uncons, filter, take, drop
+@docs head, tail, filter, take, drop
 
 # Putting Lists Together
 @docs repeat, (::), append, concat, intersperse
@@ -47,9 +47,9 @@ The current sentiment is that it is already quite error prone once you get to
 
 -}
 
-import Basics (..)
+import Basics exposing (..)
 import Maybe
-import Maybe ( Maybe(Just,Nothing) )
+import Maybe exposing ( Maybe(Just,Nothing) )
 import Native.List
 
 
@@ -67,7 +67,8 @@ infixr 5 ::
 
 {-| Extract the first element of a list.
 
-    head [1,2,3] == 1
+    head [1,2,3] == Just 1
+    head [] == Nothing
 -}
 head : List a -> Maybe a
 head list =
@@ -76,16 +77,15 @@ head list =
     [] -> Nothing
 
 
-{-| Split the first element off and returns it together with the rest of the
-list.
+{-| Extract the rest of the list.
 
-    uncons [1,2,3] == Just (1, [2,3])
-    uncons []      == Nothing
+    tail [1,2,3] == Just [2,3]
+    tail [] == Nothing
 -}
-uncons : List a -> Maybe (a, List a)
-uncons list =
+tail : List a -> Maybe (List a)
+tail list =
   case list of
-    x :: xs -> Just (x, xs)
+    x :: xs -> Just xs
     [] -> Nothing
 
 
@@ -100,6 +100,11 @@ isEmpty xs =
       _  -> False
 
 
+{-| Figure out whether a list contains a value.
+
+    member 9 [1,2,3,4] == False
+    member 4 [1,2,3,4] == True
+-}
 member : a -> List a -> Bool
 member x xs =
   any (\a -> a == x) xs
@@ -317,16 +322,23 @@ If one list is longer, the extra elements are dropped.
         map2 (,) lefts rights
 -}
 map2 : (a -> b -> result) -> List a -> List b -> List result
-map2 = Native.List.map2
+map2 =
+  Native.List.map2
 
+{-|-}
 map3 : (a -> b -> c -> result) -> List a -> List b -> List c -> List result
-map3 = Native.List.map3
+map3 =
+  Native.List.map3
 
+{-|-}
 map4 : (a -> b -> c -> d -> result) -> List a -> List b -> List c -> List d -> List result
-map4 = Native.List.map4
+map4 =
+  Native.List.map4
 
+{-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> List a -> List b -> List c -> List d -> List e -> List result
-map5 = Native.List.map5
+map5 =
+  Native.List.map5
 
 
 {-| Decompose a list of tuples into a tuple of lists.

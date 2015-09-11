@@ -1,332 +1,471 @@
 Elm.Native.Signal = {};
+
 Elm.Native.Signal.make = function(localRuntime) {
-
-    localRuntime.Native = localRuntime.Native || {};
-    localRuntime.Native.Signal = localRuntime.Native.Signal || {};
-    if (localRuntime.Native.Signal.values)
-    {
-        return localRuntime.Native.Signal.values;
-    }
-
-    var Utils = Elm.Native.Utils.make(localRuntime);
-
-    function broadcastToKids(node, timestep, changed) {
-        var kids = node.kids;
-        for (var i = kids.length; i--; )
-        {
-            kids[i].recv(timestep, changed, node.id);
-        }
-    }
+	localRuntime.Native = localRuntime.Native || {};
+	localRuntime.Native.Signal = localRuntime.Native.Signal || {};
+	if (localRuntime.Native.Signal.values)
+	{
+		return localRuntime.Native.Signal.values;
+	}
 
 
-    // INPUTS
-
-    function Input(base) {
-        this.id = Utils.guid();
-        this.value = base;
-        this.kids = [];
-        this.defaultNumberOfKids = 0;
-        this.recv = function(timestep, eid, v) {
-            var changed = eid === this.id;
-            if (changed)
-            {
-                this.value = v;
-            }
-            broadcastToKids(this, timestep, changed);
-            return changed;
-        };
-        localRuntime.inputs.push(this);
-    }
+	var Task = Elm.Native.Task.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
-    // MAPPING
-
-    function LiftN(update, args) {
-        this.id = Utils.guid();
-        this.value = update();
-        this.kids = [];
-
-        var n = args.length;
-        var count = 0;
-        var isChanged = false;
-
-        this.recv = function(timestep, changed, parentID) {
-            ++count;
-            if (changed)
-            {
-                isChanged = true;
-            }
-            if (count == n)
-            {
-                if (isChanged)
-                {
-                    this.value = update();
-                }
-                broadcastToKids(this, timestep, isChanged);
-                isChanged = false;
-                count = 0;
-            }
-        };
-        for (var i = n; i--; )
-        {
-            args[i].kids.push(this);
-        }
-    }
-
-    function map(func, a) {
-        function update() {
-            return func(a.value);
-        }
-        return new LiftN(update, [a]);
-    }
-    function map2(func, a, b) {
-        function update() {
-            return A2( func, a.value, b.value );
-        }
-        return new LiftN(update, [a,b]);
-    }
-    function map3(func, a, b, c) {
-        function update() {
-            return A3( func, a.value, b.value, c.value );
-        }
-        return new LiftN(update, [a,b,c]);
-    }
-    function map4(func, a, b, c, d) {
-        function update() {
-            return A4( func, a.value, b.value, c.value, d.value );
-        }
-        return new LiftN(update, [a,b,c,d]);
-    }
-    function map5(func, a, b, c, d, e) {
-        function update() {
-            return A5( func, a.value, b.value, c.value, d.value, e.value );
-        }
-        return new LiftN(update, [a,b,c,d,e]);
-    }
+	function broadcastToKids(node, timestamp, update)
+	{
+		var kids = node.kids;
+		for (var i = kids.length; i--; )
+		{
+			kids[i].notify(timestamp, update, node.id);
+		}
+	}
 
 
-    // FOLDING
+	// INPUT
 
-    function Foldp(step, state, input) {
-        this.id = Utils.guid();
-        this.value = state;
-        this.kids = [];
+	function input(name, base)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'input-' + name,
+			value: base,
+			parents: [],
+			kids: []
+		};
 
-        this.recv = function(timestep, changed, parentID) {
-            if (changed)
-            {
-                this.value = A2( step, input.value, this.value );
-            }
-            broadcastToKids(this, timestep, changed);
-        };
-        input.kids.push(this);
-    }
+		node.notify = function(timestamp, targetId, value) {
+			var update = targetId === node.id;
+			if (update)
+			{
+				node.value = value;
+			}
+			broadcastToKids(node, timestamp, update);
+			return update;
+		};
 
-    function foldp(step, state, input) {
-        return new Foldp(step, state, input);
-    }
+		localRuntime.inputs.push(node);
 
+		return node;
+	}
 
-    // FILTERING
-
-    function DropIf(pred,base,input) {
-        this.id = Utils.guid();
-        this.value = pred(input.value) ? base : input.value;
-        this.kids = [];
-        this.recv = function(timestep, changed, parentID) {
-            var chng = changed && !pred(input.value);
-            if (chng)
-            {
-                this.value = input.value;
-            }
-            broadcastToKids(this, timestep, chng);
-        };
-        input.kids.push(this);
-    }
-
-    function dropIf(isBad, base, signal) {
-        return new DropIf(isBad, base, signal);
-    }
-
-    function keepIf(isGood, base, signal) {
-        function isBad(x) {
-            return !isGood(x);
-        }
-        return new DropIf(isBad, base, signal);
-    }
+	function constant(value)
+	{
+		return input('constant', value);
+	}
 
 
-    function DropRepeats(input) {
-        this.id = Utils.guid();
-        this.value = input.value;
-        this.kids = [];
-        this.recv = function(timestep, changed, parentID) {
-            var chng = changed && !Utils.eq(this.value,input.value);
-            if (chng)
-            {
-                this.value = input.value;
-            }
-            broadcastToKids(this, timestep, chng);
-        };
-        input.kids.push(this);
-    }
+	// MAILBOX
 
-    function dropRepeats(signal) {
-        return new DropRepeats(signal);
-    }
+	function mailbox(base)
+	{
+		var signal = input('mailbox', base);
 
+		function send(value) {
+			return Task.asyncFunction(function(callback) {
+				localRuntime.setTimeout(function() {
+					localRuntime.notify(signal.id, value);
+				}, 0);
+				callback(Task.succeed(Utils.Tuple0));
+			});
+		}
 
-    // TIME STUFF
+		return {
+			_: {},
+			signal: signal,
+			address: {
+				ctor: 'Address',
+				_0: send
+			}
+		};
+	}
 
-    function Timestamp(input) {
-        this.id = Utils.guid();
-        this.value = Utils.Tuple2(localRuntime.timer.programStart, input.value);
-        this.kids = [];
-        this.recv = function(timestep, changed, parentID) {
-            if (changed)
-            {
-                this.value = Utils.Tuple2(timestep, input.value);
-            }
-            broadcastToKids(this, timestep, changed);
-        };
-        input.kids.push(this);
-    }
-
-    function timestamp(input) {
-        return new Timestamp(input);
-    }
-
-    function SampleOn(s1,s2) {
-        this.id = Utils.guid();
-        this.value = s2.value;
-        this.kids = [];
-
-        var count = 0;
-        var isChanged = false;
-
-        this.recv = function(timestep, changed, parentID) {
-            if (parentID === s1.id)
-            {
-                isChanged = changed;
-            }
-            ++count;
-            if (count == 2)
-            {
-                if (isChanged)
-                {
-                    this.value = s2.value;
-                }
-                broadcastToKids(this, timestep, isChanged);
-                count = 0;
-                isChanged = false;
-            }
-        };
-        s1.kids.push(this);
-        s2.kids.push(this);
-    }
-
-    function sampleOn(s1,s2) {
-        return new SampleOn(s1,s2);
-    }
-
-    function delay(t,s) {
-        var delayed = new Input(s.value);
-        var firstEvent = true;
-        function update(v) {
-          if (firstEvent)
-          {
-              firstEvent = false;
-              return;
-          }
-          setTimeout(function() {
-              localRuntime.notify(delayed.id, v);
-          }, t);
-        }
-        function first(a,b) { return a; }
-        return new SampleOn(delayed, map2(F2(first), delayed, map(update,s)));
-    }
+	function sendMessage(message)
+	{
+		Task.perform(message._0);
+	}
 
 
-    // MERGING
+	// OUTPUT
 
-    function Merge(s1,s2) {
-        this.id = Utils.guid();
-        this.value = s1.value;
-        this.kids = [];
+	function output(name, handler, parent)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'output-' + name,
+			parents: [parent],
+			isOutput: true
+		};
 
-        var next = null;
-        var count = 0;
-        var isChanged = false;
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (parentUpdate)
+			{
+				handler(parent.value);
+			}
+		};
 
-        this.recv = function(timestep, changed, parentID) {
-            ++count;
-            if (changed)
-            {
-                isChanged = true;
-                if (parentID == s2.id && next === null)
-                {
-                    next = s2.value;
-                }
-                if (parentID == s1.id)
-                {
-                    next = s1.value;
-                }
-            }
-  
-            if (count == 2)
-            {
-                if (isChanged)
-                {
-                    this.value = next;
-                    next = null;
-                }
-                broadcastToKids(this, timestep, isChanged);
-                isChanged = false;
-                count = 0;
-            }
-        };
-        s1.kids.push(this);
-        s2.kids.push(this);
-    }
+		parent.kids.push(node);
 
-    function merge(s1,s2) {
-        return new Merge(s1,s2);
-    }
+		return node;
+	}
 
 
-    // SIGNAL INPUTS
+	// MAP
 
-    function input(initialValue) {
-        return new Input(initialValue);
-    }
+	function mapMany(refreshValue, args)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'map' + args.length,
+			value: refreshValue(),
+			parents: args,
+			kids: []
+		};
 
-    function send(input, value) {
-        return function() {
-            localRuntime.notify(input.id, value);
-        };
-    }
+		var numberOfParents = args.length;
+		var count = 0;
+		var update = false;
 
-    function subscribe(input) {
-        return input;
-    }
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			++count;
+
+			update = update || parentUpdate;
+
+			if (count === numberOfParents)
+			{
+				if (update)
+				{
+					node.value = refreshValue();
+				}
+				broadcastToKids(node, timestamp, update);
+				update = false;
+				count = 0;
+			}
+		};
+
+		for (var i = numberOfParents; i--; )
+		{
+			args[i].kids.push(node);
+		}
+
+		return node;
+	}
 
 
-    return localRuntime.Native.Signal.values = {
-        map: F2(map),
-        map2: F3(map2),
-        map3: F4(map3),
-        map4: F5(map4),
-        map5: F6(map5),
-        foldp: F3(foldp),
-        delay: F2(delay),
-        merge: F2(merge),
-        keepIf: F3(keepIf),
-        dropIf: F3(dropIf),
-        dropRepeats: dropRepeats,
-        sampleOn: F2(sampleOn),
-        timestamp: timestamp,
-        input: input,
-        send: F2(send),
-        subscribe: subscribe
-    };
+	function map(func, a)
+	{
+		function refreshValue()
+		{
+			return func(a.value);
+		}
+		return mapMany(refreshValue, [a]);
+	}
+
+
+	function map2(func, a, b)
+	{
+		function refreshValue()
+		{
+			return A2( func, a.value, b.value );
+		}
+		return mapMany(refreshValue, [a, b]);
+	}
+
+
+	function map3(func, a, b, c)
+	{
+		function refreshValue()
+		{
+			return A3( func, a.value, b.value, c.value );
+		}
+		return mapMany(refreshValue, [a, b, c]);
+	}
+
+
+	function map4(func, a, b, c, d)
+	{
+		function refreshValue()
+		{
+			return A4( func, a.value, b.value, c.value, d.value );
+		}
+		return mapMany(refreshValue, [a, b, c, d]);
+	}
+
+
+	function map5(func, a, b, c, d, e)
+	{
+		function refreshValue()
+		{
+			return A5( func, a.value, b.value, c.value, d.value, e.value );
+		}
+		return mapMany(refreshValue, [a, b, c, d, e]);
+	}
+
+
+	// FOLD
+
+	function foldp(update, state, signal)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'foldp',
+			parents: [signal],
+			kids: [],
+			value: state
+		};
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (parentUpdate)
+			{
+				node.value = A2( update, signal.value, node.value );
+			}
+			broadcastToKids(node, timestamp, parentUpdate);
+		};
+
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+	// TIME
+
+	function timestamp(signal)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'timestamp',
+			value: Utils.Tuple2(localRuntime.timer.programStart, signal.value),
+			parents: [signal],
+			kids: []
+		};
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (parentUpdate)
+			{
+				node.value = Utils.Tuple2(timestamp, signal.value);
+			}
+			broadcastToKids(node, timestamp, parentUpdate);
+		};
+
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+	function delay(time, signal)
+	{
+		var delayed = input('delay-input-' + time, signal.value);
+
+		function handler(value)
+		{
+			setTimeout(function() {
+				localRuntime.notify(delayed.id, value);
+			}, time);
+		}
+
+		output('delay-output-' + time, handler, signal);
+
+		return delayed;
+	}
+
+
+	// MERGING
+
+	function genericMerge(tieBreaker, leftStream, rightStream)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'merge',
+			value: A2(tieBreaker, leftStream.value, rightStream.value),
+			parents: [leftStream, rightStream],
+			kids: []
+		};
+
+		var left = { touched: false, update: false, value: null };
+		var right = { touched: false, update: false, value: null };
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (parentID === leftStream.id)
+			{
+				left.touched = true;
+				left.update = parentUpdate;
+				left.value = leftStream.value;
+			}
+			if (parentID === rightStream.id)
+			{
+				right.touched = true;
+				right.update = parentUpdate;
+				right.value = rightStream.value;
+			}
+
+			if (left.touched && right.touched)
+			{
+				var update = false;
+				if (left.update && right.update)
+				{
+					node.value = A2(tieBreaker, left.value, right.value);
+					update = true;
+				}
+				else if (left.update)
+				{
+					node.value = left.value;
+					update = true;
+				}
+				else if (right.update)
+				{
+					node.value = right.value;
+					update = true;
+				}
+				left.touched = false;
+				right.touched = false;
+
+				broadcastToKids(node, timestamp, update);
+			}
+		};
+
+		leftStream.kids.push(node);
+		rightStream.kids.push(node);
+
+		return node;
+	}
+
+
+	// FILTERING
+
+	function filterMap(toMaybe, base, signal)
+	{
+		var maybe = toMaybe(signal.value);
+		var node = {
+			id: Utils.guid(),
+			name: 'filterMap',
+			value: maybe.ctor === 'Nothing' ? base : maybe._0,
+			parents: [signal],
+			kids: []
+		};
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			var update = false;
+			if (parentUpdate)
+			{
+				var maybe = toMaybe(signal.value);
+				if (maybe.ctor === 'Just')
+				{
+					update = true;
+					node.value = maybe._0;
+				}
+			}
+			broadcastToKids(node, timestamp, update);
+		};
+
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+	// SAMPLING
+
+	function sampleOn(ticker, signal)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'sampleOn',
+			value: signal.value,
+			parents: [ticker, signal],
+			kids: []
+		};
+
+		var signalTouch = false;
+		var tickerTouch = false;
+		var tickerUpdate = false;
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			if (parentID === ticker.id)
+			{
+				tickerTouch = true;
+				tickerUpdate = parentUpdate;
+			}
+			if (parentID === signal.id)
+			{
+				signalTouch = true;
+			}
+
+			if (tickerTouch && signalTouch)
+			{
+				if (tickerUpdate)
+				{
+					node.value = signal.value;
+				}
+				tickerTouch = false;
+				signalTouch = false;
+
+				broadcastToKids(node, timestamp, tickerUpdate);
+			}
+		};
+
+		ticker.kids.push(node);
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+	// DROP REPEATS
+
+	function dropRepeats(signal)
+	{
+		var node = {
+			id: Utils.guid(),
+			name: 'dropRepeats',
+			value: signal.value,
+			parents: [signal],
+			kids: []
+		};
+
+		node.notify = function(timestamp, parentUpdate, parentID)
+		{
+			var update = false;
+			if (parentUpdate && !Utils.eq(node.value, signal.value))
+			{
+				node.value = signal.value;
+				update = true;
+			}
+			broadcastToKids(node, timestamp, update);
+		};
+
+		signal.kids.push(node);
+
+		return node;
+	}
+
+
+	return localRuntime.Native.Signal.values = {
+		input: input,
+		constant: constant,
+		mailbox: mailbox,
+		sendMessage: sendMessage,
+		output: output,
+		map: F2(map),
+		map2: F3(map2),
+		map3: F4(map3),
+		map4: F5(map4),
+		map5: F6(map5),
+		foldp: F3(foldp),
+		genericMerge: F3(genericMerge),
+		filterMap: F3(filterMap),
+		sampleOn: F2(sampleOn),
+		dropRepeats: dropRepeats,
+		timestamp: timestamp,
+		delay: F2(delay)
+	};
 };
