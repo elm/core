@@ -162,7 +162,8 @@ together lots of different signals to feed into a `foldp`.
 
 If an update comes from either of the incoming signals, it updates the outgoing
 signal. If an update comes on both signals at the same time, the left update
-wins (i.e., the right update is discarded).
+wins (i.e., the right update is discarded). In the above example, the signal 
+from `Mouse.position` is kept if both signals come in at the same time.
 -}
 merge : Signal a -> Signal a -> Signal a
 merge left right =
