@@ -54,25 +54,9 @@ type NColor
     | NBlack  -- Negative Black, counts as -1 blacks for the invariant
 
 
-showNColor : NColor -> String
-showNColor c =
-  case c of
-    Red    -> "Red"
-    Black  -> "Black"
-    BBlack -> "BBlack"
-    NBlack -> "NBlack"
-
-
 type LeafColor
     = LBlack
     | LBBlack -- Double Black, counts as 2
-
-
-showLColor : LeafColor -> String
-showLColor color =
-    case color of
-      LBlack  -> "LBlack"
-      LBBlack -> "LBBlack"
 
 
 {-| A dictionary of keys and values. So a `(Dict String User)` is a dictionary
@@ -180,12 +164,6 @@ remove key dict =
 
 type Flag = Insert | Remove | Same
 
-showFlag : Flag -> String
-showFlag f = case f of
-  Insert -> "Insert"
-  Remove -> "Remove"
-  Same   -> "Same"
-
 
 {-| Update the value of a dictionary for a specific key with a given function. -}
 update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
@@ -271,7 +249,7 @@ reportRemBug msg c lgot rgot =
   Native.Debug.crash <|
     String.concat
     [ "Internal red-black tree invariant violated, expected "
-    , msg, " and got ", showNColor c, "/", lgot, "/", rgot
+    , msg, " and got ", toString c, "/", lgot, "/", rgot
     , "\nPlease report this bug to <https://github.com/elm-lang/Elm/issues>"
     ]
 
@@ -291,7 +269,7 @@ rem c l r =
                 RBNode_elm_builtin Black k' v' l' r'
 
             _ ->
-                reportRemBug "Black/LBlack/Red" c (showLColor cl) (showNColor cr)
+                reportRemBug "Black/LBlack/Red" c (toString cl) (toString cr)
 
       (RBNode_elm_builtin cl k' v' l' r', RBEmpty_elm_builtin cr) ->
           case (c, cl, cr) of
@@ -299,7 +277,7 @@ rem c l r =
                 RBNode_elm_builtin Black k' v' l' r'
 
             _ ->
-                reportRemBug "Black/Red/LBlack" c (showNColor cl) (showLColor cr)
+                reportRemBug "Black/Red/LBlack" c (toString cl) (toString cr)
 
       -- l and r are both RBNodes
       (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
