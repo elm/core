@@ -161,8 +161,8 @@ together lots of different signals to feed into a `foldp`.
             (map TimeDelta (fps 40))
 
 If an update comes from either of the incoming signals, it updates the outgoing
-signal. If an update comes on both signals at the same time, the left update
-wins (i.e., the right update is discarded).
+signal. If an update comes on both signals at the same time, the update provided
+by the left input signal wins (i.e., the update from the second signal is discarded).
 -}
 merge : Signal a -> Signal a -> Signal a
 merge left right =
