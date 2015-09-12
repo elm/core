@@ -347,7 +347,7 @@ rem c l r =
           maxWithDefault kl vl rl
 
         l' =
-          remove_max cl kl vl ll rl
+          removeMax cl kl vl ll rl
       in
         bubble c k v l' r
 
@@ -363,14 +363,14 @@ bubble c k v l r =
 
 
 -- Removes rightmost node, may leave root as BBlack
-remove_max : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-remove_max c k v l r =
+removeMax : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
+removeMax c k v l r =
   case r of
     RBEmpty_elm_builtin _ ->
       rem c l r
 
     RBNode_elm_builtin cr kr vr lr rr ->
-      bubble c k v l (remove_max cr kr vr lr rr)
+      bubble c k v l (removeMax cr kr vr lr rr)
 
 
 -- generalized tree balancing act
