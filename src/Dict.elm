@@ -149,16 +149,24 @@ isEmpty dict =
   dict == empty
 
 
+{- The actual pattern match here is somewhat lax. If it is given invalid input,
+it will do the wrong thing. The expected behavior is:
+
+  red node => black node
+  black node => same
+  bblack node => xxx
+  nblack node => xxx
+
+  black leaf => same
+  bblack leaf => xxx
+-}
 ensureBlackRoot : Dict k v -> Dict k v
 ensureBlackRoot dict =
   case dict of
     RBNode_elm_builtin Red key value left right ->
       RBNode_elm_builtin Black key value left right
 
-    RBNode_elm_builtin Black _ _ _ _ ->
-      dict
-
-    RBEmpty_elm_builtin LBlack ->
+    _ ->
       dict
 
 
@@ -185,7 +193,8 @@ update k alter dict =
   let
     up dict =
       case dict of
-        RBEmpty_elm_builtin LBlack ->
+        -- expecting only black nodes, never double black nodes here
+        RBEmpty_elm_builtin _ ->
           case alter Nothing of
             Nothing ->
               (Same, empty)
@@ -292,13 +301,21 @@ lessBlack color =
       Native.Debug.crash "Can't make a negative black node less black!"
 
 
+{- The actual pattern match here is somewhat lax. If it is given invalid input,
+it will do the wrong thing. The expected behavior is:
+
+  node => less black node
+
+  bblack leaf => black leaf
+  black leaf => xxx
+-}
 lessBlackTree : Dict k v -> Dict k v
 lessBlackTree dict =
   case dict of
     RBNode_elm_builtin c k v l r ->
       RBNode_elm_builtin (lessBlack c) k v l r
 
-    RBEmpty_elm_builtin LBBlack ->
+    RBEmpty_elm_builtin _ ->
       RBEmpty_elm_builtin LBlack
 
 
@@ -323,6 +340,9 @@ rem c l r =
 
         Black ->
           RBEmpty_elm_builtin LBBlack
+
+        _ ->
+          Native.Debug.crash "cannot have bblack or nblack nodes at this point"
 
     (RBEmpty_elm_builtin cl, RBNode_elm_builtin cr k' v' l' r') ->
       case (c, cl, cr) of
