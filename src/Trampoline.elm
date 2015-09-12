@@ -17,8 +17,6 @@ JavaScript, so use this library only when it is essential that you recurse deepl
 @docs trampoline, Trampoline
 -}
 
-import Native.Trampoline
-
 
 {-| A way to build computations that may be deeply recursive. We will take an
 example of a tail-recursive function and rewrite it in a way that lets us use
@@ -54,5 +52,10 @@ type Trampoline a
 
 {-| Evaluate a trampolined value in constant space. -}
 trampoline : Trampoline a -> a
-trampoline =
-  Native.Trampoline.trampoline
+trampoline tramp =
+  case tramp of
+    Done value ->
+      value
+
+    Continue f ->
+      trampoline (f ())
