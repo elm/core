@@ -98,7 +98,7 @@ dictionary.
 get : comparable -> Dict comparable v -> Maybe v
 get targetKey dict =
   case dict of
-    RBEmpty_elm_builtin LBlack ->
+    RBEmpty_elm_builtin _ ->
       Nothing
 
     RBNode_elm_builtin _ key value left right ->
@@ -458,7 +458,7 @@ redden t =
 map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
 map f dict =
   case dict of
-    RBEmpty_elm_builtin LBlack ->
+    RBEmpty_elm_builtin _ ->
       RBEmpty_elm_builtin LBlack
 
     RBNode_elm_builtin clr key value left right ->
@@ -470,7 +470,7 @@ key to highest key. -}
 foldl : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
 foldl f acc dict =
   case dict of
-    RBEmpty_elm_builtin LBlack ->
+    RBEmpty_elm_builtin _ ->
       acc
 
     RBNode_elm_builtin _ key value left right ->
@@ -482,7 +482,7 @@ key to lowest key. -}
 foldr : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
 foldr f acc t =
   case t of
-    RBEmpty_elm_builtin LBlack ->
+    RBEmpty_elm_builtin _ ->
       acc
 
     RBNode_elm_builtin _ key value left right ->
