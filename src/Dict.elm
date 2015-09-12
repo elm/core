@@ -376,7 +376,15 @@ remove_max c k v l r =
 -- generalized tree balancing act
 balance : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
 balance c k v l r =
-  balance_node (RBNode_elm_builtin c k v l r)
+  let
+    tree =
+      RBNode_elm_builtin c k v l r
+  in
+    if blackish tree then
+      balanceHelp tree
+
+    else
+      tree
 
 
 blackish : Dict k v -> Bool
@@ -389,47 +397,43 @@ blackish t =
       True
 
 
-balance_node : Dict k v -> Dict k v
-balance_node t =
+balanceHelp : Dict k v -> Dict k v
+balanceHelp t =
   let
     assemble col xk xv yk yv zk zv a b c d =
       RBNode_elm_builtin (lessBlack col) yk yv (RBNode_elm_builtin Black xk xv a b) (RBNode_elm_builtin Black zk zv c d)
   in
-    if blackish t then
-      case t of
-        RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red yk yv (RBNode_elm_builtin Red xk xv a b) c) d ->
-          assemble col xk xv yk yv zk zv a b c d
+    case t of
+      RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red yk yv (RBNode_elm_builtin Red xk xv a b) c) d ->
+        assemble col xk xv yk yv zk zv a b c d
 
-        RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red xk xv a (RBNode_elm_builtin Red yk yv b c)) d ->
-          assemble col xk xv yk yv zk zv a b c d
+      RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red xk xv a (RBNode_elm_builtin Red yk yv b c)) d ->
+        assemble col xk xv yk yv zk zv a b c d
 
-        RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red zk zv (RBNode_elm_builtin Red yk yv b c) d) ->
-          assemble col xk xv yk yv zk zv a b c d
+      RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red zk zv (RBNode_elm_builtin Red yk yv b c) d) ->
+        assemble col xk xv yk yv zk zv a b c d
 
-        RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red yk yv b (RBNode_elm_builtin Red zk zv c d)) ->
-          assemble col xk xv yk yv zk zv a b c d
+      RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red yk yv b (RBNode_elm_builtin Red zk zv c d)) ->
+        assemble col xk xv yk yv zk zv a b c d
 
-        RBNode_elm_builtin BBlack xk xv a (RBNode_elm_builtin NBlack zk zv (RBNode_elm_builtin Black yk yv b c) d) ->
-          case d of
-            RBNode_elm_builtin Black _ _ _ _ ->
-              RBNode_elm_builtin Black yk yv (RBNode_elm_builtin Black xk xv a b) (balance Black zk zv c (redden d))
+      RBNode_elm_builtin BBlack xk xv a (RBNode_elm_builtin NBlack zk zv (RBNode_elm_builtin Black yk yv b c) d) ->
+        case d of
+          RBNode_elm_builtin Black _ _ _ _ ->
+            RBNode_elm_builtin Black yk yv (RBNode_elm_builtin Black xk xv a b) (balance Black zk zv c (redden d))
 
-            _ ->
-              t
+          _ ->
+            t
 
-        RBNode_elm_builtin BBlack zk zv (RBNode_elm_builtin NBlack xk xv a (RBNode_elm_builtin Black yk yv b c)) d ->
-          case a of
-            RBNode_elm_builtin Black _ _ _ _ ->
-              RBNode_elm_builtin Black yk yv (balance Black xk xv (redden a) b) (RBNode_elm_builtin Black zk zv c d)
+      RBNode_elm_builtin BBlack zk zv (RBNode_elm_builtin NBlack xk xv a (RBNode_elm_builtin Black yk yv b c)) d ->
+        case a of
+          RBNode_elm_builtin Black _ _ _ _ ->
+            RBNode_elm_builtin Black yk yv (balance Black xk xv (redden a) b) (RBNode_elm_builtin Black zk zv c d)
 
-            _ ->
-              t
+          _ ->
+            t
 
-        _ ->
-          t
-
-    else
-      t
+      _ ->
+        t
 
 
 -- make the top node black
