@@ -1,5 +1,6 @@
 module Trampoline
-    ( trampoline, Trampoline(..)
+    ( trampoline
+    , Trampoline(..)
     ) where
 
 {-| A [trampoline](http://en.wikipedia.org/wiki/Tail-recursive_function#Through_trampolining)
@@ -17,6 +18,7 @@ JavaScript, so use this library only when it is essential that you recurse deepl
 -}
 
 import Native.Trampoline
+
 
 {-| A way to build computations that may be deeply recursive. We will take an
 example of a tail-recursive function and rewrite it in a way that lets us use
@@ -49,6 +51,8 @@ type Trampoline a
     = Done a
     | Continue (() -> Trampoline a)
 
+
 {-| Evaluate a trampolined value in constant space. -}
 trampoline : Trampoline a -> a
-trampoline = Native.Trampoline.trampoline
+trampoline =
+  Native.Trampoline.trampoline
