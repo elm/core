@@ -127,12 +127,17 @@ member key dict =
 {-| Determine the number of key-value pairs in the dictionary. -}
 size : Dict comparable v -> Int
 size dict =
+  sizeHelp 0 dict
+
+
+sizeHelp : Int -> Dict k v -> Int
+sizeHelp n dict =
   case dict of
     RBEmpty_elm_builtin _ ->
-      0
+      n
 
     RBNode_elm_builtin _ _ _ left right ->
-      1 + size left + size right
+      sizeHelp (sizeHelp (n+1) right) left
 
 
 {-| Determine if a dictionary is empty.
