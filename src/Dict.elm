@@ -458,7 +458,8 @@ redden t =
       RBNode_elm_builtin Red k v l r
 
 
-{-| Apply a function to all values in a dictionary. -}
+{-| Apply a function to all values in a dictionary.
+-}
 map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
 map f dict =
   case dict of
@@ -470,7 +471,8 @@ map f dict =
 
 
 {-| Fold over the key-value pairs in a dictionary, in order from lowest
-key to highest key. -}
+key to highest key.
+-}
 foldl : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
 foldl f acc dict =
   case dict of
@@ -482,7 +484,8 @@ foldl f acc dict =
 
 
 {-| Fold over the key-value pairs in a dictionary, in order from highest
-key to lowest key. -}
+key to lowest key.
+-}
 foldr : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
 foldr f acc t =
   case t of
@@ -494,14 +497,16 @@ foldr f acc t =
 
 
 {-| Combine two dictionaries. If there is a collision, preference is given
-to the first dictionary. -}
+to the first dictionary.
+-}
 union : Dict comparable v -> Dict comparable v -> Dict comparable v
 union t1 t2 =
   foldl insert t2 t1
 
 
 {-| Keep a key-value pair when its key appears in the second dictionary.
-Preference is given to values in the first dictionary. -}
+Preference is given to values in the first dictionary.
+-}
 intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
 intersect t1 t2 =
   filter (\k _ -> member k t2) t1
@@ -514,13 +519,19 @@ diff t1 t2 =
   foldl (\k v t -> remove k t) t1 t2
 
 
-{-| Get all of the keys in a dictionary. -}
+{-| Get all of the keys in a dictionary.
+
+    keys (fromList [(0,"Alice"),(1,"Bob")]) == [0,1]
+-}
 keys : Dict comparable v -> List comparable
 keys dict =
   foldr (\key value keyList -> key :: keyList) [] dict
 
 
-{-| Get all of the values in a dictionary. -}
+{-| Get all of the values in a dictionary.
+
+    values (fromList [(0,"Alice"),(1,"Bob")]) == ["Alice", "Bob"]
+-}
 values : Dict comparable v -> List v
 values dict =
   foldr (\key value valueList -> value :: valueList) [] dict
