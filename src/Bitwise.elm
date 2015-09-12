@@ -16,25 +16,34 @@ module Bitwise
 
 import Native.Bitwise
 
+
 {-| Bitwise AND
 -}
 and : Int -> Int -> Int
-and = Native.Bitwise.and
+and =
+  Native.Bitwise.and
+
 
 {-| Bitwise OR
 -}
 or : Int -> Int -> Int
-or = Native.Bitwise.or
+or =
+  Native.Bitwise.or
+
 
 {-| Bitwise XOR
 -}
 xor : Int -> Int -> Int
-xor = Native.Bitwise.xor
+xor =
+  Native.Bitwise.xor
+
 
 {-| Flip each bit individually, often called bitwise NOT
 -}
 complement : Int -> Int
-complement = Native.Bitwise.complement
+complement =
+  Native.Bitwise.complement
+
 
 {-| Shift bits to the left by a given offset, filling new bits with zeros.
 This can be used to multiply numbers by powers of two.
@@ -43,7 +52,9 @@ This can be used to multiply numbers by powers of two.
     8 `shiftLeft` 2 == 32
 -}
 shiftLeft : Int -> Int -> Int
-shiftLeft = Native.Bitwise.shiftLeft
+shiftLeft =
+  Native.Bitwise.shiftLeft
+
 
 {-| Shift bits to the right by a given offset, filling new bits with
 whatever is the topmost bit. This can be used to divide numbers by powers of two.
@@ -58,7 +69,9 @@ often written (>>), and sometimes called a sign-propagating
 right shift because it fills empty spots with copies of the highest bit.
 -}
 shiftRight : Int -> Int -> Int
-shiftRight = Native.Bitwise.shiftRightArithmatic
+shiftRight =
+  Native.Bitwise.shiftRightArithmatic
+
 
 {-| Shift bits to the right by a given offset, filling new bits with
 zeros.
@@ -73,5 +86,6 @@ and sometimes called a zero-fill right shift because it fills empty spots
 with zeros.
 -}
 shiftRightLogical : Int -> Int -> Int
-shiftRightLogical = Native.Bitwise.shiftRightLogical
+shiftRightLogical =
+  Native.Bitwise.shiftRightLogical
 
