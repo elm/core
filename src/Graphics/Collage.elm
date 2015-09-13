@@ -269,8 +269,10 @@ alpha a f =
   { f | alpha = a }
 
 
-{-| A collage is a collection of 2D forms. There are no strict positioning
-relationships between forms, so you are free to do all kinds of 2D graphics.
+{-| Create a collage with certain dimensions and content. It takes width and height
+arguments to specify dimensions, and then a list of 2D forms to decribe the content.
+
+Unlike with `Element`s, these 2D forms can be moved and rotated however you like.
 The forms are drawn in the order of the list, i.e., `collage w h [a, b]` will
 draw `b` on top of `a`.
 -}
