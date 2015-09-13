@@ -420,33 +420,28 @@ blackish t =
 balanceHelp : Dict k v -> Dict k v
 balanceHelp tree =
   case tree of
+    -- double red: left, left
     RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red yk yv (RBNode_elm_builtin Red xk xv a b) c) d ->
       balancedTree col xk xv yk yv zk zv a b c d
 
+    -- double red: left, right
     RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red xk xv a (RBNode_elm_builtin Red yk yv b c)) d ->
       balancedTree col xk xv yk yv zk zv a b c d
 
+    -- double red: right, left
     RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red zk zv (RBNode_elm_builtin Red yk yv b c) d) ->
       balancedTree col xk xv yk yv zk zv a b c d
 
+    -- double red: right, right
     RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red yk yv b (RBNode_elm_builtin Red zk zv c d)) ->
       balancedTree col xk xv yk yv zk zv a b c d
 
-    RBNode_elm_builtin BBlack xk xv a (RBNode_elm_builtin NBlack zk zv (RBNode_elm_builtin Black yk yv b c) d) ->
-      case d of
-        RBNode_elm_builtin Black _ _ _ _ ->
-          RBNode_elm_builtin Black yk yv (RBNode_elm_builtin Black xk xv a b) (balance Black zk zv c (redden d))
+    -- handle double blacks
+    RBNode_elm_builtin BBlack xk xv a (RBNode_elm_builtin NBlack zk zv (RBNode_elm_builtin Black yk yv b c) (RBNode_elm_builtin Black _ _ _ _ as d)) ->
+      RBNode_elm_builtin Black yk yv (RBNode_elm_builtin Black xk xv a b) (balance Black zk zv c (redden d))
 
-        _ ->
-          tree
-
-    RBNode_elm_builtin BBlack zk zv (RBNode_elm_builtin NBlack xk xv a (RBNode_elm_builtin Black yk yv b c)) d ->
-      case a of
-        RBNode_elm_builtin Black _ _ _ _ ->
-          RBNode_elm_builtin Black yk yv (balance Black xk xv (redden a) b) (RBNode_elm_builtin Black zk zv c d)
-
-        _ ->
-          tree
+    RBNode_elm_builtin BBlack zk zv (RBNode_elm_builtin NBlack xk xv (RBNode_elm_builtin Black _ _ _ _ as a) (RBNode_elm_builtin Black yk yv b c)) d ->
+      RBNode_elm_builtin Black yk yv (balance Black xk xv (redden a) b) (RBNode_elm_builtin Black zk zv c d)
 
     _ ->
       tree
