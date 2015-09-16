@@ -4,6 +4,7 @@ module List
     , repeat, (::), append, concat, intersperse
     , partition, unzip
     , map, map2, map3, map4, map5
+    , pure
     , filterMap, concatMap, indexedMap
     , foldr, foldl
     , sum, product, maximum, minimum, all, any, scanl
