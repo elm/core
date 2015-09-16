@@ -298,6 +298,12 @@ concatMap : (a -> List b) -> List a -> List b
 concatMap f list =
   concat (map f list)
 
+{-| Turn a value into a list containing one value. Useful for point free style.
+    pure x == [x]
+-}
+pure : a -> List a
+pure x = [x]
+
 
 {-| Get the sum of the list elements.
 
