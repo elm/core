@@ -512,9 +512,9 @@ succeed =
 
 {-| Handle an array with exactly one element.
 
-    -- ["Hello"]
     extractString : Decoder String
-    extractString = tuple1 identity string
+    extractString = 
+        tuple1 identity string
 
     authorship : Decoder String
     authorship =
