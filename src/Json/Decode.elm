@@ -512,6 +512,10 @@ succeed =
 
 {-| Handle an array with exactly one element.
 
+    extractString : Decoder String
+    extractString = 
+        tuple1 identity string
+
     authorship : Decoder String
     authorship =
         oneOf
