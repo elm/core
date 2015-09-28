@@ -20,7 +20,7 @@ module Char
 
 import Native.Char
 import Basics exposing ((&&), (||), (>=), (<=))
-
+import Result exposing (Result)
 
 isBetween : Char -> Char -> Char -> Bool
 isBetween low high char =
@@ -82,6 +82,11 @@ toLocaleLower : Char -> Char
 toLocaleLower =
   Native.Char.toLocaleLower
 
+
+{-| Convert to an Int. -}
+toInt : Char -> Result String Int
+toInt char =
+  Native.Char.toInt
 
 {-| In this library, we use integers to represent the key codes coming from the
 keyboard. You can use [`toCode`](#toCode) and [`fromCode`](#fromCode)
