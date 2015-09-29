@@ -3,6 +3,7 @@ module Test.Char (tests) where
 import Basics exposing (..)
 import Char exposing (..)
 import List
+import Result exposing (Result)
 
 import ElmTest.Assertion exposing (..)
 import ElmTest.Test exposing (..)
@@ -23,6 +24,9 @@ decCodes = [48..(48 + List.length dec - 1)]
 oneOf : List a -> a -> Bool
 oneOf = flip List.member
 
+intErrLower = map (\c -> Result.Error "could not convert string '" + c + "' to an Int") lower
+intErrUpper = map (\c -> Result.Error "could not convert string '" + c + "' to an Int") upper
+intOk = map Result.Ok [0..9]
 
 tests : Test
 tests = suite "Char"
@@ -60,6 +64,12 @@ tests = suite "Char"
       [ test "a-z" <| assertEqual (upper) (List.map toUpper lower)
       , test "A-Z" <| assertEqual (upper) (List.map toUpper upper)
       , test "0-9" <| assertEqual (dec) (List.map toUpper dec)
+      ]
+
+  , suite "toInt"
+      [ test "a-z" <| assertEqual (intErrLower) (List.map toInt lower)
+      , test "A-Z" <| assertEqual (intErrUpper) (List.map toInt upper)
+      , test "0-9" <| assertEqual (intOk) (List.map toInt dec)
       ]
 
   , suite "isLower"

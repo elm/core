@@ -15,6 +15,7 @@ Elm.Native.Char.make = function(localRuntime) {
 		toUpper: function(c) { return Utils.chr(c.toUpperCase()); },
 		toLower: function(c) { return Utils.chr(c.toLowerCase()); },
 		toLocaleUpper: function(c) { return Utils.chr(c.toLocaleUpperCase()); },
-		toLocaleLower: function(c) { return Utils.chr(c.toLocaleLowerCase()); }
+		toLocaleLower: function(c) { return Utils.chr(c.toLocaleLowerCase()); },
+		toInt: function(c) { return String.toInt(c); }
 	};
 };
