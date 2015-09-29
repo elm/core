@@ -28,6 +28,7 @@ For more information, see the [Elm documentation on Tasks](http://elm-lang.org/g
 -}
 
 import Native.Task
+import Basics exposing (Time)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Result exposing (Result(Ok,Err))
@@ -274,8 +275,6 @@ spawn =
 
 
 -- kill : ThreadID -> Task x ()
-
-type alias Time = Float
 
 
 {-| Make a thread sleep for a certain amount of time. The following example

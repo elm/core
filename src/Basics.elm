@@ -11,6 +11,7 @@ module Basics
     , toString, (++)
     , fst, snd
     , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
+    , Time
     ) where
 
 {-| Tons of useful functions that get imported by default.
@@ -60,6 +61,8 @@ which happen to be radians.
 # Higher-Order Helpers
 @docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
 
+# Time
+@docs Time
 -}
 
 import Native.Basics
@@ -607,3 +610,10 @@ This combines two arguments into a single pair.
 uncurry : (a -> b -> c) -> (a,b) -> c
 uncurry f (a,b) =
   f a b
+
+
+{-| Type alias to make it clearer when you are working with time values.
+Using the `Time` constants from the [`Time`](Time) library instead of
+raw numbers is very highly recommended.
+-}
+type alias Time = Float
