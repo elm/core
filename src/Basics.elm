@@ -519,7 +519,7 @@ This can also be written as:
       |> scale 2
 -}
 (|>) : a -> (a -> b) -> b
-x |> f =
+(|>) x f =
   f x
 
 
@@ -533,7 +533,7 @@ This can also be written as:
     leftAligned << monospace <| fromString "code"
 -}
 (<|) : (a -> b) -> a -> b
-f <| x =
+(<|) f x =
   f x
 
 
