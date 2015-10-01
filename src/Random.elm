@@ -2,7 +2,8 @@ module Random
     ( Generator, Seed
     , bool, int, float
     , list, pair
-    , map, andThen
+    , map, map2, map3, map4, map5
+    , andThen
     , minInt, maxInt
     , generate, initialSeed
     )
@@ -60,7 +61,7 @@ module. It has a period of roughly 2.30584e18.
 @docs pair, list
 
 # Custom Generators
-@docs map, andThen
+@docs map, map2, map3, map4, map5, andThen
 
 # Run a Generator
 @docs generate, Seed, initialSeed
@@ -161,7 +162,7 @@ float a b =
       (lo, hi) =
         if a < b then (a,b) else (b,a)
 
-      (number, seed') =
+      (number, newSeed) =
         generate (int minInt maxInt) seed
 
       negativeOneToOne =
@@ -170,7 +171,7 @@ float a b =
       scaled =
         (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
     in
-      (scaled, seed')
+      (scaled, newSeed)
 
 
 -- DATA STRUCTURES
@@ -185,16 +186,8 @@ wide and 200 pixels tall.
 
 -}
 pair : Generator a -> Generator b -> Generator (a,b)
-pair (Generator genLeft) (Generator genRight) =
-  Generator <| \seed ->
-    let
-      (left, seed') =
-        genLeft seed
-
-      (right, seed'') =
-        genRight seed'
-    in
-      ((left,right), seed'')
+pair genA genB =
+  map2 (,) genA genB
 
 
 {-| Create a list of random values.
@@ -223,13 +216,14 @@ listHelp list n generate seed =
     (List.reverse list, seed)
   else
     let
-      (value, seed') =
+      (value, newSeed) =
         generate seed
     in
-      listHelp (value :: list) (n-1) generate seed'
+      listHelp (value :: list) (n-1) generate newSeed
 
 
-{-| Map a function over the value of an existing generator.
+{-| Transform the values produced by a generator. The following examples show
+how to generate booleans and letters based on a basic integer generator.
 
     bool : Generator Bool
     bool =
@@ -245,21 +239,92 @@ listHelp list n generate seed =
 
 -}
 map : (a -> b) -> Generator a -> Generator b
-map f (Generator generate) =
-  Generator <| \seed ->
+map func (Generator genA) =
+  Generator <| \seed0 ->
     let
-      (x, seed') =
-        generate seed
+      (a, seed1) = genA seed0
     in
-      (f x, seed')
+      (func a, seed1)
+
+
+{-| Combine two generators.
+
+This function is used to define things like [`pair`](#pair) where you want to
+put two generators together.
+
+    pair : Generator a -> Generator b -> Generator (a,b)
+    pair genA genB =
+      map2 (,) genA genB
+
+-}
+map2 : (a -> b -> c) -> Generator a -> Generator b -> Generator c
+map2 func (Generator genA) (Generator genB) =
+  Generator <| \seed0 ->
+    let
+      (a, seed1) = genA seed0
+      (b, seed2) = genB seed1
+    in
+      (func a b, seed2)
+
+
+{-| Combine three generators. This could be used to produce random colors.
+
+    import Color
+
+    rgb : Generator Color.Color
+    rgb =
+      map3 Color.rgb (int 0 255) (int 0 255) (int 0 255)
+
+    hsl : Generator Color.Color
+    hsl =
+      map3 Color.hsl (map degrees (int 0 360)) (float 0 1) (float 0 1)
+-}
+map3 : (a -> b -> c -> d) -> Generator a -> Generator b -> Generator c -> Generator d
+map3 func (Generator genA) (Generator genB) (Generator genC) =
+  Generator <| \seed0 ->
+    let
+      (a, seed1) = genA seed0
+      (b, seed2) = genB seed1
+      (c, seed3) = genC seed2
+    in
+      (func a b c, seed3)
+
+
+{-| Combine four generators.
+-}
+map4 : (a -> b -> c -> d -> e) -> Generator a -> Generator b -> Generator c -> Generator d -> Generator e
+map4 func (Generator genA) (Generator genB) (Generator genC) (Generator genD) =
+  Generator <| \seed0 ->
+    let
+      (a, seed1) = genA seed0
+      (b, seed2) = genB seed1
+      (c, seed3) = genC seed2
+      (d, seed4) = genD seed3
+    in
+      (func a b c d, seed4)
+
+
+{-| Combine five generators.
+-}
+map5 : (a -> b -> c -> d -> e -> f) -> Generator a -> Generator b -> Generator c -> Generator d -> Generator e -> Generator f
+map5 func (Generator genA) (Generator genB) (Generator genC) (Generator genD) (Generator genE) =
+  Generator <| \seed0 ->
+    let
+      (a, seed1) = genA seed0
+      (b, seed2) = genB seed1
+      (c, seed3) = genC seed2
+      (d, seed4) = genD seed3
+      (e, seed5) = genE seed4
+    in
+      (func a b c d e, seed5)
 
 
 {-| Chain random operations, threading through the seed. In the following
 example, we will generate a random letter by putting together uppercase and
 lowercase letters.
 
-    randomLetter : Generator Char
-    randomLetter =
+    letter : Generator Char
+    letter =
       bool `andThen` \b ->
         if b then uppercaseLetter else lowercaseLetter
 
@@ -271,13 +336,13 @@ andThen : Generator a -> (a -> Generator b) -> Generator b
 andThen (Generator generate) callback =
   Generator <| \seed ->
     let
-      (result, seed') =
+      (result, newSeed) =
         generate seed
 
-      (Generator generateB) =
+      (Generator genB) =
         callback result
     in
-      generateB seed'
+      genB newSeed
 
 
 {-| A `Generator` is like a recipe for generating certain random values. So a
