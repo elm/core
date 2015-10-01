@@ -51,9 +51,18 @@ L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 module. It has a period of roughly 2.30584e18.
 
 # Generators
-@docs Generator, bool, int, float, pair, list, map, andThen
+@docs Generator
 
-# Running a Generator
+# Primitive Generators
+@docs bool, int, float
+
+# Data Structure Generators
+@docs pair, list
+
+# Custom Generators
+@docs map, andThen
+
+# Run a Generator
 @docs generate, Seed, initialSeed
 
 # Constants
@@ -271,18 +280,22 @@ andThen (Generator generate) callback =
       generateB seed'
 
 
-{-| A `Generator` is a value that can generate random values. So a
-(`Generator Int`) will generate integers and a (`Generator String`) will
-generate strings.
+{-| A `Generator` is like a recipe for generating certain random values. So a
+`Generator Int` describes how to generate integers and a `Generator String`
+describes how to generate strings.
+
+To actually *run* a generator and produce the random values, you need to use
+functions like [`generate`](#generate) and [`initialSeed`](#initialSeed).
 -}
 type Generator a =
     Generator (Seed -> (a, Seed))
 
+
 type State = State Int Int
 
 
-{-| A `Seed` helps you generate random values. Think of this as a "seed of
-randomness" that you can use along with a `Generator`.
+{-| A `Seed` is the source of randomness in this whole system. Whenever
+you want to use a generator, you need to pair it with a seed.
 -}
 type Seed = Seed
     { state : State
@@ -292,8 +305,15 @@ type Seed = Seed
     }
 
 
-{-| Run a random value generator with a given seed. It will give you back a
-random value and a new seed.
+{-| Generate a random value as specified by a given `Generator`.
+
+In the following example, we are trying to generate a number between 0 and 100
+with the `int 0 100` generator. Each time we call `generate` we need to provide
+a seed. This will produce a random number and a *new* seed to use if we want to
+run other generators later.
+
+So here it is done right, where we get a new seed from each `generate` call and
+thread that through.
 
     seed0 = initialSeed 31415
 
