@@ -232,11 +232,11 @@ listHelp list n generate seed =
 
     lowercaseLetter : Generator Char
     lowercaseLetter =
-      map (\n -> Char.fromCode (n + 65)) (int 1 26)
+      map (\n -> Char.fromCode (n + 97)) (int 0 25)
 
     uppercaseLetter : Generator Char
     uppercaseLetter =
-      map (\n -> Char.fromCode (n + 65)) (int 1 26)
+      map (\n -> Char.fromCode (n + 65)) (int 0 25)
 
 -}
 map : (a -> b) -> Generator a -> Generator b
