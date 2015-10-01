@@ -5,7 +5,6 @@ module Random
     , map, andThen
     , minInt, maxInt
     , generate, initialSeed
-    , customGenerator
     )
   where
 
@@ -59,9 +58,6 @@ module. It has a period of roughly 2.30584e18.
 
 # Constants
 @docs maxInt, minInt
-
-# Custom Generators
-@docs customGenerator
 
 -}
 
@@ -273,24 +269,6 @@ andThen (Generator generate) callback =
         callback result
     in
       generateB seed'
-
-
-{-| Create a custom generator. You provide a function that takes a seed, and
-returns a random value and a new seed. You can use this to create custom
-generators not covered by the basic functions in this library.
-
-    pairOf : Generator a -> Generator (a,a)
-    pairOf generator =
-      customGenerator <| \seed ->
-        let (left , seed' ) = generate generator seed
-            (right, seed'') = generate generator seed'
-        in
-            ((left,right), seed'')
-
--}
-customGenerator : (Seed -> (a, Seed)) -> Generator a
-customGenerator generate =
-  Generator generate
 
 
 {-| A `Generator` is a value that can generate random values. So a
