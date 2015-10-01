@@ -1,6 +1,6 @@
 module Random
     ( Generator, Seed
-    , int, float
+    , bool, int, float
     , list, pair
     , map, andThen
     , minInt, maxInt
@@ -52,7 +52,7 @@ L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 module. It has a period of roughly 2.30584e18.
 
 # Generators
-@docs Generator, int, float, pair, list, map, andThen
+@docs Generator, bool, int, float, pair, list, map, andThen
 
 # Running a Generator
 @docs generate, Seed, initialSeed
@@ -69,14 +69,29 @@ import Basics exposing (..)
 import List exposing ((::))
 
 
-{-| Create a generator that produces 32-bit integers in a given range. This
-function *can* produce values outside of the range [minInt, maxInt] but
-sufficient randomness is not guaranteed.
+{-| Create a generator that produces boolean values. The following example
+simulates a coin flip that may land heads or tails.
+
+    type Flip = Heads | Tails
+
+    coinFlip : Generator Flip
+    coinFlip =
+        map (\b -> if b then Heads else Tails) bool
+-}
+bool : Generator Bool
+bool =
+  map ((==) 1) (int 0 1)
+
+
+{-| Generate 32-bit integers in a given range.
 
     int 0 10   -- an integer between zero and ten
     int -5 5   -- an integer between -5 and 5
 
     int minInt maxInt  -- an integer in the widest range feasible
+
+This function *can* produce values outside of the range [[`minInt`](#minInt),
+[`maxInt`](#maxInt)] but sufficient randomness is not guaranteed.
 -}
 int : Int -> Int -> Generator Int
 int a b =
@@ -127,14 +142,12 @@ minInt =
   -2147483648
 
 
-{-| Create a generator that produces floats in a given range.
+{-| Generate floats in a given range. The following example is a generator
+that produces decimals between 0 and 1.
 
     probability : Generator Float
     probability =
         float 0 1
-
-    -- generate probability seed0 ==> (0.51, seed1)
-    -- generate probability seed1 ==> (0.04, seed2)
 -}
 float : Float -> Float -> Generator Float
 float a b =
