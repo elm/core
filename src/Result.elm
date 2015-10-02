@@ -1,5 +1,6 @@
 module Result
     ( Result(..)
+    , withDefault
     , map, map2, map3, map4, map5
     , andThen
     , toMaybe, fromMaybe, formatError
@@ -10,6 +11,9 @@ way to manage errors in Elm.
 
 # Type and Constructors
 @docs Result
+
+# Common Helpers
+@ withDefault
 
 # Mapping
 @docs map, map2, map3, map4, map5
@@ -27,7 +31,25 @@ import Maybe exposing ( Maybe(Just, Nothing) )
 {-| A `Result` is either `Ok` meaning the computation succeeded, or it is an
 `Err` meaning that there was some failure.
 -}
-type Result error value = Ok value | Err error
+type Result error value
+    = Ok value
+    | Err error
+
+
+{-| If the result is `Ok` return the value, but if the result is an `Err` then
+return a given default value. The following examples try to parse integers.
+
+    Result.withDefault 0 (String.toInt "123") == 123
+    Result.withDefault 0 (String.toInt "abc") == 0
+-}
+withDefault : a -> Result x a -> a
+withDefault def result =
+  case result of
+    Ok a ->
+        a
+
+    Err _ ->
+        def
 
 
 {-| Apply a function to a result. If the result is `Ok`, it will be converted.
