@@ -11,11 +11,14 @@ module Random
 
 {-| This library helps you generate pseudo-random values.
 
-The general pattern is to build up a [`Generator`](#Generator) which can produce
-certain kinds of random values. You can then use a `Generator` by running the
-[`generate`](#generate) function. If you need random values across many
-frames, you will probably want to store the most recent seed in your
-application state.
+This library is all about building [`generators`](#Generator) for whatever
+type of values you need. There are a bunch of primitive generators like
+[`bool`](#bool) and [`int`](#int) that you can build up into fancier
+generators with functions like [`list`](#list) and [`map`](#map).
+
+You use a `Generator` by running the [`generate`](#generate) function. If you
+need random values across many frames, you will probably want to store the
+most recent seed in your application state.
 
 *Note:* This is an implementation of the Portable Combined Generator of
 L'Ecuyer for 32-bit computers. It is almost a direct translation from the
