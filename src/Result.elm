@@ -12,17 +12,14 @@ way to manage errors in Elm.
 # Type and Constructors
 @docs Result
 
-# Common Helpers
-@ withDefault
-
 # Mapping
 @docs map, map2, map3, map4, map5
 
 # Chaining
 @docs andThen
 
-# Formatting Errors
-@docs toMaybe, fromMaybe, formatError
+# Handling Errors
+@docs withDefault, toMaybe, fromMaybe, formatError
 -}
 
 import Maybe exposing ( Maybe(Just, Nothing) )
