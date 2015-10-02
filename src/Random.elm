@@ -11,42 +11,13 @@ module Random
 
 {-| This library helps you generate pseudo-random values.
 
-The general pattern is to define a `Generator` which can produce certain kinds
-of random values. You actually produce random values by feeding a fresh `Seed`
-to your `Generator`.
+The general pattern is to build up a [`Generator`](#Generator) which can produce
+certain kinds of random values. You can then use a `Generator` by running the
+[`generate`](#generate) function. If you need random values across many
+frames, you will probably want to store the most recent seed in your
+application state.
 
-Since you need a fresh `Seed` to produce more random values, you should
-probably store a `Seed` in your application's state. This will allow you to
-keep updating it as you generate random values and fresh seeds.
-
-The following example models a bunch of bad guys that randomly appear. The
-`possiblyAddBadGuy` function uses the random seed to see if we should add a bad
-guy, and if so, it places a bad guy at a randomly generated point.
-
-    type alias Model =
-        { badGuys : List (Float,Float)
-        , seed : Seed
-        }
-
-    possiblyAddBadGuy : Model -> Model
-    possiblyAddBadGuy model =
-      let
-        (addProbability, seed') =
-          generate (float 0 1) model.seed
-      in
-        if addProbability < 0.9 then
-          { model | seed = seed' }
-        else
-          let
-            (position, seed'') =
-              generate (pair (float 0 100) (float 0 100)) seed'
-          in
-            { model |
-                badGuys = position :: model.badGuys,
-                seed = seed''
-            }
-
-Details: This is an implementation of the Portable Combined Generator of
+*Note:* This is an implementation of the Portable Combined Generator of
 L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 [System.Random](http://hackage.haskell.org/package/random-1.0.1.1/docs/System-Random.html)
 module. It has a period of roughly 2.30584e18.
