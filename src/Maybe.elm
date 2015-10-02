@@ -1,4 +1,10 @@
-module Maybe (Maybe(Just,Nothing), andThen, map, withDefault, oneOf) where
+module Maybe
+    ( Maybe(Just,Nothing)
+    , andThen
+    , map, map2, map3, map4, map5
+    , withDefault
+    , oneOf
+    ) where
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
 you with optional arguments, error handling, and records with optional fields.
@@ -7,7 +13,7 @@ you with optional arguments, error handling, and records with optional fields.
 @docs Maybe
 
 # Common Helpers
-@docs map, withDefault, oneOf
+@docs withDefault, oneOf, map, map2, map3, map4, map5
 
 # Chaining Maybes
 @docs andThen
@@ -27,7 +33,9 @@ sometimes, but does not absolutely need it.
     tom = { name = "Tom", age = Just 42 }
     sue = { name = "Sue", age = Nothing }
 -}
-type Maybe a = Just a | Nothing
+type Maybe a
+    = Just a
+    | Nothing
 
 
 {-| Provide a default value, turning an optional value into a normal
@@ -76,6 +84,55 @@ map f maybe =
     case maybe of
       Just value -> Just (f value)
       Nothing -> Nothing
+
+
+{-| Apply a function if all the arguments are `Just` a value.
+
+    map2 (+) (Just 3) (Just 4) == Just 7
+    map2 (+) (Just 3) Nothing == Nothing
+    map2 (+) Nothing (Just 4) == Nothing
+-}
+map2 : (a -> b -> value) -> Maybe a -> Maybe b -> Maybe value
+map2 func ma mb =
+    case (ma,mb) of
+      (Just a, Just b) ->
+          Just (func a b)
+
+      _ ->
+          Nothing
+
+
+{-|-}
+map3 : (a -> b -> c -> value) -> Maybe a -> Maybe b -> Maybe c -> Maybe value
+map3 func ma mb mc =
+    case (ma,mb,mc) of
+      (Just a, Just b, Just c) ->
+          Just (func a b c)
+
+      _ ->
+          Nothing
+
+
+{-|-}
+map4 : (a -> b -> c -> d -> value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe value
+map4 func ma mb mc md =
+    case (ma,mb,mc,md) of
+      (Just a, Just b, Just c, Just d) ->
+          Just (func a b c d)
+
+      _ ->
+          Nothing
+
+
+{-|-}
+map5 : (a -> b -> c -> d -> e -> value) -> Maybe a -> Maybe b -> Maybe c -> Maybe d -> Maybe e -> Maybe value
+map5 func ma mb mc md me =
+    case (ma,mb,mc,md,me) of
+      (Just a, Just b, Just c, Just d, Just e) ->
+          Just (func a b c d e)
+
+      _ ->
+          Nothing
 
 
 {-| Chain together many computations that may fail. It is helpful to see its
