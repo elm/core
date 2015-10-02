@@ -2,7 +2,6 @@ module Signal
     ( Signal
     , merge, mergeMany
     , map, map2, map3, map4, map5
-    , (<~), (~)
     , constant
     , dropRepeats, filter, filterMap, sampleOn
     , foldp
@@ -33,9 +32,6 @@ signals and time (e.g. timestamps) can be found in the [`Time`](Time) library.
 
 # Mapping
 @docs map, map2, map3, map4, map5
-
-# Fancy Mapping
-@docs (<~), (~)
 
 # Past-Dependence
 @docs foldp
@@ -255,47 +251,6 @@ approximate time of the latest click. -}
 sampleOn : Signal a -> Signal b -> Signal b
 sampleOn =
     Native.Signal.sampleOn
-
-
-{-| An alias for `map`. A prettier way to apply a function to the current value
-of a signal.
-
-    main : Signal Html
-    main =
-      view <~ model
-
-    model : Signal Model
-
-    view : Model -> Html
--}
-(<~) : (a -> b) -> Signal a -> Signal b
-(<~) =
-  map
-
-
-{-| Intended to be paired with the `(<~)` operator, this makes it possible for
-many signals to flow into a function. Think of it as a fancy alias for
-`mapN`. For example, the following declarations are equivalent:
-
-    main : Signal Element
-    main =
-      scene <~ Window.dimensions ~ Mouse.position
-
-    main : Signal Element
-    main =
-      map2 scene Window.dimensions Mouse.position
-
-You can use this pattern for as many signals as you want by using `(~)` a bunch
-of times, so you can go higher than `map5` if you need to.
--}
-(~) : Signal (a -> b) -> Signal a -> Signal b
-(~) funcs args =
-  map2 (\f v -> f v) funcs args
-
-
-infixl 4 <~
-infixl 4 ~
-
 
 
 -- MAILBOXES
