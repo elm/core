@@ -132,7 +132,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 		ceiling: Math.ceil,
 		floor: Math.floor,
 		round: Math.round,
-        toFixedRep: F2(toFixedRep),
+		toFixedRep: F2(toFixedRep),
 		toFloat: function(x) { return x; },
 		isNaN: isNaN,
 		isInfinite: isInfinite
