@@ -18,6 +18,10 @@ tests =
         , test "endsWith" (assert <| String.endsWith "ship" "spaceship")
         , test "reverse" <| assertEqual "desserts" (String.reverse "stressed")
         , test "repeat" <| assertEqual "hahaha" (String.repeat 3 "ha")
+        , test "replace 1" <| assertEqual "the tiny fox is fox"
+            (String.replace "quick" "tiny" "the quick fox is fox")
+        , test "replace 2" <| assertEqual "the tiny fly is fox"
+            (String.replace "fox" "fly" "the quick fox is fox")
         ]
 
       combiningTests = suite "Combining Strings"

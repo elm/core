@@ -1,6 +1,6 @@
 module String
     ( isEmpty, length, reverse, repeat
-    , cons, uncons, fromChar, append, concat, split, join, words, lines
+    , cons, uncons, fromChar, append, concat, split, join, words, lines, replace
     , slice, left, right, dropLeft, dropRight
     , contains, startsWith, endsWith, indexes, indices
     , toInt, toFloat, toList, fromList
@@ -15,7 +15,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs isEmpty, length, reverse, repeat
 
 # Building and Splitting
-@docs cons, uncons, fromChar, append, concat, split, join, words, lines
+@docs cons, uncons, fromChar, append, concat, split, join, words, lines, replace
 
 # Get Substrings
 @docs slice, left, right, dropLeft, dropRight
@@ -300,6 +300,16 @@ lines : String -> List String
 lines =
   Native.String.lines
 
+{-| Create a new string, replacing the first occurance of a given substring with a replacement
+
+    replace "quick" "tiny" "the quick fox is fox" == "the tiny fox is fox"
+    replace "fox" "fly" "the quick fox is fox" == "the tiny fly is fox"
+
+Use [`Regex.replace`](Regex#replace) if you need something more flexible.
+-}
+replace : String -> String -> String -> String
+replace =
+  Native.String.replace
 
 {-| Convert a string to all upper case. Useful for case-insensitive comparisons
 and VIRTUAL YELLING.
