@@ -92,6 +92,9 @@ Elm.Native.Basics.make = function(localRuntime) {
 		var y = point._1;
 		return Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 	}
+    function toFixedRep(num, fix) {
+        return num.toFixed(fix);
+    }
 
 	return localRuntime.Native.Basics.values = {
 		div: F2(div),
@@ -129,6 +132,7 @@ Elm.Native.Basics.make = function(localRuntime) {
 		ceiling: Math.ceil,
 		floor: Math.floor,
 		round: Math.round,
+        toFixedRep: F2(toFixedRep),
 		toFloat: function(x) { return x; },
 		isNaN: isNaN,
 		isInfinite: isInfinite

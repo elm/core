@@ -38,6 +38,11 @@ tests =
             , test "toString String single quote" <| assertEqual "\"not 'escaped'\"" (toString "not 'escaped'")
             , test "toString String double quote" <| assertEqual "\"are \\\"escaped\\\"\"" (toString "are \"escaped\"")
             ]
+        toFixedRepTests = suite "toFixedRep Tests"
+            [ test "toFixedRep no digets" <| assertEqual "45" (toFixedRep 45.0 0)
+            , test "toFixedRep less digets" <| assertEqual "3.14" (toFixedRep 3.141592 2)
+            , test "toFixedRep more digets" <| assertEqual "3.1415920000" (toFixedRep 3.141592 10)
+            ]
         trigTests = suite "Trigonometry Tests"
             [ test "radians 0" <| assertEqual 0 (radians 0)
             , test "radians positive" <| assertEqual 5 (radians 5)
@@ -149,4 +154,5 @@ tests =
             , booleanTests
             , miscTests
             , higherOrderTests
+            , toFixedRepTests
             ]
