@@ -8,6 +8,7 @@ module Basics
     , degrees, radians, turns
     , toPolar, fromPolar
     , isNaN, isInfinite
+    , toFixedRep
     , toString, (++)
     , fst, snd
     , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
@@ -52,7 +53,7 @@ which happen to be radians.
 @docs isNaN, isInfinite
 
 # Strings and Lists
-@docs toString, (++)
+@docs toFixedRep, toString, (++)
 
 # Tuples
 @docs fst, snd
