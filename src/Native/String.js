@@ -159,8 +159,8 @@ Elm.Native.String.make = function(localRuntime) {
 		return List.fromArray(str.split(/\r\n|\r|\n/g));
 	}
 	function replace(search, repl, str) {
-        return str.replace(search, repl)
-    }
+		return str.replace(search, repl)
+	}
 	function toUpper(str)
 	{
 		return str.toUpperCase();
