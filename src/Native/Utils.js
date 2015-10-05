@@ -8,6 +8,9 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return localRuntime.Native.Utils.values;
 	}
 
+
+	// COMPARISONS
+
 	function eq(l, r)
 	{
 		var stack = [{'x': l, 'y': r}];
@@ -131,6 +134,8 @@ Elm.Native.Utils.make = function(localRuntime) {
 	}
 
 
+	// TUPLES
+
 	var Tuple0 = {
 		ctor: '_Tuple0'
 	};
@@ -143,6 +148,9 @@ Elm.Native.Utils.make = function(localRuntime) {
 			_1: y
 		};
 	}
+
+
+	// LITERALS
 
 	function chr(c)
 	{
@@ -158,67 +166,31 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return t;
 	}
 
+
+	// GUID
+
 	var count = 0;
 	function guid(_)
 	{
 		return count++;
 	}
 
-	function copy(oldRecord)
+
+	// RECORDS
+
+	function update(oldRecord, updatedFields)
 	{
 		var newRecord = {};
 		for (var key in oldRecord)
 		{
-			var value = key === '_'
-				? copy(oldRecord._)
-				: oldRecord[key];
+			var value = (key in updatedFields) ? updatedFields[key] : oldRecord[key];
 			newRecord[key] = value;
 		}
 		return newRecord;
 	}
 
-	function remove(key, oldRecord)
-	{
-		var record = copy(oldRecord);
-		if (key in record._)
-		{
-			record[key] = record._[key][0];
-			record._[key] = record._[key].slice(1);
-			if (record._[key].length === 0)
-			{
-				delete record._[key];
-			}
-		}
-		else
-		{
-			delete record[key];
-		}
-		return record;
-	}
 
-	function replace(keyValuePairs, oldRecord)
-	{
-		var record = copy(oldRecord);
-		for (var i = keyValuePairs.length; i--; )
-		{
-			var pair = keyValuePairs[i];
-			record[pair[0]] = pair[1];
-		}
-		return record;
-	}
-
-	function insert(key, value, oldRecord)
-	{
-		var newRecord = copy(oldRecord);
-		if (key in newRecord)
-		{
-			var values = newRecord._[key];
-			var copiedValues = values ? values.slice(0) : [];
-			newRecord._[key] = [newRecord[key]].concat(copiedValues);
-		}
-		newRecord[key] = value;
-		return newRecord;
-	}
+	// MOUSE COORDINATES
 
 	function getXY(e)
 	{
@@ -348,10 +320,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 		Tuple2: Tuple2,
 		chr: chr,
 		txt: txt,
-		copy: copy,
-		remove: remove,
-		replace: replace,
-		insert: insert,
+		update: update,
 		guid: guid,
 		getXY: getXY,
 
