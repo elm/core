@@ -1,6 +1,7 @@
 module Debug
     ( log, crash
-    , watch, watchSummary, trace
+    , watch, watchSummary
+    , trace
     ) where
 
 {-| This library is for investigating bugs or performance problems. It should
@@ -26,7 +27,9 @@ Notice that `log` is not a pure function! It should *only* be used for
 investigating bugs or performance problems.
 -}
 log : String -> a -> a
-log = Native.Debug.log
+log =
+  Native.Debug.log
+
 
 {-| Crash the program with an error message. This is an uncatchable error,
 intended for code that is soon-to-be-implemented. For example, if you are
@@ -37,22 +40,31 @@ make sense to do this:
 
     drawEntity entity =
         case entity of
-          Ship -> ...
-          Fish -> ...
-          _ -> Debug.crash ("drawEntity not implemented for " ++ toString entity ++ " yet!")
+          Ship ->
+              ...
 
-Note that incomplete pattern matches are *very* bad practice! They are one of
-the very few ways to crash an Elm program, and they are completely avoidable.
-Production code should not have incomplete pattern matches!
+          Fish ->
+              ...
+
+          _ ->
+              Debug.crash "TODO"
+
+The Elm compiler recognizes each `Debug.crash` and when you run into it at
+runtime, the error will point to the corresponding module name and line number.
+For `case` expressions that ends with a wildcard pattern and a crash, it will
+also show the value that snuck through. In our example, that'd be `Captain` or
+`Seagull`.
 
 **Use this if** you want to do some testing while you are partway through
 writing a function.
 
 **Do not use this if** you want to do some typical try-catch exception handling.
-Use the `Maybe` or `Either` libraries instead.
+Use the [`Maybe`](Maybe) or [`Result`](Result) libraries instead.
 -}
 crash : String -> a
-crash = Native.Debug.crash
+crash =
+  Native.Debug.crash
+
 
 {-| Watch a particular value in the debugger. Say we want to know the value of
 a variable called `velocity` because it may not be updated correctly. Adding
@@ -69,7 +81,9 @@ to watch a timer signal, instead of `Debug.watch "time" <| Time.every 1000`
 you need `Debug.watch "time" <~ Time.every 1000`.
 -}
 watch : String -> a -> a
-watch = Native.Debug.watch
+watch =
+  Native.Debug.watch
+
 
 {-| Watch a summary of a particular value in the debugger. This function is
 pretty much the same as `watch` but it lets you specify a way to summarize
@@ -88,10 +102,14 @@ Again, this evaluates to `clicks` but we get to see how long that list is in
 the debugger.
 -}
 watchSummary : String -> (a -> b) -> a -> a
-watchSummary = Native.Debug.watchSummary
+watchSummary =
+  Native.Debug.watchSummary
+
 
 {-| Trace all past positions of a `Form` in the debugger. Add this to a `Form`
 and you will see a line tracing its entire history.
 -}
 trace : String -> Form -> Form
-trace = Native.Debug.tracePath
+trace =
+  Native.Debug.tracePath
+
