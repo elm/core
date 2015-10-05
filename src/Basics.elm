@@ -65,7 +65,6 @@ which happen to be radians.
 import Native.Basics
 import Native.Port
 import Native.Runtime
-import Native.Show
 import Native.Utils
 
 
@@ -456,7 +455,7 @@ with `Text.fromString` it should look just like the value it came from.
 -}
 toString : a -> String
 toString =
-  Native.Show.toString
+  Native.Utils.toString
 
 
 {-| Put two appendable things together. This includes strings, lists, and text.
