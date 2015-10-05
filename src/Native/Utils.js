@@ -270,29 +270,51 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return root;
 	}
 
-	//// RUNTIME ERRORS ////
 
-	function indent(lines)
+	// CRASHES
+
+	function crash(moduleName, region)
 	{
-		return '\n' + lines.join('\n');
+		return function(message) {
+			throw new Error(
+				'Ran into a `Debug.crash` in module `' + moduleName + '` ' + regionToString(region) + '\n'
+				+ 'The message provided by the code author is:\n\n    '
+				+ message
+			);
+		};
 	}
 
-	function badCase(moduleName, span)
+	function crashCase(moduleName, region, value)
 	{
-		var msg = indent([
-			'Non-exhaustive pattern match in case-expression.',
-			'Make sure your patterns cover every case!'
-		]);
-		throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
+		return function(message) {
+			throw new Error(
+				'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
+				+ 'This was caused by the `case` expression ' + regionToString(region) + '.\n'
+				+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + toString(value) + '\n\n'
+				+ 'The message provided by the code author is:\n\n    '
+				+ message
+			);
+		};
 	}
 
-	function badIf(moduleName, span)
+	function regionToString(region)
 	{
-		var msg = indent([
-			'Non-exhaustive pattern match in multi-way-if expression.',
-			'It is best to use \'otherwise\' as the last branch of multi-way-if.'
-		]);
-		throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
+		if (region.start.line == region.end.line)
+		{
+			return 'on line ' + region.start.line;
+		}
+		return 'between lines ' + region.start.line + ' and ' + region.end.line;
+	}
+
+
+	// BAD PORTS
+
+	function badPort(expected, received)
+	{
+		throw new Error(
+			'Runtime error when sending values through a port.\n\n'
+			+ 'Expecting ' + expected + ' but was given ' + formatValue(received)
+		);
 	}
 
 	function formatValue(value)
@@ -300,15 +322,6 @@ Elm.Native.Utils.make = function(localRuntime) {
 		// Explicity format undefined values as "undefined"
 		// because JSON.stringify(undefined) unhelpfully returns ""
 		return (value === undefined) ? "undefined" : JSON.stringify(value);
-	}
-
-	function badPort(expected, received)
-	{
-		var msg = indent([
-			'Expecting ' + expected + ' but was given ',
-			formatValue(received)
-		]);
-		throw new Error('Runtime error when sending values through a port.' + msg);
 	}
 
 
@@ -328,8 +341,8 @@ Elm.Native.Utils.make = function(localRuntime) {
 		Cons: Cons,
 		append: F2(append),
 
-		badCase: badCase,
-		badIf: badIf,
+		crash: crash,
+		crashCase: crashCase,
 		badPort: badPort
 	};
 };
