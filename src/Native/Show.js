@@ -35,27 +35,6 @@ Elm.Native.Show.make = function(localRuntime) {
 		{
 			return '"' + addSlashes(v, false) + '"';
 		}
-		else if (type === 'object' && '_' in v && probablyPublic(v))
-		{
-			var output = [];
-			for (var k in v._)
-			{
-				for (var i = v._[k].length; i--; )
-				{
-					output.push(k + ' = ' + toString(v._[k][i]));
-				}
-			}
-			for (var k in v)
-			{
-				if (k === '_') continue;
-				output.push(k + ' = ' + toString(v[k]));
-			}
-			if (output.length === 0)
-			{
-				return '{}';
-			}
-			return '{ ' + output.join(', ') + ' }';
-		}
 		else if (type === 'object' && 'ctor' in v)
 		{
 			if (v.ctor.substring(0, 6) === '_Tuple')
@@ -133,9 +112,22 @@ Elm.Native.Show.make = function(localRuntime) {
 				return v.ctor + output;
 			}
 		}
-		if (type === 'object' && 'notify' in v && 'id' in v)
+		else if (type === 'object' && 'notify' in v && 'id' in v)
 		{
 			return '<Signal>';
+		}
+		else if (type === 'object' && probablyPublic(v))
+		{
+			var output = [];
+			for (var k in v)
+			{
+				output.push(k + ' = ' + toString(v[k]));
+			}
+			if (output.length === 0)
+			{
+				return '{}';
+			}
+			return '{ ' + output.join(', ') + ' }';
 		}
 		return '<internal structure>';
 	};
