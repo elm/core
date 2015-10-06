@@ -233,6 +233,16 @@ Elm.Native.Utils.make = function(localRuntime) {
 		};
 	}
 
+	function list(arr)
+	{
+		var out = Nil;
+		for (var i = arr.length; i--; )
+		{
+			out = Cons(arr[i], out);
+		}
+		return out;
+	}
+
 	function append(xs, ys)
 	{
 		// append Strings
@@ -516,6 +526,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 		Nil: Nil,
 		Cons: Cons,
+		list: list,
 		append: F2(append),
 
 		crash: crash,

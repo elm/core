@@ -16,6 +16,8 @@ Elm.Native.List.make = function(localRuntime) {
 	var Nil = Utils.Nil;
 	var Cons = Utils.Cons;
 
+	var fromArray = Utils.list;
+
 	function toArray(xs)
 	{
 		var out = [];
@@ -23,16 +25,6 @@ Elm.Native.List.make = function(localRuntime) {
 		{
 			out.push(xs._0);
 			xs = xs._1;
-		}
-		return out;
-	}
-
-	function fromArray(arr)
-	{
-		var out = Nil;
-		for (var i = arr.length; i--; )
-		{
-			out = Cons(arr[i], out);
 		}
 		return out;
 	}
