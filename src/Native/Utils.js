@@ -243,6 +243,20 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return out;
 	}
 
+	function range(lo, hi)
+	{
+		var list = Nil;
+		if (lo <= hi)
+		{
+			do
+			{
+				list = Cons(hi, list);
+			}
+			while (hi-- > lo);
+		}
+		return list;
+	}
+
 	function append(xs, ys)
 	{
 		// append Strings
@@ -527,6 +541,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 		Nil: Nil,
 		Cons: Cons,
 		list: list,
+		range: range,
 		append: F2(append),
 
 		crash: crash,

@@ -29,16 +29,6 @@ Elm.Native.List.make = function(localRuntime) {
 		return out;
 	}
 
-	function range(lo, hi)
-	{
-		var lst = Nil;
-		if (lo <= hi)
-		{
-			do { lst = Cons(hi, lst); } while (hi-- > lo);
-		}
-		return lst;
-	}
-
 	// f defined similarly for both foldl and foldr (NB: different from Haskell)
 	// ie, foldl : (a -> b -> b) -> b -> [a] -> b
 	function foldl(f, b, xs)
@@ -158,7 +148,6 @@ Elm.Native.List.make = function(localRuntime) {
 		cons: F2(Cons),
 		toArray: toArray,
 		fromArray: fromArray,
-		range: range,
 
 		foldl: F3(foldl),
 		foldr: F3(foldr),
