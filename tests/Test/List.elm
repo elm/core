@@ -104,6 +104,12 @@ testListOfN n =
             ]
             
         , test "unzip" <| assertEqual (xsNeg, xs) (map (\x -> (-x, x)) xs |> unzip)
+
+        , suite "zip"
+            [ test "same length" <| assertEqual [(1, "a"), (2, "b")] (zip [1, 2] ["a", "b"])
+            , test "short first" <| assertEqual [(1, "a")] (zip [1] ["a", "b"])
+            , test "long first" <| assertEqual [(1, "a")] (zip [1, 2] ["a"])
+            ]
         
         , suite "filterMap"
             [ test "none" <| assertEqual ([]) (filterMap (\x -> Nothing) xs)

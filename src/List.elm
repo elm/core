@@ -2,7 +2,7 @@ module List
     ( isEmpty, length, reverse, member
     , head, tail, filter, take, drop
     , repeat, (::), append, concat, intersperse
-    , partition, unzip
+    , partition, zip, unzip
     , map, map2, map3, map4, map5
     , filterMap, concatMap, indexedMap
     , foldr, foldl
@@ -20,7 +20,7 @@ list must have the same type.
 @docs head, tail, filter, take, drop
 
 # Putting Lists Together
-@docs repeat, (::), append, concat, intersperse
+@docs repeat, (::), append, concat, intersperse, zip
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -399,6 +399,16 @@ map4 =
 map5 : (a -> b -> c -> d -> e -> result) -> List a -> List b -> List c -> List d -> List e -> List result
 map5 =
   Native.List.map5
+
+
+{-| Combine two lists into a single list of tuples. The first element comes
+from the first list and the second element comes from the second list. If one
+list is longer, the extra elements are dropped.
+
+    zip [1,2,3] ['a','b'] == [(1,'a'), (2,'b')]
+-}
+zip : List a -> List b -> List (a, b)
+zip = map2 (,)
 
 
 {-| Decompose a list of tuples into a tuple of lists.
