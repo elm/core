@@ -460,7 +460,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 		{
 			return '<Signal>';
 		}
-		else if (type === 'object' && probablyPublic(v))
+		else if (type === 'object' && '_' in v && probablyPublic(v))
 		{
 			var output = [];
 			for (var k in v)
