@@ -176,7 +176,7 @@ pair genA genB =
 
     intPairs : Generator (List (Int, Int))
     intPairs =
-        list 10 (pair int int)
+        list 10 <| pair (int 0 100) (int 0 100)
 -}
 list : Int -> Generator a -> Generator (List a)
 list n (Generator generate) =
