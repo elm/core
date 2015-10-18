@@ -247,7 +247,7 @@ type Gradient
 end points. See [this example](http://elm-lang.org/examples/linear-gradient) for a
 more visual explanation.
 -}
-linear : (number, number) -> (number, number) -> List (Float,Color) -> Gradient
+linear : (Float, Float) -> (Float, Float) -> List (Float,Color) -> Gradient
 linear =
   Linear
 
@@ -258,7 +258,7 @@ stops&rdquo; that indicate how to interpolate between the inner and outer
 circles. See [this example](http://elm-lang.org/examples/radial-gradient) for a
 more visual explanation.
 -}
-radial : (number,number) -> number -> (number,number) -> number -> List (Float,Color) -> Gradient
+radial : (Float,Float) -> Float -> (Float,Float) -> Float -> List (Float,Color) -> Gradient
 radial =
   Radial
 

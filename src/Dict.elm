@@ -69,7 +69,7 @@ type Dict k v
 
 
 {-| Create an empty dictionary. -}
-empty : Dict comparable v
+empty : Dict k v
 empty =
   RBEmpty_elm_builtin LBlack
 
@@ -125,7 +125,7 @@ member key dict =
 
 
 {-| Determine the number of key-value pairs in the dictionary. -}
-size : Dict comparable v -> Int
+size : Dict k v -> Int
 size dict =
   sizeHelp 0 dict
 
@@ -144,7 +144,7 @@ sizeHelp n dict =
 
     isEmpty empty == True
 -}
-isEmpty : Dict comparable v -> Bool
+isEmpty : Dict k v -> Bool
 isEmpty dict =
   dict == empty
 
