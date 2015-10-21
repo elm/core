@@ -43,7 +43,7 @@ guy, and if so, it places a bad guy at a randomly generated point.
                 in
                     { model |
                         badGuys <- position :: model.badGuys
-                        seed <- seed''
+                        ,seed <- seed''
                     }
 
 Details: This is an implemenation of the Portable Combined Generator of
