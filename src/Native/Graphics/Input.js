@@ -360,10 +360,8 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			field.value = field.elm_old_value;
 
 			Signal.sendMessage(field.elm_handler({
-				_: {},
 				string: next,
 				selection: {
-					_: {},
 					start: start,
 					end: end,
 					direction: { ctor: direction }

@@ -72,7 +72,6 @@ Elm.Native.Signal.make = function(localRuntime) {
 		}
 
 		return {
-			_: {},
 			signal: signal,
 			address: {
 				ctor: 'Address',

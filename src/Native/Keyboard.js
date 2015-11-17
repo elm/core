@@ -14,7 +14,6 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 	function keyEvent(event)
 	{
 		return {
-			_: {},
 			alt: event.altKey,
 			meta: event.metaKey,
 			keyCode: event.keyCode
@@ -24,7 +23,7 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 
 	function keyStream(node, eventName, handler)
 	{
-		var stream = NS.input(eventName, { _: {}, alt: false, meta: false, keyCode: 0 });
+		var stream = NS.input(eventName, { alt: false, meta: false, keyCode: 0 });
 
 		localRuntime.addListener([stream.id], node, eventName, function(e) {
 			localRuntime.notify(stream.id, handler(e));
