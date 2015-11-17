@@ -34,7 +34,7 @@ import Result exposing (Result(Ok,Err))
 
 
 {-| Represents asynchronous effects that may fail. It is useful for stuff like
-HTTP and or using browser storage.
+HTTP.
 
 For example, maybe we have a task with the type (`Task String User`). This means
 that when we perform the task, it will either fail with a `String` message or
