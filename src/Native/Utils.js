@@ -413,7 +413,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 			}
 			else if (v.ctor === '[]')
 			{
-				return '"[]';
+				return '[]';
 			}
 			else if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
 			{
