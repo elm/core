@@ -450,8 +450,8 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	function update(node, wrappedCurrent, wrappedNext)
 	{
-		var curr = wrappedCurrent;
-		var next = wrappedNext;
+		var curr = wrappedCurrent._0;
+		var next = wrappedNext._0;
 		var rootNode = node;
 		if (node.tagName === 'A')
 		{
