@@ -434,12 +434,12 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		var i = 0;
 		function peekNext()
 		{
-			return i < arr.length ? arr[i].form.ctor : '';
+			return i < arr.length ? arr[i]._0.form.ctor : '';
 		}
 		// assumes that there is a next element
 		function next()
 		{
-			var out = arr[i];
+			var out = arr[i]._0;
 			++i;
 			return out;
 		}
