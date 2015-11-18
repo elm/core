@@ -443,6 +443,14 @@ Elm.Native.Utils.make = function(localRuntime) {
 			{
 				return '<text>';
 			}
+			else if (v.ctor === 'Element_elm_builtin')
+			{
+				return '<element>'
+			}
+			else if (v.ctor === 'Form_elm_builtin')
+			{
+				return '<form>'
+			}
 			else
 			{
 				var output = '';
@@ -458,9 +466,9 @@ Elm.Native.Utils.make = function(localRuntime) {
 		}
 		else if (type === 'object' && 'notify' in v && 'id' in v)
 		{
-			return '<Signal>';
+			return '<signal>';
 		}
-		else if (type === 'object' && probablyPublic(v))
+		else if (type === 'object')
 		{
 			var output = [];
 			for (var k in v)
@@ -492,37 +500,6 @@ Elm.Native.Utils.make = function(localRuntime) {
 		{
 			return s.replace(/\"/g, '\\"');
 		}
-	}
-
-	function probablyPublic(v)
-	{
-		var keys = Object.keys(v);
-		var len = keys.length;
-		if (len === 3
-			&& 'props' in v
-			&& 'element' in v)
-		{
-			return false;
-		}
-		else if (len === 5
-			&& 'horizontal' in v
-			&& 'vertical' in v
-			&& 'x' in v
-			&& 'y' in v)
-		{
-			return false;
-		}
-		else if (len === 7
-			&& 'theta' in v
-			&& 'scale' in v
-			&& 'x' in v
-			&& 'y' in v
-			&& 'alpha' in v
-			&& 'form' in v)
-		{
-			return false;
-		}
-		return true;
 	}
 
 
