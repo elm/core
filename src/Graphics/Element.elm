@@ -308,9 +308,12 @@ type Three = P | Z | N
 
 
 {-| Specifies a distance from a particular location within a `container`, like
-“20 pixels right and up from the center”.
+“20 pixels right and up from the center”. You can use `absolute` or `relative`
+to specify a `Pos` in pixels or as a percentage of the container.
 -}
-type Pos = Absolute Int | Relative Float
+type Pos
+    = Absolute Int
+    | Relative Float
 
 
 {-| Specifies a position for an element within a `container`, like “the top
@@ -428,14 +431,25 @@ layers es =
 
 -- Repetitive things --
 
-{-|-}
+{-| A position specified in pixels. If you want something 10 pixels to the
+right of the middle of a container, you would write this:
+
+    middleAt (absolute 10) (absolute 0)
+
+-}
 absolute : Int -> Pos
-absolute = Absolute
+absolute =
+  Absolute
 
 
-{-|-}
+{-| A position specified as a percentage. If you want something 10% away from
+the top left corner, you would say:
+
+    topLeftAt (relative 0.1) (relative 0.1)
+-}
 relative : Float -> Pos
-relative = Relative
+relative =
+  Relative
 
 
 {-|-}
