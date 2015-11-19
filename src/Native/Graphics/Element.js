@@ -315,8 +315,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	// must clear right, left, top, bottom, and transform
 	// before calling this function
-	function setPos(pos, elem, e)
+	function setPos(pos, wrappedElement, e)
 	{
+		var elem = wrappedElement._0;
 		var element = elem.element;
 		var props = elem.props;
 		var w = props.width + (element.adjustWidth ? element.adjustWidth : 0);
