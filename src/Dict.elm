@@ -325,7 +325,7 @@ reportRemBug msg c lgot rgot =
     String.concat
     [ "Internal red-black tree invariant violated, expected "
     , msg, " and got ", toString c, "/", lgot, "/", rgot
-    , "\nPlease report this bug to <https://github.com/elm-lang/Elm/issues>"
+    , "\nPlease report this bug to <https://github.com/elm-lang/core/issues>"
     ]
 
 
