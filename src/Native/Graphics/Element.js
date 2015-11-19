@@ -503,7 +503,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				var arr = List.toArray(nextE._1);
 				for (var i = arr.length; i--; )
 				{
-					arr[i] = arr[i].element.ctor;
+					arr[i] = arr[i]._0.element.ctor;
 				}
 				if (nextE._0.ctor !== currE._0.ctor)
 				{
