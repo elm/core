@@ -453,7 +453,7 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			Signal.sendMessage(message);
 		}
 		var element = wrappedElement._0;
-		var props = Utils.update(element.props, { click: onClick });
+		var newProps = Utils.update(element.props, { click: onClick });
 		return {
 			ctor: wrappedElement.ctor,
 			_0: {
