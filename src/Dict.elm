@@ -540,7 +540,7 @@ diff t1 t2 =
   foldl (\k v t -> remove k t) t1 t2
 
 
-{-| Get all of the keys in a dictionary.
+{-| Get all of the keys in a dictionary, sorted from lowest to highest.
 
     keys (fromList [(0,"Alice"),(1,"Bob")]) == [0,1]
 -}
@@ -549,7 +549,7 @@ keys dict =
   foldr (\key value keyList -> key :: keyList) [] dict
 
 
-{-| Get all of the values in a dictionary.
+{-| Get all of the values in a dictionary, in the order of their keys.
 
     values (fromList [(0,"Alice"),(1,"Bob")]) == ["Alice", "Bob"]
 -}
@@ -558,7 +558,7 @@ values dict =
   foldr (\key value valueList -> value :: valueList) [] dict
 
 
-{-| Convert a dictionary into an association list of key-value pairs. -}
+{-| Convert a dictionary into an association list of key-value pairs, sorted by keys. -}
 toList : Dict comparable v -> List (comparable,v)
 toList dict =
   foldr (\key value list -> (key,value) :: list) [] dict
