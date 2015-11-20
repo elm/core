@@ -36,7 +36,7 @@ y =
   Signal.map snd position
 
 
-{-| The current state of the mouse
+{-| The current state of the mouse.
 True when any mouse button is down, and false otherwise. -}
 isDown : Signal Bool
 isDown =
