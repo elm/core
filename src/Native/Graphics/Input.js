@@ -218,8 +218,8 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 	function customButton(message, up, hover, down)
 	{
 		return A3(Element.newElement,
-				  max3(up.props.width, hover.props.width, down.props.width),
-				  max3(up.props.height, hover.props.height, down.props.height),
+				  max3(up._0.props.width, hover._0.props.width, down._0.props.width),
+				  max3(up._0.props.height, hover._0.props.height, down._0.props.height),
 				  { ctor: 'Custom',
 					type: 'CustomButton',
 					render: renderCustomButton,
