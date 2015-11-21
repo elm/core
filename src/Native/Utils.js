@@ -363,6 +363,11 @@ function toString(v)
 
 	if (type === 'object')
 	{
+		if (v instanceof Date)
+		{
+			return v.toString();
+		}
+
 		var output = [];
 		for (var k in v)
 		{
