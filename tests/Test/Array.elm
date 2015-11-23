@@ -7,8 +7,7 @@ import List exposing ((::))
 import Maybe exposing (..)
 import Native.Array
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 mergeSplit : Int -> Array.Array a -> Array.Array a
 mergeSplit n arr =

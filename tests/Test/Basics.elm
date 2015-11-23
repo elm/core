@@ -1,8 +1,7 @@
 module Test.Basics (tests) where
 
 import Basics exposing (..)
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 tests : Test
 tests =

@@ -1,7 +1,6 @@
 module Test.List (tests) where
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 import Basics exposing (..)
 import Maybe exposing (Maybe(Nothing, Just))

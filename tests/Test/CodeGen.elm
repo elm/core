@@ -1,8 +1,7 @@
 module Test.CodeGen (tests) where
 
 import Basics exposing (..)
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 import Maybe
 import Maybe exposing (..)
