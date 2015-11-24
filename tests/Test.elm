@@ -1,15 +1,10 @@
 module Main where
 
 import Basics exposing (..)
-import Signal exposing (..)
+import Task
 
-import ElmTest.Assertion as A
-import ElmTest.Run as R
-import ElmTest.Runner.Console exposing (runDisplay)
-import ElmTest.Test exposing (..)
-import IO.IO exposing (..)
-import IO.Runner exposing (Request, Response)
-import IO.Runner as Run
+import ElmTest exposing (..)
+import Console
 
 import Test.Array as Array
 import Test.Basics as Basics
@@ -45,10 +40,7 @@ tests =
     , Trampoline.tests
     ]
 
-console : IO ()
-console = runDisplay tests
 
-port requests : Signal Request
-port requests = Run.run responses console
-
-port responses : Signal Response
+port runner : Signal (Task.Task x ())
+port runner = 
+    Console.run (consoleRunner tests)
