@@ -4,4 +4,4 @@ install:
 before_script:
   - bash tests/set-up-tests.sh
 script:
-  - node test.js
+  - node tests/test.js
