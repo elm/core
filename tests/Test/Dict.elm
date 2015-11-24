@@ -5,8 +5,7 @@ import Dict
 import List
 import Maybe exposing (..)
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 animals : Dict.Dict String String
 animals = Dict.fromList [ ("Tom", "cat"), ("Jerry", "mouse") ]
