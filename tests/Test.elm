@@ -2,6 +2,7 @@ module Main where
 
 import Basics exposing (..)
 import Task
+import Signal exposing (Signal)
 
 import ElmTest exposing (..)
 import Console
@@ -24,21 +25,21 @@ import Test.Trampoline as Trampoline
 tests : Test
 tests =
     suite "Elm Standard Library Tests"
-    [ Array.tests
-    , Basics.tests
-    , Bitwise.tests
-    , Char.tests
-    , CodeGen.tests
-    , Dict.tests
-    , Equality.tests
-    , Json.tests
-    , List.tests
-    , Result.tests
-    , Set.tests
-    , String.tests
-    , Regex.tests
-    , Trampoline.tests
-    ]
+        [ Array.tests
+        , Basics.tests
+        , Bitwise.tests
+        , Char.tests
+        , CodeGen.tests
+        , Dict.tests
+        , Equality.tests
+        , Json.tests
+        , List.tests
+        , Result.tests
+        , Set.tests
+        , String.tests
+        , Regex.tests
+        , Trampoline.tests
+        ]
 
 
 port runner : Signal (Task.Task x ())
