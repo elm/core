@@ -18,4 +18,3 @@ ln -s $CORE_GIT_DIR $CORE_PACKAGE_DIR
 
 elm-make --yes --output raw-test.js Test.elm
 bash $ELM_IO_PATH raw-test.js test.js 
-node test.js
