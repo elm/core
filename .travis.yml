@@ -2,5 +2,6 @@ language: haskell
 install:
   - npm install -g elm@0.16.0	
 before_script:
-  - tests/set-up-tests.sh
+  - bash tests/set-up-tests.sh
+script:
   - node test.js
