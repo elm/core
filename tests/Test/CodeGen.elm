@@ -6,6 +6,10 @@ import ElmTest exposing (..)
 import Maybe
 import Maybe exposing (..)
 
+
+type Wrapper a = Wrapper a
+
+
 casePrime m' =
     case m' of
         Just x -> x
@@ -17,7 +21,7 @@ patternPrime =
         Nothing -> 0
 
 letQualified =
-    let (Maybe.Just x) = Just 42
+    let (Wrapper x) = Wrapper 42
     in  x
 
 caseQualified =
