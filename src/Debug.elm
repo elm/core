@@ -77,8 +77,8 @@ That means it's easy to add `Debug.watch` to any value.
 
 Note that calling `Debug.watch` on a signal is not useful. Instead, it needs
 to be mapped into the signal (to act on the contained value). So if you want
-to watch a timer signal, instead of `Debug.watch "time" <| Time.every 1000`
-you need `Debug.watch "time" <~ Time.every 1000`.
+to watch a timer signal, instead of `Debug.watch "time" (Time.every 1000)`
+you need `Signal.map (Debug.watch "time") (Time.every 1000)`.
 -}
 watch : String -> a -> a
 watch =
