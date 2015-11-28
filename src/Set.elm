@@ -118,7 +118,7 @@ diff (Set_elm_builtin d1) (Set_elm_builtin d2) =
   Set_elm_builtin <| Dict.diff d1 d2
 
 
-{-| Convert a set into a list.
+{-| Convert a set into a list, sorted from lowest to highest.
 -}
 toList : Set comparable -> List comparable
 toList (Set_elm_builtin d) =
