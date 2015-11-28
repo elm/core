@@ -77,7 +77,7 @@ customButton =
             flow right [ box, box, box ]
 
     main : Signal Element
-    main = boxes <~ check.signal
+    main = Signal.map boxes check.signal
 -}
 checkbox : (Bool -> Signal.Message) -> Bool -> Element
 checkbox =
