@@ -220,7 +220,8 @@ keyValuePairs =
     Native.Json.decodeKeyValuePairs
 
 
-{-| Turn any object into a dictionary of key-value pairs.
+{-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
+decoded with the given decoder.
 
     -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
     planetMasses : Decoder (Dict String Float)
