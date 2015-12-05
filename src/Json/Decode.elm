@@ -207,7 +207,7 @@ object8 =
     Native.Json.decodeObject8
 
 
-{-| Turn any object into a list of key-value pairs. Fails if _any_ key can't be
+{-| Turn any object into a list of key-value pairs. Fails if _any_ value can't be
 decoded with the given decoder.
 
     -- { tom: 89, sue: 92, bill: 97, ... }
