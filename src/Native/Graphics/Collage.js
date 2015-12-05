@@ -411,7 +411,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 
 	function makeTransform(w, h, form, matrices)
 	{
-		var props = form.form._0.props;
+		var props = form.form._0._0.props;
 		var m = A6( Transform.matrix, 1, 0, 0, -1,
 					(w - props.width ) / 2,
 					(h - props.height) / 2 );
@@ -434,12 +434,12 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 		var i = 0;
 		function peekNext()
 		{
-			return i < arr.length ? arr[i].form.ctor : '';
+			return i < arr.length ? arr[i]._0.form.ctor : '';
 		}
 		// assumes that there is a next element
 		function next()
 		{
-			var out = arr[i];
+			var out = arr[i]._0;
 			++i;
 			return out;
 		}
@@ -582,7 +582,7 @@ Elm.Native.Graphics.Collage.make = function(localRuntime) {
 				: NativeElement.update(kid, kid.oldElement, elem);
 
 			node.style.position = 'absolute';
-			node.style.opacity = alpha * form.alpha * elem.props.opacity;
+			node.style.opacity = alpha * form.alpha * elem._0.props.opacity;
 			NativeElement.addTransform(node.style, makeTransform(w, h, form, matrices));
 			node.oldElement = elem;
 			++i;

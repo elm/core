@@ -312,7 +312,7 @@ if (!Elm.fullscreen) {
 			// Figure out what the render functions should be
 			var render;
 			var update;
-			if (initialScene.props)
+			if (initialScene.ctor === 'Element_elm_builtin')
 			{
 				var Element = Elm.Native.Graphics.Element.make(elm);
 				render = Element.render;

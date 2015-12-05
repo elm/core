@@ -186,7 +186,7 @@ to match what they have entered.
 
     nameField : Signal Element
     nameField =
-        field defaultStyle (Signal.message name.address) "Name" <~ name.signal
+        Signal.map (field defaultStyle (Signal.message name.address) "Name") name.signal
 
 When we use the `field` function, we first give it a visual style. This is
 the first argument so that it is easier to define your own custom field

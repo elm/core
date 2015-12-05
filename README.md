@@ -4,10 +4,10 @@
 
 Every Elm project needs the core libraries. They provide basic functionality including:
 
-  * Basic operations like addition and subtraction
-  * Core data structures like lists, dictionaries, and sets
-  * Underlying implementation of Signals
-  * Core rendering libraries
+  * The Basics &mdash; addition, subtraction, etc.
+  * Data Structures &mdash; lists, dictionaries, sets, etc.
+  * Signals &mdash; to make Elm programs reactive
+
 
 ## Default Imports
 
@@ -15,6 +15,7 @@ In all Elm files there is a small set of default imports:
 
 ```elm
 import Basics exposing (..)
+import Debug
 import List exposing ( List, (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )
 import Result exposing ( Result( Ok, Err ) )

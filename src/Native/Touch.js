@@ -42,14 +42,13 @@ Elm.Native.Touch.make = function(localRuntime) {
 	var root = NS.input('touch', []),
 		tapTime = 500,
 		hasTap = false,
-		tap = {_: {}, x: 0, y: 0},
+		tap = { x: 0, y: 0},
 		dict = new Dict();
 
 	function touch(t) {
 		var r = dict.lookup(t.identifier);
 		var point = Utils.getXY(t);
 		return {
-			_: {},
 			id: t.identifier,
 			x: point._0,
 			y: point._1,
@@ -77,7 +76,6 @@ Elm.Native.Touch.make = function(localRuntime) {
 		{
 			hasTap = true;
 			tap = {
-				_: {},
 				x: t.x,
 				y: t.y
 			};
@@ -166,7 +164,7 @@ Elm.Native.Touch.make = function(localRuntime) {
 			hasTap = false;
 			return b;
 		}
-		var sig2 = A3(Signal.filter, pred, {_: {}, x: 0, y: 0}, sig);
+		var sig2 = A3(Signal.filter, pred, {x: 0, y: 0}, sig);
 		sig2.defaultNumberOfKids = 0;
 		return sig2;
 	}();

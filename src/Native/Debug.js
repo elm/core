@@ -7,7 +7,7 @@ Elm.Native.Debug.make = function(localRuntime) {
 		return localRuntime.Native.Debug.values;
 	}
 
-	var toString = Elm.Native.Show.make(localRuntime).toString;
+	var toString = Elm.Native.Utils.make(localRuntime).toString;
 
 	function log(tag, value)
 	{

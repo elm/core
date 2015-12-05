@@ -1,7 +1,7 @@
 module Basics
     ( (==), (/=)
     , (<), (>), (<=), (>=), max, min, Order (..), compare
-    , not, (&&), (||), xor, otherwise
+    , not, (&&), (||), xor
     , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
     , pi, cos, sin, tan, acos, asin, atan, atan2
     , round, floor, ceiling, truncate, toFloat
@@ -28,7 +28,7 @@ are your tuples so big?
 @docs (<), (>), (<=), (>=), max, min, Order, compare
 
 # Booleans
-@docs not, (&&), (||), xor, otherwise
+@docs not, (&&), (||), xor
 
 # Mathematics
 @docs (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
@@ -65,7 +65,6 @@ which happen to be radians.
 import Native.Basics
 import Native.Port
 import Native.Runtime
-import Native.Show
 import Native.Utils
 
 
@@ -386,12 +385,6 @@ not =
   Native.Basics.not
 
 
-{-| Equal to `True`. Useful as the last case of a multi-way-if. -}
-otherwise : Bool
-otherwise =
-  True
-
-
 -- Conversions
 
 {-| Round a number to the nearest integer. -}
@@ -462,7 +455,7 @@ with `Text.fromString` it should look just like the value it came from.
 -}
 toString : a -> String
 toString =
-  Native.Show.toString
+  Native.Utils.toString
 
 
 {-| Put two appendable things together. This includes strings, lists, and text.
@@ -525,7 +518,7 @@ This can also be written as:
       |> scale 2
 -}
 (|>) : a -> (a -> b) -> b
-x |> f =
+(|>) x f =
   f x
 
 
@@ -539,7 +532,7 @@ This can also be written as:
     leftAligned << monospace <| fromString "code"
 -}
 (<|) : (a -> b) -> a -> b
-f <| x =
+(<|) f x =
   f x
 
 

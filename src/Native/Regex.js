@@ -54,7 +54,6 @@ Elm.Native.Regex.make = function(localRuntime) {
 					: Maybe.Just(submatch);
 			}
 			out.push({
-				_: {},
 				match: result[0],
 				submatches: List.fromArray(subs),
 				index: result.index,
@@ -86,7 +85,6 @@ Elm.Native.Regex.make = function(localRuntime) {
 					: Maybe.Just(submatch);
 			}
 			return replacer({
-				_: {},
 				match: match,
 				submatches: List.fromArray(submatches),
 				index: arguments[i - 1],

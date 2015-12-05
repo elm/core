@@ -50,19 +50,20 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 	function newElement(width, height, elementPrim)
 	{
 		return {
-			_: {},
-			element: elementPrim,
-			props: {
-				_: {},
-				id: Utils.guid(),
-				width: width,
-				height: height,
-				opacity: 1,
-				color: Maybe.Nothing,
-				href: '',
-				tag: '',
-				hover: Utils.Tuple0,
-				click: Utils.Tuple0
+			ctor: 'Element_elm_builtin',
+			_0: {
+				element: elementPrim,
+				props: {
+					id: Utils.guid(),
+					width: width,
+					height: height,
+					opacity: 1,
+					color: Maybe.Nothing,
+					href: '',
+					tag: '',
+					hover: Utils.Tuple0,
+					click: Utils.Tuple0
+				}
 			}
 		};
 	}
@@ -314,8 +315,9 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	// must clear right, left, top, bottom, and transform
 	// before calling this function
-	function setPos(pos, elem, e)
+	function setPos(pos, wrappedElement, e)
 	{
+		var elem = wrappedElement._0;
 		var element = elem.element;
 		var props = elem.props;
 		var w = props.width + (element.adjustWidth ? element.adjustWidth : 0);
@@ -403,10 +405,12 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	// RENDER
 
-	function render(elem)
+	function render(wrappedElement)
 	{
+		var elem = wrappedElement._0;
 		return setProps(elem, makeElement(elem));
 	}
+
 	function makeElement(e)
 	{
 		var elem = e.element;
@@ -445,8 +449,10 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 
 	// UPDATE
 
-	function update(node, curr, next)
+	function update(node, wrappedCurrent, wrappedNext)
 	{
+		var curr = wrappedCurrent._0;
+		var next = wrappedNext._0;
 		var rootNode = node;
 		if (node.tagName === 'A')
 		{
@@ -459,7 +465,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		}
 		if (curr.element.ctor !== next.element.ctor)
 		{
-			return render(next);
+			return render(wrappedNext);
 		}
 		var nextE = next.element;
 		var currE = curr.element;
@@ -489,7 +495,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 					|| next.props.width !== curr.props.width
 					|| next.props.height !== curr.props.height)
 				{
-					return render(next);
+					return render(wrappedNext);
 				}
 				updateProps(node, curr, next);
 				return rootNode;
@@ -498,17 +504,17 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 				var arr = List.toArray(nextE._1);
 				for (var i = arr.length; i--; )
 				{
-					arr[i] = arr[i].element.ctor;
+					arr[i] = arr[i]._0.element.ctor;
 				}
 				if (nextE._0.ctor !== currE._0.ctor)
 				{
-					return render(next);
+					return render(wrappedNext);
 				}
 				var nexts = List.toArray(nextE._1);
 				var kids = node.childNodes;
 				if (nexts.length !== kids.length)
 				{
-					return render(next);
+					return render(wrappedNext);
 				}
 				var currs = List.toArray(currE._1);
 				var dir = nextE._0.ctor;
@@ -537,7 +543,7 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 					updateProps(updatedNode, curr, next);
 					return updatedNode;
 				}
-				return render(next);
+				return render(wrappedNext);
 		}
 	}
 

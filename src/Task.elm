@@ -34,7 +34,7 @@ import Result exposing (Result(Ok,Err))
 
 
 {-| Represents asynchronous effects that may fail. It is useful for stuff like
-HTTP and or using browser storage.
+HTTP.
 
 For example, maybe we have a task with the type (`Task String User`). This means
 that when we perform the task, it will either fail with a `String` message or
@@ -200,16 +200,15 @@ mapError f task =
   task `onError` \err -> fail (f err)
 
 
-{-| Helps with handling failure. Instead of having a task fail with some value
-of type `x` it promotes the failure to a `Nothing` and turns all successes into
-`Just` something.
+{-| Translate a task that can fail into a task that can never fail, by
+converting any failure into `Nothing` and any success into `Just` something.
 
     toMaybe (fail "file not found") == succeed Nothing
     toMaybe (succeed 42)            == succeed (Just 42)
 
 This means you can handle the error with the `Maybe` module instead.
 -}
-toMaybe : Task x a -> Task y (Maybe a)
+toMaybe : Task x a -> Task never (Maybe a)
 toMaybe task =
   map Just task `onError` (\_ -> succeed Nothing)
 
@@ -227,16 +226,15 @@ fromMaybe default maybe =
     Nothing -> fail default
 
 
-{-| Helps with handling failure. Instead of having a task fail with some value
-of type `x` it promotes the failure to an `Err` and turns all successes into
-`Ok` something.
+{-| Translate a task that can fail into a task that can never fail, by
+converting any failure into `Err` something and any success into `Ok` something.
 
     toResult (fail "file not found") == succeed (Err "file not found")
     toResult (succeed 42)            == succeed (Ok 42)
 
 This means you can handle the error with the `Result` module instead.
 -}
-toResult : Task x a -> Task y (Result x a)
+toResult : Task x a -> Task never (Result x a)
 toResult task =
   map Ok task `onError` (\msg -> succeed (Err msg))
 

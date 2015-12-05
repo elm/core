@@ -36,8 +36,8 @@ y =
   Signal.map snd position
 
 
-{-| The current state of the left mouse-button.
-True when the button is down, and false otherwise. -}
+{-| The current state of the mouse.
+True when any mouse button is down, and false otherwise. -}
 isDown : Signal Bool
 isDown =
   Native.Mouse.isDown
