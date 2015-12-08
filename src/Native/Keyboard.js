@@ -16,7 +16,7 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 		return {
 			alt: event.altKey,
 			meta: event.metaKey,
-			keyCode: event.keyCode || event.which || event.charCode || 0
+			keyCode: event.keyCode
 		};
 	}
 
