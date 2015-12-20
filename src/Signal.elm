@@ -56,7 +56,7 @@ import Native.Signal
 import Task exposing (Task, succeed, onError)
 
 
-{-| A value that changes over time. So a `(Signal Int))` is an integer that is
+{-| A value that changes over time. So a `(Signal Int)` is an integer that is
 varying as time passes, perhaps representing the current window width of the
 browser. Every signal is updated at discrete moments in response to events in
 the world.
