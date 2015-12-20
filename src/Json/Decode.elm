@@ -210,7 +210,7 @@ object8 =
 {-| Turn any object into a list of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
 decoded with the given decoder.
 
-    -- { tom: 89, sue: 92, bill: 97, ... }
+    -- { "tom": 89, "sue": 92, "bill": 97, ... }
     grades : Decoder (List (String, Int))
     grades =
         keyValuePairs int
@@ -223,7 +223,7 @@ keyValuePairs =
 {-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
 decoded with the given decoder.
 
-    -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
+    -- { "mercury": 0.33, "venus": 4.87, "earth": 5.97, ... }
     planetMasses : Decoder (Dict String Float)
     planetMasses =
         dict float
@@ -238,7 +238,7 @@ dict decoder =
 with something with a very strange shape and when `andThen` does not help
 narrow things down so you can be more targeted.
 
-    -- [ [3,4], { x:0, y:0 }, [5,12] ]
+    -- [ [3,4], { "x":0, "y":0 }, [5,12] ]
 
     points : Decoder (List (Float,Float))
     points =
@@ -284,7 +284,7 @@ float =
 
 {-| Extract an integer.
 
-    -- { ... age: 42 ... }
+    -- { ... "age": 42 ... }
 
     age : Decoder Int
     age =
@@ -297,7 +297,7 @@ int =
 
 {-| Extract a boolean.
 
-    -- { ... checked: true ... }
+    -- { ... "checked": true ... }
 
     checked : Decoder Bool
     checked =
