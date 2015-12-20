@@ -90,8 +90,8 @@ map =
 {-| Using a certain decoder, attempt to parse a JSON string. If the decoder
 fails, you will get a string message telling you why.
 
-    decodeString (tuple2 float float) "[3,4]"                  -- Ok (3,4)
-    decodeString (tuple2 float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
+    decodeString (tuple2 (,) float float) "[3,4]"                  -- Ok (3,4)
+    decodeString (tuple2 (,) float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
 -}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
