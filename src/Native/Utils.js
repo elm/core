@@ -362,7 +362,7 @@ Elm.Native.Utils.make = function(localRuntime) {
 		{
 			return '<null>';
 		}
-		if (type === 'function')
+		else if (type === 'function')
 		{
 			var name = v.func ? v.func.name : v.name;
 			return '<function' + (name === '' ? '' : ': ') + name + '>';
