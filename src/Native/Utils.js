@@ -379,6 +379,9 @@ Elm.Native.Utils.make = function(localRuntime) {
 		{
 			return '"' + addSlashes(v, false) + '"';
 		}
+		else if (v instanceof Date) {
+			return '<date ' + v.toISOString() + '>';
+		}
 		else if (type === 'object' && 'ctor' in v)
 		{
 			if (v.ctor.substring(0, 6) === '_Tuple')
