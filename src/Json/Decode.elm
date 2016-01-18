@@ -207,7 +207,7 @@ object8 =
     Native.Json.decodeObject8
 
 
-{-| Turn any object into a list of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
+{-| Turn any object into a list of key-value pairs, including inherited enumerable properties. Fails if _any_ value can't be
 decoded with the given decoder.
 
     -- { "tom": 89, "sue": 92, "bill": 97, ... }
@@ -220,7 +220,7 @@ keyValuePairs =
     Native.Json.decodeKeyValuePairs
 
 
-{-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
+{-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properties. Fails if _any_ value can't be
 decoded with the given decoder.
 
     -- { "mercury": 0.33, "venus": 4.87, "earth": 5.97, ... }
