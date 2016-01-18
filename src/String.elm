@@ -53,7 +53,10 @@ isEmpty =
   Native.String.isEmpty
 
 
-{-| Add a character to the beginning of a string. -}
+{-| Add a character to the beginning of a string.
+
+    cons 'T' "he truth is out there" == "The truth is out there"
+-}
 cons : Char -> String -> String
 cons =
   Native.String.cons
@@ -199,25 +202,37 @@ slice =
   Native.String.slice
 
 
-{-| Take *n* characters from the left side of a string. -}
+{-| Take *n* characters from the left side of a string.
+
+    left 2 "Mulder" == "Mu"
+-}
 left : Int -> String -> String
 left =
   Native.String.left
 
 
-{-| Take *n* characters from the right side of a string. -}
+{-| Take *n* characters from the right side of a string.
+
+    right 2 "Scully" == "ly"
+-}
 right : Int -> String -> String
 right =
   Native.String.right
 
 
-{-| Drop *n* characters from the left side of a string. -}
+{-| Drop *n* characters from the left side of a string.
+
+    dropLeft 2 "The Lone Gunmen" == "e Lone Gunmen"
+-}
 dropLeft : Int -> String -> String
 dropLeft =
   Native.String.dropLeft
 
 
-{-| Drop *n* characters from the right side of a string. -}
+{-| Drop *n* characters from the right side of a string.
+
+    dropRight 2 "Cigarette Smoking Man" == "Cigarette Smoking M"
+-}
 dropRight : Int -> String -> String
 dropRight =
   Native.String.dropRight
@@ -303,13 +318,18 @@ lines =
 
 {-| Convert a string to all upper case. Useful for case-insensitive comparisons
 and VIRTUAL YELLING.
+
+    toUpper "skinner" == "SKINNER"
 -}
 toUpper : String -> String
 toUpper =
   Native.String.toUpper
 
 
-{-| Convert a string to all lower case. Useful for case-insensitive comparisons. -}
+{-| Convert a string to all lower case. Useful for case-insensitive comparisons.
+
+   toLower "X-FILES" == "x-files"
+-}
 toLower : String -> String
 toLower =
   Native.String.toLower
