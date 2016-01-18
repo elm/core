@@ -90,8 +90,8 @@ map =
 {-| Using a certain decoder, attempt to parse a JSON string. If the decoder
 fails, you will get a string message telling you why.
 
-    decodeString (tuple2 float float) "[3,4]"                  -- Ok (3,4)
-    decodeString (tuple2 float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
+    decodeString (tuple2 (,) float float) "[3,4]"                  -- Ok (3,4)
+    decodeString (tuple2 (,) float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
 -}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
@@ -207,10 +207,10 @@ object8 =
     Native.Json.decodeObject8
 
 
-{-| Turn any object into a list of key-value pairs. Fails if _any_ key can't be
+{-| Turn any object into a list of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
 decoded with the given decoder.
 
-    -- { tom: 89, sue: 92, bill: 97, ... }
+    -- { "tom": 89, "sue": 92, "bill": 97, ... }
     grades : Decoder (List (String, Int))
     grades =
         keyValuePairs int
@@ -220,9 +220,10 @@ keyValuePairs =
     Native.Json.decodeKeyValuePairs
 
 
-{-| Turn any object into a dictionary of key-value pairs.
+{-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properies. Fails if _any_ value can't be
+decoded with the given decoder.
 
-    -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
+    -- { "mercury": 0.33, "venus": 4.87, "earth": 5.97, ... }
     planetMasses : Decoder (Dict String Float)
     planetMasses =
         dict float
@@ -237,7 +238,7 @@ dict decoder =
 with something with a very strange shape and when `andThen` does not help
 narrow things down so you can be more targeted.
 
-    -- [ [3,4], { x:0, y:0 }, [5,12] ]
+    -- [ [3,4], { "x":0, "y":0 }, [5,12] ]
 
     points : Decoder (List (Float,Float))
     points =
@@ -283,7 +284,7 @@ float =
 
 {-| Extract an integer.
 
-    -- { ... age: 42 ... }
+    -- { ... "age": 42 ... }
 
     age : Decoder Int
     age =
@@ -296,7 +297,7 @@ int =
 
 {-| Extract a boolean.
 
-    -- { ... checked: true ... }
+    -- { ... "checked": true ... }
 
     checked : Decoder Bool
     checked =
