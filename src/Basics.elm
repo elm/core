@@ -529,7 +529,7 @@ avoiding parentheses. Consider the following code to create a text element:
 
 This can also be written as:
 
-    leftAligned << monospace <| fromString "code"
+    leftAligned <| monospace <| fromString "code"
 -}
 (<|) : (a -> b) -> a -> b
 (<|) f x =
