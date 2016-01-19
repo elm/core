@@ -358,7 +358,11 @@ Elm.Native.Utils.make = function(localRuntime) {
 	var toString = function(v)
 	{
 		var type = typeof v;
-		if (type === 'function')
+		if (v === null)
+		{
+			return '<null>';
+		}
+		else if (type === 'function')
 		{
 			var name = v.func ? v.func.name : v.name;
 			return '<function' + (name === '' ? '' : ': ') + name + '>';
