@@ -1,8 +1,7 @@
 module Test.CodeGen (tests) where
 
 import Basics exposing (..)
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 import Maybe
 import Maybe exposing (..)
@@ -17,9 +16,9 @@ patternPrime =
         Just x' -> x'
         Nothing -> 0
 
-letQualified =
-    let (Maybe.Just x) = Just 42
-    in  x
+--letQualified =
+--    let (Maybe.Just x) = Just 42
+--    in  x
 
 caseQualified =
     case Just 42 of
@@ -42,8 +41,8 @@ tests =
             ]
         qualifiedPatterns =
             suite "Qualified Patterns"
-            [ test "let" <| assertEqual 42 letQualified
-            , test "case" <| assertEqual 42 caseQualified
+            [ test "case" <| assertEqual 42 caseQualified
+            --, test "let" <| assertEqual 42 letQualified
             ]
         scope =
             suite "Scoping"

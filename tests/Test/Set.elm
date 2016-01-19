@@ -6,8 +6,7 @@ import Set
 import Set exposing (Set)
 import List
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 set : Set Int
 set = Set.fromList [1..100]

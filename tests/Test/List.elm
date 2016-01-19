@@ -1,7 +1,6 @@
 module Test.List (tests) where
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 import Basics exposing (..)
 import Maybe exposing (Maybe(Nothing, Just))
@@ -15,7 +14,7 @@ tests = suite "List Tests"
   , testListOfN 2
   , testListOfN 1000
   ]
-  
+
 
 testListOfN : Int -> Test
 testListOfN n =
@@ -32,33 +31,33 @@ testListOfN n =
             [ test "order" <| assertEqual (n) (foldl (\x acc -> x) 0 xs)
             , test "total" <| assertEqual (xsSum) (foldl (+) 0 xs)
             ]
-            
+
         , suite "foldr"
             [ test "order" <| assertEqual (min 1 n) (foldr (\x acc -> x) 0 xs)
             , test "total" <| assertEqual (xsSum) (foldl (+) 0 xs)
             ]
-            
+
         , suite "map"
             [ test "identity" <| assertEqual (xs) (map identity xs)
             , test "linear" <| assertEqual ([2..(n + 1)]) (map ((+) 1) xs)
             ]
-            
+
         , test "isEmpty" <| assertEqual (n == 0) (isEmpty xs)
-        
+
         , test "length" <| assertEqual (n) (length xs)
-        
+
         , test "reverse" <| assertEqual (xsOpp) (reverse xsNeg)
-        
-        , suite "member" 
+
+        , suite "member"
             [ test "positive" <| assertEqual (True) (member n zs)
             , test "negative" <| assertEqual (False) (member (n + 1) xs)
             ]
-            
+
         , test "head" <|
             if n == 0
             then assertEqual (Nothing) (head xs)
             else assertEqual (Just 1) (head xs)
-            
+
         , suite "filter"
             [ test "none" <| assertEqual ([]) (filter (\x -> x > n) xs)
             , test "one" <| assertEqual ([n]) (filter (\z -> z == n) zs)

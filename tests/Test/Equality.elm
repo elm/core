@@ -3,16 +3,15 @@ module Test.Equality (tests) where
 import Basics exposing (..)
 import Maybe exposing (..)
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 type Different
-    = A String 
+    = A String
     | B (List Int)
 
 tests : Test
-tests = 
-  let diffTests = suite "ADT equality" 
+tests =
+  let diffTests = suite "ADT equality"
         [ test "As eq" <| assert (A "a" == A "a")
         , test "Bs eq" <| assert (B [1] == B [1])
         , test "A left neq" <| assert (A "a" /= B [1])
