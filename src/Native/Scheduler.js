@@ -11,6 +11,9 @@ Elm.Native.Scheduler.make = function(localRuntime)
 	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
+	var MAX_STEPS = 10000;
+
+
 	// TASKS
 
 	function succeed(value)
