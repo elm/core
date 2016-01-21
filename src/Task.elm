@@ -6,8 +6,10 @@ module Task
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
-    , ThreadID, spawn, sleep
-    ) where
+    , Process, spawn, kill
+    )
+    where
+
 {-| Tasks make it easy to describe asynchronous operations that may fail, like HTTP requests or writing to a database.
 For more information, see the [Elm documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 
@@ -23,14 +25,15 @@ For more information, see the [Elm documentation on Tasks](http://elm-lang.org/g
 # Errors
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
-# Threads
-@docs spawn, sleep, ThreadID
+# Processes
+@docs Process, spawn, kill
 -}
 
-import Native.Task
+import Native.Scheduler
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Result exposing (Result(Ok,Err))
+
 
 
 {-| Represents asynchronous effects that may fail. It is useful for stuff like
@@ -44,7 +47,9 @@ for a certain user.
 type Task x a = Task
 
 
+
 -- BASICS
+
 
 {-| A task that succeeds immediately when run.
 
@@ -52,7 +57,7 @@ type Task x a = Task
 -}
 succeed : a -> Task x a
 succeed =
-  Native.Task.succeed
+  Native.Scheduler.succeed
 
 
 {-| A task that fails immediately when run.
@@ -61,10 +66,12 @@ succeed =
 -}
 fail : x -> Task x a
 fail =
-  Native.Task.fail
+  Native.Scheduler.fail
+
 
 
 -- MAPPING
+
 
 {-| Transform a task.
 
@@ -147,17 +154,15 @@ sequence : List (Task x a) -> Task x (List a)
 sequence tasks =
   case tasks of
     [] ->
-        succeed []
+      succeed []
 
     task :: remainingTasks ->
-        map2 (::) task (sequence remainingTasks)
-
-
--- interleave : List (Task x a) -> Task x (List a)
+      map2 (::) task (sequence remainingTasks)
 
 
 
 -- CHAINING
+
 
 {-| Chain together a task and a callback. The first task will run, and if it is
 successful, you give the result to the callback resulting in another task. This
@@ -170,7 +175,7 @@ your servers *and then* lookup their picture once you know their name.
 -}
 andThen : Task x a -> (a -> Task x b) -> Task x b
 andThen =
-  Native.Task.andThen
+  Native.Scheduler.andThen
 
 
 -- ERRORS
@@ -183,7 +188,7 @@ callback to recover.
 -}
 onError : Task x a -> (x -> Task y a) -> Task y a
 onError =
-  Native.Task.catch_
+  Native.Scheduler.onError
 
 
 {-| Transform the error value. This can be useful if you need a bunch of error
@@ -222,8 +227,11 @@ a maybe value like a task.
 fromMaybe : x -> Maybe a -> Task x a
 fromMaybe default maybe =
   case maybe of
-    Just value -> succeed value
-    Nothing -> fail default
+    Just value ->
+      succeed value
+
+    Nothing ->
+      fail default
 
 
 {-| Translate a task that can fail into a task that can never fail, by
@@ -248,55 +256,49 @@ a result like a task.
 fromResult : Result x a -> Task x a
 fromResult result =
   case result of
-    Ok value -> succeed value
-    Err msg -> fail msg
+    Ok value ->
+      succeed value
+
+    Err msg ->
+      fail msg
 
 
--- THREADS
 
-{-| Abstract type that uniquely identifies a thread.
+-- PROCESSES
+
+
+{-| A light-weight process that runs concurrently. You can have a bunch of
+different tasks running in different processes, and the Elm runtime will
+interleave their progress. So if a task is taking too long, we will pause
+it at an `andThen` and switch over to other stuff.
+
+**Note:** We make a distinction between *concurrency* which means interleaving
+different sequences and *parallelism* which means running different
+sequences at the exact same time. For example, a
+[time-sharing system](https://en.wikipedia.org/wiki/Time-sharing) is definitely
+concurrent, but not necessarily parallel. So even though JS runs within a
+single OS-level thread, Elm can still run things concurrently.
 -}
-type ThreadID = ThreadID Int
+type Process = Pid
 
 
-{-| Run a task on a separate thread. This lets you start working with basic
-concurrency. In the following example, `task1` and `task2` will be interleaved.
-If `task1` makes a long HTTP request, we can hop over to `task2` and do some
-work there.
+{-| Run a task in its own light-weight process. In the following example,
+`task1` and `task2` will be interleaved. If `task1` makes a long HTTP request,
+we can hop over to `task2` and do some work there.
 
     spawn task1 `andThen` \_ -> task2
 -}
-spawn : Task x a -> Task y ThreadID
+spawn : Task x a -> Task y Process
 spawn =
-  Native.Task.spawn
+  Native.Process.spawn
 
 
--- kill : ThreadID -> Task x ()
-
-type alias Time = Float
-
-
-{-| Make a thread sleep for a certain amount of time. The following example
-sleeps for 1 second and then succeeds with 42.
-
-    sleep 1000 `andThen` \_ -> succeed 42
+{-| Sometimes you `spawn` a process, but later decide it would be a waste to
+have it keep running and doing stuff. The `kill` function will force a process
+to bail on whatever task it is running. So if there is an HTTP request in
+flight, it will also abort the request.
 -}
-sleep : Time -> Task x ()
-sleep =
-  Native.Task.sleep
+kill : Process -> Task x ()
+kill =
+  Native.Process.kill
 
-
-
-{-- TASK MANAGERS
-
-type Manager
-
-runOne : Task x a -> Manager
-
-runSequential : Events (Task x a) -> Manager
-
-runLatest : Events (Task x a) -> Manager
-
-runConcurrent : Events (Task x a) -> Manager
-
---}
