@@ -290,7 +290,7 @@ we can hop over to `task2` and do some work there.
 -}
 spawn : Task x a -> Task y Process
 spawn =
-  Native.Process.spawn
+  Native.Scheduler.spawn
 
 
 {-| Sometimes you `spawn` a process, but later decide it would be a waste to
@@ -300,5 +300,5 @@ flight, it will also abort the request.
 -}
 kill : Process -> Task x ()
 kill =
-  Native.Process.kill
+  Native.Scheduler.kill
 
