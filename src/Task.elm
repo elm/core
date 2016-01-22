@@ -27,9 +27,9 @@ documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 
 -}
 
-import Native.Scheduler
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
+import Native.Scheduler
 import Process exposing (Process)
 import Result exposing (Result(Ok,Err))
 
