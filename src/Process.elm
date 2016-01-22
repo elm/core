@@ -12,6 +12,7 @@ module Process
 
 -}
 
+import Basics exposing (Never)
 import Native.Scheduler
 
 
