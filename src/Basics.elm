@@ -10,8 +10,9 @@ module Basics
     , isNaN, isInfinite
     , toString, (++)
     , fst, snd
-    , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
-    ) where
+    , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+    )
+    where
 
 {-| Tons of useful functions that get imported by default.
 
@@ -58,7 +59,7 @@ which happen to be radians.
 @docs fst, snd
 
 # Higher-Order Helpers
-@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
+@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
 
 -}
 
@@ -600,3 +601,15 @@ This combines two arguments into a single pair.
 uncurry : (a -> b -> c) -> (a,b) -> c
 uncurry f (a,b) =
   f a b
+
+
+{-| A type that is "uninhabited". There are no values of type `Never`, and its
+primary use is demanding that certain tasks cannot possibly fail.
+
+For example, a task with type `(Task Never Int)` must *always* succeed with an
+integer. For the task to fail, someone would need to say `(Task.fail ???)` but
+since there is no value with type `Never` they could not fill in the question
+marks!
+-}
+type Never = Never Never
+
