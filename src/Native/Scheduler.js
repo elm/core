@@ -32,12 +32,12 @@ Elm.Native.Scheduler.make = function(localRuntime)
 		};
 	}
 
-	function nativeBinding(func, cancel)
+	function nativeBinding(callback)
 	{
 		return {
 			ctor: '_Task_nativeBinding',
-			func: func,
-			cancel: cancel
+			callback: callback,
+			cancel: null
 		};
 	}
 
@@ -72,17 +72,19 @@ Elm.Native.Scheduler.make = function(localRuntime)
 
 	function spawn(task)
 	{
-		var process = {
-			ctor: '_Process',
-			_0: Utils.guid(),
-			root: task,
-			stack: null,
-			mailbox: []
-		}
+		return nativeBinding(function(callback) {
+			var process = {
+				ctor: '_Process',
+				_0: Utils.guid(),
+				root: task,
+				stack: null,
+				mailbox: []
+			}
 
-		enqueue(process);
+			enqueue(process);
 
-		return process;
+			callback(succeed(process));
+		};
 	}
 
 	function send(process, msg)
@@ -96,15 +98,17 @@ Elm.Native.Scheduler.make = function(localRuntime)
 
 	function kill(process)
 	{
-		var root = process.root;
-		if (root.ctor === '_Task_nativeBinding' && root.cancel)
-		{
-			root.cancel();
-		}
+		return nativeBinding(function(callback) {
+			var root = process.root;
+			if (root.ctor === '_Task_nativeBinding' && root.cancel)
+			{
+				root.cancel();
+			}
 
-		process.root = null;
+			process.root = null;
 
-		return Utils.Tuple0;
+			callback(succeed(Utils.Tuple0));
+		};
 	}
 
 	function step(numSteps, process)
@@ -174,7 +178,7 @@ Elm.Native.Scheduler.make = function(localRuntime)
 
 			if (ctor === '_Task_nativeBinding')
 			{
-				root.func(function(newRoot) {
+				root.cancel = root.func(function(newRoot) {
 					process.root = newRoot;
 					enqueue(process);
 				});
