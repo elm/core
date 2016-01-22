@@ -6,7 +6,6 @@ module Task
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
-    , Process, spawn, kill
     )
     where
 
@@ -26,13 +25,12 @@ documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 # Errors
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
-# Processes
-@docs Process, spawn, kill
 -}
 
 import Native.Scheduler
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
+import Process exposing (Process)
 import Result exposing (Result(Ok,Err))
 
 
@@ -262,44 +260,4 @@ fromResult result =
 
     Err msg ->
       fail msg
-
-
-
--- PROCESSES
-
-
-{-| A light-weight process that runs concurrently. You can have a bunch of
-different tasks running in different processes, and the Elm runtime will
-interleave their progress. So if a task is taking too long, we will pause
-it at an `andThen` and switch over to other stuff.
-
-**Note:** We make a distinction between *concurrency* which means interleaving
-different sequences and *parallelism* which means running different
-sequences at the exact same time. For example, a
-[time-sharing system](https://en.wikipedia.org/wiki/Time-sharing) is definitely
-concurrent, but not necessarily parallel. So even though JS runs within a
-single OS-level thread, Elm can still run things concurrently.
--}
-type Process = Pid
-
-
-{-| Run a task in its own light-weight process. In the following example,
-`task1` and `task2` will be interleaved. If `task1` makes a long HTTP request,
-we can hop over to `task2` and do some work there.
-
-    spawn task1 `andThen` \_ -> task2
--}
-spawn : Task x a -> Task y Process
-spawn =
-  Native.Scheduler.spawn
-
-
-{-| Sometimes you `spawn` a process, but later decide it would be a waste to
-have it keep running and doing stuff. The `kill` function will force a process
-to bail on whatever task it is running. So if there is an HTTP request in
-flight, it will also abort the request.
--}
-kill : Process -> Task x ()
-kill =
-  Native.Scheduler.kill
 

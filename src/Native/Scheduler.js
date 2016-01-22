@@ -59,6 +59,14 @@ Elm.Native.Scheduler.make = function(localRuntime)
 		};
 	}
 
+	function receive(callback)
+	{
+		return {
+			ctor: '_Task_receive',
+			callback: callback
+		};
+	}
+
 
 	// PROCESSES
 
@@ -68,7 +76,8 @@ Elm.Native.Scheduler.make = function(localRuntime)
 			ctor: '_Process',
 			_0: Utils.guid(),
 			root: task,
-			stack: null
+			stack: null,
+			mailbox: []
 		}
 
 		enqueue(process);
@@ -76,10 +85,19 @@ Elm.Native.Scheduler.make = function(localRuntime)
 		return process;
 	}
 
+	function send(process, msg)
+	{
+		return nativeBinding(function(callback) {
+			process.mailbox.push(msg);
+			enqueue(process);
+			callback(succeed(Utils.Tuple0));
+		});
+	}
+
 	function kill(process)
 	{
 		var root = process.root;
-		if (root.ctor === '_Task_nativeBinding')
+		if (root.ctor === '_Task_nativeBinding' && root.cancel)
 		{
 			root.cancel();
 		}
@@ -163,6 +181,20 @@ Elm.Native.Scheduler.make = function(localRuntime)
 
 				break;
 			}
+
+			if (ctor === '_Task_receive')
+			{
+				var mailbox = process.mailbox;
+				if (mailbox.length === 0)
+				{
+					break;
+				}
+
+				var msg = mailbox.shift();
+				root = root.callback(msg);
+				++numSteps;
+				continue;
+			}
 		}
 
 		if (numSteps < MAX_STEPS)
@@ -212,6 +244,7 @@ Elm.Native.Scheduler.make = function(localRuntime)
 
 		spawn: spawn,
 		kill: kill,
+		send: F2(send),
 
 		work: work
 	};
