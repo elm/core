@@ -308,7 +308,7 @@ type Three = P | Z | N
 
 
 {-| Specifies a distance from a particular location within a `container`, like
-“20 pixels right and up from the center”. You can use `absolute` or `relative`
+"20 pixels right and up from the center". You can use `absolute` or `relative`
 to specify a `Pos` in pixels or as a percentage of the container.
 -}
 type Pos
@@ -316,8 +316,8 @@ type Pos
     | Relative Float
 
 
-{-| Specifies a position for an element within a `container`, like “the top
-left corner”.
+{-| Specifies a position for an element within a `container`, like "the top
+left corner".
 -}
 type Position = Position RawPosition
 
