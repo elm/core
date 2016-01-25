@@ -146,6 +146,9 @@ wasd : Signal { x:Int, y:Int }
 wasd =
   dropMap (toXY { up = 87, down = 83, left = 65, right = 68 }) keysDown
 
+vimKeys : Signal { x:Int, y:Int }
+vimKeys =
+  dropMap (toXY { up = 75, down = 74, left = 72, right = 76 }) keysDown
 
 {-| Whether an arbitrary key is pressed. -}
 isDown : KeyCode -> Signal Bool
