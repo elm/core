@@ -94,7 +94,7 @@ Elm.Native.Port.make = function(localRuntime) {
 		}
 		function unsubscribe(handler)
 		{
-			subscribers.pop(subscribers.indexOf(handler));
+			subscribers.splice(subscribers.indexOf(handler), 1);
 		}
 
 		function notify(elmValue)
