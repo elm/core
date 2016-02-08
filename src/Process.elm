@@ -28,7 +28,7 @@ sequences at the exact same time. For example, a
 concurrent, but not necessarily parallel. So even though JS runs within a
 single OS-level thread, Elm can still run things concurrently.
 -}
-type Process err msg = Pid
+type Process exit msg = Pid
 
 
 {-| Run a task in its own light-weight process. In the following example,
@@ -52,7 +52,7 @@ have it keep running and doing stuff. The `kill` function will force a process
 to bail on whatever task it is running. So if there is an HTTP request in
 flight, it will also abort the request.
 -}
-kill : Process err msg -> Task x ()
+kill : Process exit msg -> Task x ()
 kill =
   Native.Scheduler.kill
 
@@ -63,7 +63,7 @@ kill =
 messages. If you are defining an `effect module` (which for 99% of readers
 should not be) you will need to use this function.
 -}
-send : Process err msg -> msg -> Task x ()
+send : Process exit msg -> msg -> Task x ()
 send =
   Native.Scheduler.send
 
