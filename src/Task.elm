@@ -1,4 +1,4 @@
-module Task
+effect module Task { command = MyCmd }
     ( Task
     , succeed, fail
     , map, map2, map3, map4, map5, andMap
@@ -6,6 +6,7 @@ module Task
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
+    , perform, performAndIgnore
     )
     where
 
@@ -27,10 +28,11 @@ documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 
 -}
 
+import Basics exposing (Never)
+import Elm exposing (Process)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
-import Process exposing (Process)
 import Result exposing (Result(Ok,Err))
 
 
@@ -43,7 +45,7 @@ that when we perform the task, it will either fail with a `String` message or
 succeed with a `User`. So this could represent a task that is asking a server
 for a certain user.
 -}
-type Task x a = Task
+type Task err ok = Task
 
 
 
@@ -260,4 +262,72 @@ fromResult result =
 
     Err msg ->
       fail msg
+
+
+
+-- COMMANDS
+
+
+type MyCmd msg
+  = Silent (Task Never ())
+  | Noisy (Task Never msg)
+
+
+{-| Command the runtime system to perform a task. You provide a task that
+`Never` fails so that errors are not silently lost. Instead you must use
+functions like `Task.toMaybe` or `Task.toResult` to capture the error and
+handle it in your component.
+-}
+perform : (a -> msg) -> Task Never a -> Cmd [Task] msg
+perform tagger task =
+  command (Noisy (map tagger task))
+
+
+{-| Command the runtime system to perform a task, but do not report the
+result back to your component.
+-}
+performAndIgnore : Task Never () -> Cmd [Task] msg
+performAndIgnore task =
+  command (Silent task)
+
+
+cmdMap : (a -> b) -> MyCmd a -> MyCmd b
+cmdMap tagger cmd =
+  case cmd of
+    Silent task ->
+      Silent task
+
+    Noisy task ->
+      Noisy (map tagger task)
+
+
+
+-- MANAGER
+
+
+init : Task Never ()
+init =
+  succeed ()
+
+
+appUpdate : Process a msg -> Process b Never -> () -> List (MyCmd msg) -> Task Never ()
+appUpdate app self state commands =
+  map
+    (\_ -> ())
+    (sequence (spawnCmd app) commands)
+
+
+selfUpdate : Process a msg -> Process b Never -> () -> Never -> Task Never ()
+selfUpdate app self state selfMsg =
+  succeed ()
+
+
+spawnCmd : Process a msg -> MyCmd msg -> Task x ()
+spawnCmd app cmd =
+  case cmd of
+    Silent task ->
+      Native.Scheduler.spawn task
+
+    Noisy task ->
+      Native.Scheduler.spawn (task `andThen` Native.Scheduler.send app)
 

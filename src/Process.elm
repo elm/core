@@ -13,7 +13,9 @@ module Process
 -}
 
 import Basics exposing (Never)
+import Elm
 import Native.Scheduler
+import Task exposing (Task)
 
 
 {-| A light-weight process that runs concurrently. You can use `Task.spawn` to
@@ -28,7 +30,8 @@ sequences at the exact same time. For example, a
 concurrent, but not necessarily parallel. So even though JS runs within a
 single OS-level thread, Elm can still run things concurrently.
 -}
-type Process exit msg = Pid
+type alias Process exit msgs =
+  Elm.Process exit msgs
 
 
 {-| Run a task in its own light-weight process. In the following example,
