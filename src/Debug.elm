@@ -1,8 +1,8 @@
 module Debug
-    ( log, crash
-    , watch, watchSummary
-    , trace
-    ) where
+  ( log, crash
+  , watch, watchSummary
+  )
+  where
 
 {-| This library is for investigating bugs or performance problems. It should
 *not* be used in production code.
@@ -11,10 +11,9 @@ module Debug
 @docs log, crash
 
 # Time-Travel Debugging
-@docs watch, watchSummary, trace
+@docs watch, watchSummary
 -}
 
-import Graphics.Collage exposing (Form)
 import Native.Debug
 
 
@@ -105,11 +104,4 @@ watchSummary : String -> (a -> b) -> a -> a
 watchSummary =
   Native.Debug.watchSummary
 
-
-{-| Trace all past positions of a `Form` in the debugger. Add this to a `Form`
-and you will see a line tracing its entire history.
--}
-trace : String -> Form -> Form
-trace =
-  Native.Debug.tracePath
 

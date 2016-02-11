@@ -29,15 +29,6 @@ Elm.Native.Debug.make = function(localRuntime) {
 		throw new Error(message);
 	}
 
-	function tracePath(tag, form)
-	{
-		if (localRuntime.debug)
-		{
-			return localRuntime.debug.trace(tag, form);
-		}
-		return form;
-	}
-
 	function watch(tag, value)
 	{
 		if (localRuntime.debug)
@@ -58,7 +49,6 @@ Elm.Native.Debug.make = function(localRuntime) {
 
 	return localRuntime.Native.Debug.values = {
 		crash: crash,
-		tracePath: F2(tracePath),
 		log: F2(log),
 		watch: F2(watch),
 		watchSummary: F3(watchSummary)
