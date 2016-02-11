@@ -26,6 +26,9 @@ documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 # Errors
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
+# Commands
+@docs perform, performAndIgnore
+
 -}
 
 import Basics exposing (Never)
@@ -33,6 +36,7 @@ import Elm exposing (Process)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
+import Platform exposing (Cmd)
 import Result exposing (Result(Ok,Err))
 
 
@@ -314,7 +318,7 @@ appUpdate : Process a msg -> Process b Never -> () -> List (MyCmd msg) -> Task N
 appUpdate app self state commands =
   map
     (\_ -> ())
-    (sequence (spawnCmd app) commands)
+    (sequence (List.map (spawnCmd app) commands))
 
 
 selfUpdate : Process a msg -> Process b Never -> () -> Never -> Task Never ()
