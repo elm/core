@@ -32,11 +32,10 @@ documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 -}
 
 import Basics exposing (Never)
-import Elm exposing (Process)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
-import Platform exposing (Cmd)
+import Platform exposing (Cmd, Process)
 import Result exposing (Result(Ok,Err))
 
 

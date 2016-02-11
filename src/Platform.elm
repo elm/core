@@ -1,6 +1,6 @@
 module Platform
   ( Program
-  , program, programWithFlags
+  , Process, program, programWithFlags
   , Cmd, Sub
   )
   where
@@ -25,17 +25,19 @@ and subscriptions.
 @docs Cmd, Sub
 
 
-# Functions for Platform Implementers
+# Details for Platform Implementers
 
-@docs program, programWithFlags
+@docs Process, program, programWithFlags
 
 -}
 
 
 import Basics exposing (Never)
-import Elm exposing (Process)
 import Native.Platform
 
+
+
+-- EFFECTS
 
 
 {-| A command is a way of telling Elm, “Hey, I want you to do this thing!”
@@ -71,6 +73,10 @@ Tutorial]() and see how they fit into a real application!
 type Sub effects msg = Sub
 
 
+
+-- PROGRAMS
+
+
 {-| Every Elm project will define `main` to be some sort of `Program`. A
 `Program` value captures all the details needed to manage your application,
 including how to initialize things, how to respond to events, etc.
@@ -99,6 +105,13 @@ clear with use, so the important thing is to dive in to things like [the Elm
 Architecture Tutorial]() and try things out in practice!
 -}
 type Program flags effects = Program
+
+
+
+-- DETAILS FOR PLATFORM IMPLEMENTERS
+
+
+type Process exit msgs = Process
 
 
 {-| **You should not use this directly.** This function is needed by the folks

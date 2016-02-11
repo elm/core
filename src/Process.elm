@@ -13,8 +13,8 @@ module Process
 -}
 
 import Basics exposing (Never)
-import Elm
 import Native.Scheduler
+import Platform
 import Task exposing (Task)
 
 
@@ -31,7 +31,7 @@ concurrent, but not necessarily parallel. So even though JS runs within a
 single OS-level thread, Elm can still run things concurrently.
 -}
 type alias Process exit msgs =
-  Elm.Process exit msgs
+  Platform.Process exit msgs
 
 
 {-| Run a task in its own light-weight process. In the following example,
