@@ -146,8 +146,13 @@ indexedMap f xs =
     foldl (::) [] [1,2,3] == [3,2,1]
 -}
 foldl : (a -> b -> b) -> b -> List a -> b
-foldl =
-  Native.List.foldl
+foldl func acc list =
+  case list of
+    [] ->
+      acc
+
+    x :: xs ->
+      foldl func (func x acc) xs
 
 
 {-| Reduce a list from the right.
@@ -440,8 +445,17 @@ intersperse sep xs =
     take 2 [1,2,3,4] == [1,2]
 -}
 take : Int -> List a -> List a
-take =
-  Native.List.take
+take n list =
+  if n <= 0 then
+    []
+
+  else
+    case list of
+      [] ->
+        list
+
+      x :: xs ->
+        x :: take (n - 1) xs
 
 
 {-| Drop the first *n* members of a list.
