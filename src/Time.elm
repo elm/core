@@ -12,7 +12,6 @@ module Time
 -}
 
 import Basics exposing (..)
-import Native.Time
 
 
 {-| Type alias to make it clearer when you are working with time values.
