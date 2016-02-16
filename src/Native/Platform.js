@@ -13,7 +13,15 @@ Elm.Native.Platform.make = function(localRuntime) {
 		return details;
 	}
 
+	function dummyRenderer(parent, tagger, initialUnit)
+	{
+		return {
+			update: function(newUnit) {}
+		};
+	}
+
 	return localRuntime.Native.Platform.values = {
-		program: program
+		program: program,
+		dummyRenderer: dummyRenderer
 	};
 };

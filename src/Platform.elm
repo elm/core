@@ -122,7 +122,7 @@ program
     , update : msg -> model -> (model, Cmd effects msg)
     , subscriptions : model -> Sub effects msg
     , view : model -> view
-    , renderer : Process Never msg -> Renderer view
+    , renderer : Renderer view msg
     }
   -> Program flags effects
 program =
@@ -137,14 +137,17 @@ programWithFlags
     , update : msg -> model -> (model, Cmd effects msg)
     , subscriptions : model -> Sub effects msg
     , view : model -> view
-    , renderer : Process Never msg -> Renderer view
+    , renderer : Renderer view msg
     }
   -> Program flags effects
 programWithFlags =
   Native.Platform.program
 
 
-type Renderer view = Renderer
+type Renderer view msg = Renderer
 
 
--- dummyRenderer : Process Never msg -> Renderer ()
+dummyRenderer : Renderer () msg
+dummyRenderer =
+  Native.Platform.dummyRenderer
+
