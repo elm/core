@@ -106,7 +106,7 @@ fpsWhen =
 {-| Takes a time interval `t`. The resulting signal is the current time, updated
 every `t`.
 
-Note: Calling `every 100` twice gives two independently running timers.
+Note: Calling `every (100 * millisecond)` twice gives two independently running timers.
 -}
 every : Time -> Signal Time
 every =
