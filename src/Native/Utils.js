@@ -180,36 +180,6 @@ function update(oldRecord, updatedFields)
 }
 
 
-// MOUSE COORDINATES
-
-function getXY(e)
-{
-	var posx = 0;
-	var posy = 0;
-	if (e.pageX || e.pageY)
-	{
-		posx = e.pageX;
-		posy = e.pageY;
-	}
-	else if (e.clientX || e.clientY)
-	{
-		posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-		posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-	}
-
-	if (localRuntime.isEmbed())
-	{
-		var rect = localRuntime.node.getBoundingClientRect();
-		var relx = rect.left + document.body.scrollLeft + document.documentElement.scrollLeft;
-		var rely = rect.top + document.body.scrollTop + document.documentElement.scrollTop;
-		// TODO: figure out if there is a way to avoid rounding here
-		posx = posx - Math.round(relx) - localRuntime.node.clientLeft;
-		posy = posy - Math.round(rely) - localRuntime.node.clientTop;
-	}
-	return Tuple2(posx, posy);
-}
-
-
 //// LIST STUFF ////
 
 var Nil = { ctor: '[]' };
