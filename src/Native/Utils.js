@@ -399,18 +399,6 @@ var toString = function(v)
 			}
 			return name + '.fromList ' + toString(list);
 		}
-		else if (v.ctor.slice(0, 5) === 'Text:')
-		{
-			return '<text>';
-		}
-		else if (v.ctor === 'Element_elm_builtin')
-		{
-			return '<element>'
-		}
-		else if (v.ctor === 'Form_elm_builtin')
-		{
-			return '<form>'
-		}
 		else
 		{
 			var output = '';
@@ -423,10 +411,6 @@ var toString = function(v)
 			}
 			return v.ctor + output;
 		}
-	}
-	else if (type === 'object' && 'notify' in v && 'id' in v)
-	{
-		return '<signal>';
 	}
 	else if (type === 'object')
 	{
