@@ -1,8 +1,10 @@
-//import Native.Utils as Utils
+//import Native.Utils //
+
+var _elm_lang$core$Native_Debug = function() {
 
 function log(tag, value)
 {
-	var msg = tag + ': ' + Utils.toString(value);
+	var msg = tag + ': ' + _elm_lang$core$Native_Utils.toString(value);
 	var process = process || {};
 	if (process.stdout)
 	{
@@ -24,3 +26,5 @@ return {
 	crash: crash,
 	log: F2(log)
 };
+
+}();

@@ -1,4 +1,6 @@
-//import Native.List as List
+//import Native.List //
+
+var _elm_lang$core$Native_Array = function() {
 
 // A RRB-Tree has two distinct data types.
 // Leaf -> "height"  is always 0
@@ -298,7 +300,7 @@ function push_(item, a)
 // Converts an array into a list of elements.
 function toList(a)
 {
-	return toList_(List.Nil, a);
+	return toList_(_elm_lang$core$Native_List.Nil, a);
 }
 
 function toList_(list, a)
@@ -307,7 +309,7 @@ function toList_(list, a)
 	{
 		list =
 			a.height === 0
-				? List.Cons(a.table[i], list)
+				? _elm_lang$core$Native_List.Cons(a.table[i], list)
 				: toList_(list, a.table[i]);
 	}
 	return list;
@@ -961,3 +963,5 @@ return {
 	toJSArray: toJSArray,
 	fromJSArray: fromJSArray
 };
+
+}();

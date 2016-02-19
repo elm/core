@@ -1,9 +1,6 @@
-//import Native.Array as ElmArray
-//import Native.List as List
-//import Maybe
-//import Result
-//import Native.Utils as Utils
+//import Maybe, Native.Array, Native.List, Native.Utils, Result //
 
+var _elm_lang$core$Native_Json = function() {
 
 function crash(expected, actual)
 {
@@ -93,7 +90,7 @@ function decodeArray(decoder)
 			{
 				array[i] = decoder(value[i]);
 			}
-			return ElmArray.fromJSArray(array);
+			return _elm_lang$core$Native_Array.fromJSArray(array);
 		}
 		crash('an Array', value);
 	};
@@ -109,10 +106,10 @@ function decodeList(decoder)
 		if (value instanceof Array)
 		{
 			var len = value.length;
-			var list = List.Nil;
+			var list = _elm_lang$core$Native_List.Nil;
 			for (var i = len; i--; )
 			{
-				list = List.Cons( decoder(value[i]), list );
+				list = _elm_lang$core$Native_List.Cons( decoder(value[i]), list );
 			}
 			return list;
 		}
@@ -129,11 +126,11 @@ function decodeMaybe(decoder)
 	{
 		try
 		{
-			return Maybe.Just(decoder(value));
+			return _elm_lang$core$Maybe$Just(decoder(value));
 		}
 		catch(e)
 		{
-			return Maybe.Nothing;
+			return _elm_lang$core$Maybe$Nothing;
 		}
 	};
 }
@@ -168,12 +165,12 @@ function decodeKeyValuePairs(decoder)
 
 		if (isObject)
 		{
-			var keyValuePairs = List.Nil;
+			var keyValuePairs = _elm_lang$core$Native_List.Nil;
 			for (var key in value)
 			{
 				var elmValue = decoder(value[key]);
-				var pair = Utils.Tuple2(key, elmValue);
-				keyValuePairs = List.Cons(pair, keyValuePairs);
+				var pair = _elm_lang$core$Native_Utils.Tuple2(key, elmValue);
+				keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
 			}
 			return keyValuePairs;
 		}
@@ -415,11 +412,11 @@ function runDecoderValue(decoder, value)
 {
 	try
 	{
-		return Result.Ok(decoder(value));
+		return _elm_lang$core$Result$Ok(decoder(value));
 	}
 	catch(e)
 	{
-		return Result.Err(e.message);
+		return _elm_lang$core$Result$Err(e.message);
 	}
 }
 
@@ -490,11 +487,11 @@ function get(decoder, value)
 {
 	try
 	{
-		return Result.Ok(decoder(value));
+		return _elm_lang$core$Result$Ok(decoder(value));
 	}
 	catch(e)
 	{
-		return Result.Err(e.message);
+		return _elm_lang$core$Result$Err(e.message);
 	}
 }
 
@@ -505,11 +502,11 @@ function runDecoderString(decoder, string)
 {
 	try
 	{
-		return Result.Ok(decoder(JSON.parse(string)));
+		return _elm_lang$core$Result$Ok(decoder(JSON.parse(string)));
 	}
 	catch(e)
 	{
-		return Result.Err(e.message);
+		return _elm_lang$core$Result$Err(e.message);
 	}
 }
 
@@ -583,8 +580,9 @@ return {
 
 	identity: identity,
 	encodeNull: null,
-	encodeArray: ElmArray.toJSArray,
-	encodeList: List.toArray,
+	encodeArray: _elm_lang$core$Native_Array.toJSArray,
+	encodeList: _elm_lang$core$Native_List.toArray,
 	encodeObject: encodeObject
-
 };
+
+}();

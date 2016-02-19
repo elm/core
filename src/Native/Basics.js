@@ -1,4 +1,6 @@
-//import Native.Utils as Utils
+//import Native.Utils //
+
+var _elm_lang$core$Native_Basics = function() {
 
 function div(a, b)
 {
@@ -34,15 +36,26 @@ function abs(n)
 
 function min(a, b)
 {
-	return Utils.cmp(a, b) < 0 ? a : b;
+	return _elm_lang$core$Native_Utils.cmp(a, b) < 0 ? a : b;
 }
 function max(a, b)
 {
-	return Utils.cmp(a, b) > 0 ? a : b;
+	return _elm_lang$core$Native_Utils.cmp(a, b) > 0 ? a : b;
 }
 function clamp(lo, hi, n)
 {
-	return Utils.cmp(n, lo) < 0 ? lo : Utils.cmp(n, hi) > 0 ? hi : n;
+	return _elm_lang$core$Native_Utils.cmp(n, lo) < 0
+		? lo
+		: _elm_lang$core$Native_Utils.cmp(n, hi) > 0
+			? hi
+			: n;
+}
+
+var ord = ['LT', 'EQ', 'GT'];
+
+function compare(x, y)
+{
+	return { ctor: ord[_elm_lang$core$Native_Utils.cmp(x, y) + 1] };
 }
 
 function xor(a, b)
@@ -75,13 +88,13 @@ function fromPolar(point)
 {
 	var r = point._0;
 	var t = point._1;
-	return Utils.Tuple2(r * Math.cos(t), r * Math.sin(t));
+	return _elm_lang$core$Native_Utils.Tuple2(r * Math.cos(t), r * Math.sin(t));
 }
 function toPolar(point)
 {
 	var x = point._0;
 	var y = point._1;
-	return Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
+	return _elm_lang$core$Native_Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 }
 
 return {
@@ -111,7 +124,7 @@ return {
 	min: F2(min),
 	max: F2(max),
 	clamp: F3(clamp),
-	compare: Utils.compare,
+	compare: F2(compare),
 
 	xor: F2(xor),
 	not: not,
@@ -124,3 +137,5 @@ return {
 	isNaN: isNaN,
 	isInfinite: isInfinite
 };
+
+}();

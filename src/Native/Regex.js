@@ -1,5 +1,6 @@
-//import Native.List as List
-//import Maybe
+//import Maybe, Native.List //
+
+var _elm_lang$core$Native_Regex = function() {
 
 function escape(str)
 {
@@ -37,19 +38,19 @@ function find(n, re, str)
 		{
 			var submatch = result[i];
 			subs[--i] = submatch === undefined
-				? Maybe.Nothing
-				: Maybe.Just(submatch);
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
 		}
 		out.push({
 			match: result[0],
-			submatches: List.fromArray(subs),
+			submatches: _elm_lang$core$Native_List.fromArray(subs),
 			index: result.index,
 			number: number
 		});
 		prevLastIndex = re.lastIndex;
 	}
 	re.lastIndex = lastIndex;
-	return List.fromArray(out);
+	return _elm_lang$core$Native_List.fromArray(out);
 }
 
 function replace(n, re, replacer, string)
@@ -68,12 +69,12 @@ function replace(n, re, replacer, string)
 		{
 			var submatch = arguments[i];
 			submatches[--i] = submatch === undefined
-				? Maybe.Nothing
-				: Maybe.Just(submatch);
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
 		}
 		return replacer({
 			match: match,
-			submatches: List.fromArray(submatches),
+			submatches: _elm_lang$core$Native_List.fromArray(submatches),
 			index: arguments[i - 1],
 			number: count
 		});
@@ -86,7 +87,7 @@ function split(n, re, str)
 	n = n.ctor === 'All' ? Infinity : n._0;
 	if (n === Infinity)
 	{
-		return List.fromArray(str.split(re));
+		return _elm_lang$core$Native_List.fromArray(str.split(re));
 	}
 	var string = str;
 	var result;
@@ -99,7 +100,7 @@ function split(n, re, str)
 		start = re.lastIndex;
 	}
 	out.push(string.slice(start));
-	return List.fromArray(out);
+	return _elm_lang$core$Native_List.fromArray(out);
 }
 
 return {
@@ -112,3 +113,5 @@ return {
 	replace: F4(replace),
 	split: F3(split)
 };
+
+}();

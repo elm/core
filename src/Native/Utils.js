@@ -1,3 +1,6 @@
+//import //
+
+var _elm_lang$core$Native_Utils = function() {
 
 // COMPARISONS
 
@@ -51,18 +54,13 @@ function eq(rootX, rootY)
 	return true;
 }
 
-// code in Generate/JavaScript.hs depends on the particular
-// integer values assigned to LT, EQ, and GT
-var LT = -1, EQ = 0, GT = 1, ord = ['LT', 'EQ', 'GT'];
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
 
-function compare(x, y)
+var LT = -1, EQ = 0, GT = 1;
+
+function cmp(x, y)
 {
-	return {
-		ctor: ord[cmp(x, y) + 1]
-	};
-}
-
-function cmp(x, y) {
 	var ord;
 	if (typeof x !== 'object')
 	{
@@ -177,16 +175,6 @@ function Cons(hd, tl)
 		_0: hd,
 		_1: tl
 	};
-}
-
-function list(arr)
-{
-	var out = Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = Cons(arr[i], out);
-	}
-	return out;
 }
 
 function range(lo, hi)
@@ -419,7 +407,6 @@ function addSlashes(str, isChar)
 return {
 	eq: eq,
 	cmp: cmp,
-	compare: F2(compare),
 	Tuple0: Tuple0,
 	Tuple2: Tuple2,
 	chr: chr,
@@ -430,7 +417,6 @@ return {
 
 	Nil: Nil,
 	Cons: Cons,
-	list: list,
 	range: range,
 	append: F2(append),
 
@@ -440,3 +426,5 @@ return {
 
 	toString: toString
 };
+
+}();

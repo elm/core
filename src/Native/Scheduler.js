@@ -1,5 +1,6 @@
-//import Native.Utils as Utils
+//import Native.Utils //
 
+var _elm_lang$core$Native_Scheduler = function() {
 
 var MAX_STEPS = 10000;
 
@@ -65,7 +66,7 @@ function spawn(task)
 	return nativeBinding(function(callback) {
 		var process = {
 			ctor: '_Process',
-			_0: Utils.guid(),
+			_0: _elm_lang$core$Native_Utils.guid(),
 			root: task,
 			stack: null,
 			mailbox: []
@@ -82,7 +83,7 @@ function send(process, msg)
 	return nativeBinding(function(callback) {
 		process.mailbox.push(msg);
 		enqueue(process);
-		callback(succeed(Utils.Tuple0));
+		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
 	});
 }
 
@@ -97,7 +98,7 @@ function kill(process)
 
 		process.root = null;
 
-		callback(succeed(Utils.Tuple0));
+		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
 	};
 }
 
@@ -242,3 +243,5 @@ return {
 
 	work: work
 };
+
+}();

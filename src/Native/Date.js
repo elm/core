@@ -1,11 +1,13 @@
-//import Result
+//import Result //
+
+var _elm_lang$core$Native_Date = function() {
 
 function fromString(str)
 {
 	var date = new Date(str);
 	return isNaN(date.getTime())
-		? Result.Err('unable to parse \'' + str + '\' as a date')
-		: Result.Ok(date);
+		? _elm_lang$core$Result$Err('unable to parse \'' + str + '\' as a date')
+		: _elm_lang$core$Result$Ok(date);
 }
 
 var dayTable = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -27,3 +29,5 @@ return {
 	fromTime: function(t) { return new Date(t); },
 	dayOfWeek: function(d) { return { ctor: dayTable[d.getDay()] }; }
 };
+
+}();

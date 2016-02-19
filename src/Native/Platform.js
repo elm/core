@@ -1,3 +1,6 @@
+//import //
+
+var _elm_lang$core$Native_Platform = function() {
 
 function program(details)
 {
@@ -15,3 +18,5 @@ return {
 	program: program,
 	dummyRenderer: dummyRenderer
 };
+
+}();

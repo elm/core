@@ -1,9 +1,23 @@
-//import Native.Utils as Utils
+//import Native.Utils //
 
-var Nil = Utils.Nil;
-var Cons = Utils.Cons;
+var _elm_lang$core$Native_List = function() {
 
-var fromArray = Utils.list;
+var Nil = { ctor: '[]' };
+
+function Cons(hd, tl)
+{
+	return { ctor: '::', _0: hd, _1: tl };
+}
+
+function fromArray(arr)
+{
+	var out = Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = Cons(arr[i], out);
+	}
+	return out;
+}
 
 function toArray(xs)
 {
@@ -91,7 +105,7 @@ function map5(f, vs, ws, xs, ys, zs)
 function sortBy(f, xs)
 {
 	return fromArray(toArray(xs).sort(function(a, b) {
-		return Utils.cmp(f(a), f(b));
+		return _elm_lang$core$Native_Utils.cmp(f(a), f(b));
 	}));
 }
 
@@ -119,3 +133,5 @@ return {
 	sortBy: F2(sortBy),
 	sortWith: F2(sortWith)
 };
+
+}();

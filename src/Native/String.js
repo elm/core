@@ -1,7 +1,6 @@
-//import Maybe
-//import Native.List as List
-//import Native.Utils as Utils
-//import Result
+//import Maybe, Native.List, Native.Utils, Result //
+
+var _elm_lang$core$Native_String = function() {
 
 function isEmpty(str)
 {
@@ -16,9 +15,9 @@ function uncons(str)
 	var hd = str[0];
 	if (hd)
 	{
-		return Maybe.Just(Utils.Tuple2(Utils.chr(hd), str.slice(1)));
+		return _elm_lang$core$Maybe$Just(_elm_lang$core$Native_Utils.Tuple2(_elm_lang$core$Native_Utils.chr(hd), str.slice(1)));
 	}
-	return Maybe.Nothing;
+	return _elm_lang$core$Maybe$Nothing;
 }
 function append(a, b)
 {
@@ -26,7 +25,7 @@ function append(a, b)
 }
 function concat(strs)
 {
-	return List.toArray(strs).join('');
+	return _elm_lang$core$Native_List.toArray(strs).join('');
 }
 function length(str)
 {
@@ -37,13 +36,13 @@ function map(f, str)
 	var out = str.split('');
 	for (var i = out.length; i--; )
 	{
-		out[i] = f(Utils.chr(out[i]));
+		out[i] = f(_elm_lang$core$Native_Utils.chr(out[i]));
 	}
 	return out.join('');
 }
 function filter(pred, str)
 {
-	return str.split('').map(Utils.chr).filter(pred).join('');
+	return str.split('').map(_elm_lang$core$Native_Utils.chr).filter(pred).join('');
 }
 function reverse(str)
 {
@@ -54,7 +53,7 @@ function foldl(f, b, str)
 	var len = str.length;
 	for (var i = 0; i < len; ++i)
 	{
-		b = A2(f, Utils.chr(str[i]), b);
+		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
 	}
 	return b;
 }
@@ -62,17 +61,17 @@ function foldr(f, b, str)
 {
 	for (var i = str.length; i--; )
 	{
-		b = A2(f, Utils.chr(str[i]), b);
+		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
 	}
 	return b;
 }
 function split(sep, str)
 {
-	return List.fromArray(str.split(sep));
+	return _elm_lang$core$Native_List.fromArray(str.split(sep));
 }
 function join(sep, strs)
 {
-	return List.toArray(strs).join(sep);
+	return _elm_lang$core$Native_List.toArray(strs).join(sep);
 }
 function repeat(n, str)
 {
@@ -136,11 +135,11 @@ function trimRight(str)
 
 function words(str)
 {
-	return List.fromArray(str.trim().split(/\s+/g));
+	return _elm_lang$core$Native_List.fromArray(str.trim().split(/\s+/g));
 }
 function lines(str)
 {
-	return List.fromArray(str.split(/\r\n|\r|\n/g));
+	return _elm_lang$core$Native_List.fromArray(str.split(/\r\n|\r|\n/g));
 }
 
 function toUpper(str)
@@ -156,7 +155,7 @@ function any(pred, str)
 {
 	for (var i = str.length; i--; )
 	{
-		if (pred(Utils.chr(str[i])))
+		if (pred(_elm_lang$core$Native_Utils.chr(str[i])))
 		{
 			return true;
 		}
@@ -167,7 +166,7 @@ function all(pred, str)
 {
 	for (var i = str.length; i--; )
 	{
-		if (!pred(Utils.chr(str[i])))
+		if (!pred(_elm_lang$core$Native_Utils.chr(str[i])))
 		{
 			return false;
 		}
@@ -198,7 +197,7 @@ function indexes(sub, str)
 		is.push(i);
 		i = i + subLen;
 	}
-	return List.fromArray(is);
+	return _elm_lang$core$Native_List.fromArray(is);
 }
 
 function toInt(s)
@@ -206,14 +205,14 @@ function toInt(s)
 	var len = s.length;
 	if (len === 0)
 	{
-		return Result.Err("could not convert string '" + s + "' to an Int" );
+		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
 	}
 	var start = 0;
 	if (s[0] === '-')
 	{
 		if (len === 1)
 		{
-			return Result.Err("could not convert string '" + s + "' to an Int" );
+			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
 		}
 		start = 1;
 	}
@@ -222,10 +221,10 @@ function toInt(s)
 		var c = s[i];
 		if (c < '0' || '9' < c)
 		{
-			return Result.Err("could not convert string '" + s + "' to an Int" );
+			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
 		}
 	}
-	return Result.Ok(parseInt(s, 10));
+	return _elm_lang$core$Result$Ok(parseInt(s, 10));
 }
 
 function toFloat(s)
@@ -233,14 +232,14 @@ function toFloat(s)
 	var len = s.length;
 	if (len === 0)
 	{
-		return Result.Err("could not convert string '" + s + "' to a Float" );
+		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
 	}
 	var start = 0;
 	if (s[0] === '-')
 	{
 		if (len === 1)
 		{
-			return Result.Err("could not convert string '" + s + "' to a Float" );
+			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
 		}
 		start = 1;
 	}
@@ -260,18 +259,18 @@ function toFloat(s)
 				continue;
 			}
 		}
-		return Result.Err("could not convert string '" + s + "' to a Float" );
+		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
 	}
-	return Result.Ok(parseFloat(s));
+	return _elm_lang$core$Result$Ok(parseFloat(s));
 }
 
 function toList(str)
 {
-	return List.fromArray(str.split('').map(Utils.chr));
+	return _elm_lang$core$Native_List.fromArray(str.split('').map(_elm_lang$core$Native_Utils.chr));
 }
 function fromList(chars)
 {
-	return List.toArray(chars).join('');
+	return _elm_lang$core$Native_List.toArray(chars).join('');
 }
 
 return {
@@ -324,3 +323,5 @@ return {
 	toList: toList,
 	fromList: fromList
 };
+
+}();
