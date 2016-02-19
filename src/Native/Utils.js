@@ -412,7 +412,6 @@ return {
 	chr: chr,
 	update: update,
 	guid: guid,
-	getXY: getXY,
 
 	Nil: Nil,
 	Cons: Cons,
