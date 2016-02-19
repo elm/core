@@ -1,9 +1,9 @@
 
 // COMPARISONS
 
-function eq(l, r)
+function eq(rootX, rootY)
 {
-	var stack = [{'x': l, 'y': r}];
+	var stack = [{ x: rootX, y: rootY }];
 	while (stack.length > 0)
 	{
 		var front = stack.pop();
@@ -23,7 +23,7 @@ function eq(l, r)
 				{
 					if (i !== 'ctor')
 					{
-						stack.push({ 'x': x[i], 'y': y[i] });
+						stack.push({ x: x[i], y: y[i] });
 					}
 				}
 				else
@@ -33,7 +33,7 @@ function eq(l, r)
 			}
 			if ('ctor' in x)
 			{
-				stack.push({'x': x.ctor, 'y': y.ctor});
+				stack.push({ x: x.ctor, y: y.ctor});
 			}
 			if (c !== Object.keys(y).length)
 			{
