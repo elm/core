@@ -1,6 +1,6 @@
 //import Result
 
-function readDate(str)
+function fromString(str)
 {
 	var date = new Date(str);
 	return isNaN(date.getTime())
@@ -15,7 +15,7 @@ var monthTable =
 
 
 return {
-	read: readDate,
+	fromString: fromString,
 	year: function(d) { return d.getFullYear(); },
 	month: function(d) { return { ctor: monthTable[d.getMonth()] }; },
 	day: function(d) { return d.getDate(); },

@@ -3,7 +3,8 @@ module Date
     , year, month, Month(..)
     , day, dayOfWeek, Day(..)
     , hour, minute, second, millisecond
-    ) where
+    )
+    where
 
 {-| Library for working with dates. Email the mailing list if you encounter
 issues with internationalization or locale formatting.
@@ -46,7 +47,7 @@ type Month
 -}
 fromString : String -> Result String Date
 fromString =
-  Native.Date.read
+  Native.Date.fromString
 
 
 {-| Convert a date into a time since midnight (UTC) of 1 January 1970 (i.e.
