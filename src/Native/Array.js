@@ -129,7 +129,7 @@ function initialize_(f, h, from, to)
 
 function fromList(list)
 {
-	if (list === List.Nil)
+	if (list.ctor === '[]')
 	{
 		return empty;
 	}
