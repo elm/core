@@ -1,4 +1,3 @@
-//import Char
 //import Maybe
 //import Native.List as List
 //import Native.Utils as Utils
@@ -220,7 +219,8 @@ function toInt(s)
 	}
 	for (var i = start; i < len; ++i)
 	{
-		if (!Char.isDigit(s[i]))
+		var c = s[i];
+		if (c < '0' || '9' < c)
 		{
 			return Result.Err("could not convert string '" + s + "' to an Int" );
 		}
@@ -247,11 +247,12 @@ function toFloat(s)
 	var dotCount = 0;
 	for (var i = start; i < len; ++i)
 	{
-		if (Char.isDigit(s[i]))
+		var c = s[i];
+		if ('0' <= c && c <= '9')
 		{
 			continue;
 		}
-		if (s[i] === '.')
+		if (c === '.')
 		{
 			dotCount += 1;
 			if (dotCount <= 1)
