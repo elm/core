@@ -281,7 +281,7 @@ type MyCmd msg
 functions like `Task.toMaybe` or `Task.toResult` to capture the error and
 handle it in your component.
 -}
-perform : (a -> msg) -> Task Never a -> Cmd [Task] msg
+perform : (a -> msg) -> Task Never a -> Cmd msg
 perform tagger task =
   command (Noisy (map tagger task))
 
@@ -289,7 +289,7 @@ perform tagger task =
 {-| Command the runtime system to perform a task, but do not report the
 result back to your component.
 -}
-performAndIgnore : Task Never () -> Cmd [Task] msg
+performAndIgnore : Task Never () -> Cmd msg
 performAndIgnore task =
   command (Silent task)
 
