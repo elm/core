@@ -122,7 +122,7 @@ function cmp(x, y) {
 }
 
 
-// TUPLES
+// COMMON VALUES
 
 var Tuple0 = {
 	ctor: '_Tuple0'
@@ -137,21 +137,9 @@ function Tuple2(x, y)
 	};
 }
 
-
-// LITERALS
-
 function chr(c)
 {
-	var x = new String(c);
-	x.isChar = true;
-	return x;
-}
-
-function txt(str)
-{
-	var t = new String(str);
-	t.text = true;
-	return t;
+	return new String(c);
 }
 
 
@@ -329,7 +317,7 @@ var toString = function(v)
 	{
 		return v + '';
 	}
-	else if ((v instanceof String) && v.isChar)
+	else if (v instanceof String)
 	{
 		return '\'' + addSlashes(v, true) + '\'';
 	}
