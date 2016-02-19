@@ -297,10 +297,6 @@ function formatValue(value)
 
 // TO STRING
 
-var _Array;
-var Dict;
-var List;
-
 var toString = function(v)
 {
 	var type = typeof v;
@@ -339,11 +335,7 @@ var toString = function(v)
 		}
 		else if (v.ctor === '_Array')
 		{
-			if (!_Array)
-			{
-				_Array = Elm.Array.make(localRuntime);
-			}
-			var list = _Array.toList(v);
+			var list = _Array$toList(v); // IMPORT
 			return 'Array.fromList ' + toString(list);
 		}
 		else if (v.ctor === '::')
@@ -363,25 +355,16 @@ var toString = function(v)
 		}
 		else if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
 		{
-			if (!Dict)
-			{
-				Dict = Elm.Dict.make(localRuntime);
-			}
-			var list;
-			var name;
+			var name, list;
 			if (v.ctor === 'Set_elm_builtin')
 			{
-				if (!List)
-				{
-					List = Elm.List.make(localRuntime);
-				}
 				name = 'Set';
-				list = A2(List.map, function(x) {return x._0; }, Dict.toList(v._0));
+				list = A2(_List$map, function(x) {return x._0; }, _Dict$toList(v._0)); // IMPORT
 			}
 			else
 			{
 				name = 'Dict';
-				list = Dict.toList(v);
+				list = _Dict$toList(v); // IMPORT
 			}
 			return name + '.fromList ' + toString(list);
 		}
