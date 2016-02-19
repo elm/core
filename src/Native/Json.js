@@ -535,7 +535,7 @@ function encodeObject(keyValuePairs)
 	return obj;
 }
 
-return localRuntime.Native.Json.values = {
+return {
 	encode: F2(encode),
 	runDecoderString: F2(runDecoderString),
 	runDecoderValue: F2(runDecoderValue),
