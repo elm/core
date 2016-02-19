@@ -16,20 +16,18 @@ function eq(rootX, rootY)
 		if (typeof x === 'object')
 		{
 			var c = 0;
-			for (var i in x)
+			for (var key in x)
 			{
 				++c;
-				if (i in y)
-				{
-					if (i !== 'ctor')
-					{
-						stack.push({ x: x[i], y: y[i] });
-					}
-				}
-				else
+				if (!(key in y))
 				{
 					return false;
 				}
+				if (key === 'ctor')
+				{
+					continue;
+				}
+				stack.push({ x: x[key], y: y[key] });
 			}
 			if ('ctor' in x)
 			{
