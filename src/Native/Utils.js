@@ -410,7 +410,6 @@ return {
 	Tuple0: Tuple0,
 	Tuple2: Tuple2,
 	chr: chr,
-	txt: txt,
 	update: update,
 	guid: guid,
 	getXY: getXY,
