@@ -30,6 +30,21 @@ function toArray(xs)
 	return out;
 }
 
+
+function range(lo, hi)
+{
+	var list = Nil;
+	if (lo <= hi)
+	{
+		do
+		{
+			list = Cons(hi, list);
+		}
+		while (hi-- > lo);
+	}
+	return list;
+}
+
 function foldr(f, b, xs)
 {
 	var arr = toArray(xs);
@@ -123,6 +138,7 @@ return {
 	cons: F2(Cons),
 	toArray: toArray,
 	fromArray: fromArray,
+	range: range,
 
 	foldr: F3(foldr),
 

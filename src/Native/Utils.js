@@ -177,20 +177,6 @@ function Cons(hd, tl)
 	};
 }
 
-function range(lo, hi)
-{
-	var list = Nil;
-	if (lo <= hi)
-	{
-		do
-		{
-			list = Cons(hi, list);
-		}
-		while (hi-- > lo);
-	}
-	return list;
-}
-
 function append(xs, ys)
 {
 	// append Strings
@@ -404,7 +390,6 @@ return {
 
 	Nil: Nil,
 	Cons: Cons,
-	range: range,
 	append: F2(append),
 
 	crash: crash,
