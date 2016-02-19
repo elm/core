@@ -199,17 +199,6 @@ function append(xs, ys)
 		return xs + ys;
 	}
 
-	// append Text
-	if (xs.ctor.slice(0, 5) === 'Text:')
-	{
-		return {
-			ctor: 'Text:Append',
-			_0: xs,
-			_1: ys
-		};
-	}
-
-
 	// append Lists
 	if (xs.ctor === '[]')
 	{
