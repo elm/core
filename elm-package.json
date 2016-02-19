@@ -19,6 +19,7 @@
         "Json.Encode",
         "List",
         "Maybe",
+        "Platform",
         "Random",
         "Regex",
         "Result",
