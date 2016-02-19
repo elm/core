@@ -388,8 +388,6 @@ return {
 	update: update,
 	guid: guid,
 
-	Nil: Nil,
-	Cons: Cons,
 	append: F2(append),
 
 	crash: crash,
