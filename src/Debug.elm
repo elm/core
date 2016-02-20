@@ -36,7 +36,7 @@ intended for code that is soon-to-be-implemented. For example, if you are
 working with a large ADT and have partially completed a case expression, it may
 make sense to do this:
 
-    data Entity = Ship | Fish | Captain | Seagull
+    type Entity = Ship | Fish | Captain | Seagull
 
     drawEntity entity =
         case entity of
