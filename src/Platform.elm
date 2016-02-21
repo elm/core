@@ -1,6 +1,6 @@
 module Platform
   ( Program
-  , Process, program, programWithFlags
+  , Process
   , Cmd, Sub
   )
   where
@@ -25,9 +25,9 @@ and subscriptions.
 @docs Cmd, Sub
 
 
-# Details for Platform Implementers
+# Processes
 
-@docs Process, program, programWithFlags
+@docs Process
 
 -}
 
@@ -81,73 +81,32 @@ type Sub effects msg = Sub
 `Program` value captures all the details needed to manage your application,
 including how to initialize things, how to respond to events, etc.
 
-The type of a `Program` includes `flags` and `effects` which Elm uses to help
-get everything started.
+The type of a `Program` includes a `flags` type variable which describes the
+data we need to start a program. So say our program needs to be given a `userID`
+and `token` to get started:
 
-The **`flags`** type describes teh data we need to start a program. So say our
-program needs to be given a `name` and `age` to get started:
-
-    main : Program { name : String, age : Int } [Task]
+    MyApp.main : Program { userID : String, token : Int }
 
 So when we initialize this program in JavaScript, we can give the necessary flags
 really easily!
 
 ```javascript
-Elm.fullscreen(Elm.MyApp, { name: "Tom", age: 42 });
+Elm.MyApp.fullscreen({
+    userID: "Tom",
+    token: 42
+});
 ```
-
-The **`effects`** type is a list of all the different effects that are needed
-by your program. This will be things like `Task` and `WebSocket` and
-`Animation`. Elm uses this list to know exactly which effects need to be
-managed as the program runs. As a beginner, you can totally ignore these
-details and get tons of stuff done, so do not get freaked out! It will become
-clear with use, so the important thing is to dive in to things like [the Elm
-Architecture Tutorial]() and try things out in practice!
 -}
-type Program flags effects = Program
+type Program flags = Program
 
 
 
--- DETAILS FOR PLATFORM IMPLEMENTERS
+-- PROCESSES
 
 
+{-| Head over to the documentation for the [`Process`](Process) module for
+information on how this works. It is only defined here because it needs to be
+a platform primitive for both the `Task` and `Process` modules to use it.
+-}
 type Process exit msgs = Process
-
-
-{-| **You should not use this directly.** This function is needed by the folks
-on the core Elm team to implement things like HTML and SVG renderers.
--}
-program
-  : { init : (model, Cmd effects msg)
-    , update : msg -> model -> (model, Cmd effects msg)
-    , subscriptions : model -> Sub effects msg
-    , view : model -> view
-    , renderer : Renderer view msg
-    }
-  -> Program flags effects
-program =
-  Native.Platform.program
-
-
-{-| **You should not use this directly.** This function is needed by the folks
-on the core Elm team to implement things like HTML and SVG renderers.
--}
-programWithFlags
-  : { init : flags -> (model, Cmd effects msg)
-    , update : msg -> model -> (model, Cmd effects msg)
-    , subscriptions : model -> Sub effects msg
-    , view : model -> view
-    , renderer : Renderer view msg
-    }
-  -> Program flags effects
-programWithFlags =
-  Native.Platform.program
-
-
-type Renderer view msg = Renderer
-
-
-dummyRenderer : Renderer () msg
-dummyRenderer =
-  Native.Platform.dummyRenderer
 
