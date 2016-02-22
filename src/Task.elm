@@ -35,7 +35,8 @@ import Basics exposing (Never)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
-import Platform exposing (Cmd, Process)
+import Platform exposing (Process)
+import Platform.Cmd exposing (Cmd)
 import Result exposing (Result(Ok,Err))
 
 

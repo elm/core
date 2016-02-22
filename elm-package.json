@@ -20,6 +20,8 @@
         "List",
         "Maybe",
         "Platform",
+        "Platform.Cmd",
+        "Platform.Sub",
         "Random",
         "Regex",
         "Result",
