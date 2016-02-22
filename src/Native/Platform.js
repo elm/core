@@ -2,6 +2,92 @@
 
 var _elm_lang$core$Native_Platform = function() {
 
+
+// BAGS
+
+
+function leaf(home)
+{
+	return function(value)
+	{
+		return {
+			type: 'leaf',
+			home: home,
+			value: value
+		};
+	};
+}
+
+function batch(list)
+{
+	return {
+		type: 'node',
+		branches: list
+	};
+}
+
+function map(tagger, bag)
+{
+	return {
+		type: 'map',
+		tagger: tagger,
+		tree: bag
+	}
+}
+
+function categorizeEffects(bag)
+{
+	return categorizeEffectsHelp(bag, {});
+}
+
+function categorizeEffectsHelp(bag, effectDict)
+{
+	switch (bag.type)
+	{
+		case 'leaf':
+			var home = bag.home;
+			var effects = effectDict[home];
+
+			var value = {
+				effect: bag.value,
+				taggers: []
+			};
+
+			effects
+				? effects.push(value)
+				: effectDict[home] = [value];
+
+			return effectDict;
+
+		case 'node':
+			var list = bag.branches;
+			while (list.ctor !== '[]')
+			{
+				categorizeEffectsHelp(list._0, effectDict);
+				list = list._1;
+			}
+			return effectDict;
+
+		case 'map':
+			categorizeEffectsHelp(bag.tree, effectDict);
+			for (var home in effectDict)
+			{
+				var effects = effectDict[home];
+				for (var i = 0; i < effects.length; i++)
+				{
+					var effect = effects[i];
+					effect.taggers.push(bag.tagger);
+				}
+			}
+			return effectDict;
+	}
+}
+
+
+
+// PROGRAMS
+
+
 function fullscreenFor(program)
 {
 	if (!program.renderer)
@@ -20,8 +106,8 @@ function fullscreenFor(program)
 
 		var starterTuple = program.init(flags);
 		var model = starterTuple._0;
-		var initialCmds = starterTuple._1;  // TODO do these things
-		var initialSubs = subs(model);      // TODO do these things
+		var initialCmds = categorizeEffects(starterTuple._1);
+		var initialSubs = categorizeEffects(subs(model));
 
 		var renderer = program.renderer(document.body, enqueue, view(model));
 
@@ -48,7 +134,10 @@ function addPublicModule(object, name, main)
 }
 
 return {
-	addPublicModule: addPublicModule
+	addPublicModule: addPublicModule,
+	leaf: leaf,
+	batch: batch,
+	map: map
 };
 
 }();
