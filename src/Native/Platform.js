@@ -104,18 +104,21 @@ function fullscreenFor(program)
 		var subs = program.subscriptions;
 		var view = program.view;
 
-		var starterTuple = program.init(flags);
-		var model = starterTuple._0;
-		var initialCmds = categorizeEffects(starterTuple._1);
+		var tuple = program.init(flags);
+		var model = tuple._0;
+		var initialCmds = categorizeEffects(tuple._1);
 		var initialSubs = categorizeEffects(subs(model));
 
 		var renderer = program.renderer(document.body, enqueue, view(model));
 
 		function enqueue(msg)
 		{
+			console.log(msg);
 			// TODO this may be mean user events can "cut" to the front
 			// of the event queue. If so, do it another way instead.
-			model = A2(update, msg, model);
+			var tuple = A2(update, msg, model);
+			model = tuple._0;
+			categorizeEffects(tuple._1);
 			renderer.update(view(model));
 		}
 	};
