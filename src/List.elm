@@ -275,6 +275,8 @@ any isOkay list =
 
     append [1,1,2] [3,5,8] == [1,1,2,3,5,8]
     append ['a','b'] ['c'] == ['a','b','c']
+
+You can also use [the `(++)` operator](Basics#++) to append lists.
 -}
 append : List a -> List a -> List a
 append xs ys =
