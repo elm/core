@@ -113,7 +113,6 @@ function fullscreenFor(program)
 
 		function enqueue(msg)
 		{
-			console.log(msg);
 			// TODO this may be mean user events can "cut" to the front
 			// of the event queue. If so, do it another way instead.
 			var tuple = A2(update, msg, model);
