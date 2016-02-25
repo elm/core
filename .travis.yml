@@ -1,26 +1,7 @@
 language: haskell
 install:
-  - cabal sandbox init
-  -
-  - git clone https://github.com/elm-lang/elm-compiler.git
-  - cd elm-compiler
-  - cabal sandbox init --sandbox ..
-  - cabal install
-  - cd ..
-  -
-  - git clone https://github.com/elm-lang/elm-package.git
-  - cd elm-package
-  - cabal sandbox init --sandbox ..
-  - cabal install
-  - cd ..
-  -
-  - git clone https://github.com/elm-lang/elm-make.git
-  - cd elm-make
-  - cabal sandbox init --sandbox ..
-  - cabal install
-  - cd ..
-
+  - npm install -g elm@0.16.0	
 before_script:
-  - export PATH=$PWD/bin:$PATH
+  - bash tests/set-up-tests.sh
 script:
-  - tests/run-test.sh
+  - node tests/test.js

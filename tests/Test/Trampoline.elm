@@ -5,8 +5,7 @@ import Basics exposing (..)
 import List
 import Trampoline exposing (..)
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
     
 badSum : Int -> Int
 badSum n =
