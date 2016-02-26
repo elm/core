@@ -2,152 +2,40 @@
 
 var _elm_lang$core$Native_Json = function() {
 
-function crash(expected, actual)
+
+function decodePrimitive(tag)
 {
-	throw new Error(
-		'expecting ' + expected + ' but got ' + JSON.stringify(actual)
-	);
-}
-
-
-// PRIMITIVE VALUES
-
-function decodeNull(successValue)
-{
-	return function(value)
-	{
-		if (value === null)
-		{
-			return successValue;
-		}
-		crash('null', value);
+	return {
+		ctor: '<decoder>',
+		tag: tag
 	};
 }
 
-
-function decodeString(value)
+function decodeContainer(tag, decoder)
 {
-	if (typeof value === 'string' || value instanceof String)
-	{
-		return value;
-	}
-	crash('a String', value);
-}
-
-
-function decodeFloat(value)
-{
-	if (typeof value === 'number')
-	{
-		return value;
-	}
-	crash('a Float', value);
-}
-
-
-function decodeInt(value)
-{
-	if (typeof value !== 'number')
-	{
-		crash('an Int', value);
-	}
-
-	if (value < 2147483647 && value > -2147483647 && (value | 0) === value)
-	{
-		return value;
-	}
-
-	if (isFinite(value) && !(value % 1))
-	{
-		return value;
-	}
-
-	crash('an Int', value);
-}
-
-
-function decodeBool(value)
-{
-	if (typeof value === 'boolean')
-	{
-		return value;
-	}
-	crash('a Bool', value);
-}
-
-
-// ARRAY
-
-function decodeArray(decoder)
-{
-	return function(value)
-	{
-		if (value instanceof Array)
-		{
-			var len = value.length;
-			var array = new Array(len);
-			for (var i = len; i--; )
-			{
-				array[i] = decoder(value[i]);
-			}
-			return _elm_lang$core$Native_Array.fromJSArray(array);
-		}
-		crash('an Array', value);
+	return {
+		ctor: '<decoder>',
+		tag: tag,
+		decoder: decoder
 	};
 }
 
-
-// LIST
-
-function decodeList(decoder)
+function decodeNull(value)
 {
-	return function(value)
-	{
-		if (value instanceof Array)
-		{
-			var len = value.length;
-			var list = _elm_lang$core$Native_List.Nil;
-			for (var i = len; i--; )
-			{
-				list = _elm_lang$core$Native_List.Cons( decoder(value[i]), list );
-			}
-			return list;
-		}
-		crash('a List', value);
+	return {
+		ctor: '<decoder>',
+		tag: 'null',
+		value: value
 	};
 }
-
-
-// MAYBE
-
-function decodeMaybe(decoder)
-{
-	return function(value)
-	{
-		try
-		{
-			return _elm_lang$core$Maybe$Just(decoder(value));
-		}
-		catch(e)
-		{
-			return _elm_lang$core$Maybe$Nothing;
-		}
-	};
-}
-
-
-// FIELDS
 
 function decodeField(field, decoder)
 {
-	return function(value)
-	{
-		var subValue = value[field];
-		if (subValue !== undefined)
-		{
-			return decoder(subValue);
-		}
-		crash("an object with field '" + field + "'", value);
+	return {
+		ctor: '<decoder>',
+		tag: 'field',
+		field: field,
+		decoder: decoder
 	};
 }
 
@@ -156,359 +44,458 @@ function decodeField(field, decoder)
 
 function decodeKeyValuePairs(decoder)
 {
-	return function(value)
-	{
-		var isObject =
-			typeof value === 'object'
-				&& value !== null
-				&& !(value instanceof Array);
+	return {
+		ctor: '<decoder>',
+		tag: 'key-value',
+		decoder: decoder
+	};
+}
 
-		if (isObject)
-		{
-			var keyValuePairs = _elm_lang$core$Native_List.Nil;
-			for (var key in value)
-			{
-				var elmValue = decoder(value[key]);
-				var pair = _elm_lang$core$Native_Utils.Tuple2(key, elmValue);
-				keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
-			}
-			return keyValuePairs;
-		}
-
-		crash('an object', value);
+function decodeObject(f, decoders)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'map-many',
+		func: f,
+		decoders: decoders
 	};
 }
 
 function decodeObject1(f, d1)
 {
-	return function(value)
-	{
-		return f(d1(value));
-	};
+	return decodeObject(f, [d1]);
 }
 
 function decodeObject2(f, d1, d2)
 {
-	return function(value)
-	{
-		return A2( f, d1(value), d2(value) );
-	};
+	return decodeObject(f, [d1, d2]);
 }
 
 function decodeObject3(f, d1, d2, d3)
 {
-	return function(value)
-	{
-		return A3( f, d1(value), d2(value), d3(value) );
-	};
+	return decodeObject(f, [d1, d2, d3]);
 }
 
 function decodeObject4(f, d1, d2, d3, d4)
 {
-	return function(value)
-	{
-		return A4( f, d1(value), d2(value), d3(value), d4(value) );
-	};
+	return decodeObject(f, [d1, d2, d3, d4]);
 }
 
 function decodeObject5(f, d1, d2, d3, d4, d5)
 {
-	return function(value)
-	{
-		return A5( f, d1(value), d2(value), d3(value), d4(value), d5(value) );
-	};
+	return decodeObject(f, [d1, d2, d3, d4, d5]);
 }
 
 function decodeObject6(f, d1, d2, d3, d4, d5, d6)
 {
-	return function(value)
-	{
-		return A6( f,
-			d1(value),
-			d2(value),
-			d3(value),
-			d4(value),
-			d5(value),
-			d6(value)
-		);
-	};
+	return decodeObject(f, [d1, d2, d3, d4, d5, d6]);
 }
 
 function decodeObject7(f, d1, d2, d3, d4, d5, d6, d7)
 {
-	return function(value)
-	{
-		return A7( f,
-			d1(value),
-			d2(value),
-			d3(value),
-			d4(value),
-			d5(value),
-			d6(value),
-			d7(value)
-		);
-	};
+	return decodeObject(f, [d1, d2, d3, d4, d5, d6, d7]);
 }
 
 function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8)
 {
-	return function(value)
-	{
-		return A8( f,
-			d1(value),
-			d2(value),
-			d3(value),
-			d4(value),
-			d5(value),
-			d6(value),
-			d7(value),
-			d8(value)
-		);
-	};
+	return decodeObject(f, [d1, d2, d3, d4, d5, d6, d7, d8]);
 }
 
 
 // TUPLES
 
+function decodeTuple(f, decoders)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'tuple',
+		func: f,
+		decoders: decoders
+	};
+}
+
 function decodeTuple1(f, d1)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 1 )
-		{
-			crash('a Tuple of length 1', value);
-		}
-		return f( d1(value[0]) );
-	};
+	return decodeTuple(f, [d1]);
 }
 
 function decodeTuple2(f, d1, d2)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 2 )
-		{
-			crash('a Tuple of length 2', value);
-		}
-		return A2( f, d1(value[0]), d2(value[1]) );
-	};
+	return decodeTuple(f, [d1, d2]);
 }
 
 function decodeTuple3(f, d1, d2, d3)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 3 )
-		{
-			crash('a Tuple of length 3', value);
-		}
-		return A3( f, d1(value[0]), d2(value[1]), d3(value[2]) );
-	};
+	return decodeTuple(f, [d1, d2, d3]);
 }
-
 
 function decodeTuple4(f, d1, d2, d3, d4)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 4 )
-		{
-			crash('a Tuple of length 4', value);
-		}
-		return A4( f, d1(value[0]), d2(value[1]), d3(value[2]), d4(value[3]) );
-	};
+	return decodeTuple(f, [d1, d2, d3, d4]);
 }
-
 
 function decodeTuple5(f, d1, d2, d3, d4, d5)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 5 )
-		{
-			crash('a Tuple of length 5', value);
-		}
-		return A5( f,
-			d1(value[0]),
-			d2(value[1]),
-			d3(value[2]),
-			d4(value[3]),
-			d5(value[4])
-		);
-	};
+	return decodeTuple(f, [d1, d2, d3, d4, d5]);
 }
-
 
 function decodeTuple6(f, d1, d2, d3, d4, d5, d6)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 6 )
-		{
-			crash('a Tuple of length 6', value);
-		}
-		return A6( f,
-			d1(value[0]),
-			d2(value[1]),
-			d3(value[2]),
-			d4(value[3]),
-			d5(value[4]),
-			d6(value[5])
-		);
-	};
+	return decodeTuple(f, [d1, d2, d3, d4, d5, d6]);
 }
 
 function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 7 )
-		{
-			crash('a Tuple of length 7', value);
-		}
-		return A7( f,
-			d1(value[0]),
-			d2(value[1]),
-			d3(value[2]),
-			d4(value[3]),
-			d5(value[4]),
-			d6(value[5]),
-			d7(value[6])
-		);
-	};
+	return decodeTuple(f, [d1, d2, d3, d4, d5, d6, d7]);
 }
-
 
 function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8)
 {
-	return function(value)
-	{
-		if ( !(value instanceof Array) || value.length !== 8 )
-		{
-			crash('a Tuple of length 8', value);
-		}
-		return A8( f,
-			d1(value[0]),
-			d2(value[1]),
-			d3(value[2]),
-			d4(value[3]),
-			d5(value[4]),
-			d6(value[5]),
-			d7(value[6]),
-			d8(value[7])
-		);
-	};
+	return decodeTuple(f, [d1, d2, d3, d4, d5, d6, d7, d8]);
 }
 
 
 // CUSTOM DECODERS
 
-function decodeValue(value)
+function customAndThen(decoder, callback)
 {
-	return value;
-}
-
-function runDecoderValue(decoder, value)
-{
-	try
-	{
-		return _elm_lang$core$Result$Ok(decoder(value));
-	}
-	catch(e)
-	{
-		return _elm_lang$core$Result$Err(e.message);
-	}
-}
-
-function customDecoder(decoder, callback)
-{
-	return function(value)
-	{
-		var result = callback(decoder(value));
-		if (result.ctor === 'Err')
-		{
-			throw new Error('custom decoder failed: ' + result._0);
-		}
-		return result._0;
+	return {
+		ctor: '<decoder>',
+		tag: 'customAndThen',
+		decode: decode,
+		callback: callback
 	};
 }
 
 function andThen(decode, callback)
 {
-	return function(value)
-	{
-		var result = decode(value);
-		return callback(result)(value);
+	return {
+		ctor: '<decoder>',
+		tag: 'andThen',
+		decode: decode,
+		callback: callback
 	};
 }
 
 function fail(msg)
 {
-	return function(value)
-	{
-		throw new Error(msg);
+	return {
+		ctor: '<decoder>',
+		tag: 'fail',
+		msg: msg
 	};
 }
 
-function succeed(successValue)
+function succeed(msg)
 {
-	return function(value)
-	{
-		return successValue;
+	return {
+		ctor: '<decoder>',
+		tag: 'succeed',
+		msg: msg
 	};
 }
-
-
-// ONE OF MANY
 
 function oneOf(decoders)
 {
-	return function(value)
-	{
-		var errors = [];
-		var temp = decoders;
-		while (temp.ctor !== '[]')
-		{
-			try
-			{
-				return temp._0(value);
-			}
-			catch(e)
-			{
-				errors.push(e.message);
-			}
-			temp = temp._1;
-		}
-		throw new Error('expecting one of the following:\n    ' + errors.join('\n    '));
+	return {
+		ctor: '<decoder>',
+		tag: 'oneOf',
+		decoders: decoders
 	};
 }
 
-function get(decoder, value)
+
+// DECODE HELPERS
+
+function ok(value)
 {
-	try
+	return { tag: 'ok', value: value };
+}
+
+function badPrimitive(type, value)
+{
+	return { tag: 'primitive', type: type, value: value };
+}
+
+function badIndex(index, nestedProblems)
+{
+	return { tag: 'index', index: index, rest: nestedProblems };
+}
+
+function badField(field, nestedProblems)
+{
+	return { tag: 'field', field: field, rest: nestedProblems };
+}
+
+function badOneOf(problems)
+{
+	return { tag: 'oneOf', problems: problems };
+}
+
+var bad = { tag: 'fail' };
+
+function badToString(problem)
+{
+	var context = '_';
+	while (problem)
 	{
-		return _elm_lang$core$Result$Ok(decoder(value));
-	}
-	catch(e)
-	{
-		return _elm_lang$core$Result$Err(e.message);
+		switch (problem.tag)
+		{
+			case 'primitive':
+				return 'Expecting ' + problem.type
+					+ (context === '_' ? '' : ' at ' + context)
+					+ ' but instead got: ' + jsToString(problem.value);
+
+			case 'index':
+				context += '[' + problem.index + ']';
+				problem = problem.rest;
+				break;
+
+			case 'field':
+				context += '.' + problem.field;
+				problem = problem.rest;
+				break;
+
+			case 'oneOf':
+				var problems = problem.problems;
+				for (var i = 0; i < problems.length; i++)
+				{
+					problems[i] = badToString(problems[i]);
+				}
+				return 'I ran into the following problems'
+					+ (context === '_' ? '' : ' at ' + context)
+					+ ':\n\n' + problems.join('\n');
+
+			case 'fail':
+				return 'I ran into a `fail` decoder'
+					+ (context === '_' ? '' : ' at ' + context);
+		}
 	}
 }
 
-
-// ENCODE / DECODE
-
-function runDecoderString(decoder, string)
+function jsToString(value)
 {
+	return value === undefined
+		? 'undefined'
+		: JSON.stringify(value);
+}
+
+
+// DECODE
+
+function runOnString(decoder, string)
+{
+	var json;
 	try
 	{
-		return _elm_lang$core$Result$Ok(decoder(JSON.parse(string)));
+		json = JSON.parse(string);
 	}
-	catch(e)
+	catch (e)
 	{
-		return _elm_lang$core$Result$Err(e.message);
+		return _elm_lang$core$Result$Err('Given an invalid JSON: ' + e.message);
+	}
+	return run(decoder, json);
+}
+
+function run(decoder, value)
+{
+	var result = runHelp(decoder, value);
+	return (result.tag === 'ok')
+		? _elm_lang$core$Result$Ok(result.value)
+		: _elm_lang$core$Result$Err(badToString(result));
+}
+
+function runHelp(decoder, value)
+{
+	switch (decoder.tag)
+	{
+		case 'bool':
+			return (typeof value === 'boolean')
+				? ok(value)
+				: badPrimitive('a Bool', value);
+
+		case 'int':
+			var isNotInt =
+				typeof value !== 'number'
+				|| !(-2147483647 < value && value < 2147483647 && (value | 0) === value)
+				|| !(isFinite(value) && !(value % 1));
+
+			return isNotInt
+				? badPrimitive('an Int', value)
+				: ok(value);
+
+		case 'float':
+			return (typeof value === 'number')
+				? ok(value)
+				: badPrimitive('a Float', value);
+
+		case 'string':
+			return (typeof value === 'string')
+				? ok(value)
+				: (value instanceof String)
+					? ok(value + '')
+					: badPrimitive('a String', value);
+
+		case 'null':
+			return (value === null)
+				? ok(decoder.value)
+				: badPrimitive('null', value);
+
+		case 'value':
+			return ok(value);
+
+		case 'list':
+			if (!(value instanceof Array))
+			{
+				return badPrimitive('a List', value);
+			}
+
+			var list = _elm_lang$core$Native_List.Nil;
+			for (var i = value.length; i--; )
+			{
+				var result = runHelp(decoder.decoder, value[i]);
+				if (result.tag !== 'ok')
+				{
+					return badIndex(i, result)
+				}
+				list = _elm_lang$core$Native_List.Cons(result.value, list);
+			}
+			return ok(list);
+
+		case 'array':
+			if (!(value instanceof Array))
+			{
+				return badPrimitive('an Array', value);
+			}
+
+			var len = value.length;
+			var array = new Array(len);
+			for (var i = len; i--; )
+			{
+				var result = runHelp(decoder.decoder, value[i]);
+				if (result.tag !== 'ok')
+				{
+					return badIndex(i, result);
+				}
+				array[i] = result.value;
+			}
+			return _elm_lang$core$Native_Array.fromJSArray(array);
+
+		case 'maybe':
+			var result = runHelp(decoder.decoder, value);
+			return (result.tag === 'ok')
+				? ok(_elm_lang$core$Maybe$Just(result.value))
+				: ok(_elm_lang$core$Maybe$Nothing);
+
+		case 'field':
+			var field = decoder.field;
+			if (typeof value !== 'object' || value === null || !(field in value))
+			{
+				return badPrimitive('an object with a `' + field + '` field', value);
+			}
+
+			var result = runHelp(decoder.decoder, value[field]);
+			return (result.tag === 'ok')
+				? result
+				: badField(field, result);
+
+		case 'key-value':
+			if (typeof value !== 'object' || value === null || value instanceof Array)
+			{
+				return err('an object', value);
+			}
+
+			var keyValuePairs = _elm_lang$core$Native_List.Nil;
+			for (var key in value)
+			{
+				var result = runHelp(decoder.decoder, value[key]);
+				if (result.tag !== 'ok')
+				{
+					return badField(key, result);
+				}
+				var pair = _elm_lang$core$Native_Utils.Tuple2(key, result.value);
+				keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
+			}
+			return ok(keyValuePairs);
+
+		case 'map-many':
+			var answer = decoder.func;
+			var decoders = decoder.decoders;
+			for (var i = 0; i < decoders.length; i++)
+			{
+				var result = runHelp(decoders[i], value);
+				if (result.tag !== 'ok')
+				{
+					return result;
+				}
+				answer = answer(result.value);
+			}
+			return ok(answer);
+
+		case 'tuple':
+			var decoders = decoder.decoders;
+			var len = decoders.length;
+
+			if ( !(value instanceof Array) || value.length !== len )
+			{
+				return badPrimitive('a Tuple with ' + len + ' entries', value);
+			}
+
+			var answer = decoder.func;
+			for (var i = 0; i < len; i++)
+			{
+				var result = runHelp(decoders[i], value[i]);
+				if (result.tag !== 'ok')
+				{
+					return badIndex(i, result);
+				}
+				answer = answer(result.value);
+			}
+			return ok(answer);
+
+		case 'customAndThen':
+			var result = runHelp(decoder.decoder, value);
+			if (result.tag !== 'ok')
+			{
+				return result;
+			}
+			var realResult = decoder.callback(result.value);
+			if (realResult.ctor === 'Err')
+			{
+				throw new Error('TODO');
+			}
+			return ok(realResult._0);
+
+		case 'andThen':
+			var result = runHelp(decoder.decoder, value);
+			return (result.tag !== 'ok')
+				? result
+				: runHelp(decoder.callback(result.value), value);
+
+		case 'oneOf':
+			var errors;
+			var temp = decoder.decoders;
+			while (temp.ctor !== '[]')
+			{
+				var result = runHelp(temp._0, value);
+				if (result.tag === 'ok')
+				{
+					return result;
+				}
+				errors ? errors = [result.msg] : errors.push(result.msg);
+				temp = temp._1;
+			}
+			return badOneOf(errors);
+
+		case 'fail':
+			return bad;
+
+		case 'succeed':
+			return ok(decoder.msg);
 	}
 }
+
+// ENCODE
 
 function encode(indentLevel, value)
 {
@@ -534,22 +521,11 @@ function encodeObject(keyValuePairs)
 
 return {
 	encode: F2(encode),
-	runDecoderString: F2(runDecoderString),
-	runDecoderValue: F2(runDecoderValue),
+	runOnString: F2(runOnString),
+	run: F2(run),
 
-	get: F2(get),
-	oneOf: oneOf,
-
-	decodeNull: decodeNull,
-	decodeInt: decodeInt,
-	decodeFloat: decodeFloat,
-	decodeString: decodeString,
-	decodeBool: decodeBool,
-
-	decodeMaybe: decodeMaybe,
-
-	decodeList: decodeList,
-	decodeArray: decodeArray,
+	decodePrimitive: decodePrimitive,
+	decodeContainer: F2(decodeContainer),
 
 	decodeField: F2(decodeField),
 
@@ -573,10 +549,10 @@ return {
 	decodeTuple8: F9(decodeTuple8),
 
 	andThen: F2(andThen),
-	decodeValue: decodeValue,
-	customDecoder: F2(customDecoder),
+	customAndThen: F2(customAndThen),
 	fail: fail,
 	succeed: succeed,
+	oneOf: oneOf,
 
 	identity: identity,
 	encodeNull: null,
