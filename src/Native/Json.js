@@ -3,6 +3,26 @@
 var _elm_lang$core$Native_Json = function() {
 
 
+// CORE DECODERS
+
+function succeed(msg)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'succeed',
+		msg: msg
+	};
+}
+
+function fail(msg)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'fail',
+		msg: msg
+	};
+}
+
 function decodePrimitive(tag)
 {
 	return {
@@ -39,9 +59,6 @@ function decodeField(field, decoder)
 	};
 }
 
-
-// OBJECTS
-
 function decodeKeyValuePairs(decoder)
 {
 	return {
@@ -60,6 +77,48 @@ function decodeObject(f, decoders)
 		decoders: decoders
 	};
 }
+
+function decodeTuple(f, decoders)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'tuple',
+		func: f,
+		decoders: decoders
+	};
+}
+
+function andThen(decode, callback)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'andThen',
+		decode: decode,
+		callback: callback
+	};
+}
+
+function customAndThen(decoder, callback)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'customAndThen',
+		decode: decode,
+		callback: callback
+	};
+}
+
+function oneOf(decoders)
+{
+	return {
+		ctor: '<decoder>',
+		tag: 'oneOf',
+		decoders: decoders
+	};
+}
+
+
+// DECODING OBJECTS
 
 function decodeObject1(f, d1)
 {
@@ -102,17 +161,7 @@ function decodeObject8(f, d1, d2, d3, d4, d5, d6, d7, d8)
 }
 
 
-// TUPLES
-
-function decodeTuple(f, decoders)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'tuple',
-		func: f,
-		decoders: decoders
-	};
-}
+// DECODING TUPLES
 
 function decodeTuple1(f, d1)
 {
@@ -152,56 +201,6 @@ function decodeTuple7(f, d1, d2, d3, d4, d5, d6, d7)
 function decodeTuple8(f, d1, d2, d3, d4, d5, d6, d7, d8)
 {
 	return decodeTuple(f, [d1, d2, d3, d4, d5, d6, d7, d8]);
-}
-
-
-// CUSTOM DECODERS
-
-function customAndThen(decoder, callback)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'customAndThen',
-		decode: decode,
-		callback: callback
-	};
-}
-
-function andThen(decode, callback)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'andThen',
-		decode: decode,
-		callback: callback
-	};
-}
-
-function fail(msg)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'fail',
-		msg: msg
-	};
-}
-
-function succeed(msg)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'succeed',
-		msg: msg
-	};
-}
-
-function oneOf(decoders)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'oneOf',
-		decoders: decoders
-	};
 }
 
 
@@ -495,6 +494,81 @@ function runHelp(decoder, value)
 	}
 }
 
+
+// EQUALITY
+
+function equality(a, b)
+{
+	if (a === b)
+	{
+		return true;
+	}
+
+	if (a.tag !== b.tag)
+	{
+		return false;
+	}
+
+	switch (a.tag)
+	{
+		case 'succeed':
+		case 'fail':
+			return a.msg === b.msg;
+
+		case 'bool':
+		case 'int':
+		case 'float':
+		case 'string':
+		case 'value':
+			return true;
+
+		case 'null':
+			return a.value === b.value;
+
+		case 'list':
+		case 'array':
+		case 'maybe':
+		case 'key-value':
+			return equality(a.decoder, b.decoder);
+
+		case 'field':
+			return a.field === b.field && equality(a.decoder, b.decoder);
+
+		case 'map-many':
+		case 'tuple':
+			if (a.func !== b.func)
+			{
+				return false;
+			}
+			return listEquality(a.decoders, b.decoders);
+
+		case 'andThen':
+		case 'customAndThen':
+			return a.callback === b.callback && equality(a.decoder, b.decoder);
+
+		case 'oneOf':
+			return listEquality(a.decoders, b.decoders);
+	}
+}
+
+function listEquality(aDecoders, bDecoders)
+{
+	var len = aDecoders.length;
+	if (len !== bDecoders.length)
+	{
+		return false;
+	}
+	for (var i = 0; i < len; i++)
+	{
+		if (!equality(aDecoders[i], bDecoders[i]))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+
 // ENCODE
 
 function encode(indentLevel, value)
@@ -558,7 +632,9 @@ return {
 	encodeNull: null,
 	encodeArray: _elm_lang$core$Native_Array.toJSArray,
 	encodeList: _elm_lang$core$Native_List.toArray,
-	encodeObject: encodeObject
+	encodeObject: encodeObject,
+
+	equality: equality
 };
 
 }();
