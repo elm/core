@@ -8,6 +8,9 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return localRuntime.Native.Utils.values;
 	}
 
+
+	// COMPARISONS
+
 	function eq(l, r)
 	{
 		var stack = [{'x': l, 'y': r}];
@@ -131,6 +134,8 @@ Elm.Native.Utils.make = function(localRuntime) {
 	}
 
 
+	// TUPLES
+
 	var Tuple0 = {
 		ctor: '_Tuple0'
 	};
@@ -143,6 +148,9 @@ Elm.Native.Utils.make = function(localRuntime) {
 			_1: y
 		};
 	}
+
+
+	// LITERALS
 
 	function chr(c)
 	{
@@ -158,67 +166,31 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return t;
 	}
 
+
+	// GUID
+
 	var count = 0;
 	function guid(_)
 	{
 		return count++;
 	}
 
-	function copy(oldRecord)
+
+	// RECORDS
+
+	function update(oldRecord, updatedFields)
 	{
 		var newRecord = {};
 		for (var key in oldRecord)
 		{
-			var value = key === '_'
-				? copy(oldRecord._)
-				: oldRecord[key];
+			var value = (key in updatedFields) ? updatedFields[key] : oldRecord[key];
 			newRecord[key] = value;
 		}
 		return newRecord;
 	}
 
-	function remove(key, oldRecord)
-	{
-		var record = copy(oldRecord);
-		if (key in record._)
-		{
-			record[key] = record._[key][0];
-			record._[key] = record._[key].slice(1);
-			if (record._[key].length === 0)
-			{
-				delete record._[key];
-			}
-		}
-		else
-		{
-			delete record[key];
-		}
-		return record;
-	}
 
-	function replace(keyValuePairs, oldRecord)
-	{
-		var record = copy(oldRecord);
-		for (var i = keyValuePairs.length; i--; )
-		{
-			var pair = keyValuePairs[i];
-			record[pair[0]] = pair[1];
-		}
-		return record;
-	}
-
-	function insert(key, value, oldRecord)
-	{
-		var newRecord = copy(oldRecord);
-		if (key in newRecord)
-		{
-			var values = newRecord._[key];
-			var copiedValues = values ? values.slice(0) : [];
-			newRecord._[key] = [newRecord[key]].concat(copiedValues);
-		}
-		newRecord[key] = value;
-		return newRecord;
-	}
+	// MOUSE COORDINATES
 
 	function getXY(e)
 	{
@@ -261,6 +233,30 @@ Elm.Native.Utils.make = function(localRuntime) {
 		};
 	}
 
+	function list(arr)
+	{
+		var out = Nil;
+		for (var i = arr.length; i--; )
+		{
+			out = Cons(arr[i], out);
+		}
+		return out;
+	}
+
+	function range(lo, hi)
+	{
+		var list = Nil;
+		if (lo <= hi)
+		{
+			do
+			{
+				list = Cons(hi, list);
+			}
+			while (hi-- > lo);
+		}
+		return list;
+	}
+
 	function append(xs, ys)
 	{
 		// append Strings
@@ -298,39 +294,212 @@ Elm.Native.Utils.make = function(localRuntime) {
 		return root;
 	}
 
-	//// RUNTIME ERRORS ////
 
-	function indent(lines)
+	// CRASHES
+
+	function crash(moduleName, region)
 	{
-		return '\n' + lines.join('\n');
+		return function(message) {
+			throw new Error(
+				'Ran into a `Debug.crash` in module `' + moduleName + '` ' + regionToString(region) + '\n'
+				+ 'The message provided by the code author is:\n\n    '
+				+ message
+			);
+		};
 	}
 
-	function badCase(moduleName, span)
+	function crashCase(moduleName, region, value)
 	{
-		var msg = indent([
-			'Non-exhaustive pattern match in case-expression.',
-			'Make sure your patterns cover every case!'
-		]);
-		throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
+		return function(message) {
+			throw new Error(
+				'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
+				+ 'This was caused by the `case` expression ' + regionToString(region) + '.\n'
+				+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + toString(value) + '\n\n'
+				+ 'The message provided by the code author is:\n\n    '
+				+ message
+			);
+		};
 	}
 
-	function badIf(moduleName, span)
+	function regionToString(region)
 	{
-		var msg = indent([
-			'Non-exhaustive pattern match in multi-way-if expression.',
-			'It is best to use \'otherwise\' as the last branch of multi-way-if.'
-		]);
-		throw new Error('Runtime error in module ' + moduleName + ' (' + span + ')' + msg);
+		if (region.start.line == region.end.line)
+		{
+			return 'on line ' + region.start.line;
+		}
+		return 'between lines ' + region.start.line + ' and ' + region.end.line;
 	}
 
+
+	// BAD PORTS
 
 	function badPort(expected, received)
 	{
-		var msg = indent([
-			'Expecting ' + expected + ' but was given ',
-			JSON.stringify(received)
-		]);
-		throw new Error('Runtime error when sending values through a port.' + msg);
+		throw new Error(
+			'Runtime error when sending values through a port.\n\n'
+			+ 'Expecting ' + expected + ' but was given ' + formatValue(received)
+		);
+	}
+
+	function formatValue(value)
+	{
+		// Explicity format undefined values as "undefined"
+		// because JSON.stringify(undefined) unhelpfully returns ""
+		return (value === undefined) ? "undefined" : JSON.stringify(value);
+	}
+
+
+	// TO STRING
+
+	var _Array;
+	var Dict;
+	var List;
+
+	var toString = function(v)
+	{
+		var type = typeof v;
+		if (type === 'function')
+		{
+			var name = v.func ? v.func.name : v.name;
+			return '<function' + (name === '' ? '' : ': ') + name + '>';
+		}
+		else if (type === 'boolean')
+		{
+			return v ? 'True' : 'False';
+		}
+		else if (type === 'number')
+		{
+			return v + '';
+		}
+		else if ((v instanceof String) && v.isChar)
+		{
+			return '\'' + addSlashes(v, true) + '\'';
+		}
+		else if (type === 'string')
+		{
+			return '"' + addSlashes(v, false) + '"';
+		}
+		else if (type === 'object' && 'ctor' in v)
+		{
+			if (v.ctor.substring(0, 6) === '_Tuple')
+			{
+				var output = [];
+				for (var k in v)
+				{
+					if (k === 'ctor') continue;
+					output.push(toString(v[k]));
+				}
+				return '(' + output.join(',') + ')';
+			}
+			else if (v.ctor === '_Array')
+			{
+				if (!_Array)
+				{
+					_Array = Elm.Array.make(localRuntime);
+				}
+				var list = _Array.toList(v);
+				return 'Array.fromList ' + toString(list);
+			}
+			else if (v.ctor === '::')
+			{
+				var output = '[' + toString(v._0);
+				v = v._1;
+				while (v.ctor === '::')
+				{
+					output += ',' + toString(v._0);
+					v = v._1;
+				}
+				return output + ']';
+			}
+			else if (v.ctor === '[]')
+			{
+				return '[]';
+			}
+			else if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
+			{
+				if (!Dict)
+				{
+					Dict = Elm.Dict.make(localRuntime);
+				}
+				var list;
+				var name;
+				if (v.ctor === 'Set_elm_builtin')
+				{
+					if (!List)
+					{
+						List = Elm.List.make(localRuntime);
+					}
+					name = 'Set';
+					list = A2(List.map, function(x) {return x._0; }, Dict.toList(v._0));
+				}
+				else
+				{
+					name = 'Dict';
+					list = Dict.toList(v);
+				}
+				return name + '.fromList ' + toString(list);
+			}
+			else if (v.ctor.slice(0, 5) === 'Text:')
+			{
+				return '<text>';
+			}
+			else if (v.ctor === 'Element_elm_builtin')
+			{
+				return '<element>'
+			}
+			else if (v.ctor === 'Form_elm_builtin')
+			{
+				return '<form>'
+			}
+			else
+			{
+				var output = '';
+				for (var i in v)
+				{
+					if (i === 'ctor') continue;
+					var str = toString(v[i]);
+					var parenless = str[0] === '{' || str[0] === '<' || str.indexOf(' ') < 0;
+					output += ' ' + (parenless ? str : '(' + str + ')');
+				}
+				return v.ctor + output;
+			}
+		}
+		else if (type === 'object' && 'notify' in v && 'id' in v)
+		{
+			return '<signal>';
+		}
+		else if (type === 'object')
+		{
+			var output = [];
+			for (var k in v)
+			{
+				output.push(k + ' = ' + toString(v[k]));
+			}
+			if (output.length === 0)
+			{
+				return '{}';
+			}
+			return '{ ' + output.join(', ') + ' }';
+		}
+		return '<internal structure>';
+	};
+
+	function addSlashes(str, isChar)
+	{
+		var s = str.replace(/\\/g, '\\\\')
+				  .replace(/\n/g, '\\n')
+				  .replace(/\t/g, '\\t')
+				  .replace(/\r/g, '\\r')
+				  .replace(/\v/g, '\\v')
+				  .replace(/\0/g, '\\0');
+		if (isChar)
+		{
+			return s.replace(/\'/g, '\\\'');
+		}
+		else
+		{
+			return s.replace(/\"/g, '\\"');
+		}
 	}
 
 
@@ -342,19 +511,20 @@ Elm.Native.Utils.make = function(localRuntime) {
 		Tuple2: Tuple2,
 		chr: chr,
 		txt: txt,
-		copy: copy,
-		remove: remove,
-		replace: replace,
-		insert: insert,
+		update: update,
 		guid: guid,
 		getXY: getXY,
 
 		Nil: Nil,
 		Cons: Cons,
+		list: list,
+		range: range,
 		append: F2(append),
 
-		badCase: badCase,
-		badIf: badIf,
-		badPort: badPort
+		crash: crash,
+		crashCase: crashCase,
+		badPort: badPort,
+
+		toString: toString
 	};
 };

@@ -85,7 +85,7 @@ hsla hue saturation lightness alpha =
 
 
 {-| Create [HSL colors](http://en.wikipedia.org/wiki/HSL_and_HSV). This gives
-you access to colors more like a color wheel, where all hues are aranged in a
+you access to colors more like a color wheel, where all hues are arranged in a
 circle that you specify with standard Elm angles (radians).
 
     red   = hsl (degrees   0) 1 0.5
@@ -189,9 +189,12 @@ rgbToHsl red green blue =
 
     hue =
       degrees 60 *
-        if  | cMax == r -> ((g - b) / c) `fmod` 6
-            | cMax == g -> ((b - r) / c) + 2
-            | cMax == b -> ((r - g) / c) + 4
+        if cMax == r then
+          ((g - b) / c) `fmod` 6
+        else if cMax == g then
+          ((b - r) / c) + 2
+        else {- cMax == b -}
+          ((r - g) / c) + 4
 
     lightness =
       (cMax + cMin) / 2
@@ -214,14 +217,14 @@ hslToRgb hue saturation lightness =
     x = chroma * (1 - abs (fmod hue' 2 - 1))
 
     (r,g,b) =
-      if  | hue' < 0  -> (0, 0, 0)
-          | hue' < 1  -> (chroma, x, 0)
-          | hue' < 2  -> (x, chroma, 0)
-          | hue' < 3  -> (0, chroma, x)
-          | hue' < 4  -> (0, x, chroma)
-          | hue' < 5  -> (x, 0, chroma)
-          | hue' < 6  -> (chroma, 0, x)
-          | otherwise -> (0, 0, 0)
+      if hue' < 0 then (0, 0, 0)
+      else if hue' < 1 then (chroma, x, 0)
+      else if hue' < 2 then (x, chroma, 0)
+      else if hue' < 3 then (0, chroma, x)
+      else if hue' < 4 then (0, x, chroma)
+      else if hue' < 5 then (x, 0, chroma)
+      else if hue' < 6 then (chroma, 0, x)
+      else (0, 0, 0)
 
     m = lightness - chroma / 2
   in
@@ -241,10 +244,10 @@ type Gradient
 
 {-| Create a linear gradient. Takes a start and end point and then a series of
 &ldquo;color stops&rdquo; that indicate how to interpolate between the start and
-end points. See [this example](http://elm-lang.org/edit/examples/Elements/LinearGradient.elm) for a
+end points. See [this example](http://elm-lang.org/examples/linear-gradient) for a
 more visual explanation.
 -}
-linear : (number, number) -> (number, number) -> List (Float,Color) -> Gradient
+linear : (Float, Float) -> (Float, Float) -> List (Float,Color) -> Gradient
 linear =
   Linear
 
@@ -252,10 +255,10 @@ linear =
 {-| Create a radial gradient. First takes a start point and inner radius.  Then
 takes an end point and outer radius. It then takes a series of &ldquo;color
 stops&rdquo; that indicate how to interpolate between the inner and outer
-circles. See [this example](http://elm-lang.org/edit/examples/Elements/RadialGradient.elm) for a
+circles. See [this example](http://elm-lang.org/examples/radial-gradient) for a
 more visual explanation.
 -}
-radial : (number,number) -> number -> (number,number) -> number -> List (Float,Color) -> Gradient
+radial : (Float,Float) -> Float -> (Float,Float) -> Float -> List (Float,Color) -> Gradient
 radial =
   Radial
 

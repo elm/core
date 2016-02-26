@@ -116,7 +116,7 @@ if (!Elm.fullscreen) {
 				var div = document.createElement('div');
 				var newElm = init(display, div, newModule, args, elm);
 				inputs = [];
-				// elm.swap = newElm.swap;
+
 				return newElm;
 			}
 
@@ -134,13 +134,13 @@ if (!Elm.fullscreen) {
 			}
 			catch (error)
 			{
-				if (typeof container.appendChild === 'undefined')
+				if (typeof container.appendChild === "function")
 				{
-					console.error(error.message);
+					container.appendChild(errorNode(error.message));
 				}
 				else
 				{
-					container.appendChild(errorNode(error.message));
+					console.error(error.message);
 				}
 				throw error;
 			}
@@ -312,7 +312,7 @@ if (!Elm.fullscreen) {
 			// Figure out what the render functions should be
 			var render;
 			var update;
-			if (initialScene.props)
+			if (initialScene.ctor === 'Element_elm_builtin')
 			{
 				var Element = Elm.Native.Graphics.Element.make(elm);
 				render = Element.render;

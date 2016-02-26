@@ -1,14 +1,10 @@
 module Keyboard
-    ( KeyCode
-    , arrows, wasd
+    ( arrows, wasd
     , enter, space, ctrl, shift, alt, meta
     , isDown, keysDown, presses
     ) where
 
 {-| Library for working with keyboard input.
-
-# Representing Keys
-@docs KeyCode
 
 # Directions
 @docs arrows, wasd
@@ -25,16 +21,10 @@ otherwise.
 -}
 
 import Basics exposing (always, (-))
+import Char exposing (KeyCode)
 import Set
 import Native.Keyboard
 import Signal exposing (Signal)
-
-
-{-| Type alias to make it clearer what integers are supposed to represent
-in this library. Use `Char.toCode` and `Char.fromCode` to convert key codes
-to characters. Use the uppercase character with `toCode`.
--}
-type alias KeyCode = Int
 
 
 -- MANAGE RAW STREAMS

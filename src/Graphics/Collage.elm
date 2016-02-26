@@ -56,7 +56,8 @@ import Text exposing (Text)
 {-| A visual `Form` has a shape and texture. This can be anything from a red
 square to a circle textured with stripes.
 -}
-type alias Form =
+type Form =
+  Form_elm_builtin
     { theta : Float
     , scale : Float
     , x : Float
@@ -100,7 +101,7 @@ type alias LineStyle =
 You can use record updates to build the line style you
 want. For example, to make a thicker line, you could say:
 
-    { defaultLine | width <- 10 }
+    { defaultLine | width = 10 }
 -}
 defaultLine : LineStyle
 defaultLine =
@@ -116,19 +117,19 @@ defaultLine =
 {-| Create a solid line style with a given color. -}
 solid : Color -> LineStyle
 solid  clr =
-  { defaultLine | color <- clr }
+  { defaultLine | color = clr }
 
 
 {-| Create a dashed line style with a given color. Dashing equals `[8,4]`. -}
 dashed : Color -> LineStyle
 dashed clr =
-  { defaultLine | color <- clr, dashing <- [8,4] }
+  { defaultLine | color = clr, dashing = [8,4] }
 
 
 {-| Create a dotted line style with a given color. Dashing equals `[3,3]`. -}
 dotted : Color -> LineStyle
 dotted clr =
-  { defaultLine | color <- clr, dashing <- [3,3] }
+  { defaultLine | color = clr, dashing = [3,3] }
 
 
 type BasicForm
@@ -148,7 +149,14 @@ type ShapeStyle
 
 form : BasicForm -> Form
 form f =
-  { theta=0, scale=1, x=0, y=0, alpha=1, form=f }
+  Form_elm_builtin
+    { theta = 0
+    , scale = 1
+    , x = 0
+    , y = 0
+    , alpha = 1
+    , form = f
+    }
 
 
 fill style (Shape shape) =
@@ -206,6 +214,7 @@ toForm e =
 
 {-| Flatten many forms into a single `Form`. This lets you move and rotate them
 as a single unit, making it possible to build small, modular components.
+Forms will be drawn in the order that they are listed, as in `collage`.
 -}
 group : List Form -> Form
 group fs =
@@ -213,7 +222,8 @@ group fs =
 
 
 {-| Flatten many forms into a single `Form` and then apply a matrix
-transformation.
+transformation. Forms will be drawn in the order that they are listed, as in
+`collage`.
 -}
 groupTransform : Transform2D -> List Form -> Form
 groupTransform matrix fs =
@@ -224,32 +234,32 @@ groupTransform matrix fs =
 `(move (5,10) form)` would move `form` five pixels to the right and ten pixels up.
 -}
 move : (Float,Float) -> Form -> Form
-move (x,y) f =
-  { f | x <- f.x + x, y <- f.y + y }
+move (x,y) (Form_elm_builtin f) =
+  Form_elm_builtin { f | x = f.x + x, y = f.y + y }
 
 
 {-| Move a shape in the x direction. This is relative so `(moveX 10 form)` moves
 `form` 10 pixels to the right.
 -}
 moveX : Float -> Form -> Form
-moveX x f =
-  { f | x <- f.x + x }
+moveX x (Form_elm_builtin f) =
+  Form_elm_builtin { f | x = f.x + x }
 
 
 {-| Move a shape in the y direction. This is relative so `(moveY 10 form)` moves
 `form` upwards by 10 pixels.
 -}
 moveY : Float -> Form -> Form
-moveY y f =
-  { f | y <- f.y + y }
+moveY y (Form_elm_builtin f) =
+  Form_elm_builtin { f | y = f.y + y }
 
 
 {-| Scale a form by a given factor. Scaling by 2 doubles both dimensions,
 and quadruples the area.
 -}
 scale : Float -> Form -> Form
-scale s f =
-  { f | scale <- f.scale * s }
+scale s (Form_elm_builtin f) =
+  Form_elm_builtin { f | scale = f.scale * s }
 
 
 {-| Rotate a form by a given angle. Rotate takes standard Elm angles (radians)
@@ -257,18 +267,22 @@ and turns things counterclockwise. So to turn `form` 30&deg; to the left
 you would say, `(rotate (degrees 30) form)`.
 -}
 rotate : Float -> Form -> Form
-rotate t f =
-  { f | theta <- f.theta + t }
+rotate t (Form_elm_builtin f) =
+  Form_elm_builtin { f | theta = f.theta + t }
 
 
 {-| Set the alpha of a `Form`. The default is 1, and 0 is totally transparent. -}
 alpha : Float -> Form -> Form
-alpha a f =
-  { f | alpha <- a }
+alpha a (Form_elm_builtin f) =
+  Form_elm_builtin { f | alpha = a }
 
 
-{-| A collage is a collection of 2D forms. There are no strict positioning
-relationships between forms, so you are free to do all kinds of 2D graphics.
+{-| Create a collage with certain dimensions and content. It takes width and height
+arguments to specify dimensions, and then a list of 2D forms to decribe the content.
+
+Unlike with `Element`s, these 2D forms can be moved and rotated however you like.
+The forms are drawn in the order of the list, i.e., `collage w h [a, b]` will
+draw `b` on top of `a`.
 -}
 collage : Int -> Int -> List Form -> Element
 collage =

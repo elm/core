@@ -218,8 +218,8 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 	function customButton(message, up, hover, down)
 	{
 		return A3(Element.newElement,
-				  max3(up.props.width, hover.props.width, down.props.width),
-				  max3(up.props.height, hover.props.height, down.props.height),
+				  max3(up._0.props.width, hover._0.props.width, down._0.props.width),
+				  max3(up._0.props.height, hover._0.props.height, down._0.props.height),
 				  { ctor: 'Custom',
 					type: 'CustomButton',
 					render: renderCustomButton,
@@ -360,10 +360,8 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 			field.value = field.elm_old_value;
 
 			Signal.sendMessage(field.elm_handler({
-				_: {},
 				string: next,
 				selection: {
-					_: {},
 					start: start,
 					end: end,
 					direction: { ctor: direction }
@@ -431,29 +429,37 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 		return F4(field);
 	}
 
-	function hoverable(handler, elem)
+	function hoverable(handler, wrappedElement)
 	{
 		function onHover(bool)
 		{
 			Signal.sendMessage(handler(bool));
 		}
-		var props = Utils.replace([['hover', onHover]], elem.props);
+		var element = wrappedElement._0;
+		var newProps = Utils.update(element.props, { hover: onHover });
 		return {
-			props: props,
-			element: elem.element
+			ctor: wrappedElement.ctor,
+			_0: {
+				props: newProps,
+				element: element.element
+			}
 		};
 	}
 
-	function clickable(message, elem)
+	function clickable(message, wrappedElement)
 	{
 		function onClick()
 		{
 			Signal.sendMessage(message);
 		}
-		var props = Utils.replace([['click', onClick]], elem.props);
+		var element = wrappedElement._0;
+		var newProps = Utils.update(element.props, { click: onClick });
 		return {
-			props: props,
-			element: elem.element
+			ctor: wrappedElement.ctor,
+			_0: {
+				props: newProps,
+				element: element.element
+			}
 		};
 	}
 

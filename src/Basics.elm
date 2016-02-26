@@ -1,7 +1,7 @@
 module Basics
     ( (==), (/=)
     , (<), (>), (<=), (>=), max, min, Order (..), compare
-    , not, (&&), (||), xor, otherwise
+    , not, (&&), (||), xor
     , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
     , pi, cos, sin, tan, acos, asin, atan, atan2
     , round, floor, ceiling, truncate, toFloat
@@ -29,7 +29,7 @@ are your tuples so big?
 @docs (<), (>), (<=), (>=), max, min, Order, compare
 
 # Booleans
-@docs not, (&&), (||), xor, otherwise
+@docs not, (&&), (||), xor
 
 # Mathematics
 @docs (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
@@ -68,7 +68,6 @@ which happen to be radians.
 import Native.Basics
 import Native.Port
 import Native.Runtime
-import Native.Show
 import Native.Utils
 
 
@@ -92,13 +91,13 @@ turns =
   Native.Basics.turns
 
 
-{-| Convert polar coordinates (r,&theta;) to cartesian coordinates (x,y). -}
+{-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
 fromPolar : (Float,Float) -> (Float,Float)
 fromPolar =
   Native.Basics.fromPolar
 
 
-{-| Convert cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
+{-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
 toPolar : (Float,Float) -> (Float,Float)
 toPolar =
   Native.Basics.toPolar
@@ -214,7 +213,7 @@ atan =
   Native.Basics.atan
 
 
-{-| This helps you find the angle of a cartesian coordinate.
+{-| This helps you find the angle of a Cartesian coordinate.
 You will almost certainly want to use this instead of `atan`.
 So `atan2 y x` computes *atan(y/x)* but also keeps track of which
 quadrant the angle should really be in. The result will be between
@@ -389,12 +388,6 @@ not =
   Native.Basics.not
 
 
-{-| Equal to `True`. Useful as the last case of a multi-way-if. -}
-otherwise : Bool
-otherwise =
-  True
-
-
 -- Conversions
 
 {-| Round a number to the nearest integer. -}
@@ -465,7 +458,7 @@ with `Text.fromString` it should look just like the value it came from.
 -}
 toString : a -> String
 toString =
-  Native.Show.toString
+  Native.Utils.toString
 
 
 {-| Put two appendable things together. This includes strings, lists, and text.
@@ -515,7 +508,7 @@ reads nicely in expressions like: `filter (not << isRegistered) students`
 
 
 {-| Forward function application `x |> f == f x`. This function is useful
-for avoiding parenthesis and writing code in a more natural way.
+for avoiding parentheses and writing code in a more natural way.
 Consider the following code to create a pentagon:
 
     scale 2 (move (10,10) (filled blue (ngon 5 30)))
@@ -528,21 +521,21 @@ This can also be written as:
       |> scale 2
 -}
 (|>) : a -> (a -> b) -> b
-x |> f =
+(|>) x f =
   f x
 
 
 {-| Backward function application `f <| x == f x`. This function is useful for
-avoiding parenthesis. Consider the following code to create a text element:
+avoiding parentheses. Consider the following code to create a text element:
 
     leftAligned (monospace (fromString "code"))
 
 This can also be written as:
 
-    leftAligned << monospace <| fromString "code"
+    leftAligned <| monospace <| fromString "code"
 -}
 (<|) : (a -> b) -> a -> b
-f <| x =
+(<|) f x =
   f x
 
 

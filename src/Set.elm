@@ -49,7 +49,7 @@ type Set t =
 
 {-| Create an empty set.
 -}
-empty : Set comparable
+empty : Set a
 empty =
   Set_elm_builtin Dict.empty
 
@@ -77,7 +77,7 @@ remove k (Set_elm_builtin d) =
 
 {-| Determine if a set is empty.
 -}
-isEmpty : Set comparable -> Bool
+isEmpty : Set a -> Bool
 isEmpty (Set_elm_builtin d) =
   Dict.isEmpty d
 
@@ -91,7 +91,7 @@ member k (Set_elm_builtin d) =
 
 {-| Determine the number of elements in a set.
 -}
-size : Set comparable -> Int
+size : Set a -> Int
 size (Set_elm_builtin d) =
   Dict.size d
 
@@ -118,7 +118,7 @@ diff (Set_elm_builtin d1) (Set_elm_builtin d2) =
   Set_elm_builtin <| Dict.diff d1 d2
 
 
-{-| Convert a set into a list.
+{-| Convert a set into a list, sorted from lowest to highest.
 -}
 toList : Set comparable -> List comparable
 toList (Set_elm_builtin d) =

@@ -76,7 +76,8 @@ import Text exposing (Text)
 rectangle with a known width and height, so they can be composed and stacked
 easily.
 -}
-type alias Element =
+type Element =
+  Element_elm_builtin
     { props : Properties
     , element : ElementPrim
     }
@@ -100,66 +101,56 @@ type alias Properties =
     flow down [ img1, if showMore then img2 else empty ]
 -}
 empty : Element
-empty = spacer 0 0
+empty =
+    spacer 0 0
 
 
 {-| Get the width of an Element -}
 widthOf : Element -> Int
-widthOf e =
+widthOf (Element_elm_builtin e) =
     e.props.width
 
 
 {-| Get the height of an Element -}
 heightOf : Element -> Int
-heightOf e =
+heightOf (Element_elm_builtin e) =
     e.props.height
 
 
 {-| Get the width and height of an Element -}
 sizeOf : Element -> (Int,Int)
-sizeOf e =
+sizeOf (Element_elm_builtin e) =
     (e.props.width, e.props.height)
 
 
 {-| Create an `Element` with a given width. -}
 width : Int -> Element -> Element
-width nw e =
-    let p = e.props
+width newWidth (Element_elm_builtin {element, props}) =
+  let
+    newHeight =
+      case element of
+        Image _ w h _ ->
+            round (toFloat h / toFloat w * toFloat newWidth)
 
-        props =
-            case e.element of
-              Image _ w h _ ->
-                  { p |
-                      height <- round (toFloat h / toFloat w * toFloat nw)
-                  }
+        RawHtml ->
+            snd (Native.Graphics.Element.htmlHeight newWidth element)
 
-              RawHtml ->
-                  { p |
-                      height <- snd (Native.Graphics.Element.htmlHeight nw e.element)
-                  }
-
-              _ -> p
-    in
-        { element = e.element
-        , props = { props | width <- nw }
-        }
+        _ ->
+            props.height
+  in
+    Element_elm_builtin
+      { element = element
+      , props = { props | width = newWidth, height = newHeight }
+      }
 
 
 {-| Create an `Element` with a given height. -}
 height : Int -> Element -> Element
-height nh e =
-    let p = e.props
-        props =
-            case e.element of
-              Image _ w h _ ->
-                  { p |
-                      width <- round (toFloat w / toFloat h * toFloat nh)
-                  }
-              _ -> p
-    in
-        { element = e.element
-        , props = { p | height <- nh }
-        }
+height newHeight (Element_elm_builtin {element, props}) =
+  Element_elm_builtin
+    { element = element
+    , props = { props | height = newHeight }
+    }
 
 
 {-| Create an `Element` with a new width and height. -}
@@ -172,20 +163,20 @@ size w h e =
 where 0 means totally clear.
 -}
 opacity : Float -> Element -> Element
-opacity o e =
-    let p = e.props
-    in
-        { element = e.element
-        , props = { p | opacity <- o }
-        }
+opacity givenOpacity (Element_elm_builtin {element, props}) =
+  Element_elm_builtin
+    { element = element
+    , props = { props | opacity = givenOpacity }
+    }
 
 
 {-| Create an `Element` with a given background color. -}
 color : Color -> Element -> Element
-color c e = let p = e.props in
-            { element = e.element
-            , props = { p | color <- Just c}
-            }
+color clr (Element_elm_builtin {element, props}) =
+  Element_elm_builtin
+    { element = element
+    , props = { props | color = Just clr }
+    }
 
 
 {-| Create an `Element` with a tag. This lets you link directly to it.
@@ -193,22 +184,20 @@ The element `(tag "all-about-badgers" thirdParagraph)` can be reached
 with a link like this: `/facts-about-animals.elm#all-about-badgers`
 -}
 tag : String -> Element -> Element
-tag name e =
-    let p = e.props
-    in
-        { element = e.element
-        , props = { p | tag <- name }
-        }
+tag name (Element_elm_builtin {element, props}) =
+  Element_elm_builtin
+    { element = element
+    , props = { props | tag = name }
+    }
 
 
 {-| Create an `Element` that is a hyper-link. -}
 link : String -> Element -> Element
-link href e =
-    let p = e.props
-    in
-        { element = e.element
-        , props = { p | href <- href }
-        }
+link href (Element_elm_builtin {element, props}) =
+  Element_elm_builtin
+    { element = element
+    , props = { props | href = href }
+    }
 
 
 newElement : Int -> Int -> ElementPrim -> Element
@@ -319,9 +308,12 @@ type Three = P | Z | N
 
 
 {-| Specifies a distance from a particular location within a `container`, like
-“20 pixels right and up from the center”.
+“20 pixels right and up from the center”. You can use `absolute` or `relative`
+to specify a `Pos` in pixels or as a percentage of the container.
 -}
-type Pos = Absolute Int | Relative Float
+type Pos
+    = Absolute Int
+    | Relative Float
 
 
 {-| Specifies a position for an element within a `container`, like “the top
@@ -439,14 +431,25 @@ layers es =
 
 -- Repetitive things --
 
-{-|-}
+{-| A position specified in pixels. If you want something 10 pixels to the
+right of the middle of a container, you would write this:
+
+    middleAt (absolute 10) (absolute 0)
+
+-}
 absolute : Int -> Pos
-absolute = Absolute
+absolute =
+  Absolute
 
 
-{-|-}
+{-| A position specified as a percentage. If you want something 10% away from
+the top left corner, you would say:
+
+    topLeftAt (relative 0.1) (relative 0.1)
+-}
 relative : Float -> Pos
-relative = Relative
+relative =
+  Relative
 
 
 {-|-}

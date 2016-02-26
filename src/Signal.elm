@@ -2,7 +2,6 @@ module Signal
     ( Signal
     , merge, mergeMany
     , map, map2, map3, map4, map5
-    , (<~), (~)
     , constant
     , dropRepeats, filter, filterMap, sampleOn
     , foldp
@@ -34,9 +33,6 @@ signals and time (e.g. timestamps) can be found in the [`Time`](Time) library.
 # Mapping
 @docs map, map2, map3, map4, map5
 
-# Fancy Mapping
-@docs (<~), (~)
-
 # Past-Dependence
 @docs foldp
 
@@ -60,7 +56,7 @@ import Native.Signal
 import Task exposing (Task, succeed, onError)
 
 
-{-| A value that changes over time. So a `(Signal Int))` is an integer that is
+{-| A value that changes over time. So a `(Signal Int)` is an integer that is
 varying as time passes, perhaps representing the current window width of the
 browser. Every signal is updated at discrete moments in response to events in
 the world.
@@ -129,7 +125,7 @@ map5 =
   Native.Signal.map5
 
 
-{-| Create a past-dependent signal. Each update from the incoming signals will
+{-| Create a past-dependent signal. Each update from the incoming signal will
 be used to step the state forward. The outgoing signal represents the current
 state.
 
@@ -143,6 +139,11 @@ state.
 
 So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
 is the time the program has been running, updated 40 times a second.
+
+Note: The behavior of the outgoing signal is not influenced at all by
+the initial value of the incoming signal, only by updates occurring on
+the latter. So the initial value of `sig` is completely ignored in
+`foldp f s sig`.
 -}
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp =
@@ -161,8 +162,8 @@ together lots of different signals to feed into a `foldp`.
             (map TimeDelta (fps 40))
 
 If an update comes from either of the incoming signals, it updates the outgoing
-signal. If an update comes on both signals at the same time, the left update
-wins (i.e., the right update is discarded).
+signal. If an update comes on both signals at the same time, the update provided
+by the left input signal wins (i.e., the update from the second signal is discarded).
 -}
 merge : Signal a -> Signal a -> Signal a
 merge left right =
@@ -257,50 +258,9 @@ sampleOn =
     Native.Signal.sampleOn
 
 
-{-| An alias for `map`. A prettier way to apply a function to the current value
-of a signal.
-
-    main : Signal Html
-    main =
-      view <~ model
-
-    model : Signal Model
-
-    view : Model -> Html
--}
-(<~) : (a -> b) -> Signal a -> Signal b
-(<~) =
-  map
-
-
-{-| Intended to be paired with the `(<~)` operator, this makes it possible for
-many signals to flow into a function. Think of it as a fancy alias for
-`mapN`. For example, the following declarations are equivalent:
-
-    main : Signal Element
-    main =
-      scene <~ Window.dimensions ~ Mouse.position
-
-    main : Signal Element
-    main =
-      map2 scene Window.dimensions Mouse.position
-
-You can use this pattern for as many signals as you want by using `(~)` a bunch
-of times, so you can go higher than `map5` if you need to.
--}
-(~) : Signal (a -> b) -> Signal a -> Signal b
-(~) funcs args =
-  map2 (\f v -> f v) funcs args
-
-
-infixl 4 <~
-infixl 4 ~
-
-
-
 -- MAILBOXES
 
-{-| An `Mailbox` is a communication hub. It is made up of
+{-| A `Mailbox` is a communication hub. It is made up of
 
   * an `Address` that you can send messages to
   * a `Signal` of messages sent to the mailbox

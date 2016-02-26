@@ -90,8 +90,8 @@ map =
 {-| Using a certain decoder, attempt to parse a JSON string. If the decoder
 fails, you will get a string message telling you why.
 
-    decodeString (tuple2 float float) "[3,4]"                  -- Ok (3,4)
-    decodeString (tuple2 float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
+    decodeString (tuple2 (,) float float) "[3,4]"                  -- Ok (3,4)
+    decodeString (tuple2 (,) float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
 -}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
@@ -118,7 +118,8 @@ at fields decoder =
     List.foldr (:=) decoder fields
 
 
-{-| Decode an object if it has a certain field.
+{-| Applies the decoder to the field with the given name.
+Fails if the JSON object has no such field.
 
     nameAndAge : Decoder (String,Int)
     nameAndAge =
@@ -206,10 +207,10 @@ object8 =
     Native.Json.decodeObject8
 
 
-{-| Turn any object into a list of key-value pairs. Fails if _any_ key can't be
+{-| Turn any object into a list of key-value pairs, including inherited enumerable properties. Fails if _any_ value can't be
 decoded with the given decoder.
 
-    -- { tom: 89, sue: 92, bill: 97, ... }
+    -- { "tom": 89, "sue": 92, "bill": 97, ... }
     grades : Decoder (List (String, Int))
     grades =
         keyValuePairs int
@@ -219,9 +220,10 @@ keyValuePairs =
     Native.Json.decodeKeyValuePairs
 
 
-{-| Turn any object into a dictionary of key-value pairs.
+{-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properties. Fails if _any_ value can't be
+decoded with the given decoder.
 
-    -- { mercury: 0.33, venus: 4.87, earth: 5.97, ... }
+    -- { "mercury": 0.33, "venus": 4.87, "earth": 5.97, ... }
     planetMasses : Decoder (Dict String Float)
     planetMasses =
         dict float
@@ -236,7 +238,7 @@ dict decoder =
 with something with a very strange shape and when `andThen` does not help
 narrow things down so you can be more targeted.
 
-    -- [ [3,4], { x:0, y:0 }, [5,12] ]
+    -- [ [3,4], { "x":0, "y":0 }, [5,12] ]
 
     points : Decoder (List (Float,Float))
     points =
@@ -282,7 +284,7 @@ float =
 
 {-| Extract an integer.
 
-    -- { ... age: 42 ... }
+    -- { ... "age": 42 ... }
 
     age : Decoder Int
     age =
@@ -295,11 +297,11 @@ int =
 
 {-| Extract a boolean.
 
-    -- { ... checked: true ... }
+    -- { ... "checked": true ... }
 
     checked : Decoder Bool
     checked =
-        "checked" := true
+        "checked" := bool
 -}
 bool : Decoder Bool
 bool =
@@ -356,7 +358,7 @@ null =
 
 {-| Extract a Maybe value, wrapping successes with `Just` and turning any
 failure in `Nothing`. If you are expecting that a field can sometimes be `null`,
-it's better to check for it [explictly](#null), as this function will swallow
+it's better to check for it [explicitly](#null), as this function will swallow
 errors from ill-formed JSON.
 
 The following code decodes JSON objects that may not have a profession field.
@@ -498,7 +500,7 @@ missing.
 
     point3D : Decoder (Float,Float,Float)
     point3D =
-        object (,,)
+        object3 (,,)
           ("x" := float)
           ("y" := float)
           (oneOf [ "z" := float, succeed 0 ])
@@ -511,6 +513,10 @@ succeed =
 -- TUPLES
 
 {-| Handle an array with exactly one element.
+
+    extractString : Decoder String
+    extractString = 
+        tuple1 identity string
 
     authorship : Decoder String
     authorship =

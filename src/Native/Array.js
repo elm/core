@@ -371,7 +371,7 @@ Elm.Native.Array.make = function(localRuntime) {
 			newA.table[i] =
 				a.height === 0
 					? A2(f, from + i, a.table[i])
-					: indexedMap_(f, a.table[i], i === 0 ? 0 : a.lengths[i - 1]);
+					: indexedMap_(f, a.table[i], i == 0 ? from : from + a.lengths[i - 1]);
 		}
 		return newA;
 	}

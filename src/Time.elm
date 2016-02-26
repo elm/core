@@ -25,7 +25,7 @@ import Signal exposing (Signal)
 
 
 {-| Units of time, making it easier to specify things like a half-second
-`(500 * milliseconds)` without remembering Elm&rsquo;s underlying units of time.
+`(500 * millisecond)` without remembering Elm&rsquo;s underlying units of time.
 -}
 millisecond : Time
 millisecond =
@@ -100,7 +100,7 @@ fpsWhen =
 {-| Takes a time interval `t`. The resulting signal is the current time, updated
 every `t`.
 
-Note: Calling `every 100` twice gives two independently running timers.
+Note: Calling `every (100 * millisecond)` twice gives two independently running timers.
 -}
 every : Time -> Signal Time
 every =

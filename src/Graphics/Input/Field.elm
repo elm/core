@@ -100,7 +100,7 @@ noHighlight =
 
 
 {-| Describe the style of a text box. `style` describes the style of the text
-itself using [`Text.Style`](/Text#Style). `highlight` describes the glowing blue
+itself using [`Text.Style`](Text#Style). `highlight` describes the glowing blue
 highlight that shows up when the field has focus. `outline` describes the line
 surrounding the text field, and `padding` adds whitespace between the `outline`
 and the text.
@@ -186,7 +186,7 @@ to match what they have entered.
 
     nameField : Signal Element
     nameField =
-        field defaultStyle (Signal.message name.address) "Name" <~ name.signal
+        Signal.map (field defaultStyle (Signal.message name.address) "Name") name.signal
 
 When we use the `field` function, we first give it a visual style. This is
 the first argument so that it is easier to define your own custom field

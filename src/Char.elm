@@ -1,6 +1,7 @@
 module Char
     ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
-    , toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
+    , toUpper, toLower, toLocaleUpper, toLocaleLower
+    , KeyCode, toCode, fromCode
     ) where
 
 {-| Functions for working with characters. Character literals are enclosed in
@@ -10,7 +11,10 @@ module Char
 @docs isUpper, isLower, isDigit, isOctDigit, isHexDigit
 
 # Conversion
-@docs toUpper, toLower, toLocaleUpper, toLocaleLower, KeyCode, toCode, fromCode
+@docs toUpper, toLower, toLocaleUpper, toLocaleLower
+
+# Key Codes
+@docs KeyCode, toCode, fromCode
 
 -}
 
@@ -25,13 +29,13 @@ isBetween low high char =
       (code >= toCode low) && (code <= toCode high)
 
 
-{-| True for upper case letters. -}
+{-| True for upper case ASCII letters. -}
 isUpper : Char -> Bool
 isUpper =
   isBetween 'A' 'Z'
 
 
-{-| True for lower case letters. -}
+{-| True for lower case ASCII letters. -}
 isLower : Char -> Bool
 isLower =
   isBetween 'a' 'z'
@@ -79,13 +83,15 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
-{-| A simple alias for integers.
+{-| In this library, we use integers to represent the key codes coming from the
+keyboard. You can use [`toCode`](#toCode) and [`fromCode`](#fromCode)
+to convert between key codes and characters.
 -}
 type alias KeyCode = Int
 
 
-{-| Convert to unicode. Used with the `Keyboard` library, which expects the
-input to be uppercase.
+{-| Convert to unicode. Used with the [`Keyboard`](Keyboard) library,
+which expects the input to be uppercase.
 -}
 toCode : Char -> KeyCode
 toCode =
