@@ -5,8 +5,7 @@ import Result
 import Result exposing (Result(..))
 import String
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 isEven n =
   if n % 2 == 0

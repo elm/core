@@ -3,8 +3,7 @@ module Test.Equality (tests) where
 import Basics exposing (..)
 import Maybe exposing (..)
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 type Different
     = A String 
