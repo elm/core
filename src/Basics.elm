@@ -505,7 +505,7 @@ reads nicely in expressions like: `filter (not << isRegistered) students`
 
 
 {-| Forward function application `x |> f == f x`. This function is useful
-for avoiding parenthesis and writing code in a more natural way.
+for avoiding parentheses and writing code in a more natural way.
 Consider the following code to create a pentagon:
 
     scale 2 (move (10,10) (filled blue (ngon 5 30)))
@@ -523,13 +523,13 @@ This can also be written as:
 
 
 {-| Backward function application `f <| x == f x`. This function is useful for
-avoiding parenthesis. Consider the following code to create a text element:
+avoiding parentheses. Consider the following code to create a text element:
 
     leftAligned (monospace (fromString "code"))
 
 This can also be written as:
 
-    leftAligned << monospace <| fromString "code"
+    leftAligned <| monospace <| fromString "code"
 -}
 (<|) : (a -> b) -> a -> b
 (<|) f x =

@@ -56,7 +56,7 @@ import Native.Signal
 import Task exposing (Task, succeed, onError)
 
 
-{-| A value that changes over time. So a `(Signal Int))` is an integer that is
+{-| A value that changes over time. So a `(Signal Int)` is an integer that is
 varying as time passes, perhaps representing the current window width of the
 browser. Every signal is updated at discrete moments in response to events in
 the world.
@@ -125,7 +125,7 @@ map5 =
   Native.Signal.map5
 
 
-{-| Create a past-dependent signal. Each update from the incoming signals will
+{-| Create a past-dependent signal. Each update from the incoming signal will
 be used to step the state forward. The outgoing signal represents the current
 state.
 
@@ -139,6 +139,11 @@ state.
 
 So `clickCount` updates on each mouse click, incrementing by one. `timeSoFar`
 is the time the program has been running, updated 40 times a second.
+
+Note: The behavior of the outgoing signal is not influenced at all by
+the initial value of the incoming signal, only by updates occurring on
+the latter. So the initial value of `sig` is completely ignored in
+`foldp f s sig`.
 -}
 foldp : (a -> state -> state) -> state -> Signal a -> Signal state
 foldp =

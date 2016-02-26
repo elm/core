@@ -4,8 +4,7 @@ import Basics exposing (..)
 import Result exposing (..)
 import Json.Decode
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 tests : Test
 tests =

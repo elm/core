@@ -162,7 +162,7 @@ first month from a `List` and then make sure it is between 1 and 12:
     getFirstMonth months =
         head months `andThen` toValidMonth
 
-If `head` fails and results in `Nothing` (because the `List` was empty`),
+If `head` fails and results in `Nothing` (because the `List` was `empty`),
 this entire chain of operations will short-circuit and result in `Nothing`.
 If `toValidMonth` results in `Nothing`, again the chain of computations
 will result in `Nothing`.

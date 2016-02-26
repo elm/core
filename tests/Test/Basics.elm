@@ -1,8 +1,7 @@
 module Test.Basics (tests) where
 
 import Basics exposing (..)
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 tests : Test
 tests =
@@ -104,7 +103,6 @@ tests =
             , test "xor True True" <| assertEqual False (xor True True)
             , test "not True" <| assertEqual False (not True)
             , test "not False" <| assertEqual True (not False)
-            , test "otherwise" <| assertEqual True otherwise
             ]
         conversionTests = suite "Conversion Tests"
             [ test "round 0.6" <| assertEqual 1 (round 0.6)

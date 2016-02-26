@@ -3,8 +3,7 @@ module Test.Bitwise (tests) where
 import Basics exposing (..)
 import Bitwise
 
-import ElmTest.Assertion exposing (..)
-import ElmTest.Test exposing (..)
+import ElmTest exposing (..)
 
 tests : Test
 tests =
