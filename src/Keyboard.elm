@@ -20,7 +20,7 @@ otherwise.
 
 -}
 
-import Basics exposing (always, (-))
+import Basics exposing (always, (-), (/=))
 import Char exposing (KeyCode)
 import Set
 import Native.Keyboard
