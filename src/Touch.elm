@@ -14,7 +14,7 @@ include gestures that would be useful for both games and web-pages.
 -}
 
 import Native.Touch
-import Time exposing (Time)
+import Basics exposing (Time)
 import Signal exposing (Signal)
 
 
