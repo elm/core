@@ -196,8 +196,9 @@ keysDown =
   dropMap .keyCodes model
 
 
-{-| The latest key that has been pressed. -}
+{-| The latest key normally producing a character value that has
+been pressed. -}
 presses : Signal KeyCode
 presses =
-  Signal.map .keyCode Native.Keyboard.presses
+  Signal.filter ((/=) 0) 0 (Signal.map .keyCode Native.Keyboard.presses)
 
