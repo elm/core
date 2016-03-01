@@ -92,49 +92,38 @@ function map(tagger, bag)
 
 function categorizeEffects(bag)
 {
-	return categorizeEffectsHelp(bag, {});
+	var effectsDict = {};
+	categorizeEffectsHelp(bag, null, effectsDict);
+	return effectsDict;
 }
 
-function categorizeEffectsHelp(bag, effectDict)
+function categorizeEffectsHelp(bag, taggers, effectsDict)
 {
 	switch (bag.type)
 	{
 		case 'leaf':
 			var home = bag.home;
-			var effects = effectDict[home];
-
+			var list = effectsDict[home] || _elm_lang$core$Native_List.Nil;
 			var value = {
 				effect: bag.value,
-				taggers: []
+				taggers: taggers
 			};
-
-			effects
-				? effects.push(value)
-				: effectDict[home] = [value];
-
-			return effectDict;
+			effectsDict[home] = _elm_lang$core$Native_List.Cons(value, list);
+			return;
 
 		case 'node':
 			var list = bag.branches;
 			while (list.ctor !== '[]')
 			{
-				categorizeEffectsHelp(list._0, effectDict);
+				categorizeEffectsHelp(list._0, taggers, effectsDict);
 				list = list._1;
 			}
-			return effectDict;
+			return;
 
 		case 'map':
-			categorizeEffectsHelp(bag.tree, effectDict);
-			for (var home in effectDict)
-			{
-				var effects = effectDict[home];
-				for (var i = 0; i < effects.length; i++)
-				{
-					var effect = effects[i];
-					effect.taggers.push(bag.tagger);
-				}
-			}
-			return effectDict;
+			var newTaggers = { tagger: bag.tagger, rest: taggers };
+			categorizeEffectsHelp(bag.tree, newTaggers, effectsDict);
+			return;
 	}
 }
 
