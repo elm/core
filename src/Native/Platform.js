@@ -94,7 +94,7 @@ function fullscreenFor(program)
 	{
 		return function fullscreen()
 		{
-			_evancz$virtual_dom$Native_VirtualDom.render(document.body, program);
+			_evancz$virtual_dom$Native_VirtualDom.staticProgram(document.body, program);
 		}
 	}
 
