@@ -3,8 +3,12 @@
 var _elm_lang$core$Native_Platform = function() {
 
 
-// PROGRAMS
+// EFFECT MANAGERS
 
+var managers = {};
+
+
+// PROGRAMS
 
 function addPublicModule(object, name, main)
 {
@@ -39,10 +43,8 @@ function fullscreenFor(program)
 
 		var tuple = program.init(flags);
 		var model = tuple._0;
-		var initialCmds = categorizeEffects(tuple._1);
-		var initialSubs = categorizeEffects(subs(model));
-
 		var renderer = program.renderer(document.body, enqueue, view(model));
+		dispatchEffects(tuple._1, subs(model));
 
 		function enqueue(msg)
 		{
@@ -50,16 +52,14 @@ function fullscreenFor(program)
 			// of the event queue. If so, do it another way instead.
 			var tuple = A2(update, msg, model);
 			model = tuple._0;
-			categorizeEffects(tuple._1);
 			renderer.update(view(model));
+			dispatchEffects(tuple._1, subs(model));
 		}
 	};
 }
 
 
-
 // BAGS
-
 
 function leaf(home)
 {
@@ -90,45 +90,79 @@ function map(tagger, bag)
 	}
 }
 
-function categorizeEffects(bag)
+
+// PIPE BAGS INTO EFFECT MANAGERS
+
+function dispatchEffects(cmdBag, subBag)
 {
 	var effectsDict = {};
-	categorizeEffectsHelp(bag, null, effectsDict);
-	return effectsDict;
+	gatherEffects('cmd', cmdBag, effectsDict, null);
+	gatherEffects('sub', subBag, effectsDict, null);
+
+	for (var home in effectsDict)
+	{
+		var effects = effectsDict[home];
+		var manager = managers[home];
+		// TODO actually give the effects to the manager
+	}
 }
 
-function categorizeEffectsHelp(bag, taggers, effectsDict)
+function gatherEffects(tag, bag, effectsDict, taggers)
 {
 	switch (bag.type)
 	{
 		case 'leaf':
 			var home = bag.home;
-			var list = effectsDict[home] || _elm_lang$core$Native_List.Nil;
-			var value = {
-				effect: bag.value,
-				taggers: taggers
-			};
-			effectsDict[home] = _elm_lang$core$Native_List.Cons(value, list);
+			var effect = toEffect(home, taggers, bag.value);
+			insert(tag, effectsDict, home, effect);
 			return;
 
 		case 'node':
 			var list = bag.branches;
 			while (list.ctor !== '[]')
 			{
-				categorizeEffectsHelp(list._0, taggers, effectsDict);
+				gatherEffects(list._0, effectsDict, insert, taggers);
 				list = list._1;
 			}
 			return;
 
 		case 'map':
-			var newTaggers = { tagger: bag.tagger, rest: taggers };
-			categorizeEffectsHelp(bag.tree, newTaggers, effectsDict);
+			gatherEffects(bag.tree, effectsDict, insert, {
+				tagger: bag.tagger,
+				rest: taggers
+			});
 			return;
 	}
 }
 
+function insert(tag, effectsDict, home, value)
+{
+	var effects = effectsDict[home] || {
+		'cmd': _elm_lang$core$Native_List.Nil,
+		'sub': _elm_lang$core$Native_List.Nil
+	};
+	effects[tag] = _elm_lang$core$Native_List.Cons(value, effects[tag]);
+	effectsDict[home] = effects;
+}
+
+function toEffect(tag, home, taggers, value)
+{
+	function applyTaggers(x)
+	{
+		var i = taggers.length;
+		while (i--)
+		{
+			x = taggers[i](x);
+		}
+		return x;
+	}
+
+	return A2(managers[home][tag], applyTaggers, value)
+}
+
 
 return {
+	managers: managers,
 	addPublicModule: addPublicModule,
 	leaf: leaf,
 	batch: batch,
