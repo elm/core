@@ -66,10 +66,10 @@ function cmp(x, y)
 	{
 		return x === y ? EQ : x < y ? LT : GT;
 	}
-	else if (x.isChar)
+	else if (x instanceof String)
 	{
-		var a = x.toString();
-		var b = y.toString();
+		var a = x.valueOf();
+		var b = y.valueOf();
 		return a === b
 			? EQ
 			: a < b
@@ -286,7 +286,9 @@ var toString = function(v)
 	}
 	else if (type === 'object' && 'ctor' in v)
 	{
-		if (v.ctor.substring(0, 6) === '_Tuple')
+		var ctorStarter = v.ctor.substring(0, 5);
+
+		if (ctorStarter === '_Tupl')
 		{
 			var output = [];
 			for (var k in v)
@@ -295,6 +297,10 @@ var toString = function(v)
 				output.push(toString(v[k]));
 			}
 			return '(' + output.join(',') + ')';
+		}
+		else if (ctorStarter === '_Task')
+		{
+			return '<task>'
 		}
 		else if (v.ctor === '_Array')
 		{
