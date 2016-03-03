@@ -165,8 +165,8 @@ multiple fields from an object.
 
     type alias Job = { name : String, id : Int, completed : Bool }
 
-    point : Decoder Job
-    point =
+    job : Decoder Job
+    job =
         object3 Job
           ("name" := string)
           ("id" := int)
