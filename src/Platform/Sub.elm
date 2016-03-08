@@ -40,7 +40,7 @@ map =
 
 {-|-}
 batch : List (Sub msg) -> Sub msg
-batch list =
+batch =
   Native.Platform.batch
 
 

@@ -50,7 +50,7 @@ map =
 
 {-|-}
 batch : List (Cmd msg) -> Cmd msg
-batch list =
+batch =
   Native.Platform.batch
 
 
