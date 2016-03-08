@@ -35,7 +35,7 @@ import Basics exposing (Never)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
-import Platform exposing (Process)
+import Platform
 import Platform.Cmd exposing (Cmd)
 import Result exposing (Result(Ok,Err))
 
@@ -49,7 +49,8 @@ that when we perform the task, it will either fail with a `String` message or
 succeed with a `User`. So this could represent a task that is asking a server
 for a certain user.
 -}
-type Task err ok = Task
+type alias Task err ok =
+  Platform.Task err ok
 
 
 
@@ -314,24 +315,24 @@ init =
   succeed ()
 
 
-appUpdate : Process a msg -> Process b Never -> () -> List (MyCmd msg) -> Task Never ()
-appUpdate app self state commands =
+onEffects : Platform.Router msg Never -> List (MyCmd msg) -> () -> Task Never ()
+onEffects router commands state =
   map
     (\_ -> ())
-    (sequence (List.map (spawnCmd app) commands))
+    (sequence (List.map (spawnCmd router) commands))
 
 
-selfUpdate : Process a msg -> Process b Never -> () -> Never -> Task Never ()
-selfUpdate app self state selfMsg =
+onSelfMsg : Platform.Router msg Never -> Never -> () -> Task Never ()
+onSelfMsg _ _ _ =
   succeed ()
 
 
-spawnCmd : Process a msg -> MyCmd msg -> Task x ()
-spawnCmd app cmd =
+spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
+spawnCmd router cmd =
   case cmd of
     Silent task ->
       Native.Scheduler.spawn task
 
     Noisy task ->
-      Native.Scheduler.spawn (task `andThen` Native.Scheduler.send app)
+      Native.Scheduler.spawn (task `andThen` Platform.sendToApp router)
 
