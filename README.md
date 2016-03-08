@@ -1,6 +1,6 @@
 # Elm Core Libraries
 
-[![Build Status](https://travis-ci.org/elm-lang/core.png)](https://travis-ci.org/elm-lang/core)
+[![Build Status](https://travis-ci.org/elm-lang/core.svg?branch=master)](https://travis-ci.org/elm-lang/core)
 
 Every Elm project needs the core libraries. They provide basic functionality including:
 
