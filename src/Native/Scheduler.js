@@ -61,28 +61,39 @@ function receive(callback)
 
 // PROCESSES
 
+function rawSpawn(task)
+{
+	var process = {
+		ctor: '_Process',
+		id: _elm_lang$core$Native_Utils.guid(),
+		root: task,
+		stack: null,
+		mailbox: []
+	};
+
+	enqueue(process);
+
+	return process;
+}
+
 function spawn(task)
 {
 	return nativeBinding(function(callback) {
-		var process = {
-			ctor: '_Process',
-			_0: _elm_lang$core$Native_Utils.guid(),
-			root: task,
-			stack: null,
-			mailbox: []
-		}
-
-		enqueue(process);
-
+		var process = rawSpawn(task);
 		callback(succeed(process));
-	};
+	});
+}
+
+function rawSend(process, msg)
+{
+	process.mailbox.push(msg);
+	enqueue(process);
 }
 
 function send(process, msg)
 {
 	return nativeBinding(function(callback) {
-		process.mailbox.push(msg);
-		enqueue(process);
+		rawSend(process, msg);
 		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
 	});
 }
@@ -99,77 +110,74 @@ function kill(process)
 		process.root = null;
 
 		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
-	};
+	});
 }
 
 function step(numSteps, process)
 {
-	var root = process.root;
-	var stack = process.stack;
-
 	while (numSteps < MAX_STEPS)
 	{
-		var ctor = root.ctor;
+		var ctor = process.root.ctor;
 
 		if (ctor === '_Task_succeed')
 		{
-			while (stack.ctor === '_Task_onError')
+			while (process.stack && process.stack.ctor === '_Task_onError')
 			{
-				stack = stack.rest;
+				process.stack = process.stack.rest;
 			}
-			if (stack === null)
+			if (process.stack === null)
 			{
 				break;
 			}
-			root = stack.callback(root.value);
-			stack = stack.rest;
+			process.root = process.stack.callback(process.root.value);
+			process.stack = process.stack.rest;
 			++numSteps;
 			continue;
 		}
 
 		if (ctor === '_Task_fail')
 		{
-			while (stack.ctor === '_Task_andThen')
+			while (process.stack && process.stack.ctor === '_Task_andThen')
 			{
-				stack = stack.rest;
+				process.stack = process.stack.rest;
 			}
-			if (stack === null)
+			if (process.stack === null)
 			{
 				break;
 			}
-			root = stack.callback(root.value);
-			stack = stack.rest;
+			process.root = process.stack.callback(process.root.value);
+			process.stack = process.stack.rest;
 			++numSteps;
 			continue;
 		}
 
 		if (ctor === '_Task_andThen')
 		{
-			stack = {
+			process.stack = {
 				ctor: '_Task_andThen',
-				callback: root.callback,
-				rest: stack
+				callback: process.root.callback,
+				rest: process.stack
 			};
-			root = root.task;
+			process.root = process.root.task;
 			++numSteps;
 			continue;
 		}
 
 		if (ctor === '_Task_onError')
 		{
-			stack = {
+			process.stack = {
 				ctor: '_Task_onError',
-				callback: root.callback,
-				rest: stack
+				callback: process.root.callback,
+				rest: process.stack
 			};
-			root = root.task;
+			process.root = process.root.task;
 			++numSteps;
 			continue;
 		}
 
 		if (ctor === '_Task_nativeBinding')
 		{
-			root.cancel = root.func(function(newRoot) {
+			process.root.cancel = process.root.callback(function(newRoot) {
 				process.root = newRoot;
 				enqueue(process);
 			});
@@ -185,20 +193,18 @@ function step(numSteps, process)
 				break;
 			}
 
-			var msg = mailbox.shift();
-			root = root.callback(msg);
+			process.root = process.root.callback(mailbox.shift());
 			++numSteps;
 			continue;
 		}
+
+		throw new Error(ctor);
 	}
 
 	if (numSteps < MAX_STEPS)
 	{
 		return numSteps + 1;
 	}
-
-	process.root = root;
-	process.stack = stack;
 	enqueue(process);
 
 	return numSteps;
@@ -207,11 +213,18 @@ function step(numSteps, process)
 
 // WORK QUEUE
 
+var working = false;
 var workQueue = [];
 
 function enqueue(process)
 {
 	workQueue.push(process);
+
+	if (!working)
+	{
+		setTimeout(work, 0);
+		working = true;
+	}
 }
 
 function work()
@@ -224,6 +237,7 @@ function work()
 	}
 	if (!process)
 	{
+		working = false;
 		return;
 	}
 	setTimeout(work, 0);
@@ -236,12 +250,14 @@ return {
 	nativeBinding: nativeBinding,
 	andThen: F2(andThen),
 	onError: F2(onError),
+	receive: receive,
 
 	spawn: spawn,
 	kill: kill,
 	send: F2(send),
 
-	work: work
+	rawSpawn: rawSpawn,
+	rawSend: rawSend
 };
 
 }();
