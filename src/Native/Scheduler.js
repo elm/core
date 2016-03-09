@@ -113,6 +113,20 @@ function kill(process)
 	});
 }
 
+function sleep(time)
+{
+	return nativeBinding(function(callback) {
+		var id = setTimeout(function() {
+			callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+		}, time);
+
+		return function() { clearTimeout(id); };
+	});
+}
+
+
+// STEP PROCESSES
+
 function step(numSteps, process)
 {
 	while (numSteps < MAX_STEPS)
@@ -254,6 +268,7 @@ return {
 
 	spawn: spawn,
 	kill: kill,
+	sleep: sleep,
 	send: F2(send),
 
 	rawSpawn: rawSpawn,

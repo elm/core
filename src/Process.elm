@@ -1,13 +1,14 @@
 module Process
   ( Id
   , spawn
+  , sleep
   , kill
   )
   where
 {-|
 
 # Processes
-@docs Id, spawn, kill
+@docs Id, spawn, sleep, kill
 
 ## Future Plans
 
@@ -47,6 +48,7 @@ import Basics exposing (Never)
 import Native.Scheduler
 import Platform
 import Task exposing (Task)
+import Time exposing (Time)
 
 
 {-| A light-weight process that runs concurrently. You can use `Task.spawn` to
@@ -79,6 +81,17 @@ come in a later release!
 spawn : Task x a -> Task y Id
 spawn =
   Native.Scheduler.spawn
+
+
+{-| Block progress on the current thread for a given amount of time. The
+JavaScript equivalent of this is [`setTimeout`][setTimeout] which lets you
+delay work until later.
+
+[setTimeout]: https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout
+-}
+sleep : Time -> Task x ()
+sleep =
+  Native.Scheduler.sleep
 
 
 {-| Sometimes you `spawn` a process, but later decide it would be a waste to
