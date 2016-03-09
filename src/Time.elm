@@ -1,23 +1,45 @@
 module Time
-    ( Time, millisecond, second, minute, hour
+    ( Time
+    , now
+    , millisecond, second, minute, hour
     , inMilliseconds, inSeconds, inMinutes, inHours
     ) where
 
 {-| Library for working with time.
 
+# Time
+@docs Time, now
+
 # Units
-@docs Time, millisecond, second, minute, hour,
-      inMilliseconds, inSeconds, inMinutes, inHours
+@docs millisecond, second, minute, hour,
+  inMilliseconds, inSeconds, inMinutes, inHours
 
 -}
 
 import Basics exposing (..)
+import Native.Time
+import Task exposing (Task)
+
+
+
+-- TIMES
 
 
 {-| Type alias to make it clearer when you are working with time values.
 Using the `Time` constants instead of raw numbers is very highly recommended.
 -}
 type alias Time = Float
+
+
+{-| Get the `Time` at the moment when this task is run.
+-}
+now : Task x Time
+now =
+  Native.Time.now
+
+
+
+-- UNITS
 
 
 {-| Units of time, making it easier to specify things like a half-second
@@ -68,4 +90,3 @@ inMinutes t =
 inHours : Time -> Float
 inHours t =
   t / hour
-
