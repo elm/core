@@ -27,14 +27,14 @@ equality with `(==)` is unreliable and should not be used.
 # Query
 @docs isEmpty, member, get, size
 
-# Combine
-@docs union, intersect, diff, merge
-
 # Lists
 @docs keys, values, toList, fromList
 
 # Transform
 @docs map, foldl, foldr, filter, partition
+
+# Combine
+@docs union, intersect, diff, merge
 
 -}
 
