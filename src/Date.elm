@@ -3,6 +3,7 @@ module Date
     , year, month, Month(..)
     , day, dayOfWeek, Day(..)
     , hour, minute, second, millisecond
+    , now
     )
     where
 
@@ -10,7 +11,7 @@ module Date
 issues with internationalization or locale formatting.
 
 # Dates
-@docs Date
+@docs Date, now
 
 # Conversions
 @docs fromString, toTime, fromTime
@@ -21,13 +22,29 @@ issues with internationalization or locale formatting.
 -}
 
 import Native.Date
+import Task exposing (Task)
 import Time exposing (Time)
 import Result exposing (Result)
+
+
+
+-- DATES
 
 
 {-| Representation of a date.
 -}
 type Date = Date
+
+
+{-| Get the `Date` at the moment when this task is run.
+-}
+now : Task x Date
+now =
+  Task.map fromTime Time.now
+
+
+
+-- CONVERSIONS AND EXTRACTIONS
 
 
 {-| Represents the days of the week.
@@ -128,4 +145,3 @@ this returns the integer `123`.
 millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
-
