@@ -5,10 +5,11 @@ module Dict
     , filter
     , partition
     , foldl, foldr, map
-    , union, intersect, diff
+    , union, intersect, diff, merge
     , keys, values
     , toList, fromList
-    ) where
+    )
+    where
 
 {-| A dictionary mapping unique keys to values. The keys can be any comparable
 type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or
@@ -27,7 +28,7 @@ equality with `(==)` is unreliable and should not be used.
 @docs isEmpty, member, get, size
 
 # Combine
-@docs union, intersect, diff
+@docs union, intersect, diff, merge
 
 # Lists
 @docs keys, values, toList, fromList
@@ -512,6 +513,47 @@ intersect t1 t2 =
 diff : Dict comparable v -> Dict comparable v -> Dict comparable v
 diff t1 t2 =
   foldl (\k v t -> remove k t) t1 t2
+
+
+{-| The most general way of combining two dictionaries. You provide three
+accumulators for when a given key appears:
+
+  1. Only in the left dictionary.
+  2. In both dictionaries.
+  3. Only in the right dictionary.
+
+You then traverse all the keys from lowest to highest, building up whatever
+you want.
+-}
+merge
+  :  (comparable -> a -> result -> result)
+  -> (comparable -> a -> b -> result -> result)
+  -> (comparable -> b -> result -> result)
+  -> Dict comparable a
+  -> Dict comparable b
+  -> result
+  -> result
+merge leftStep bothStep rightStep leftDict rightDict initialResult =
+  let
+    stepState rKey rValue (list, result) =
+      case list of
+        [] ->
+          (list, rightStep rKey rValue result)
+
+        (lKey, lValue) :: rest ->
+          if lKey < rKey then
+            (rest, leftStep lKey lValue result)
+
+          else if lKey > rKey then
+            (list, rightStep rKey rValue result)
+
+          else
+            (rest, bothStep lKey lValue rValue result)
+
+    (leftovers, intermediateResult) =
+      foldl stepState (toList leftDict, initialResult) rightDict
+  in
+    List.foldl (\(k,v) result -> leftStep k v result) intermediateResult leftovers
 
 
 
