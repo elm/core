@@ -45,6 +45,10 @@ import Native.Debug
 import String
 
 
+
+-- DICTIONARIES
+
+
 -- BBlack and NBlack should only be used during the deletion
 -- algorithm. Any other occurrence is a bug and should fail an assert.
 type NColor
@@ -254,6 +258,10 @@ update k alter dict =
 singleton : comparable -> v -> Dict comparable v
 singleton key value =
   insert key value empty
+
+
+
+-- HELPERS
 
 
 isBBlack : Dict k v -> Bool
@@ -479,6 +487,37 @@ redden t =
       RBNode_elm_builtin Red k v l r
 
 
+
+-- COMBINE
+
+
+{-| Combine two dictionaries. If there is a collision, preference is given
+to the first dictionary.
+-}
+union : Dict comparable v -> Dict comparable v -> Dict comparable v
+union t1 t2 =
+  foldl insert t2 t1
+
+
+{-| Keep a key-value pair when its key appears in the second dictionary.
+Preference is given to values in the first dictionary.
+-}
+intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
+intersect t1 t2 =
+  filter (\k _ -> member k t2) t1
+
+
+{-| Keep a key-value pair when its key does not appear in the second dictionary.
+-}
+diff : Dict comparable v -> Dict comparable v -> Dict comparable v
+diff t1 t2 =
+  foldl (\k v t -> remove k t) t1 t2
+
+
+
+-- TRANSFORM
+
+
 {-| Apply a function to all values in a dictionary.
 -}
 map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
@@ -517,27 +556,39 @@ foldr f acc t =
       foldr f (f key value (foldr f acc right)) left
 
 
-{-| Combine two dictionaries. If there is a collision, preference is given
-to the first dictionary.
+{-| Keep a key-value pair when it satisfies a predicate. -}
+filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+filter predicate dictionary =
+  let
+    add key value dict =
+      if predicate key value then
+        insert key value dict
+
+      else
+        dict
+  in
+    foldl add empty dictionary
+
+
+{-| Partition a dictionary according to a predicate. The first dictionary
+contains all key-value pairs which satisfy the predicate, and the second
+contains the rest.
 -}
-union : Dict comparable v -> Dict comparable v -> Dict comparable v
-union t1 t2 =
-  foldl insert t2 t1
+partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
+partition predicate dict =
+  let
+    add key value (t1, t2) =
+      if predicate key value then
+        (insert key value t1, t2)
+
+      else
+        (t1, insert key value t2)
+  in
+    foldl add (empty, empty) dict
 
 
-{-| Keep a key-value pair when its key appears in the second dictionary.
-Preference is given to values in the first dictionary.
--}
-intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
-intersect t1 t2 =
-  filter (\k _ -> member k t2) t1
 
-
-{-| Keep a key-value pair when its key does not appear in the second dictionary.
--}
-diff : Dict comparable v -> Dict comparable v -> Dict comparable v
-diff t1 t2 =
-  foldl (\k v t -> remove k t) t1 t2
+-- LISTS
 
 
 {-| Get all of the keys in a dictionary, sorted from lowest to highest.
@@ -568,34 +619,3 @@ toList dict =
 fromList : List (comparable,v) -> Dict comparable v
 fromList assocs =
   List.foldl (\(key,value) dict -> insert key value dict) empty assocs
-
-
-{-| Keep a key-value pair when it satisfies a predicate. -}
-filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-filter predicate dictionary =
-  let
-    add key value dict =
-      if predicate key value then
-        insert key value dict
-
-      else
-        dict
-  in
-    foldl add empty dictionary
-
-
-{-| Partition a dictionary according to a predicate. The first dictionary
-contains all key-value pairs which satisfy the predicate, and the second
-contains the rest.
--}
-partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
-partition predicate dict =
-  let
-    add key value (t1, t2) =
-      if predicate key value then
-        (insert key value t1, t2)
-
-      else
-        (t1, insert key value t2)
-  in
-    foldl add (empty, empty) dict
