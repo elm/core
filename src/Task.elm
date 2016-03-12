@@ -6,7 +6,7 @@ effect module Task { command = MyCmd }
     , andThen
     , onError, mapError
     , toMaybe, fromMaybe, toResult, fromResult
-    , perform, performAndIgnore
+    , perform
     )
     where
 
@@ -27,7 +27,7 @@ documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
 # Commands
-@docs perform, performAndIgnore
+@docs perform
 
 -}
 
@@ -273,37 +273,24 @@ fromResult result =
 -- COMMANDS
 
 
-type MyCmd msg
-  = Silent (Task Never ())
-  | Noisy (Task Never msg)
+type MyCmd msg =
+  T (Task Never msg)
 
 
-{-| Command the runtime system to perform a task. You provide a task that
-`Never` fails so that errors are not silently lost. Instead you must use
-functions like `Task.toMaybe` or `Task.toResult` to capture the error and
-handle it in your component.
+{-| Command the runtime system to perform a task. The most important argument
+is the `Task` which describes what you want to happen. But you also need to
+provide functions to tag the two possible outcomes of the task. It can succeed
+or fail, but either way, you need to have a message to feed back into your
+application.
 -}
-perform : (a -> msg) -> Task Never a -> Cmd msg
-perform tagger task =
-  command (Noisy (map tagger task))
-
-
-{-| Command the runtime system to perform a task, but do not report the
-result back to your component.
--}
-performAndIgnore : Task Never () -> Cmd msg
-performAndIgnore task =
-  command (Silent task)
+perform : (a -> msg) -> (x -> msg) -> Task x a -> Cmd msg
+perform onSuccess onFail task =
+  command (T (map onSuccess task `onError` \x -> succeed (onFail x)))
 
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
-cmdMap tagger cmd =
-  case cmd of
-    Silent task ->
-      Silent task
-
-    Noisy task ->
-      Noisy (map tagger task)
+cmdMap tagger (T task) =
+  T (map tagger task)
 
 
 
@@ -328,11 +315,6 @@ onSelfMsg _ _ _ =
 
 
 spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
-spawnCmd router cmd =
-  case cmd of
-    Silent task ->
-      Native.Scheduler.spawn task
-
-    Noisy task ->
-      Native.Scheduler.spawn (task `andThen` Platform.sendToApp router)
+spawnCmd router (T task) =
+  Native.Scheduler.spawn (task `andThen` Platform.sendToApp router)
 
