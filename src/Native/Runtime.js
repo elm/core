@@ -30,34 +30,8 @@ if (!Elm.fullscreen) {
 			return init(Display.NONE, {}, module, args || {});
 		};
 
-		Elm.embedReact = function(module, containerElement, reactEnvironment, args)
+		Elm.embedReact = function(module, containerElement, args)
 		{
-			if ((typeof reactEnvironment !== 'object') ||
-			  	(typeof reactEnvironment.React !== 'object'))
-			{
-				throw new Error(
-					"Elm.embedReact() requires at least three arguments:\n" +
-					"1: the Elm module you want to run e.g. `Elm.Main`\n" +
-					"2: an instantiated React element to conain the app\n" +
-					"3: an object containing a field named `React` whose value is\n" +
-					"   the output of `require('react-native')`.\n" +
-					"   If you want non-standard components to be accessible to Elm,\n" +
-					"   you can `require` them into this object." +
-					"   For example: \n" +
-					"     {\n" +
-					"       React: require('react-native'),\n" +
-					"       MyComponents: {\n" +
-					"         Awesome: // require your component here...\n " +
-					"       }\n" +
-					"     }\n" +
-					"   With the above, you could write an Elm function for the Awesome component: \n" +
-					"     awesome : List ReactNative.Property -> List ReactNative.Node -> ReactNative.Node\n"+
-					"     awesome = ReactNative.Node \"MyComponents.Awesome\"\n" +
-					"4: the fourth argument is an optional object containing inputs to your Elm program.\n" +
-					"   it is equivalent to the final argument of `Elm.fullscreen` or `Elm.embed`"
-				);
-			}
-
 			function isReactElement(maybeElement) {
 				return maybeElement['$$typeof'] === Symbol.for('react.element');
 			}
@@ -79,7 +53,6 @@ if (!Elm.fullscreen) {
 			}
 
 			var container = {
-				reactEnvironment: reactEnvironment,
 				firstChild: containerElement,
 				appendChild: function (child) {
 					this.firstChild = containerElement;
