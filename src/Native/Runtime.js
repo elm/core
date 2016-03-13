@@ -30,6 +30,75 @@ if (!Elm.fullscreen) {
 			return init(Display.NONE, {}, module, args || {});
 		};
 
+		Elm.embedReact = function(module, containerElement, reactEnvironment, args)
+		{
+			if ((typeof reactEnvironment !== 'object') ||
+			  	(typeof reactEnvironment.React !== 'object'))
+			{
+				throw new Error(
+					"Elm.embedReact() requires at least three arguments:\n" +
+					"1: the Elm module you want to run e.g. `Elm.Main`\n" +
+					"2: an instantiated React element to conain the app\n" +
+					"3: an object containing a field named `React` whose value is\n" +
+					"   the output of `require('react-native')`.\n" +
+					"   If you want non-standard components to be accessible to Elm,\n" +
+					"   you can `require` them into this object." +
+					"   For example: \n" +
+					"     {\n" +
+					"       React: require('react-native'),\n" +
+					"       MyComponents: {\n" +
+					"         Awesome: // require your component here...\n " +
+					"       }\n" +
+					"     }\n" +
+					"   With the above, you could write an Elm function for the Awesome component: \n" +
+					"     awesome : List ReactNative.Property -> List ReactNative.Node -> ReactNative.Node\n"+
+					"     awesome = ReactNative.Node \"MyComponents.Awesome\"\n" +
+					"4: the fourth argument is an optional object containing inputs to your Elm program.\n" +
+					"   it is equivalent to the final argument of `Elm.fullscreen` or `Elm.embed`"
+				);
+			}
+
+			function isReactElement(maybeElement) {
+				return maybeElement['$$typeof'] === Symbol.for('react.element');
+			}
+
+			function setReactVTree(reactElement, vtree) {
+				var newState = Object.assign({},
+					reactElement.state,
+					{_elmVTree: vtree}
+				);
+
+				console.log('setting state of react element: ', reactElement);
+				console.log('new state: ', newState);
+				reactElement.setState(newState);
+			}
+
+			function displayReactError(message) {
+				// TODO: bring up the RedBox with the error message
+				console.error(message);
+			}
+
+			var container = {
+				reactEnvironment: reactEnvironment,
+				firstChild: containerElement,
+				appendChild: function (child) {
+					this.firstChild = containerElement;
+					if (isReactElement(child)) {
+						setReactVTree(containerElement, child);
+						return child;
+					} else {
+						console.warn('appendChild called on React container with non-React element: ', child);
+					}
+				},
+				removeChild: function() {
+					this.firstChild = null;
+				},
+				displayReactError: displayReactError,
+			}
+
+			init(Display.COMPONENT, container, module, args || {});
+		}
+
 		function init(display, container, module, args, moduleToReplace)
 		{
 			// defining state needed for an instance of the Elm RTS
@@ -134,7 +203,10 @@ if (!Elm.fullscreen) {
 			}
 			catch (error)
 			{
-				if (typeof container.appendChild === "function")
+				if (typeof container.displayReactError === 'function') {
+					container.displayReactError(error.message);
+				}
+				else if (typeof container.appendChild === "function")
 				{
 					container.appendChild(errorNode(error.message));
 				}
@@ -320,9 +392,19 @@ if (!Elm.fullscreen) {
 			}
 			else
 			{
-				var VirtualDom = Elm.Native.VirtualDom.make(elm);
-				render = VirtualDom.render;
-				update = VirtualDom.updateAndReplace;
+				if (typeof Elm.Native.ReactNative !== 'undefined') {
+					var ReactNative = Elm.Native.ReactNative.make(elm);
+					render = ReactNative.render;
+					update = ReactNative.updateAndReplace;
+				} else if (typeof Elm.Native.VirtualDom !== 'undefined') {
+					VirtualDom = Elm.Native.VirtualDom.make(elm);
+					render = VirtualDom.render;
+					update = VirtualDom.updateAndReplace;
+				} else {
+					throw new Error(
+						"It looks like you'd like to render with either React Native\n" +
+						"or VirtualDom, but I can't find either in the Elm.Native runtime.");
+				}
 			}
 
 			// Add the initialScene to the DOM
