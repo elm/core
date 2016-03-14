@@ -166,15 +166,13 @@ foldr =
 scanl : (a -> b -> b) -> b -> List a -> List b
 scanl f b xs =
   let
-    scan1 x accAcc =
-      case accAcc of
-        acc :: _ ->
-          f x acc :: accAcc
-
-        [] ->
-          [] -- impossible
+    scan1 x (acc, rest) =
+      (f x acc, acc :: rest)
+      
+    (head, tail) =
+      foldl scan1 (b, []) xs
   in
-    reverse (foldl scan1 [b] xs)
+    foldl (::) [head] tail
 
 
 {-| Keep only elements that satisfy the predicate.
