@@ -145,7 +145,7 @@ This can be useful if you need to make a bunch of HTTP requests one-by-one.
 -}
 sequence : List (Task x a) -> Task x (List a)
 sequence tasks =
-  List.foldl (map2 (::)) (succeed []) tasks
+  List.foldr (map2 (::)) (succeed []) tasks
 
 
 -- interleave : List (Task x a) -> Task x (List a)
