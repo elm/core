@@ -278,12 +278,12 @@ type MyCmd msg =
 
 {-| Command the runtime system to perform a task. The most important argument
 is the `Task` which describes what you want to happen. But you also need to
-provide functions to tag the two possible outcomes of the task. It can succeed
-or fail, but either way, you need to have a message to feed back into your
+provide functions to tag the two possible outcomes of the task. It can fail or
+succeed, but either way, you need to have a message to feed back into your
 application.
 -}
-perform : (a -> msg) -> (x -> msg) -> Task x a -> Cmd msg
-perform onSuccess onFail task =
+perform : (x -> msg) -> (a -> msg) -> Task x a -> Cmd msg
+perform onFail onSuccess task =
   command (T (map onSuccess task `onError` \x -> succeed (onFail x)))
 
 
