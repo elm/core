@@ -30,10 +30,34 @@ if (!Elm.fullscreen) {
 			return init(Display.NONE, {}, module, args || {});
 		};
 
-		Elm.embedReact = function(module, containerElement, args)
+		Elm.embedReact = function(module, containerComponent, args)
 		{
+			// React elements have a `$$typeof` marker whose value is an
+			// ES6 Symbol.  If `Symbol` does not exist, we bail out early.
+			if (typeof(window.Symbol) === 'undefined') {
+				throw new Error(
+					'You seem to be running on an unsupported platform.\n' +
+					'Elm.embedReact is currently only supported for React Native.\n' +
+					'Please use Elm.embed or Elm.fullscreen instead.'
+				);
+			}
+
 			function isReactElement(maybeElement) {
 				return maybeElement['$$typeof'] === Symbol.for('react.element');
+			}
+
+			function isValidContainerComponent(component) {
+				// the root conainer component for the app does not have the
+				// '$$typeof' marker symbol.  I believe this is because only
+				// rendered elements have that marker, and the containerComponent
+				// gets passed in during a `componentWillMount` lifecycle hook.
+				//
+				// so, we just do some basic sanity checking here to make sure
+				// we won't blow up calling `setState` later.
+			  return (
+					typeof(component.setState) === 'function' &&
+					typeof(component.state) === 'object'
+				);
 			}
 
 			function setReactVTree(reactElement, vtree) {
@@ -42,22 +66,21 @@ if (!Elm.fullscreen) {
 					{_elmVTree: vtree}
 				);
 
-				console.log('setting state of react element: ', reactElement);
-				console.log('new state: ', newState);
 				reactElement.setState(newState);
 			}
 
-			function displayReactError(message) {
-				// TODO: bring up the RedBox with the error message
-				console.error(message);
+			if (!isValidContainerComponent(containerComponent)) {
+				throw new Error(
+					'Elm.embedReact needs its second argument to be a React component,\n' +
+					'but you gave me this: ' + containerComponent);
 			}
 
 			var container = {
-				firstChild: containerElement,
+				firstChild: containerComponent,
 				appendChild: function (child) {
-					this.firstChild = containerElement;
+					this.firstChild = containerComponent;
 					if (isReactElement(child)) {
-						setReactVTree(containerElement, child);
+						setReactVTree(containerComponent, child);
 						return child;
 					} else {
 						console.warn('appendChild called on React container with non-React element: ', child);
@@ -66,8 +89,8 @@ if (!Elm.fullscreen) {
 				removeChild: function() {
 					this.firstChild = null;
 				},
-				displayReactError: displayReactError,
-			}
+				isReactNativeContainer: true
+			};
 
 			init(Display.COMPONENT, container, module, args || {});
 		}
@@ -176,10 +199,8 @@ if (!Elm.fullscreen) {
 			}
 			catch (error)
 			{
-				if (typeof container.displayReactError === 'function') {
-					container.displayReactError(error.message);
-				}
-				else if (typeof container.appendChild === "function")
+				if (typeof container.appendChild === "function" &&
+				    !container.isReactNativeContainer)
 				{
 					container.appendChild(errorNode(error.message));
 				}
