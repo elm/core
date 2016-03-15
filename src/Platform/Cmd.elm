@@ -1,11 +1,10 @@
-module Platform.Cmd
+module Platform.Cmd exposing
   ( Cmd
   , map
   , batch
   , none
   , (!)
   )
-  where
 
 {-|
 

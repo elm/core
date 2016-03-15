@@ -1,13 +1,12 @@
-module Random
-    ( Generator, Seed
-    , bool, int, float
-    , list, pair
-    , map, map2, map3, map4, map5
-    , andThen
-    , minInt, maxInt
-    , generate, initialSeed
-    )
-  where
+module Random exposing
+  ( Generator, Seed
+  , bool, int, float
+  , list, pair
+  , map, map2, map3, map4, map5
+  , andThen
+  , minInt, maxInt
+  , generate, initialSeed
+  )
 
 {-| This library helps you generate pseudo-random values.
 

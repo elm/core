@@ -1,13 +1,13 @@
-module Color
-    ( Color, rgb, rgba, hsl, hsla, greyscale, grayscale, complement
-    , Gradient, linear, radial
-    , toRgb, toHsl
-    , red, orange, yellow, green, blue, purple, brown
-    , lightRed, lightOrange, lightYellow, lightGreen, lightBlue, lightPurple, lightBrown
-    , darkRed, darkOrange, darkYellow, darkGreen, darkBlue, darkPurple, darkBrown
-    , white, lightGrey, grey, darkGrey, lightCharcoal, charcoal, darkCharcoal, black
-    , lightGray, gray, darkGray
-    ) where
+module Color exposing
+  ( Color, rgb, rgba, hsl, hsla, greyscale, grayscale, complement
+  , Gradient, linear, radial
+  , toRgb, toHsl
+  , red, orange, yellow, green, blue, purple, brown
+  , lightRed, lightOrange, lightYellow, lightGreen, lightBlue, lightPurple, lightBrown
+  , darkRed, darkOrange, darkYellow, darkGreen, darkBlue, darkPurple, darkBrown
+  , white, lightGrey, grey, darkGrey, lightCharcoal, charcoal, darkCharcoal, black
+  , lightGray, gray, darkGray
+  )
 
 {-| Library for working with colors. Includes
 [RGB](https://en.wikipedia.org/wiki/RGB_color_model) and

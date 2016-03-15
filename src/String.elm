@@ -1,12 +1,12 @@
-module String
-    ( isEmpty, length, reverse, repeat
-    , cons, uncons, fromChar, append, concat, split, join, words, lines
-    , slice, left, right, dropLeft, dropRight
-    , contains, startsWith, endsWith, indexes, indices
-    , toInt, toFloat, toList, fromList
-    , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
-    , map, filter, foldl, foldr, any, all
-    ) where
+module String exposing
+  ( isEmpty, length, reverse, repeat
+  , cons, uncons, fromChar, append, concat, split, join, words, lines
+  , slice, left, right, dropLeft, dropRight
+  , contains, startsWith, endsWith, indexes, indices
+  , toInt, toFloat, toList, fromList
+  , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
+  , map, filter, foldl, foldr, any, all
+  )
 
 {-| A built-in representation for efficient string manipulation. String literals
 are enclosed in `"double quotes"`. Strings are *not* lists of characters.

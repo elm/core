@@ -1,15 +1,15 @@
-module Json.Decode
-    ( Decoder, Value
-    , decodeString, decodeValue
-    , string, int, float, bool, null
-    , list, array
-    , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
-    , (:=), at
-    , object1, object2, object3, object4, object5, object6, object7, object8
-    , keyValuePairs, dict
-    , maybe, oneOf, map, fail, succeed, andThen
-    , value, customDecoder
-    ) where
+module Json.Decode exposing
+  ( Decoder, Value
+  , decodeString, decodeValue
+  , string, int, float, bool, null
+  , list, array
+  , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
+  , (:=), at
+  , object1, object2, object3, object4, object5, object6, object7, object8
+  , keyValuePairs, dict
+  , maybe, oneOf, map, fail, succeed, andThen
+  , value, customDecoder
+  )
 
 {-| A way to turn Json values into Elm values. A `Decoder a` represents a
 decoding operation that will either produce a value of type `a`, or fail.

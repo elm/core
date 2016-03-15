@@ -1,14 +1,13 @@
-effect module Task { command = MyCmd }
-    ( Task
-    , succeed, fail
-    , map, map2, map3, map4, map5, andMap
-    , sequence
-    , andThen
-    , onError, mapError
-    , toMaybe, fromMaybe, toResult, fromResult
-    , perform
-    )
-    where
+effect module Task where { command = MyCmd } exposing
+  ( Task
+  , succeed, fail
+  , map, map2, map3, map4, map5, andMap
+  , sequence
+  , andThen
+  , onError, mapError
+  , toMaybe, fromMaybe, toResult, fromResult
+  , perform
+  )
 
 {-| Tasks make it easy to describe asynchronous operations that may fail, like
 HTTP requests or writing to a database. For more information, see the [Elm

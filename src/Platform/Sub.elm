@@ -1,10 +1,9 @@
-module Platform.Sub
+module Platform.Sub exposing
   ( Sub
   , map
   , batch
   , none
   )
-  where
 
 {-|
 

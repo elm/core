@@ -1,8 +1,7 @@
-module Debug
+module Debug exposing
   ( log
   , crash
   )
-  where
 
 {-| This library is for investigating bugs or performance problems. It should
 *not* be used in production code.

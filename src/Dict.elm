@@ -1,15 +1,14 @@
-module Dict
-    ( Dict
-    , empty, singleton, insert, update
-    , isEmpty, get, remove, member, size
-    , filter
-    , partition
-    , foldl, foldr, map
-    , union, intersect, diff, merge
-    , keys, values
-    , toList, fromList
-    )
-    where
+module Dict exposing
+  ( Dict
+  , empty, singleton, insert, update
+  , isEmpty, get, remove, member, size
+  , filter
+  , partition
+  , foldl, foldr, map
+  , union, intersect, diff, merge
+  , keys, values
+  , toList, fromList
+  )
 
 {-| A dictionary mapping unique keys to values. The keys can be any comparable
 type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or

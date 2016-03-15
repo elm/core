@@ -1,10 +1,10 @@
-module Process
+module Process exposing
   ( Id
   , spawn
   , sleep
   , kill
   )
-  where
+
 {-|
 
 # Processes

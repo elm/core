@@ -1,9 +1,8 @@
-module Platform
+module Platform exposing
   ( Program
   , Task, ProcessId
   , Router, sendToApp, sendToSelf
   )
-  where
 
 {-|
 

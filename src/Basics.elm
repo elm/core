@@ -1,18 +1,17 @@
-module Basics
-    ( (==), (/=)
-    , (<), (>), (<=), (>=), max, min, Order (..), compare
-    , not, (&&), (||), xor
-    , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
-    , pi, cos, sin, tan, acos, asin, atan, atan2
-    , round, floor, ceiling, truncate, toFloat
-    , degrees, radians, turns
-    , toPolar, fromPolar
-    , isNaN, isInfinite
-    , toString, (++)
-    , fst, snd
-    , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
-    )
-    where
+module Basics exposing
+  ( (==), (/=)
+  , (<), (>), (<=), (>=), max, min, Order (..), compare
+  , not, (&&), (||), xor
+  , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
+  , pi, cos, sin, tan, acos, asin, atan, atan2
+  , round, floor, ceiling, truncate, toFloat
+  , degrees, radians, turns
+  , toPolar, fromPolar
+  , isNaN, isInfinite
+  , toString, (++)
+  , fst, snd
+  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+  )
 
 {-| Tons of useful functions that get imported by default.
 

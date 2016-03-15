@@ -1,9 +1,9 @@
-module Regex
-    ( Regex
-    , regex, escape, caseInsensitive
-    , HowMany(..), Match
-    , contains, find, replace, split
-    ) where
+module Regex exposing
+  ( Regex
+  , regex, escape, caseInsensitive
+  , HowMany(..), Match
+  , contains, find, replace, split
+  )
 
 {-| A library for working with regular expressions. It uses [the
 same kind of regular expressions accepted by JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions).

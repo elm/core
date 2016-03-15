@@ -1,8 +1,8 @@
-module Char
-    ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
-    , toUpper, toLower, toLocaleUpper, toLocaleLower
-    , KeyCode, toCode, fromCode
-    ) where
+module Char exposing
+  ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
+  , toUpper, toLower, toLocaleUpper, toLocaleLower
+  , KeyCode, toCode, fromCode
+  )
 
 {-| Functions for working with characters. Character literals are enclosed in
 `'a'` pair of single quotes.

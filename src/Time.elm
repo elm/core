@@ -1,11 +1,9 @@
-effect module Time { subscription = MySub }
-    ( Time
-    , now, every
-    , millisecond, second, minute, hour
-    , inMilliseconds, inSeconds, inMinutes, inHours
-    )
-    where
-
+effect module Time where { subscription = MySub } exposing
+  ( Time
+  , now, every
+  , millisecond, second, minute, hour
+  , inMilliseconds, inSeconds, inMinutes, inHours
+  )
 
 {-| Library for working with time.
 
