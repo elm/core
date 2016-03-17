@@ -357,6 +357,10 @@ Elm.Native.Utils.make = function(localRuntime) {
 
 	var toString = function(v)
 	{
+		if (v === null)
+		{
+			return '<internal structure>';
+		}
 		var type = typeof v;
 		if (type === 'function')
 		{
