@@ -74,7 +74,7 @@ year =
 
 
 {-| Extract the month of a given date. Given the date 23 June 1990 at 11:45AM
-this returns the Month `Jun` as defined below.
+this returns the month `Jun` as defined below.
 -}
 month : Date -> Month
 month =
@@ -90,7 +90,7 @@ day =
 
 
 {-| Extract the day of the week for a given date. Given the date 23 June
-1990 at 11:45AM this returns the Day `Thu` as defined below.
+1990 at 11:45AM this returns the day `Thu` as defined below.
 -}
 dayOfWeek : Date -> Day
 dayOfWeek =
