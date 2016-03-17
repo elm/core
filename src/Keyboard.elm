@@ -1,7 +1,7 @@
 module Keyboard
     ( arrows, wasd
     , enter, space, ctrl, shift, alt, meta
-    , isDown, keysDown, presses
+    , isDown, keysDown, presses, downs
     ) where
 
 {-| Library for working with keyboard input.
@@ -16,7 +16,7 @@ otherwise.
 @docs enter, space, ctrl, shift, alt, meta
 
 # General Keypresses
-@docs isDown, keysDown, presses
+@docs isDown, keysDown, presses, downs
 
 -}
 
@@ -201,3 +201,7 @@ presses : Signal KeyCode
 presses =
   Signal.map .keyCode Native.Keyboard.presses
 
+{-| A Signal of keyCodes from the window 'keydown' event -}
+downs : Signal KeyCode
+downs =
+  Signal.map .keyCode Native.Keyboard.downs
