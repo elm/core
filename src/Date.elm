@@ -90,7 +90,7 @@ day =
 
 
 {-| Extract the day of the week for a given date. Given the date 23 June
-1990 at 11:45AM this returns the Day `Thu` as defined below.
+1990 at 11:45AM this returns the Day `Sat` as defined below.
 -}
 dayOfWeek : Date -> Day
 dayOfWeek =
