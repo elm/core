@@ -71,6 +71,11 @@ Elm.Native.Touch.make = function(localRuntime) {
 		});
 	}
 	function end(e) {
+		// if the event didn't start in the target, ignore it
+	        if (!node.contains(e.target)) 
+	        {
+	            return;
+	        }
 		var t = dict.remove(e.identifier);
 		if (localRuntime.timer.now() - t.t < tapTime)
 		{
