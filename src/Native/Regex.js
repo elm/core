@@ -13,6 +13,7 @@ Elm.Native.Regex.make = function(localRuntime) {
 
 	var List = Elm.Native.List.make(localRuntime);
 	var Maybe = Elm.Maybe.make(localRuntime);
+	var Result = Elm.Result.make(localRuntime);
 
 	function escape(str)
 	{
@@ -23,8 +24,19 @@ Elm.Native.Regex.make = function(localRuntime) {
 		return new RegExp(re.source, 'gi');
 	}
 	function regex(raw)
-	{
-		return new RegExp(raw, 'g');
+	{	
+		var compiledRegex = null; 
+		
+		try 
+		{
+			compiledRegex = new RegExp(raw, 'g');
+		}
+		catch (err)
+		{
+			return Result.Err(err.message);
+		}
+		
+		return Result.Ok(compiledRegex);
 	}
 
 	function contains(re, string)

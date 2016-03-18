@@ -24,6 +24,7 @@ and [`replace`](#replace).
 -}
 
 import Maybe exposing (Maybe)
+import Result exposing (Result)
 import Native.Regex
 
 
@@ -43,11 +44,12 @@ escape =
 
 {-| Create a Regex that matches patterns [as specified in JavaScript](https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions#Writing_a_Regular_Expression_Pattern).
 
+If an invalid regex string is given, Err with the error message given.
 Be careful to escape backslashes properly! For example, `"\w"` is escaping the
 letter `w` which is probably not what you want. You probably want `"\\w"`
 instead, which escapes the backslash.
 -}
-regex : String -> Regex
+regex : String -> Result String Regex
 regex =
   Native.Regex.regex
 
