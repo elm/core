@@ -245,36 +245,9 @@ Elm.Native.String.make = function(localRuntime) {
 
 	function toFloat(s)
 	{
-		var len = s.length;
-		if (len === 0)
+		if (!/^[-+]?([0-9]+(\.[0-9]+)?([eE][-+]?[0-9]+)?|Infinity|NaN)$/.test(s))
 		{
-			return Result.Err("could not convert string '" + s + "' to a Float" );
-		}
-		var start = 0;
-		if (s[0] === '-')
-		{
-			if (len === 1)
-			{
-				return Result.Err("could not convert string '" + s + "' to a Float" );
-			}
-			start = 1;
-		}
-		var dotCount = 0;
-		for (var i = start; i < len; ++i)
-		{
-			if (Char.isDigit(s[i]))
-			{
-				continue;
-			}
-			if (s[i] === '.')
-			{
-				dotCount += 1;
-				if (dotCount <= 1)
-				{
-					continue;
-				}
-			}
-			return Result.Err("could not convert string '" + s + "' to a Float" );
+			return Result.Err("could not convert string '" + s + "' to a Float");
 		}
 		return Result.Ok(parseFloat(s));
 	}
