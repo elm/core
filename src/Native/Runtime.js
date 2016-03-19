@@ -30,6 +30,71 @@ if (!Elm.fullscreen) {
 			return init(Display.NONE, {}, module, args || {});
 		};
 
+		Elm.embedReact = function(module, containerComponent, args)
+		{
+			// React elements have a `$$typeof` marker whose value is an
+			// ES6 Symbol.  If `Symbol` does not exist, we bail out early.
+			if (typeof(window.Symbol) === 'undefined') {
+				throw new Error(
+					'You seem to be running on an unsupported platform.\n' +
+					'Elm.embedReact is currently only supported for React Native.\n' +
+					'Please use Elm.embed or Elm.fullscreen instead.'
+				);
+			}
+
+			function isReactElement(maybeElement) {
+				return maybeElement['$$typeof'] === Symbol.for('react.element');
+			}
+
+			function isValidContainerComponent(component) {
+				// the root conainer component for the app does not have the
+				// '$$typeof' marker symbol.  I believe this is because only
+				// rendered elements have that marker, and the containerComponent
+				// gets passed in during a `componentWillMount` lifecycle hook.
+				//
+				// so, we just do some basic sanity checking here to make sure
+				// we won't blow up calling `setState` later.
+			  return (
+					typeof(component.setState) === 'function' &&
+					typeof(component.state) === 'object'
+				);
+			}
+
+			function setReactVTree(reactElement, vtree) {
+				var newState = Object.assign({},
+					reactElement.state,
+					{_elmVTree: vtree}
+				);
+
+				reactElement.setState(newState);
+			}
+
+			if (!isValidContainerComponent(containerComponent)) {
+				throw new Error(
+					'Elm.embedReact needs its second argument to be a React component,\n' +
+					'but you gave me this: ' + containerComponent);
+			}
+
+			var container = {
+				firstChild: containerComponent,
+				appendChild: function (child) {
+					this.firstChild = containerComponent;
+					if (isReactElement(child)) {
+						setReactVTree(containerComponent, child);
+						return child;
+					} else {
+						console.warn('appendChild called on React container with non-React element: ', child);
+					}
+				},
+				removeChild: function() {
+					this.firstChild = null;
+				},
+				isReactNativeContainer: true
+			};
+
+			init(Display.COMPONENT, container, module, args || {});
+		}
+
 		function init(display, container, module, args, moduleToReplace)
 		{
 			// defining state needed for an instance of the Elm RTS
@@ -134,7 +199,8 @@ if (!Elm.fullscreen) {
 			}
 			catch (error)
 			{
-				if (typeof container.appendChild === "function")
+				if (typeof container.appendChild === "function" &&
+				    !container.isReactNativeContainer)
 				{
 					container.appendChild(errorNode(error.message));
 				}
@@ -320,9 +386,19 @@ if (!Elm.fullscreen) {
 			}
 			else
 			{
-				var VirtualDom = Elm.Native.VirtualDom.make(elm);
-				render = VirtualDom.render;
-				update = VirtualDom.updateAndReplace;
+				if (typeof Elm.Native.ReactNative !== 'undefined') {
+					var ReactNative = Elm.Native.ReactNative.make(elm);
+					render = ReactNative.render;
+					update = ReactNative.updateAndReplace;
+				} else if (typeof Elm.Native.VirtualDom !== 'undefined') {
+					VirtualDom = Elm.Native.VirtualDom.make(elm);
+					render = VirtualDom.render;
+					update = VirtualDom.updateAndReplace;
+				} else {
+					throw new Error(
+						"It looks like you'd like to render with either React Native\n" +
+						"or VirtualDom, but I can't find either in the Elm.Native runtime.");
+				}
 			}
 
 			// Add the initialScene to the DOM
