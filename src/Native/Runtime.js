@@ -89,7 +89,7 @@ if (!Elm.fullscreen) {
 				removeChild: function() {
 					this.firstChild = null;
 				},
-				isReactNativeContainer: true
+				isNativeUiContainer: true
 			};
 
 			init(Display.COMPONENT, container, module, args || {});
@@ -200,7 +200,7 @@ if (!Elm.fullscreen) {
 			catch (error)
 			{
 				if (typeof container.appendChild === "function" &&
-				    !container.isReactNativeContainer)
+				    !container.isNativeUiContainer)
 				{
 					container.appendChild(errorNode(error.message));
 				}
@@ -386,10 +386,10 @@ if (!Elm.fullscreen) {
 			}
 			else
 			{
-				if (typeof Elm.Native.ReactNative !== 'undefined') {
-					var ReactNative = Elm.Native.ReactNative.make(elm);
-					render = ReactNative.render;
-					update = ReactNative.updateAndReplace;
+				if (typeof Elm.Native.NativeUi !== 'undefined') {
+					var NativeUi = Elm.Native.NativeUi.make(elm);
+					render = NativeUi.render;
+					update = NativeUi.updateAndReplace;
 				} else if (typeof Elm.Native.VirtualDom !== 'undefined') {
 					VirtualDom = Elm.Native.VirtualDom.make(elm);
 					render = VirtualDom.render;
