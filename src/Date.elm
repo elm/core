@@ -20,7 +20,7 @@ issues with internationalization or locale formatting.
 -}
 
 import Native.Date
-import Time exposing (Time)
+import Basics exposing (Time)
 import Result exposing (Result)
 
 
