@@ -153,6 +153,20 @@ function fullscreenFor(program)
 			managers[key] = makeManager(globalManagerInfo[key], mainProcess);
 		}
 
+		// setup all foreign effects
+		var foreign = {};
+
+		for (var key in globalForeignCmds)
+		{
+			setupCmd(key, managers, foreign);
+		}
+
+		for (var key in globalForeignSubs)
+		{
+			setupSub(key, managers, foreign, mainProcess);
+		}
+
+		return { foreign: foreign };
 	};
 }
 
@@ -193,8 +207,6 @@ function map(tagger, bag)
 
 function dispatchEffects(managers, cmdBag, subBag)
 {
-//	throw new Error('hello');
-
 	var effectsDict = {};
 	gatherEffects(true, cmdBag, effectsDict, null);
 	gatherEffects(false, subBag, effectsDict, null);
@@ -271,6 +283,152 @@ function insert(isCmd, newEffect, effects)
 }
 
 
+// FOREIGN EFFECT LEAFS
+
+var globalForeignCmds = {};
+var globalForeignSubs = {};
+
+function foreignCmd(name, converter)
+{
+	checkForeignName(name);
+	globalForeignCmds[name] = converter;
+	return leaf(name);
+}
+
+function foreignSub(name, converter)
+{
+	checkForeignName(name);
+	globalForeignSubs[name] = converter;
+	return leaf(name);
+}
+
+function checkForeignName(name)
+{
+	if (name in globalForeignCmds || name in globalForeignSubs)
+	{
+		throw new Error('There can only be one foreign effect named `'
+			+ name + '`, but your program has multiple.');
+	}
+}
+
+
+// SET UP FOREIGN EFFECTS
+
+function setupCmd(name, managers, foreign)
+{
+	var converter = globalForeignCmds[name];
+	var subs = [];
+
+
+	// internal dispatching
+
+	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+
+	function onMessage(msg, state)
+	{
+		var cmdList = msg._0.cmds;
+
+		while (cmdList.ctor !== '[]')
+		{
+			var value = converter(cmdList._0);
+
+			for (var i = 0; i < subs.length; i++)
+			{
+				subs[i](value);
+			}
+
+			cmdList = cmdList._1;
+		}
+
+		return init;
+	}
+
+	managers[name] = spawnLoop(init, onMessage);
+	globalManagerInfo[name] = { cmdMap: F2(foreignCmdMap) };
+
+
+	// external subscriptions
+
+	function subscribe(callback)
+	{
+		subs.push(callback);
+	}
+
+	function unsubscribe(callback)
+	{
+		var index = subs.indexOf(callback);
+		if (index >= 0)
+		{
+			subs.splice(index, 1);
+		}
+	}
+
+	foreign[name] = {
+		subscribe: subscribe,
+		unsubscribe: unsubscribe
+	};
+}
+
+// setup foreign subscriptions
+function setupSub(name, managers, foreign, mainProcess)
+{
+	var converter = globalForeignSubs[name];
+	var subs = _elm_lang$core$Native_List.Nil;
+
+
+	// internal
+
+	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+
+	function onMessage(msg, state)
+	{
+		subs = msg._0.subs;
+		return init;
+	}
+
+	managers[name] = spawnLoop(init, onMessage);
+	globalManagerInfo[name] = { subMap: F2(foreignSubMap) };
+
+
+	// external
+
+	function send(value)
+	{
+		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, value);
+		if (result.ctor === 'Err')
+		{
+			throw new Error('TODO - ' + result._0);
+		}
+
+		var value = result._0;
+		var temp = subs;
+		while (temp.ctor !== '[]')
+		{
+			_elm_lang$core$Native_Scheduler.rawSend(mainProcess, temp._0(value));
+			temp = temp._1;
+		}
+	}
+
+	foreign[name] = { send: send };
+}
+
+
+// FOREIGN MAPS
+
+function foreignCmdMap(tagger, value)
+{
+	return value;
+}
+
+function foreignSubMap(tagger, finalTagger)
+{
+	return function(value)
+	{
+		return tagger(finalTagger(value));
+	};
+}
+
+
 return {
 	// routers
 	sendToApp: F2(sendToApp),
@@ -283,7 +441,9 @@ return {
 	// effect bags
 	leaf: leaf,
 	batch: batch,
-	map: map
+	map: map,
+	foreignCmd: foreignCmd,
+	foreignSub: foreignSub
 };
 
 }();
