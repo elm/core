@@ -93,7 +93,6 @@ type alias LineStyle =
     , cap   : LineCap
     , join  : LineJoin
     , dashing : List Int
-    , dashOffset : Int
     }
 
 
@@ -110,7 +109,6 @@ defaultLine =
     , cap   = Flat
     , join  = Sharp 10
     , dashing = []
-    , dashOffset = 0
     }
 
 
