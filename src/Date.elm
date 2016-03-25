@@ -50,7 +50,7 @@ fromString =
 
 
 {-| Convert a date into a time since midnight (UTC) of 1 January 1970 (i.e.
-[UNIX Epoch time](http://en.wikipedia.org/wiki/Unix_time), but using Elm’s
+[Unix Epoch time](http://en.wikipedia.org/wiki/Unix_time), but using Elm’s
 underlying units of time). Given the date 23 June 1990 at 11:45AM this
 returns the corresponding [`Time`](Time#Time).
 -}
@@ -59,7 +59,7 @@ toTime =
   Native.Date.toTime
 
 
-{-| Take a UNIX Epoch time and convert it to a `Date`. Given the timestamp
+{-| Take a Unix Epoch time and convert it to a `Date`. Given the timestamp
 `646137900 * second` this returns 23 June 1990.
 -}
 fromTime : Time -> Date
