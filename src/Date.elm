@@ -58,7 +58,8 @@ toTime =
   Native.Date.toTime
 
 
-{-| Take a UNIX time and convert it to a `Date`.
+{-| Take a UNIX time measured in milliseconds and convert it to a `Date`.
+Given the timestamp `646109100 * second` this returns the date 23 June 1990 11:45AM.
 -}
 fromTime : Time -> Date
 fromTime =
