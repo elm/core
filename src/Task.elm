@@ -145,12 +145,7 @@ This can be useful if you need to make a bunch of HTTP requests one-by-one.
 -}
 sequence : List (Task x a) -> Task x (List a)
 sequence tasks =
-  case tasks of
-    [] ->
-        succeed []
-
-    task :: remainingTasks ->
-        map2 (::) task (sequence remainingTasks)
+  List.foldr (map2 (::)) (succeed []) tasks
 
 
 -- interleave : List (Task x a) -> Task x (List a)
