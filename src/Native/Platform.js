@@ -441,7 +441,7 @@ return {
 	// effect bags
 	leaf: leaf,
 	batch: batch,
-	map: map,
+	map: F2(map),
 	foreignCmd: foreignCmd,
 	foreignSub: foreignSub
 };
