@@ -88,12 +88,12 @@ function decodeTuple(f, decoders)
 	};
 }
 
-function andThen(decode, callback)
+function andThen(decoder, callback)
 {
 	return {
 		ctor: '<decoder>',
 		tag: 'andThen',
-		decode: decode,
+		decoder: decoder,
 		callback: callback
 	};
 }
@@ -103,7 +103,7 @@ function customAndThen(decoder, callback)
 	return {
 		ctor: '<decoder>',
 		tag: 'customAndThen',
-		decode: decode,
+		decoder: decoder,
 		callback: callback
 	};
 }
