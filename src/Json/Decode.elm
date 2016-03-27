@@ -440,7 +440,7 @@ documentation for an example usage.
 -}
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
 customDecoder =
-  Native.Json.customDecoder
+  Native.Json.customAndThen
 
 
 {-| Helpful when one field will determine the shape of a bunch of other fields.
