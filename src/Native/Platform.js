@@ -82,7 +82,7 @@ function spawnLoop(init, onMessage)
 
 function addPublicModule(object, name, main)
 {
-	object['fullscreen'] = main ? fullscreenFor(main) : mainIsUndefined(name);
+	object['fullscreen'] = main ? fullscreenFor(name, main) : mainIsUndefined(name);
 }
 
 function mainIsUndefined(name)
@@ -95,15 +95,57 @@ function mainIsUndefined(name)
 	};
 }
 
-function fullscreenFor(program)
+function fullscreenFor(moduleName, main)
 {
-	if (!program.renderer)
+	// main is a union type with one of the following tags: vdom, no-flags, flags
+	// the follow section figures out what to do in each case.
+
+	if (main.ctor === 'vdom')
 	{
 		return function fullscreen()
 		{
-			_elm_lang$virtual_dom$Native_VirtualDom.staticProgram(document.body, program);
+			_elm_lang$virtual_dom$Native_VirtualDom.staticProgram(document.body, main._0);
 		}
 	}
+
+
+	// Define: init, update, subscriptions, view, and makeRenderer
+
+	var program, init;
+
+	if (main.ctor === 'no-flags')
+	{
+		program = main._0;
+		init = program.init;
+	}
+	else
+	{
+		program = main._1;
+
+		var flagDecoder = main._0;
+		var rawInit = program.init;
+
+		init = function(flags)
+		{
+			var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+			if (result.ctor === 'Err')
+			{
+				throw new Error('You trying to initialize module `' + moduleName + '` with unexpected flags.\n'
+					+ 'When trying to convert the flags to a usable Elm value, I run into this problem:\n\n'
+					+ result._0
+				);
+			}
+			return rawInit(result._0);
+		}
+	}
+
+	var update = program.update;
+	var subscriptions = program.subscriptions;
+	var view = program.view;
+	var makeRenderer = program.renderer;
+
+
+	// Actually initialize program
 
 	return function fullscreen(flags)
 	{
@@ -111,16 +153,11 @@ function fullscreenFor(program)
 		var managers = {};
 		var renderer;
 
-		// helpers
-		var update = program.update;
-		var subscriptions = program.subscriptions;
-		var view = program.view;
-
 		// init and update state in main process
-		var init = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-			var results = program.init(flags);
+		var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+			var results = init(flags);
 			var model = results._0;
-			renderer = program.renderer(document.body, enqueue, view(model));
+			renderer = makeRenderer(document.body, enqueue, view(model));
 			var cmds = results._1;
 			var subs = subscriptions(model);
 			dispatchEffects(managers, cmds, subs);
@@ -140,7 +177,7 @@ function fullscreenFor(program)
 			});
 		}
 
-		var mainProcess = spawnLoop(init, onMessage);
+		var mainProcess = spawnLoop(initApp, onMessage);
 
 		function enqueue(msg)
 		{
@@ -397,7 +434,7 @@ function setupSub(name, managers, foreign, mainProcess)
 		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, value);
 		if (result.ctor === 'Err')
 		{
-			throw new Error('TODO - ' + result._0);
+			throw new Error('Trying to send an unexpected type of value through `' + name + '`:\n' + result._0);
 		}
 
 		var value = result._0;
