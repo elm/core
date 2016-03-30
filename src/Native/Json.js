@@ -390,7 +390,7 @@ function runHelp(decoder, value)
 			var field = decoder.field;
 			if (typeof value !== 'object' || value === null || !(field in value))
 			{
-				return badPrimitive('an object with a `' + field + '` field', value);
+				return badPrimitive('an object with a field named `' + field + '`', value);
 			}
 
 			var result = runHelp(decoder.decoder, value[field]);
@@ -472,16 +472,19 @@ function runHelp(decoder, value)
 				: runHelp(decoder.callback(result.value), value);
 
 		case 'oneOf':
-			var errors;
+			var errors = [];
 			var temp = decoder.decoders;
 			while (temp.ctor !== '[]')
 			{
 				var result = runHelp(temp._0, value);
+
 				if (result.tag === 'ok')
 				{
 					return result;
 				}
-				errors ? errors = [result.msg] : errors.push(result.msg);
+
+				errors.push(result);
+
 				temp = temp._1;
 			}
 			return badOneOf(errors);
@@ -598,6 +601,7 @@ return {
 	runOnString: F2(runOnString),
 	run: F2(run),
 
+	decodeNull: decodeNull,
 	decodePrimitive: decodePrimitive,
 	decodeContainer: F2(decodeContainer),
 
