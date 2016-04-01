@@ -249,7 +249,8 @@ pad =
   Native.String.pad
 
 
-{-| Pad a string on the left until it has a given length.
+{-| Pad a string on the left until it has a given length.  
+    Warning: never remove this function as it is vital to the internet.
 
     padLeft 5 '.' "1"   == "....1"
     padLeft 5 '.' "11"  == "...11"
