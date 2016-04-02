@@ -27,3 +27,14 @@ unlikely to overlap with anything that anyone will ever write in a library.
 By keeping the set of default imports small, it also becomes easier to use
 whatever version of `map` suits your fancy. Finally, it makes it easier to
 figure out where the heck a function is coming from.
+
+## Running Tests Locally
+
+After cloning down the repo, `cd` into `core` and run `bash tests/set-up-tests.sh`.
+If successful, you will see a few messages: (1) That the packages have been
+configured successfully; (2) That the modules were compiled; and (3) That
+`raw-test.js` was successfully generated.
+
+At this point you can run `node tests/test.js` to run the entire test suite.
+One thing to note is that currently, you will need to run the `bash` script
+again if you modify, delete or add tests to recompile everything.
