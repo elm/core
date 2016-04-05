@@ -129,7 +129,7 @@ function makeEmbedHelp(moduleName, main, rootDomNode, flags)
 
 	// Define: init, update, subscriptions, view, and makeRenderer
 	var program = main._0;
-	var init = makeInit(main);
+	var init = makeInit(moduleName, main);
 	var update = program.update;
 	var subscriptions = program.subscriptions;
 	var view = program.view;
@@ -195,7 +195,7 @@ function makeEmbedHelp(moduleName, main, rootDomNode, flags)
 	return hasForeigns ? { foreign: foreign } : {};
 }
 
-function makeInit(main)
+function makeInit(moduleName, main)
 {
 	var rawInit = main._0.init;
 
