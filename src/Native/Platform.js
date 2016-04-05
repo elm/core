@@ -82,129 +82,142 @@ function spawnLoop(init, onMessage)
 
 function addPublicModule(object, name, main)
 {
-	object['fullscreen'] = main ? fullscreenFor(name, main) : mainIsUndefined(name);
+	if (!main)
+	{
+		var badTimes = mainIsUndefined(name);
+		object['embed'] = badTimes;
+		object['fullscreen'] = badTimes;
+		return;
+	}
+
+	var embed = makeEmbed(name, main);
+	object['embed'] = embed;
+	object['fullscreen'] = function fullscreen(flags)
+	{
+		return embed(document.body, flags);
+	};
 }
 
 function mainIsUndefined(name)
 {
-	return function() {
+	return function()
+	{
 		throw new Error(
 			'Cannot initialize module ' + name +
-			' because it has no `main` value! What would I run?'
+			' because it has no `main` value! What should I show on screen?'
 		);
 	};
 }
 
-function fullscreenFor(moduleName, main)
+function makeEmbed(moduleName, main)
+{
+	return function embed(rootDomNode, flags)
+	{
+		return makeEmbedHelp(moduleName, main, rootDomNode, flags);
+	};
+}
+
+function makeEmbedHelp(moduleName, main, rootDomNode, flags)
 {
 	// main is a union type with one of the following tags: vdom, no-flags, flags
 	// the follow section figures out what to do in each case.
-
 	if (main.ctor === 'vdom')
 	{
-		return function fullscreen()
-		{
-			_elm_lang$virtual_dom$Native_VirtualDom.staticProgram(document.body, main._0);
-		}
+		_elm_lang$virtual_dom$Native_VirtualDom.staticProgram(rootDomNode, main._0);
+		return {};
 	}
-
 
 	// Define: init, update, subscriptions, view, and makeRenderer
-
-	var program, init;
-
-	if (main.ctor === 'no-flags')
-	{
-		program = main._0;
-		init = program.init;
-	}
-	else
-	{
-		program = main._1;
-
-		var flagDecoder = main._0;
-		var rawInit = program.init;
-
-		init = function(flags)
-		{
-			var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
-			if (result.ctor === 'Err')
-			{
-				throw new Error('You trying to initialize module `' + moduleName + '` with unexpected flags.\n'
-					+ 'When trying to convert the flags to a usable Elm value, I run into this problem:\n\n'
-					+ result._0
-				);
-			}
-			return rawInit(result._0);
-		}
-	}
-
+	var program = main._0;
+	var init = makeInit(main);
 	var update = program.update;
 	var subscriptions = program.subscriptions;
 	var view = program.view;
 	var makeRenderer = program.renderer;
 
+	// ambient state
+	var managers = {};
+	var renderer;
 
-	// Actually initialize program
+	// init and update state in main process
+	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+		var results = init(flags);
+		var model = results._0;
+		renderer = makeRenderer(rootDomNode, enqueue, view(model));
+		var cmds = results._1;
+		var subs = subscriptions(model);
+		dispatchEffects(managers, cmds, subs);
+		callback(_elm_lang$core$Native_Scheduler.succeed(model));
+	});
 
-	return function fullscreen(flags)
+	function onMessage(msg, model)
 	{
-		// ambient state
-		var managers = {};
-		var renderer;
-
-		// init and update state in main process
-		var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-			var results = init(flags);
-			var model = results._0;
-			renderer = makeRenderer(document.body, enqueue, view(model));
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+			var results = A2(update, msg, model);
+			model = results._0;
+			renderer.update(view(model));
 			var cmds = results._1;
 			var subs = subscriptions(model);
 			dispatchEffects(managers, cmds, subs);
 			callback(_elm_lang$core$Native_Scheduler.succeed(model));
 		});
+	}
 
-		function onMessage(msg, model)
+	var mainProcess = spawnLoop(initApp, onMessage);
+
+	function enqueue(msg)
+	{
+		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
+	}
+
+	// setup all necessary effect managers
+	for (var key in globalManagerInfo)
+	{
+		managers[key] = makeManager(globalManagerInfo[key], mainProcess);
+	}
+
+	// setup all foreign effects
+	var foreign = {};
+	var hasForeigns = false;
+
+	for (var key in globalForeignCmds)
+	{
+		hasForeigns = true;
+		setupCmd(key, managers, foreign);
+	}
+
+	for (var key in globalForeignSubs)
+	{
+		hasForeigns = true;
+		setupSub(key, managers, foreign, mainProcess);
+	}
+
+	return hasForeigns ? { foreign: foreign } : {};
+}
+
+function makeInit(main)
+{
+	var rawInit = main._0.init;
+
+	if (main.ctor === 'no-flags')
+	{
+		return rawInit;
+	}
+
+	var flagDecoder = main._1;
+
+	return function init(flags)
+	{
+		var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+		if (result.ctor === 'Err')
 		{
-			return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
-				var results = A2(update, msg, model);
-				model = results._0;
-				renderer.update(view(model));
-				var cmds = results._1;
-				var subs = subscriptions(model);
-				dispatchEffects(managers, cmds, subs);
-				callback(_elm_lang$core$Native_Scheduler.succeed(model));
-			});
+			throw new Error('You trying to initialize module `' + moduleName + '` with unexpected flags.\n'
+				+ 'When trying to convert the flags to a usable Elm value, I run into this problem:\n\n'
+				+ result._0
+			);
 		}
-
-		var mainProcess = spawnLoop(initApp, onMessage);
-
-		function enqueue(msg)
-		{
-			_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
-		}
-
-		// setup all necessary effect managers
-		for (var key in globalManagerInfo)
-		{
-			managers[key] = makeManager(globalManagerInfo[key], mainProcess);
-		}
-
-		// setup all foreign effects
-		var foreign = {};
-
-		for (var key in globalForeignCmds)
-		{
-			setupCmd(key, managers, foreign);
-		}
-
-		for (var key in globalForeignSubs)
-		{
-			setupSub(key, managers, foreign, mainProcess);
-		}
-
-		return { foreign: foreign };
-	};
+		return rawInit(result._0);
+	}
 }
 
 
