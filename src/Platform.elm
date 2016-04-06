@@ -27,6 +27,7 @@ curious? Public discussions of your explorations should be framed accordingly.
 
 import Basics exposing (Never)
 import Native.Platform
+import Native.Scheduler
 
 
 
@@ -103,3 +104,5 @@ sendToSelf =
   Native.Platform.sendToSelf
 
 
+hack =
+  Native.Scheduler.succeed
