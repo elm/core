@@ -82,16 +82,10 @@ function spawnLoop(init, onMessage)
 
 function addPublicModule(object, name, main)
 {
-	if (!main)
-	{
-		var badTimes = mainIsUndefined(name);
-		object['embed'] = badTimes;
-		object['fullscreen'] = badTimes;
-		return;
-	}
+	var embed = main ? makeEmbed(name, main) : mainIsUndefined(name);
 
-	var embed = makeEmbed(name, main);
 	object['embed'] = embed;
+
 	object['fullscreen'] = function fullscreen(flags)
 	{
 		return embed(document.body, flags);
@@ -100,12 +94,12 @@ function addPublicModule(object, name, main)
 
 function mainIsUndefined(name)
 {
-	return function()
+	return function(domNode)
 	{
-		throw new Error(
-			'Cannot initialize module ' + name +
-			' because it has no `main` value! What should I show on screen?'
-		);
+		var message = 'Cannot initialize module `' + name +
+			'` because it has no `main` value!\nWhat should I show on screen?';
+		domNode.innerHTML = errorHtml(message);
+		throw new Error(message);
 	};
 }
 
@@ -113,8 +107,22 @@ function makeEmbed(moduleName, main)
 {
 	return function embed(rootDomNode, flags)
 	{
-		return makeEmbedHelp(moduleName, main, rootDomNode, flags);
+		try
+		{
+			return makeEmbedHelp(moduleName, main, rootDomNode, flags);
+		}
+		catch (e)
+		{
+			rootDomNode.innerHTML = errorHtml(e.message);
+			throw e;
+		}
 	};
+}
+
+function errorHtml(message)
+{
+	return '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
+		+ '<pre style="padding-left:2em;">' + message + '</pre>';
 }
 
 function makeEmbedHelp(moduleName, main, rootDomNode, flags)
