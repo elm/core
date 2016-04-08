@@ -121,8 +121,10 @@ function makeEmbed(moduleName, main)
 
 function errorHtml(message)
 {
-	return '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
-		+ '<pre style="padding-left:2em;">' + message + '</pre>';
+	return '<div style="padding-left:1em;">'
+		+ '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
+		+ '<pre style="padding-left:1em;">' + message + '</pre>'
+		+ '</div>';
 }
 
 function makeEmbedHelp(moduleName, main, rootDomNode, flags)
