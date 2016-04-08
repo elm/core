@@ -19,6 +19,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 		for (var i = kids.length; i--; )
 		{
 			kids[i].notify(timestamp, update, node.id);
+			node.updatedThisFrame = update;
 		}
 	}
 
@@ -94,6 +95,7 @@ Elm.Native.Signal.make = function(localRuntime) {
 			id: Utils.guid(),
 			name: 'output-' + name,
 			parents: [parent],
+			value: parent.value,
 			isOutput: true
 		};
 
@@ -101,8 +103,11 @@ Elm.Native.Signal.make = function(localRuntime) {
 		{
 			if (parentUpdate)
 			{
+				node.value = parent.value;
 				handler(parent.value);
+
 			}
+			node.updatedThisFrame = parentUpdate;
 		};
 
 		parent.kids.push(node);

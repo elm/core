@@ -9,6 +9,7 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 	}
 
 	var NS = Elm.Native.Signal.make(localRuntime);
+	var Utils = Elm.Native.Utils.make(localRuntime);
 
 
 	function keyEvent(event)
@@ -35,7 +36,7 @@ Elm.Native.Keyboard.make = function(localRuntime) {
 	var downs = keyStream(document, 'keydown', keyEvent);
 	var ups = keyStream(document, 'keyup', keyEvent);
 	var presses = keyStream(document, 'keypress', keyEvent);
-	var blurs = keyStream(window, 'blur', function() { return null; });
+	var blurs = keyStream(window, 'blur', function() { return Utils.Tuple0; });
 
 
 	return localRuntime.Native.Keyboard.values = {
