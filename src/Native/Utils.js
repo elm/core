@@ -240,24 +240,6 @@ function regionToString(region)
 }
 
 
-// BAD PORTS
-
-function badPort(expected, received)
-{
-	throw new Error(
-		'Runtime error when sending values through a port.\n\n'
-		+ 'Expecting ' + expected + ' but was given ' + formatValue(received)
-	);
-}
-
-function formatValue(value)
-{
-	// Explicity format undefined values as "undefined"
-	// because JSON.stringify(undefined) unhelpfully returns ""
-	return (value === undefined) ? "undefined" : JSON.stringify(value);
-}
-
-
 // TO STRING
 
 var toString = function(v)
@@ -398,7 +380,6 @@ return {
 
 	crash: crash,
 	crashCase: crashCase,
-	badPort: badPort,
 
 	toString: toString
 };
