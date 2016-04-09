@@ -8,6 +8,7 @@ module Basics
     , degrees, radians, turns
     , toPolar, fromPolar
     , isNaN, isInfinite
+    , toFixedRep
     , toString, (++)
     , fst, snd
     , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
@@ -52,7 +53,7 @@ which happen to be radians.
 @docs isNaN, isInfinite
 
 # Strings and Lists
-@docs toString, (++)
+@docs toFixedRep, toString, (++)
 
 # Tuples
 @docs fst, snd
@@ -444,6 +445,17 @@ Notice that NaN is not infinite! For float `n` to be finite implies that
 isInfinite : Float -> Bool
 isInfinite =
   Native.Basics.isInfinite
+
+{-| Convert a float into a string including a fixed number of decimal places.
+
+    toFixedRep 45.0 0 == "45"
+    toFixedRep 3.141592 2 == "3.14"
+    toFixedrep 3.141592 10 == "3.1415920000"
+
+-}
+toFixedRep : Float -> Int -> String
+toFixedRep =
+  Native.Basics.toFixedRep
 
 
 {-| Turn any kind of value into a string. When you view the resulting string
