@@ -11,6 +11,8 @@ module Task
 {-| Tasks make it easy to describe asynchronous operations that may fail, like HTTP requests or writing to a database.
 For more information, see the [Elm documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 
+Task equality with `(==)` is unreliable and should not be used.
+
 # Basics
 @docs Task, succeed, fail
 
@@ -68,7 +70,7 @@ fail =
 
 {-| Transform a task.
 
-    map sqrt (succeed 9) == succeed 3
+    map sqrt (succeed 9) -- succeed 3
 -}
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
@@ -80,7 +82,7 @@ map func taskA =
 thing fails. It also runs in order so the first task will be completely
 finished before the second task starts.
 
-    map2 (+) (succeed 9) (succeed 3) == succeed 12
+    map2 (+) (succeed 9) (succeed 3) -- succeed 12
 -}
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
@@ -126,7 +128,7 @@ finished before the second task starts.
 This function makes it possible to chain tons of tasks together and pipe them
 all into a single function.
 
-    (f `map` task1 `andMap` task2 `andMap` task3) == map3 f task1 task2 task3
+    (f `map` task1 `andMap` task2 `andMap` task3) -- map3 f task1 task2 task3
 -}
 andMap : Task x (a -> b) -> Task x a -> Task x b
 andMap taskFunc taskValue =
@@ -139,7 +141,7 @@ andMap taskFunc taskValue =
 list. The tasks will be run in order one-by-one and if any task fails the whole
 sequence fails.
 
-    sequence [ succeed 1, succeed 2 ] == succeed [ 1, 2 ]
+    sequence [ succeed 1, succeed 2 ] -- succeed [ 1, 2 ]
 
 This can be useful if you need to make a bunch of HTTP requests one-by-one.
 -}
@@ -163,7 +165,7 @@ sequence tasks =
 successful, you give the result to the callback resulting in another task. This
 task then gets run.
 
-    succeed 2 `andThen` (\n -> succeed (n + 2)) == succeed 4
+    succeed 2 `andThen` (\n -> succeed (n + 2)) -- succeed 4
 
 This is useful for chaining tasks together. Maybe you need to get a user from
 your servers *and then* lookup their picture once you know their name.
@@ -203,8 +205,8 @@ mapError f task =
 {-| Translate a task that can fail into a task that can never fail, by
 converting any failure into `Nothing` and any success into `Just` something.
 
-    toMaybe (fail "file not found") == succeed Nothing
-    toMaybe (succeed 42)            == succeed (Just 42)
+    toMaybe (fail "file not found") -- succeed Nothing
+    toMaybe (succeed 42)            -- succeed (Just 42)
 
 This means you can handle the error with the `Maybe` module instead.
 -}
@@ -216,8 +218,8 @@ toMaybe task =
 {-| If you are chaining together a bunch of tasks, it may be useful to treat
 a maybe value like a task.
 
-    fromMaybe "file not found" Nothing   == fail "file not found"
-    fromMaybe "file not found" (Just 42) == succeed 42
+    fromMaybe "file not found" Nothing   -- fail "file not found"
+    fromMaybe "file not found" (Just 42) -- succeed 42
 -}
 fromMaybe : x -> Maybe a -> Task x a
 fromMaybe default maybe =
@@ -229,8 +231,8 @@ fromMaybe default maybe =
 {-| Translate a task that can fail into a task that can never fail, by
 converting any failure into `Err` something and any success into `Ok` something.
 
-    toResult (fail "file not found") == succeed (Err "file not found")
-    toResult (succeed 42)            == succeed (Ok 42)
+    toResult (fail "file not found") -- succeed (Err "file not found")
+    toResult (succeed 42)            -- succeed (Ok 42)
 
 This means you can handle the error with the `Result` module instead.
 -}
@@ -242,8 +244,8 @@ toResult task =
 {-| If you are chaining together a bunch of tasks, it may be useful to treat
 a result like a task.
 
-    fromResult (Err "file not found") == fail "file not found"
-    fromResult (Ok 42)                == succeed 42
+    fromResult (Err "file not found") -- fail "file not found"
+    fromResult (Ok 42)                -- succeed 42
 -}
 fromResult : Result x a -> Task x a
 fromResult result =
