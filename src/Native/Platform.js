@@ -244,7 +244,7 @@ function sendToApp(router, msg)
 	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
 	{
 		router.main(msg);
-		callback(_elm_lang$core$Native_Utils.Tuple0);
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
 	});
 }
 
