@@ -68,11 +68,17 @@ function mainToProgram(moduleName, wrappedMain)
 
 	if (typeof main.init === 'undefined')
 	{
-		var unit = _elm_lang$core$Native_Utils.Tuple0;
-		return _elm_lang$html$Html_App$beginnerProgram({
-			model: unit,
-			update: A2(function() { return unit; }),
-			view: function() { return main._0; }
+		var emptyBag = batch(_elm_lang$core$Native_List.Nil);
+		var noChange = _elm_lang$core$Native_Utils.Tuple2(
+			_elm_lang$core$Native_Utils.Tuple0,
+			emptyBag
+		);
+
+		return _elm_lang$virtual_dom$VirtualDom$programWithFlags({
+			init: function() { return noChange; },
+			view: function() { return main; },
+			update: F2(function() { return noChange; }),
+			subscriptions: function () { return emptyBag; }
 		});
 	}
 
@@ -81,13 +87,12 @@ function mainToProgram(moduleName, wrappedMain)
 		? initWithFlags(moduleName, main.init, flags)
 		: initWithoutFlags(moduleName, main.init);
 
-	return {
+	return _elm_lang$virtual_dom$VirtualDom$programWithFlags({
 		init: init,
 		view: main.view,
 		update: main.update,
 		subscriptions: main.subscriptions,
-		renderer: main.renderer
-	};
+	});
 }
 
 function initWithoutFlags(moduleName, realInit)
