@@ -3,81 +3,6 @@
 var _elm_lang$core$Native_Platform = function() {
 
 
-// EFFECT MANAGERS
-
-var globalManagerInfo = {};
-
-function makeManager(info, mainProcess)
-{
-	var router = {
-		main: mainProcess,
-		self: undefined
-	};
-
-	var tag = info.tag;
-	var onEffects = info.onEffects;
-	var onSelfMsg = info.onSelfMsg;
-
-	function onMessage(msg, state)
-	{
-		if (msg.ctor === 'self')
-		{
-			return A3(onSelfMsg, router, msg._0, state);
-		}
-
-		var fx = msg._0;
-		switch (tag)
-		{
-			case 'cmd':
-				return A3(onEffects, router, fx.cmds, state);
-
-			case 'sub':
-				return A3(onEffects, router, fx.subs, state);
-
-			case 'fx':
-				return A4(onEffects, router, fx.cmds, fx.subs, state);
-		}
-	}
-
-	var process = spawnLoop(info.init, onMessage);
-	router.self = process;
-	return process;
-}
-
-function sendToApp(router, msg)
-{
-	return A2(_elm_lang$core$Native_Scheduler.send, router.main, msg);
-}
-
-function sendToSelf(router, msg)
-{
-	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
-		ctor: 'self',
-		_0: msg
-	});
-}
-
-
-// HELPER for STATEFUL LOOPS
-
-function spawnLoop(init, onMessage)
-{
-	var andThen = _elm_lang$core$Native_Scheduler.andThen;
-
-	function loop(state)
-	{
-		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
-			return onMessage(msg, state);
-		});
-		return A2(andThen, handleMsg, loop);
-	}
-
-	var task = A2(andThen, init, loop);
-
-	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
-}
-
-
 // PROGRAMS
 
 function addPublicModule(object, name, main)
@@ -92,6 +17,9 @@ function addPublicModule(object, name, main)
 	};
 }
 
+
+// PROGRAM FAIL
+
 function mainIsUndefined(name)
 {
 	return function(domNode)
@@ -103,13 +31,25 @@ function mainIsUndefined(name)
 	};
 }
 
+function errorHtml(message)
+{
+	return '<div style="padding-left:1em;">'
+		+ '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
+		+ '<pre style="padding-left:1em;">' + message + '</pre>'
+		+ '</div>';
+}
+
+
+// PROGRAM SUCCESS
+
 function makeEmbed(moduleName, main)
 {
 	return function embed(rootDomNode, flags)
 	{
 		try
 		{
-			return makeEmbedHelp(moduleName, main, rootDomNode, flags);
+			var program = mainToProgram(moduleName, main);
+			return makeEmbedHelp(moduleName, program, rootDomNode, flags);
 		}
 		catch (e)
 		{
@@ -119,27 +59,76 @@ function makeEmbed(moduleName, main)
 	};
 }
 
-function errorHtml(message)
-{
-	return '<div style="padding-left:1em;">'
-		+ '<h2 style="font-weight:normal;"><b>Oops!</b> Something went wrong when starting your Elm program.</h2>'
-		+ '<pre style="padding-left:1em;">' + message + '</pre>'
-		+ '</div>';
-}
 
-function makeEmbedHelp(moduleName, main, rootDomNode, flags)
+// MAIN TO PROGRAM
+
+function mainToProgram(moduleName, wrappedMain)
 {
-	// main is a union type with one of the following tags: vdom, no-flags, flags
-	// the follow section figures out what to do in each case.
-	if (main.ctor === 'vdom')
+	var main = wrappedMain.main;
+
+	if (typeof main.init === 'undefined')
 	{
-		_elm_lang$virtual_dom$Native_VirtualDom.staticProgram(rootDomNode, main._0);
-		return {};
+		var unit = _elm_lang$core$Native_Utils.Tuple0;
+		return _elm_lang$html$Html_App$beginnerProgram({
+			model: unit,
+			update: A2(function() { return unit; }),
+			view: function() { return main._0; }
+		});
 	}
 
-	// Define: init, update, subscriptions, view, and makeRenderer
-	var program = main._0;
-	var init = makeInit(moduleName, main);
+	var flags = wrappedMain.flags;
+	var init = flags
+		? initWithFlags(moduleName, main.init, flags)
+		: initWithoutFlags(moduleName, main.init);
+
+	return {
+		init: init,
+		view: main.view,
+		update: main.update,
+		subscriptions: main.subscriptions,
+		renderer: main.renderer
+	};
+}
+
+function initWithoutFlags(moduleName, realInit)
+{
+	return function init(flags)
+	{
+		if (typeof flags !== 'undefined')
+		{
+			throw new Error(
+				'You are giving module `' + moduleName + '` an argument in JavaScript.\n'
+				+ 'This module does not take arguments though! You probably need to change the\n'
+				+ 'initialization code to something like `Elm.' + moduleName + '.fullscreen()`'
+			);
+		}
+		return realInit();
+	};
+}
+
+function initWithFlags(moduleName, realInit, flagDecoder)
+{
+	return function init(flags)
+	{
+		var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+		if (result.ctor === 'Err')
+		{
+			throw new Error(
+				'You trying to initialize module `' + moduleName + '` with an unexpected argument.\n'
+				+ 'When trying to convert it to a usable Elm value, I run into this problem:\n\n'
+				+ result._0
+			);
+		}
+		return realInit(result._0);
+	};
+}
+
+
+// SETUP RUNTIME SYSTEM
+
+function makeEmbedHelp(moduleName, program, rootDomNode, flags)
+{
+	var init = program.init;
 	var update = program.update;
 	var subscriptions = program.subscriptions;
 	var view = program.view;
@@ -180,54 +169,111 @@ function makeEmbedHelp(moduleName, main, rootDomNode, flags)
 		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
 	}
 
-	// setup all necessary effect managers
-	for (var key in globalManagerInfo)
-	{
-		managers[key] = makeManager(globalManagerInfo[key], mainProcess);
-	}
+	var ports = setupEffects(managers, enqueue);
 
-	// setup all foreign effects
-	var foreign = {};
-	var hasForeigns = false;
-
-	for (var key in globalForeignCmds)
-	{
-		hasForeigns = true;
-		setupCmd(key, managers, foreign);
-	}
-
-	for (var key in globalForeignSubs)
-	{
-		hasForeigns = true;
-		setupSub(key, managers, foreign, mainProcess);
-	}
-
-	return hasForeigns ? { foreign: foreign } : {};
+	return ports ? { ports: ports } : {};
 }
 
-function makeInit(moduleName, main)
+
+// EFFECT MANAGERS
+
+var effectManagers = {};
+
+function setupEffects(managers, callback)
 {
-	var rawInit = main._0.init;
+	var ports;
 
-	if (main.ctor === 'no-flags')
+	// setup all necessary effect managers
+	for (var key in effectManagers)
 	{
-		return rawInit;
-	}
+		var manager = effectManagers[key];
 
-	var flagDecoder = main._1;
-
-	return function init(flags)
-	{
-		var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
-		if (result.ctor === 'Err')
+		if (manager.isForeign)
 		{
-			throw new Error('You trying to initialize module `' + moduleName + '` with unexpected flags.\n'
-				+ 'When trying to convert the flags to a usable Elm value, I run into this problem:\n\n'
-				+ result._0
-			);
+			ports = ports || {};
+			ports[key] = manager.tag === 'cmd'
+				? setupOutgoingPort(key)
+				: setupIncomingPort(key, callback);
 		}
-		return rawInit(result._0);
+
+		managers[key] = makeManager(manager, callback);
 	}
+
+	return ports;
+}
+
+function makeManager(info, callback)
+{
+	var router = {
+		main: callback,
+		self: undefined
+	};
+
+	var tag = info.tag;
+	var onEffects = info.onEffects;
+	var onSelfMsg = info.onSelfMsg;
+
+	function onMessage(msg, state)
+	{
+		if (msg.ctor === 'self')
+		{
+			return A3(onSelfMsg, router, msg._0, state);
+		}
+
+		var fx = msg._0;
+		switch (tag)
+		{
+			case 'cmd':
+				return A3(onEffects, router, fx.cmds, state);
+
+			case 'sub':
+				return A3(onEffects, router, fx.subs, state);
+
+			case 'fx':
+				return A4(onEffects, router, fx.cmds, fx.subs, state);
+		}
+	}
+
+	var process = spawnLoop(info.init, onMessage);
+	router.self = process;
+	return process;
+}
+
+function sendToApp(router, msg)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		router.main(msg);
+		callback(_elm_lang$core$Native_Utils.Tuple0);
+	});
+}
+
+function sendToSelf(router, msg)
+{
+	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
+		ctor: 'self',
+		_0: msg
+	});
+}
+
+
+// HELPER for STATEFUL LOOPS
+
+function spawnLoop(init, onMessage)
+{
+	var andThen = _elm_lang$core$Native_Scheduler.andThen;
+
+	function loop(state)
+	{
+		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
+			return onMessage(msg, state);
+		});
+		return A2(andThen, handleMsg, loop);
+	}
+
+	var task = A2(andThen, init, loop);
+
+	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
 }
 
 
@@ -321,8 +367,8 @@ function toEffect(isCmd, home, taggers, value)
 	}
 
 	var map = isCmd
-		? globalManagerInfo[home].cmdMap
-		: globalManagerInfo[home].subMap;
+		? effectManagers[home].cmdMap
+		: effectManagers[home].subMap;
 
 	return A2(map, applyTaggers, value)
 }
@@ -343,71 +389,62 @@ function insert(isCmd, newEffect, effects)
 }
 
 
-// FOREIGN EFFECT LEAFS
+// PORTS
 
-var globalForeignCmds = {};
-var globalForeignSubs = {};
-
-function foreignCmd(name, converter)
+function checkPortName(name)
 {
-	checkForeignName(name);
-	globalForeignCmds[name] = converter;
-	return leaf(name);
-}
-
-function foreignSub(name, converter)
-{
-	checkForeignName(name);
-	globalForeignSubs[name] = converter;
-	return leaf(name);
-}
-
-function checkForeignName(name)
-{
-	if (name in globalForeignCmds || name in globalForeignSubs)
+	if (name in effectManagers)
 	{
-		throw new Error('There can only be one foreign effect named `'
-			+ name + '`, but your program has multiple.');
+		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
 	}
 }
 
 
-// SET UP FOREIGN EFFECTS
+// OUTGOING PORTS
 
-function setupCmd(name, managers, foreign)
+function outgoingPort(name, converter)
 {
-	var converter = globalForeignCmds[name];
+	checkPortName(name);
+	effectManagers[name] = {
+		tag: 'cmd',
+		cmdMap: outgoingPortMap,
+		converter: converter,
+		isForeign: true
+	};
+	return leaf(name);
+}
+
+var outgoingPortMap = F2(function cmdMap(tagger, value) {
+	return value;
+});
+
+function setupOutgoingPort(name)
+{
 	var subs = [];
+	var converter = effectManagers[name].converter;
 
-
-	// internal dispatching
+	// CREATE MANAGER
 
 	var init = _elm_lang$core$Native_Scheduler.succeed(null);
 
-	function onMessage(msg, state)
+	function onEffects(router, cmdList, state)
 	{
-		var cmdList = msg._0.cmds;
-
 		while (cmdList.ctor !== '[]')
 		{
 			var value = converter(cmdList._0);
-
 			for (var i = 0; i < subs.length; i++)
 			{
 				subs[i](value);
 			}
-
 			cmdList = cmdList._1;
 		}
-
 		return init;
 	}
 
-	managers[name] = spawnLoop(init, onMessage);
-	globalManagerInfo[name] = { cmdMap: F2(foreignCmdMap) };
+	effectManagers[name].init = init;
+	effectManagers[name].onEffects = F3(onEffects);
 
-
-	// external subscriptions
+	// PUBLIC API
 
 	function subscribe(callback)
 	{
@@ -423,71 +460,74 @@ function setupCmd(name, managers, foreign)
 		}
 	}
 
-	foreign[name] = {
+	return {
 		subscribe: subscribe,
 		unsubscribe: unsubscribe
 	};
 }
 
-// setup foreign subscriptions
-function setupSub(name, managers, foreign, mainProcess)
+
+// INCOMING PORTS
+
+function incomingPort(name, converter)
 {
-	var converter = globalForeignSubs[name];
+	checkPortName(name);
+	effectManagers[name] = {
+		tag: 'sub',
+		subMap: incomingPortMap,
+		converter: converter,
+		isForeign: true
+	};
+	return leaf(name);
+}
+
+var incomingPortMap = F2(function subMap(tagger, finalTagger)
+{
+	return function(value)
+	{
+		return tagger(finalTagger(value));
+	};
+});
+
+function setupIncomingPort(name, callback)
+{
 	var subs = _elm_lang$core$Native_List.Nil;
+	var converter = effectManagers[name].converter;
 
-
-	// internal
+	// CREATE MANAGER
 
 	var init = _elm_lang$core$Native_Scheduler.succeed(null);
 
-	function onMessage(msg, state)
+	function onEffects(router, subList, state)
 	{
-		subs = msg._0.subs;
+		subs = subList;
 		return init;
 	}
 
-	managers[name] = spawnLoop(init, onMessage);
-	globalManagerInfo[name] = { subMap: F2(foreignSubMap) };
+	effectManagers[name].init = init;
+	effectManagers[name].onEffects = F3(onEffects);
 
-
-	// external
+	// PUBLIC API
 
 	function send(value)
 	{
 		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, value);
 		if (result.ctor === 'Err')
 		{
-			throw new Error('Trying to send an unexpected type of value through `' + name + '`:\n' + result._0);
+			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
 		}
 
 		var value = result._0;
 		var temp = subs;
 		while (temp.ctor !== '[]')
 		{
-			_elm_lang$core$Native_Scheduler.rawSend(mainProcess, temp._0(value));
+			callback(temp._0(value));
 			temp = temp._1;
 		}
 	}
 
-	foreign[name] = { send: send };
+	return { send: send };
 }
-
-
-// FOREIGN MAPS
-
-function foreignCmdMap(tagger, value)
-{
-	return value;
-}
-
-function foreignSubMap(tagger, finalTagger)
-{
-	return function(value)
-	{
-		return tagger(finalTagger(value));
-	};
-}
-
 
 return {
 	// routers
@@ -495,15 +535,16 @@ return {
 	sendToSelf: F2(sendToSelf),
 
 	// global setup
-	globalManagerInfo: globalManagerInfo,
+	effectManagers: effectManagers,
+	setupEffects: setupEffects,
+	outgoingPort: outgoingPort,
+	incomingPort: incomingPort,
 	addPublicModule: addPublicModule,
 
 	// effect bags
 	leaf: leaf,
 	batch: batch,
-	map: F2(map),
-	foreignCmd: foreignCmd,
-	foreignSub: foreignSub
+	map: F2(map)
 };
 
 }();
