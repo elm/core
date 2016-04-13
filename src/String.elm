@@ -409,36 +409,36 @@ indices =
 
 {-| Try to convert a string into an int, failing on improperly formatted strings.
 
-    String.toInt "123" == Ok 123
-    String.toInt "-42" == Ok -42
-    String.toInt "3.1" == Err "could not convert string '3.1' to an Int"
-    String.toInt "31a" == Err "could not convert string '31a' to an Int"
+    String.toInt "123" == Just 123
+    String.toInt "-42" == Just -42
+    String.toInt "3.1" == Nothing
+    String.toInt "31a" == Nothing
 
 If you are extracting a number from some raw user input, you will typically
-want to use [`Result.withDefault`](Result#withDefault) to handle bad data:
+want to use [`Maybe.withDefault`](Maybe#withDefault) to handle bad data:
 
-    Result.withDefault 0 (String.toInt "42") == 42
-    Result.withDefault 0 (String.toInt "ab") == 0
+    Maybe.withDefault 0 (String.toInt "42") == 42
+    Maybe.withDefault 0 (String.toInt "ab") == 0
 -}
-toInt : String -> Result String Int
+toInt : String -> Maybe Int
 toInt =
   Native.String.toInt
 
 
 {-| Try to convert a string into a float, failing on improperly formatted strings.
 
-    String.toFloat "123" == Ok 123.0
-    String.toFloat "-42" == Ok -42.0
-    String.toFloat "3.1" == Ok 3.1
-    String.toFloat "31a" == Err "could not convert string '31a' to a Float"
+    String.toFloat "123" == Just 123.0
+    String.toFloat "-42" == Just -42.0
+    String.toFloat "3.1" == Just 3.1
+    String.toFloat "31a" == Nothing
 
 If you are extracting a number from some raw user input, you will typically
-want to use [`Result.withDefault`](Result#withDefault) to handle bad data:
+want to use [`Maybe.withDefault`](Maybe#withDefault) to handle bad data:
 
-    Result.withDefault 0 (String.toFloat "42.5") == 42.5
-    Result.withDefault 0 (String.toFloat "cats") == 0
+    Maybe.withDefault 0 (String.toFloat "42.5") == 42.5
+    Maybe.withDefault 0 (String.toFloat "cats") == 0
 -}
-toFloat : String -> Result String Float
+toFloat : String -> Maybe Float
 toFloat =
   Native.String.toFloat
 
@@ -461,4 +461,3 @@ something.
 fromList : List Char -> String
 fromList =
   Native.String.fromList
-

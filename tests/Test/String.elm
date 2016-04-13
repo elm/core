@@ -17,6 +17,14 @@ tests =
         , test "endsWith" (assert <| String.endsWith "ship" "spaceship")
         , test "reverse" <| assertEqual "desserts" (String.reverse "stressed")
         , test "repeat" <| assertEqual "hahaha" (String.repeat 3 "ha")
+        , test "toInt 1" <| assertEqual (Just 123) (String.toInt "123")
+        , test "toInt 2" <| assertEqual (Just -42) (String.toInt "-42")
+        , test "toInt 3" <| assertEqual Nothing (String.toInt "3.1")
+        , test "toInt 4" <| assertEqual Nothing (String.toInt "31a")
+        , test "toFloat 1" <| assertEqual (Just 123.0) (String.toFloat "123")
+        , test "toFloat 2" <| assertEqual (Just -42.0) (String.toFloat "-42")
+        , test "toFloat 3" <| assertEqual (Just 3.1) (String.toFloat "3.1")
+        , test "toFloat 4" <| assertEqual Nothing (String.toFloat "31a")
         ]
 
       combiningTests = suite "Combining Strings"

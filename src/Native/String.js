@@ -205,14 +205,14 @@ function toInt(s)
 	var len = s.length;
 	if (len === 0)
 	{
-		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
+		return _elm_lang$core$Maybe$Nothing;
 	}
 	var start = 0;
 	if (s[0] === '-')
 	{
 		if (len === 1)
 		{
-			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
+			return _elm_lang$core$Maybe$Nothing;
 		}
 		start = 1;
 	}
@@ -221,10 +221,10 @@ function toInt(s)
 		var c = s[i];
 		if (c < '0' || '9' < c)
 		{
-			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int" );
+			return _elm_lang$core$Maybe$Nothing;
 		}
 	}
-	return _elm_lang$core$Result$Ok(parseInt(s, 10));
+	return _elm_lang$core$Maybe$Just(parseInt(s, 10));
 }
 
 function toFloat(s)
@@ -232,14 +232,14 @@ function toFloat(s)
 	var len = s.length;
 	if (len === 0)
 	{
-		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
+		return _elm_lang$core$Maybe$Nothing;
 	}
 	var start = 0;
 	if (s[0] === '-')
 	{
 		if (len === 1)
 		{
-			return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
+			return _elm_lang$core$Maybe$Nothing;
 		}
 		start = 1;
 	}
@@ -259,9 +259,9 @@ function toFloat(s)
 				continue;
 			}
 		}
-		return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float" );
+		return _elm_lang$core$Maybe$Nothing;
 	}
-	return _elm_lang$core$Result$Ok(parseFloat(s));
+	return _elm_lang$core$Maybe$Just(parseFloat(s));
 }
 
 function toList(str)
