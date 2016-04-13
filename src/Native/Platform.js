@@ -540,8 +540,8 @@ return {
 	sendToSelf: F2(sendToSelf),
 
 	// global setup
+	mainToProgram: mainToProgram,
 	effectManagers: effectManagers,
-	setupEffects: setupEffects,
 	outgoingPort: outgoingPort,
 	incomingPort: incomingPort,
 	addPublicModule: addPublicModule,
