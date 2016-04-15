@@ -242,7 +242,7 @@ function regionToString(region)
 
 // TO STRING
 
-var toString = function(v)
+function toString(v)
 {
 	var type = typeof v;
 	if (type === 'function')
@@ -250,23 +250,33 @@ var toString = function(v)
 		var name = v.func ? v.func.name : v.name;
 		return '<function' + (name === '' ? '' : ': ') + name + '>';
 	}
-	else if (type === 'boolean')
+
+	if (type === 'boolean')
 	{
 		return v ? 'True' : 'False';
 	}
-	else if (type === 'number')
+
+	if (type === 'number')
 	{
 		return v + '';
 	}
-	else if (v instanceof String)
+
+	if (v instanceof String)
 	{
 		return '\'' + addSlashes(v, true) + '\'';
 	}
-	else if (type === 'string')
+
+	if (type === 'string')
 	{
 		return '"' + addSlashes(v, false) + '"';
 	}
-	else if (type === 'object' && 'ctor' in v)
+
+	if (v === null)
+	{
+		return 'null';
+	}
+
+	if (type === 'object' && 'ctor' in v)
 	{
 		var ctorStarter = v.ctor.substring(0, 5);
 
@@ -280,16 +290,24 @@ var toString = function(v)
 			}
 			return '(' + output.join(',') + ')';
 		}
-		else if (ctorStarter === '_Task')
+
+		if (ctorStarter === '_Task')
 		{
 			return '<task>'
 		}
-		else if (v.ctor === '_Array')
+
+		if (v.ctor === '_Array')
 		{
-			var list = _Array$toList(v); // IMPORT
+			var list = _elm_lang$core$Array$toList(v);
 			return 'Array.fromList ' + toString(list);
 		}
-		else if (v.ctor === '::')
+
+		if (v.ctor === '_Process')
+		{
+			return '<process:' + v.id + '>';
+		}
+
+		if (v.ctor === '::')
 		{
 			var output = '[' + toString(v._0);
 			v = v._1;
@@ -300,39 +318,44 @@ var toString = function(v)
 			}
 			return output + ']';
 		}
-		else if (v.ctor === '[]')
+
+		if (v.ctor === '[]')
 		{
 			return '[]';
 		}
-		else if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
+
+		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
 		{
 			var name, list;
 			if (v.ctor === 'Set_elm_builtin')
 			{
 				name = 'Set';
-				list = A2(_List$map, function(x) {return x._0; }, _Dict$toList(v._0)); // IMPORT
+				list = A2(
+					_elm_lang$core$List$map,
+					function(x) {return x._0; },
+					_elm_lang$core$Dict$toList(v._0)
+				);
 			}
 			else
 			{
 				name = 'Dict';
-				list = _Dict$toList(v); // IMPORT
+				list = _elm_lang$core$Dict$toList(v);
 			}
 			return name + '.fromList ' + toString(list);
 		}
-		else
+
+		var output = '';
+		for (var i in v)
 		{
-			var output = '';
-			for (var i in v)
-			{
-				if (i === 'ctor') continue;
-				var str = toString(v[i]);
-				var parenless = str[0] === '{' || str[0] === '<' || str.indexOf(' ') < 0;
-				output += ' ' + (parenless ? str : '(' + str + ')');
-			}
-			return v.ctor + output;
+			if (i === 'ctor') continue;
+			var str = toString(v[i]);
+			var parenless = str[0] === '{' || str[0] === '<' || str.indexOf(' ') < 0;
+			output += ' ' + (parenless ? str : '(' + str + ')');
 		}
+		return v.ctor + output;
 	}
-	else if (type === 'object')
+
+	if (type === 'object')
 	{
 		var output = [];
 		for (var k in v)
@@ -345,8 +368,9 @@ var toString = function(v)
 		}
 		return '{ ' + output.join(', ') + ' }';
 	}
+
 	return '<internal structure>';
-};
+}
 
 function addSlashes(str, isChar)
 {
