@@ -92,7 +92,7 @@ type alias LineStyle =
     , width : Float
     , cap   : LineCap
     , join  : LineJoin
-    , dashing : List Int
+    , dashing : List Float
     , dashOffset : Int
     }
 
