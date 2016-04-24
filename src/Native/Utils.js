@@ -248,7 +248,7 @@ function toString(v)
 	if (type === 'function')
 	{
 		var name = v.func ? v.func.name : v.name;
-		return '<function' + (name === '' ? '' : ': ') + name + '>';
+		return '<function' + (name === '' ? '' : ':') + name + '>';
 	}
 
 	if (type === 'boolean')
@@ -300,6 +300,11 @@ function toString(v)
 		{
 			var list = _elm_lang$core$Array$toList(v);
 			return 'Array.fromList ' + toString(list);
+		}
+
+		if (v.ctor === '<decoder>')
+		{
+			return '<decoder>';
 		}
 
 		if (v.ctor === '_Process')
