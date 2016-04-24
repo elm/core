@@ -349,7 +349,8 @@ function toString(v)
 		{
 			if (i === 'ctor') continue;
 			var str = toString(v[i]);
-			var parenless = str[0] === '{' || str[0] === '<' || str.indexOf(' ') < 0;
+			var c0 = str[0];
+			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
 		}
 		return v.ctor + output;
