@@ -1,11 +1,12 @@
-module Random exposing
+effect module Random where { command = MyCmd } exposing
   ( Generator, Seed
   , bool, int, float
   , list, pair
   , map, map2, map3, map4, map5
   , andThen
   , minInt, maxInt
-  , generate, initialSeed
+  , generate
+  , step, initialSeed
   )
 
 {-| This library helps you generate pseudo-random values.
@@ -15,11 +16,12 @@ type of values you need. There are a bunch of primitive generators like
 [`bool`](#bool) and [`int`](#int) that you can build up into fancier
 generators with functions like [`list`](#list) and [`map`](#map).
 
-You use a `Generator` by running the [`generate`](#generate) function. If you
-need random values across many frames, you will probably want to store the
-most recent seed in your application state.
+It may be helpful to [read about JSON decoders][json] because they work very
+similarly.
 
-*Note:* This is an implementation of the Portable Combined Generator of
+[json]: https://evancz.gitbooks.io/an-introduction-to-elm/content/interop/json.html
+
+> *Note:* This is an implementation of the Portable Combined Generator of
 L'Ecuyer for 32-bit computers. It is almost a direct translation from the
 [System.Random](http://hackage.haskell.org/package/random-1.0.1.1/docs/System-Random.html)
 module. It has a period of roughly 2.30584e18.
@@ -36,8 +38,11 @@ module. It has a period of roughly 2.30584e18.
 # Custom Generators
 @docs map, map2, map3, map4, map5, andThen
 
-# Run a Generator
-@docs generate, Seed, initialSeed
+# Generate Values
+@docs generate
+
+# Generate Values Manually
+@docs step, Seed, initialSeed
 
 # Constants
 @docs maxInt, minInt
@@ -46,6 +51,14 @@ module. It has a period of roughly 2.30584e18.
 
 import Basics exposing (..)
 import List exposing ((::))
+import Platform
+import Platform.Cmd exposing (Cmd)
+import Task exposing (Task)
+import Time
+
+
+
+-- PRIMITIVE GENERATORS
 
 
 {-| Create a generator that produces boolean values. The following example
@@ -109,13 +122,13 @@ iLogBase b i =
     1 + iLogBase b (i // b)
 
 
-{-| The maximum value for randomly generated 32-bit ints. -}
+{-| The maximum value for randomly generated 32-bit ints: 2147483647 -}
 maxInt : Int
 maxInt =
   2147483647
 
 
-{-| The minimum value for randomly generated 32-bit ints. -}
+{-| The minimum value for randomly generated 32-bit ints: -2147483648 -}
 minInt : Int
 minInt =
   -2147483648
@@ -136,7 +149,7 @@ float a b =
         if a < b then (a,b) else (b,a)
 
       (number, newSeed) =
-        generate (int minInt maxInt) seed
+        step (int minInt maxInt) seed
 
       negativeOneToOne =
         toFloat number / toFloat (maxInt - minInt)
@@ -147,7 +160,9 @@ float a b =
       (scaled, newSeed)
 
 
+
 -- DATA STRUCTURES
+
 
 {-| Create a pair of random values. A common use of this might be to generate
 a point in a certain 2D space. Imagine we have a collage that is 400 pixels
@@ -187,12 +202,17 @@ listHelp : List a -> Int -> (Seed -> (a,Seed)) -> Seed -> (List a, Seed)
 listHelp list n generate seed =
   if n < 1 then
     (List.reverse list, seed)
+
   else
     let
       (value, newSeed) =
         generate seed
     in
       listHelp (value :: list) (n-1) generate newSeed
+
+
+
+-- CUSTOM GENERATORS
 
 
 {-| Transform the values produced by a generator. The following examples show
@@ -318,6 +338,10 @@ andThen (Generator generate) callback =
       genB newSeed
 
 
+
+-- IMPLEMENTATION
+
+
 {-| A `Generator` is like a recipe for generating certain random values. So a
 `Generator Int` describes how to generate integers and a `Generator String`
 describes how to generate strings.
@@ -335,7 +359,8 @@ type State = State Int Int
 {-| A `Seed` is the source of randomness in this whole system. Whenever
 you want to use a generator, you need to pair it with a seed.
 -}
-type Seed = Seed
+type Seed =
+  Seed
     { state : State
     , next  : State -> (Int, State)
     , split : State -> (State, State)
@@ -346,29 +371,29 @@ type Seed = Seed
 {-| Generate a random value as specified by a given `Generator`.
 
 In the following example, we are trying to generate a number between 0 and 100
-with the `int 0 100` generator. Each time we call `generate` we need to provide
-a seed. This will produce a random number and a *new* seed to use if we want to
+with the `int 0 100` generator. Each time we call `step` we need to provide a
+seed. This will produce a random number and a *new* seed to use if we want to
 run other generators later.
 
-So here it is done right, where we get a new seed from each `generate` call and
+So here it is done right, where we get a new seed from each `step` call and
 thread that through.
 
     seed0 = initialSeed 31415
 
-    -- generate (int 0 100) seed0 ==> (42, seed1)
-    -- generate (int 0 100) seed1 ==> (31, seed2)
-    -- generate (int 0 100) seed2 ==> (99, seed3)
+    -- step (int 0 100) seed0 ==> (42, seed1)
+    -- step (int 0 100) seed1 ==> (31, seed2)
+    -- step (int 0 100) seed2 ==> (99, seed3)
 
 Notice that we use different seeds on each line. This is important! If you use
 the same seed, you get the same results.
 
-    -- generate (int 0 100) seed0 ==> (42, seed1)
-    -- generate (int 0 100) seed0 ==> (42, seed1)
-    -- generate (int 0 100) seed0 ==> (42, seed1)
+    -- step (int 0 100) seed0 ==> (42, seed1)
+    -- step (int 0 100) seed0 ==> (42, seed1)
+    -- step (int 0 100) seed0 ==> (42, seed1)
 -}
-generate : Generator a -> Seed -> (a, Seed)
-generate (Generator generator) seed =
-    generator seed
+step : Generator a -> Seed -> (a, Seed)
+step (Generator generator) seed =
+  generator seed
 
 
 {-| Create a &ldquo;seed&rdquo; of randomness which makes it possible to
@@ -378,7 +403,12 @@ the current time.
 -}
 initialSeed : Int -> Seed
 initialSeed n =
-    Seed { state = initState n, next = next, split = split, range = range }
+  Seed
+    { state = initState n
+    , next = next
+    , split = split
+    , range = range
+    }
 
 
 {-| Produce the initial generator state. Distinct arguments should be likely
@@ -444,3 +474,56 @@ split (State s1 s2 as std) =
 range : State -> (Int,Int)
 range _ =
     (0, magicNum8)
+
+
+
+-- MANAGER
+
+
+{-| Create a command that will generate random values.
+
+Read more about how to use this in your programs in [The Elm Architecture
+tutorial][arch] which has a section specifically [about random values][rand].
+
+[arch]: https://evancz.gitbooks.io/an-introduction-to-elm/content/architecture/index.html
+[rand]: https://evancz.gitbooks.io/an-introduction-to-elm/content/architecture/effects/random.html
+-}
+generate : (a -> msg) -> Generator a -> Cmd msg
+generate tagger generator =
+  command (Generate (map tagger generator))
+
+
+type MyCmd msg = Generate (Generator msg)
+
+
+cmdMap : (a -> b) -> MyCmd a -> MyCmd b
+cmdMap func (Generate generator) =
+  Generate (map func generator)
+
+
+init : Task Never Seed
+init =
+  Time.now `Task.andThen` \t ->
+    Task.succeed (initialSeed (round t))
+
+
+onEffects : Platform.Router msg Never -> List (MyCmd msg) -> Seed -> Task Never Seed
+onEffects router commands seed =
+  case commands of
+    [] ->
+      Task.succeed seed
+
+    Generate generator :: rest ->
+      let
+        (value, newSeed) =
+          step generator seed
+      in
+        Platform.sendToApp router value
+          `Task.andThen` \_ ->
+
+        onEffects router rest newSeed
+
+
+onSelfMsg : Platform.Router msg Never -> Never -> Seed -> Task Never Seed
+onSelfMsg _ _ seed =
+  Task.succeed seed
