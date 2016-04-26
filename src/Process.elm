@@ -51,7 +51,7 @@ import Task exposing (Task)
 import Time exposing (Time)
 
 
-{-| A light-weight process that runs concurrently. You can use `Task.spawn` to
+{-| A light-weight process that runs concurrently. You can use `spawn` to
 get a bunch of different tasks running in different processes. The Elm runtime
 will interleave their progress. So if a task is taking too long, we will pause
 it at an `andThen` and switch over to other stuff.
@@ -83,7 +83,7 @@ spawn =
   Native.Scheduler.spawn
 
 
-{-| Block progress on the current thread for a given amount of time. The
+{-| Block progress on the current process for a given amount of time. The
 JavaScript equivalent of this is [`setTimeout`][setTimeout] which lets you
 delay work until later.
 
