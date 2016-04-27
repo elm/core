@@ -4,7 +4,10 @@ module Keyboard
     , isDown, keysDown, presses
     ) where
 
-{-| Library for working with keyboard input.
+{-| Library for working with keyboard input. All signals here except for
+[`presses`](#presses) are derived from the same source as the signal
+[`keysDown`](#keysDown), so be careful when passing several of them to
+[`Signal.merge`](Signal#merge) or [`Signal.mergeMany`](Signal#mergeMany).
 
 # Directions
 @docs arrows, wasd
