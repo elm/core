@@ -378,7 +378,7 @@ function runHelp(decoder, value)
 				}
 				array[i] = result.value;
 			}
-			return _elm_lang$core$Native_Array.fromJSArray(array);
+			return ok(_elm_lang$core$Native_Array.fromJSArray(array));
 
 		case 'maybe':
 			var result = runHelp(decoder.decoder, value);
