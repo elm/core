@@ -1,6 +1,7 @@
 module Graphics.Collage
     ( collage, Form
-    , toForm, filled, textured, gradient, outlined, traced, text, outlinedText
+    , toForm, sprite, filled, textured, gradient, outlined, traced
+    , text, outlinedText
     , move, moveX, moveY, scale, rotate, alpha
     , group, groupTransform
     , Shape, rect, oval, square, circle, ngon, polygon
@@ -20,7 +21,7 @@ so moving a form 10 units in the y-axis will move it up on screen.
 @docs collage, Form
 
 # Creating Forms
-@docs toForm, filled, textured, gradient, outlined, traced, text, outlinedText
+@docs toForm, sprite, filled, textured, gradient, outlined, traced, text, outlinedText
 
 # Transforming Forms
 @docs move, moveX, moveY, scale, rotate, alpha
