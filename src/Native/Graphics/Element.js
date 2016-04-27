@@ -237,13 +237,13 @@ Elm.Native.Graphics.Element.make = function(localRuntime) {
 		e.style.overflow = 'hidden';
 
 		var img = createNode('img');
+		var sw = w / elem._1, sh = h / elem._2;
 		img.onload = function() {
-			var sw = w / elem._1, sh = h / elem._2;
 			img.style.width = ((this.width * sw) | 0) + 'px';
 			img.style.height = ((this.height * sh) | 0) + 'px';
-			img.style.marginLeft = ((- pos._0 * sw) | 0) + 'px';
-			img.style.marginTop = ((- pos._1 * sh) | 0) + 'px';
 		};
+		img.style.marginLeft = ((- pos._0 * sw) | 0) + 'px';
+		img.style.marginTop = ((- pos._1 * sh) | 0) + 'px';
 		img.src = src;
 		img.name = src;
 		e.appendChild(img);
