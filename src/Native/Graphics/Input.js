@@ -344,34 +344,53 @@ Elm.Native.Graphics.Input.make = function(localRuntime) {
 
 		field.elm_handler = model.handler;
 		field.elm_old_value = field.value;
+		field.elm_old_selection = {
+			start: field.selectionStart,
+			end: field.selectionEnd,
+			direction: { ctor: field.selectionDirection === 'forward' ? 'Forward' : 'Backward' }
+		};
 
 		function inputUpdate(event)
 		{
 			var curr = field.elm_old_value;
 			var next = field.value;
-			if (curr === next)
+			var direction = field.selectionDirection === 'forward' ? 'Forward' : 'Backward';
+			var start = field.selectionStart;
+			var end = field.selectionEnd;
+			var selection = {
+				start: start,
+				end: end,
+				direction: { ctor: direction }
+			};
+
+			function areSelectionsEqual(selection1, selection2)
+			{
+				return selection1.start === selection2.start &&
+							 selection1.end === selection2.end &&
+							 selection1.direction.ctor === selection2.direction.ctor;
+			}
+
+			if (event.type === 'input' && curr === next ||
+					event.type !== 'input' && areSelectionsEqual(field.elm_old_selection, selection))
 			{
 				return;
 			}
 
-			var direction = field.selectionDirection === 'forward' ? 'Forward' : 'Backward';
-			var start = field.selectionStart;
-			var end = field.selectionEnd;
-			field.value = field.elm_old_value;
+			field.elm_old_selection = selection;
+			if (event.type === 'input') {
+				field.value = field.elm_old_value;
+			} else {
+				field.elm_hasFocus = true;
+			}
 
 			Signal.sendMessage(field.elm_handler({
 				string: next,
-				selection: {
-					start: start,
-					end: end,
-					direction: { ctor: direction }
-				}
+				selection: selection
 			}));
 		}
 
-		field.addEventListener('input', inputUpdate);
-		field.addEventListener('focus', function() {
-			field.elm_hasFocus = true;
+		['input', 'select', 'keyup', 'click', 'focus'].forEach(function(e) {
+			field.addEventListener(e, inputUpdate);
 		});
 		field.addEventListener('blur', function() {
 			field.elm_hasFocus = false;
