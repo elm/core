@@ -322,12 +322,16 @@ function dispatchEffects(managers, cmdBag, subBag)
 	gatherEffects(true, cmdBag, effectsDict, null);
 	gatherEffects(false, subBag, effectsDict, null);
 
-	for (var home in effectsDict)
+	for (var home in managers)
 	{
-		_elm_lang$core$Native_Scheduler.rawSend(managers[home], {
-			ctor: 'fx',
-			_0: effectsDict[home]
-		});
+		var fx = home in effectsDict
+			? effectsDict[home]
+			: {
+				cmds: _elm_lang$core$Native_List.Nil,
+				subs: _elm_lang$core$Native_List.Nil
+			};
+
+		_elm_lang$core$Native_Scheduler.rawSend(managers[home], { ctor: 'fx', _0: fx });
 	}
 }
 
