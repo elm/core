@@ -1,3 +1,4 @@
+var _elm_lang$core$Native_Bitwise = function() {
 
 return {
 	and: F2(function and(a, b) { return a & b; }),
@@ -8,3 +9,5 @@ return {
 	shiftRightArithmatic: F2(function sra(a, offset) { return a >> offset; }),
 	shiftRightLogical: F2(function srl(a, offset) { return a >>> offset; })
 };
+
+}();
