@@ -197,9 +197,11 @@ filter pred xs =
 {-| Apply a function that may succeed to all values in the list, but only keep
 the successes.
 
-    String.toInt : String -> Maybe Int
+    toMaybeInt : String -> Maybe Int
+    toMaybeInt string =
+      Result.toMaybe (String.toInt string)
 
-    filterMap String.toInt ["3", "4.0", "5", "hats"] == [3,5]
+    filterMap toMaybeInt ["3", "4.0", "5", "hats"] == [3,5]
 -}
 filterMap : (a -> Maybe b) -> List a -> List b
 filterMap f xs =
