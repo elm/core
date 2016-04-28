@@ -1,15 +1,17 @@
-module Task
-    ( Task
-    , succeed, fail
-    , map, map2, map3, map4, map5, andMap
-    , sequence
-    , andThen
-    , onError, mapError
-    , toMaybe, fromMaybe, toResult, fromResult
-    , ThreadID, spawn, sleep
-    ) where
-{-| Tasks make it easy to describe asynchronous operations that may fail, like HTTP requests or writing to a database.
-For more information, see the [Elm documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
+effect module Task where { command = MyCmd } exposing
+  ( Task
+  , succeed, fail
+  , map, map2, map3, map4, map5, andMap
+  , sequence
+  , andThen
+  , onError, mapError
+  , toMaybe, fromMaybe, toResult, fromResult
+  , perform
+  )
+
+{-| Tasks make it easy to describe asynchronous operations that may fail, like
+HTTP requests or writing to a database. For more information, see the [Elm
+documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
 
 # Basics
 @docs Task, succeed, fail
@@ -23,14 +25,19 @@ For more information, see the [Elm documentation on Tasks](http://elm-lang.org/g
 # Errors
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
-# Threads
-@docs spawn, sleep, ThreadID
+# Commands
+@docs perform
+
 -}
 
-import Native.Task
+import Basics exposing (Never)
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
+import Native.Scheduler
+import Platform
+import Platform.Cmd exposing (Cmd)
 import Result exposing (Result(Ok,Err))
+
 
 
 {-| Represents asynchronous effects that may fail. It is useful for stuff like
@@ -41,10 +48,13 @@ that when we perform the task, it will either fail with a `String` message or
 succeed with a `User`. So this could represent a task that is asking a server
 for a certain user.
 -}
-type Task x a = Task
+type alias Task err ok =
+  Platform.Task err ok
+
 
 
 -- BASICS
+
 
 {-| A task that succeeds immediately when run.
 
@@ -52,7 +62,7 @@ type Task x a = Task
 -}
 succeed : a -> Task x a
 succeed =
-  Native.Task.succeed
+  Native.Scheduler.succeed
 
 
 {-| A task that fails immediately when run.
@@ -61,10 +71,12 @@ succeed =
 -}
 fail : x -> Task x a
 fail =
-  Native.Task.fail
+  Native.Scheduler.fail
+
 
 
 -- MAPPING
+
 
 {-| Transform a task.
 
@@ -147,17 +159,15 @@ sequence : List (Task x a) -> Task x (List a)
 sequence tasks =
   case tasks of
     [] ->
-        succeed []
+      succeed []
 
     task :: remainingTasks ->
-        map2 (::) task (sequence remainingTasks)
-
-
--- interleave : List (Task x a) -> Task x (List a)
+      map2 (::) task (sequence remainingTasks)
 
 
 
 -- CHAINING
+
 
 {-| Chain together a task and a callback. The first task will run, and if it is
 successful, you give the result to the callback resulting in another task. This
@@ -170,7 +180,7 @@ your servers *and then* lookup their picture once you know their name.
 -}
 andThen : Task x a -> (a -> Task x b) -> Task x b
 andThen =
-  Native.Task.andThen
+  Native.Scheduler.andThen
 
 
 -- ERRORS
@@ -183,7 +193,7 @@ callback to recover.
 -}
 onError : Task x a -> (x -> Task y a) -> Task y a
 onError =
-  Native.Task.catch_
+  Native.Scheduler.onError
 
 
 {-| Transform the error value. This can be useful if you need a bunch of error
@@ -222,8 +232,11 @@ a maybe value like a task.
 fromMaybe : x -> Maybe a -> Task x a
 fromMaybe default maybe =
   case maybe of
-    Just value -> succeed value
-    Nothing -> fail default
+    Just value ->
+      succeed value
+
+    Nothing ->
+      fail default
 
 
 {-| Translate a task that can fail into a task that can never fail, by
@@ -248,55 +261,59 @@ a result like a task.
 fromResult : Result x a -> Task x a
 fromResult result =
   case result of
-    Ok value -> succeed value
-    Err msg -> fail msg
+    Ok value ->
+      succeed value
+
+    Err msg ->
+      fail msg
 
 
--- THREADS
 
-{-| Abstract type that uniquely identifies a thread.
+-- COMMANDS
+
+
+type MyCmd msg =
+  T (Task Never msg)
+
+
+{-| Command the runtime system to perform a task. The most important argument
+is the `Task` which describes what you want to happen. But you also need to
+provide functions to tag the two possible outcomes of the task. It can fail or
+succeed, but either way, you need to have a message to feed back into your
+application.
 -}
-type ThreadID = ThreadID Int
+perform : (x -> msg) -> (a -> msg) -> Task x a -> Cmd msg
+perform onFail onSuccess task =
+  command (T (map onSuccess task `onError` \x -> succeed (onFail x)))
 
 
-{-| Run a task on a separate thread. This lets you start working with basic
-concurrency. In the following example, `task1` and `task2` will be interleaved.
-If `task1` makes a long HTTP request, we can hop over to `task2` and do some
-work there.
-
-    spawn task1 `andThen` \_ -> task2
--}
-spawn : Task x a -> Task y ThreadID
-spawn =
-  Native.Task.spawn
-
-
--- kill : ThreadID -> Task x ()
-
-type alias Time = Float
-
-
-{-| Make a thread sleep for a certain amount of time. The following example
-sleeps for 1 second and then succeeds with 42.
-
-    sleep 1000 `andThen` \_ -> succeed 42
--}
-sleep : Time -> Task x ()
-sleep =
-  Native.Task.sleep
+cmdMap : (a -> b) -> MyCmd a -> MyCmd b
+cmdMap tagger (T task) =
+  T (map tagger task)
 
 
 
-{-- TASK MANAGERS
+-- MANAGER
 
-type Manager
 
-runOne : Task x a -> Manager
+init : Task Never ()
+init =
+  succeed ()
 
-runSequential : Events (Task x a) -> Manager
 
-runLatest : Events (Task x a) -> Manager
+onEffects : Platform.Router msg Never -> List (MyCmd msg) -> () -> Task Never ()
+onEffects router commands state =
+  map
+    (\_ -> ())
+    (sequence (List.map (spawnCmd router) commands))
 
-runConcurrent : Events (Task x a) -> Manager
 
---}
+onSelfMsg : Platform.Router msg Never -> Never -> () -> Task Never ()
+onSelfMsg _ _ _ =
+  succeed ()
+
+
+spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
+spawnCmd router (T task) =
+  Native.Scheduler.spawn (task `andThen` Platform.sendToApp router)
+

@@ -1,11 +1,11 @@
-module Array
-    ( Array
-    , empty, repeat, initialize, fromList
-    , isEmpty, length, push, append
-    , get, set
-    , slice, toList, toIndexedList
-    , map, indexedMap, filter, foldl, foldr
-    ) where
+module Array exposing
+  ( Array
+  , empty, repeat, initialize, fromList
+  , isEmpty, length, push, append
+  , get, set
+  , slice, toList, toIndexedList
+  , map, indexedMap, filter, foldl, foldr
+  )
 
 {-| A library for fast immutable arrays. The elements in an array must have the
 same type. The arrays are implemented in Relaxed Radix Balanced-Trees for fast

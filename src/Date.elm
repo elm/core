@@ -1,15 +1,16 @@
-module Date
-    ( Date, fromString, toTime, fromTime
-    , year, month, Month(..)
-    , day, dayOfWeek, Day(..)
-    , hour, minute, second, millisecond
-    ) where
+module Date exposing
+  ( Date, fromString, toTime, fromTime
+  , year, month, Month(..)
+  , day, dayOfWeek, Day(..)
+  , hour, minute, second, millisecond
+  , now
+  )
 
 {-| Library for working with dates. Email the mailing list if you encounter
 issues with internationalization or locale formatting.
 
 # Dates
-@docs Date
+@docs Date, now
 
 # Conversions
 @docs fromString, toTime, fromTime
@@ -20,13 +21,29 @@ issues with internationalization or locale formatting.
 -}
 
 import Native.Date
+import Task exposing (Task)
 import Time exposing (Time)
 import Result exposing (Result)
+
+
+
+-- DATES
 
 
 {-| Representation of a date.
 -}
 type Date = Date
+
+
+{-| Get the `Date` at the moment when this task is run.
+-}
+now : Task x Date
+now =
+  Task.map fromTime Time.now
+
+
+
+-- CONVERSIONS AND EXTRACTIONS
 
 
 {-| Represents the days of the week.
@@ -46,7 +63,7 @@ type Month
 -}
 fromString : String -> Result String Date
 fromString =
-  Native.Date.read
+  Native.Date.fromString
 
 
 {-| Convert a date into a time since midnight (UTC) of 1 January 1970 (i.e.
@@ -127,4 +144,3 @@ this returns the integer `123`.
 millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
-

@@ -1,10 +1,10 @@
-module Maybe
-    ( Maybe(Just,Nothing)
-    , andThen
-    , map, map2, map3, map4, map5
-    , withDefault
-    , oneOf
-    ) where
+module Maybe exposing
+  ( Maybe(Just,Nothing)
+  , andThen
+  , map, map2, map3, map4, map5
+  , withDefault
+  , oneOf
+  )
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
 you with optional arguments, error handling, and records with optional fields.

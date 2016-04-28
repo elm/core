@@ -1,14 +1,14 @@
-module Dict
-    ( Dict
-    , empty, singleton, insert, update
-    , isEmpty, get, remove, member, size
-    , filter
-    , partition
-    , foldl, foldr, map
-    , union, intersect, diff
-    , keys, values
-    , toList, fromList
-    ) where
+module Dict exposing
+  ( Dict
+  , empty, singleton, insert, update
+  , isEmpty, get, remove, member, size
+  , filter
+  , partition
+  , foldl, foldr, map
+  , union, intersect, diff, merge
+  , keys, values
+  , toList, fromList
+  )
 
 {-| A dictionary mapping unique keys to values. The keys can be any comparable
 type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or
@@ -26,14 +26,14 @@ equality with `(==)` is unreliable and should not be used.
 # Query
 @docs isEmpty, member, get, size
 
-# Combine
-@docs union, intersect, diff
-
 # Lists
 @docs keys, values, toList, fromList
 
 # Transform
 @docs map, foldl, foldr, filter, partition
+
+# Combine
+@docs union, intersect, diff, merge
 
 -}
 
@@ -43,6 +43,10 @@ import Maybe exposing (..)
 import List exposing (..)
 import Native.Debug
 import String
+
+
+
+-- DICTIONARIES
 
 
 -- BBlack and NBlack should only be used during the deletion
@@ -254,6 +258,10 @@ update k alter dict =
 singleton : comparable -> v -> Dict comparable v
 singleton key value =
   insert key value empty
+
+
+
+-- HELPERS
 
 
 isBBlack : Dict k v -> Bool
@@ -479,6 +487,78 @@ redden t =
       RBNode_elm_builtin Red k v l r
 
 
+
+-- COMBINE
+
+
+{-| Combine two dictionaries. If there is a collision, preference is given
+to the first dictionary.
+-}
+union : Dict comparable v -> Dict comparable v -> Dict comparable v
+union t1 t2 =
+  foldl insert t2 t1
+
+
+{-| Keep a key-value pair when its key appears in the second dictionary.
+Preference is given to values in the first dictionary.
+-}
+intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
+intersect t1 t2 =
+  filter (\k _ -> member k t2) t1
+
+
+{-| Keep a key-value pair when its key does not appear in the second dictionary.
+-}
+diff : Dict comparable v -> Dict comparable v -> Dict comparable v
+diff t1 t2 =
+  foldl (\k v t -> remove k t) t1 t2
+
+
+{-| The most general way of combining two dictionaries. You provide three
+accumulators for when a given key appears:
+
+  1. Only in the left dictionary.
+  2. In both dictionaries.
+  3. Only in the right dictionary.
+
+You then traverse all the keys from lowest to highest, building up whatever
+you want.
+-}
+merge
+  :  (comparable -> a -> result -> result)
+  -> (comparable -> a -> b -> result -> result)
+  -> (comparable -> b -> result -> result)
+  -> Dict comparable a
+  -> Dict comparable b
+  -> result
+  -> result
+merge leftStep bothStep rightStep leftDict rightDict initialResult =
+  let
+    stepState rKey rValue (list, result) =
+      case list of
+        [] ->
+          (list, rightStep rKey rValue result)
+
+        (lKey, lValue) :: rest ->
+          if lKey < rKey then
+            (rest, leftStep lKey lValue result)
+
+          else if lKey > rKey then
+            (list, rightStep rKey rValue result)
+
+          else
+            (rest, bothStep lKey lValue rValue result)
+
+    (leftovers, intermediateResult) =
+      foldl stepState (toList leftDict, initialResult) rightDict
+  in
+    List.foldl (\(k,v) result -> leftStep k v result) intermediateResult leftovers
+
+
+
+-- TRANSFORM
+
+
 {-| Apply a function to all values in a dictionary.
 -}
 map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
@@ -517,27 +597,39 @@ foldr f acc t =
       foldr f (f key value (foldr f acc right)) left
 
 
-{-| Combine two dictionaries. If there is a collision, preference is given
-to the first dictionary.
+{-| Keep a key-value pair when it satisfies a predicate. -}
+filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+filter predicate dictionary =
+  let
+    add key value dict =
+      if predicate key value then
+        insert key value dict
+
+      else
+        dict
+  in
+    foldl add empty dictionary
+
+
+{-| Partition a dictionary according to a predicate. The first dictionary
+contains all key-value pairs which satisfy the predicate, and the second
+contains the rest.
 -}
-union : Dict comparable v -> Dict comparable v -> Dict comparable v
-union t1 t2 =
-  foldl insert t2 t1
+partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
+partition predicate dict =
+  let
+    add key value (t1, t2) =
+      if predicate key value then
+        (insert key value t1, t2)
+
+      else
+        (t1, insert key value t2)
+  in
+    foldl add (empty, empty) dict
 
 
-{-| Keep a key-value pair when its key appears in the second dictionary.
-Preference is given to values in the first dictionary.
--}
-intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
-intersect t1 t2 =
-  filter (\k _ -> member k t2) t1
 
-
-{-| Keep a key-value pair when its key does not appear in the second dictionary.
--}
-diff : Dict comparable v -> Dict comparable v -> Dict comparable v
-diff t1 t2 =
-  foldl (\k v t -> remove k t) t1 t2
+-- LISTS
 
 
 {-| Get all of the keys in a dictionary, sorted from lowest to highest.
@@ -568,34 +660,3 @@ toList dict =
 fromList : List (comparable,v) -> Dict comparable v
 fromList assocs =
   List.foldl (\(key,value) dict -> insert key value dict) empty assocs
-
-
-{-| Keep a key-value pair when it satisfies a predicate. -}
-filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-filter predicate dictionary =
-  let
-    add key value dict =
-      if predicate key value then
-        insert key value dict
-
-      else
-        dict
-  in
-    foldl add empty dictionary
-
-
-{-| Partition a dictionary according to a predicate. The first dictionary
-contains all key-value pairs which satisfy the predicate, and the second
-contains the rest.
--}
-partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
-partition predicate dict =
-  let
-    add key value (t1, t2) =
-      if predicate key value then
-        (insert key value t1, t2)
-
-      else
-        (t1, insert key value t2)
-  in
-    foldl add (empty, empty) dict

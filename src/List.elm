@@ -1,14 +1,14 @@
-module List
-    ( isEmpty, length, reverse, member
-    , head, tail, filter, take, drop
-    , repeat, (::), append, concat, intersperse
-    , partition, unzip
-    , map, map2, map3, map4, map5
-    , filterMap, concatMap, indexedMap
-    , foldr, foldl
-    , sum, product, maximum, minimum, all, any, scanl
-    , sort, sortBy, sortWith
-    ) where
+module List exposing
+  ( isEmpty, length, reverse, member
+  , head, tail, filter, take, drop
+  , repeat, (::), append, concat, intersperse
+  , partition, unzip
+  , map, map2, map3, map4, map5
+  , filterMap, concatMap, indexedMap
+  , foldr, foldl
+  , sum, product, maximum, minimum, all, any, scanl
+  , sort, sortBy, sortWith
+  )
 
 {-| A library for manipulating lists of values. Every value in a
 list must have the same type.
@@ -146,8 +146,13 @@ indexedMap f xs =
     foldl (::) [] [1,2,3] == [3,2,1]
 -}
 foldl : (a -> b -> b) -> b -> List a -> b
-foldl =
-  Native.List.foldl
+foldl func acc list =
+  case list of
+    [] ->
+      acc
+
+    x :: xs ->
+      foldl func (func x acc) xs
 
 
 {-| Reduce a list from the right.
@@ -277,6 +282,8 @@ any isOkay list =
 
     append [1,1,2] [3,5,8] == [1,1,2,3,5,8]
     append ['a','b'] ['c'] == ['a','b','c']
+
+You can also use [the `(++)` operator](Basics#++) to append lists.
 -}
 append : List a -> List a -> List a
 append xs ys =
@@ -447,8 +454,17 @@ intersperse sep xs =
     take 2 [1,2,3,4] == [1,2]
 -}
 take : Int -> List a -> List a
-take =
-  Native.List.take
+take n list =
+  if n <= 0 then
+    []
+
+  else
+    case list of
+      [] ->
+        list
+
+      x :: xs ->
+        x :: take (n - 1) xs
 
 
 {-| Drop the first *n* members of a list.
