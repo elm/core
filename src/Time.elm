@@ -33,7 +33,8 @@ import Task exposing (Task)
 
 
 {-| Type alias to make it clearer when you are working with time values.
-Using the `Time` constants instead of raw numbers is very highly recommended.
+It is very highly recommended to use the `Time` constants instead of raw numbers
+(and the conversion functions if raw numbers are needed).
 -}
 type alias Time = Float
 
