@@ -66,16 +66,20 @@ fromString =
   Native.Date.fromString
 
 
-{-| Convert a date into a time since midnight (UTC) of 1 January 1970 (i.e.
-[UNIX time](http://en.wikipedia.org/wiki/Unix_time)). Given the date 23 June
-1990 at 11:45AM this returns the corresponding time.
+{-| Convert a `Date` to a time in milliseconds.
+
+A time is the number of milliseconds since
+[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
 -}
 toTime : Date -> Time
 toTime =
   Native.Date.toTime
 
 
-{-| Take a UNIX time and convert it to a `Date`.
+{-| Convert a time in milliseconds into a `Date`.
+
+A time is the number of milliseconds since
+[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
 -}
 fromTime : Time -> Date
 fromTime =
