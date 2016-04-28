@@ -40,14 +40,13 @@ decoding operation that will either produce a value of type `a`, or fail.
 -}
 
 
-import Native.Json
 import Array exposing (Array)
 import Dict exposing (Dict)
 import Json.Encode as JsEncode
 import List
 import Maybe exposing (Maybe)
 import Result exposing (Result)
-
+import Native.Json
 
 {-| Represents a way of decoding JSON values. If you have a `(Decoder (List String))`
 it will attempt to take some JSON value and turn it into a list of strings.
