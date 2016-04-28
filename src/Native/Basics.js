@@ -8,6 +8,10 @@ function div(a, b)
 }
 function rem(a, b)
 {
+	if (b === 0)
+	{
+		throw new Error('Cannot perform rem 0. Division by zero error.');
+	}
 	return a % b;
 }
 function mod(a, b)
