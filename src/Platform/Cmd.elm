@@ -64,7 +64,7 @@ none =
 {-|-}
 sink : Cmd Never -> Cmd msg
 sink = 
-  map (Debug.crash "Cmd Never passed to Cmd.sink resulted in a value")
+  map (\_ -> Debug.crash "Cmd Never passed to Cmd.sink resulted in a value")
 
 
 {-|-}
