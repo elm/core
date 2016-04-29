@@ -1,4 +1,4 @@
-module Test.Bitwise (tests) where
+module Test.Bitwise exposing (tests)
 
 import Basics exposing (..)
 import Bitwise

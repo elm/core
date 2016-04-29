@@ -1,4 +1,4 @@
-module Test.String (tests) where
+module Test.String exposing (tests)
 
 import Basics exposing (..)
 

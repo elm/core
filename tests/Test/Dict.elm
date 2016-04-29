@@ -1,4 +1,4 @@
-module Test.Dict (tests) where
+module Test.Dict exposing (tests)
 
 import Basics exposing (..)
 import Dict

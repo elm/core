@@ -1,4 +1,4 @@
-module Test.Result (tests) where
+module Test.Result exposing (tests)
 
 import Basics exposing (..)
 import Result

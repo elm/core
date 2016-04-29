@@ -1,4 +1,4 @@
-module Test.Char (tests) where
+module Test.Char exposing (tests)
 
 import Basics exposing (..)
 import Char exposing (..)

@@ -1,4 +1,4 @@
-module Test.Json (tests) where
+module Test.Json exposing (tests)
 
 import Basics exposing (..)
 import Result exposing (..)
