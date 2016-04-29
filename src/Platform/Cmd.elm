@@ -3,6 +3,7 @@ module Platform.Cmd exposing
   , map
   , batch
   , none
+  , sink
   , (!)
   )
 
@@ -24,6 +25,8 @@ and subscriptions.
 -}
 
 import Native.Platform
+import Basics exposing (Never)
+import Debug
 
 
 {-| A command is a way of telling Elm, “Hey, I want you to do this thing!”
@@ -57,6 +60,11 @@ batch =
 none : Cmd msg
 none =
   batch []
+  
+{-|-}
+sink : Cmd Never -> Cmd msg
+sink = 
+  map (Debug.crash "Cmd Never passed to Cmd.sink resulted in a value")
 
 
 {-|-}
