@@ -119,7 +119,7 @@ function initWithFlags(moduleName, realInit, flagDecoder)
 		if (result.ctor === 'Err')
 		{
 			throw new Error(
-				'You trying to initialize module `' + moduleName + '` with an unexpected argument.\n'
+				'You are trying to initialize module `' + moduleName + '` with an unexpected argument.\n'
 				+ 'When trying to convert it to a usable Elm value, I run into this problem:\n\n'
 				+ result._0
 			);
