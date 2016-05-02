@@ -314,14 +314,19 @@ function runHelp(decoder, value)
 				: badPrimitive('a Bool', value);
 
 		case 'int':
-			var isNotInt =
-				typeof value !== 'number'
-				|| !(-2147483647 < value && value < 2147483647 && (value | 0) === value)
-				|| !(isFinite(value) && !(value % 1));
+			if (typeof value !== 'number') {
+				return badPrimitive('an Int', value);
+			}
 
-			return isNotInt
-				? badPrimitive('an Int', value)
-				: ok(value);
+			if (-2147483647 < value && value < 2147483647 && (value | 0) === value) {
+				return ok(value);
+			}
+
+			if (isFinite(value) && !(value % 1)) {
+				return ok(value);
+			}
+
+			return badPrimitive('an Int', value);
 
 		case 'float':
 			return (typeof value === 'number')
