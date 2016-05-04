@@ -102,7 +102,7 @@ int a b =
           0 -> (acc, state)
           _ ->
             let
-              (x, state') = seed.next state
+              (x, state') = next state
             in
               f (n - 1) (x + acc * base) state'
 
@@ -362,9 +362,6 @@ you want to use a generator, you need to pair it with a seed.
 type Seed =
   Seed
     { state : State
-    , next  : State -> (Int, State)
-    , split : State -> (State, State)
-    , range : State -> (Int,Int)
     }
 
 
@@ -405,9 +402,6 @@ initialSeed : Int -> Seed
 initialSeed n =
   Seed
     { state = initState n
-    , next = next
-    , split = split
-    , range = range
     }
 
 
@@ -454,27 +448,6 @@ next (State s1 s2) =
     z' = if z < 1 then z + magicNum8 else z
   in
     (z', State s1'' s2'')
-
-
-split : State -> (State, State)
-split (State s1 s2 as std) =
-  let
-    new_s1 =
-      if s1 == magicNum6-1 then 1 else s1 + 1
-
-    new_s2 =
-      if s2 == 1 then magicNum7-1 else s2 - 1
-
-    (State t1 t2) =
-      snd (next std)
-  in
-    (State new_s1 t2, State t1 new_s2)
-
-
-range : State -> (Int,Int)
-range _ =
-    (0, magicNum8)
-
 
 
 -- MANAGER
