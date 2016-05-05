@@ -461,7 +461,7 @@ function runHelp(decoder, value)
 			var realResult = decoder.callback(result.value);
 			if (realResult.ctor === 'Err')
 			{
-				throw new Error('TODO');
+				return badPrimitive('something custom', value);
 			}
 			return ok(realResult._0);
 
