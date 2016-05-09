@@ -7,21 +7,21 @@ var _elm_lang$core$Native_Platform = function() {
 
 function addPublicModule(object, name, main)
 {
-	var embed = main ? makeEmbed(name, main) : mainIsUndefined(name);
+	var init = main ? makeEmbed(name, main) : mainIsUndefined(name);
 
 	object['worker'] = function worker(flags)
 	{
-		return embed(undefined, flags, false);
+		return init(undefined, flags, false);
 	}
 
 	object['embed'] = function embed(domNode, flags)
 	{
-		return embed(domNode, flags, true);
+		return init(domNode, flags, true);
 	}
 
 	object['fullscreen'] = function fullscreen(flags)
 	{
-		return embed(document.body, flags, true);
+		return init(document.body, flags, true);
 	};
 }
 
