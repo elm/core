@@ -9,11 +9,19 @@ function addPublicModule(object, name, main)
 {
 	var embed = main ? makeEmbed(name, main) : mainIsUndefined(name);
 
-	object['embed'] = embed;
+	object['worker'] = function worker(flags)
+	{
+		return embed(undefined, flags, false);
+	}
+
+	object['embed'] = function embed(domNode, flags)
+	{
+		return embed(domNode, flags, true);
+	}
 
 	object['fullscreen'] = function fullscreen(flags)
 	{
-		return embed(document.body, flags);
+		return embed(document.body, flags, true);
 	};
 }
 
@@ -44,11 +52,15 @@ function errorHtml(message)
 
 function makeEmbed(moduleName, main)
 {
-	return function embed(rootDomNode, flags)
+	return function embed(rootDomNode, flags, withRenderer)
 	{
 		try
 		{
 			var program = mainToProgram(moduleName, main);
+			if (!withRenderer)
+			{
+				program.renderer = dummyRenderer;
+			}
 			return makeEmbedHelp(moduleName, program, rootDomNode, flags);
 		}
 		catch (e)
@@ -57,6 +69,11 @@ function makeEmbed(moduleName, main)
 			throw e;
 		}
 	};
+}
+
+function dummyRenderer()
+{
+	return { update: function() {} };
 }
 
 
