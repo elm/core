@@ -9,17 +9,17 @@ function addPublicModule(object, name, main)
 {
 	var embed = main ? makeEmbed(name, main) : mainIsUndefined(name);
 
-	object['worker'] = function worker(flags)
+	object['worker'] = function workerModule(flags)
 	{
 		return embed(undefined, flags, false);
 	}
 
-	object['embed'] = function embed(domNode, flags)
+	object['embed'] = function embedModule(domNode, flags)
 	{
 		return embed(domNode, flags, true);
 	}
 
-	object['fullscreen'] = function fullscreen(flags)
+	object['fullscreen'] = function fullscreenModule(flags)
 	{
 		return embed(document.body, flags, true);
 	};
