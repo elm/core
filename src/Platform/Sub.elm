@@ -26,7 +26,8 @@ messages that will come back into your application.
 
 **Note:** Do not worry if this seems confusing at first! As with every Elm user
 ever, subscriptions will make more sense as you work through [the Elm Architecture
-Tutorial]() and see how they fit into a real application!
+Tutorial](http://guide.elm-lang.org/architecture/index.html) and see how they fit
+into a real application!
 -}
 type Sub msg = Sub
 
