@@ -11,7 +11,7 @@ effect module Task where { command = MyCmd } exposing
 
 {-| Tasks make it easy to describe asynchronous operations that may fail, like
 HTTP requests or writing to a database. For more information, see the [Elm
-documentation on Tasks](http://elm-lang.org/guide/reactivity#tasks).
+documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 
 # Basics
 @docs Task, succeed, fail
