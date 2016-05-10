@@ -10,7 +10,7 @@ module Basics exposing
   , isNaN, isInfinite
   , toString, (++)
   , fst, snd
-  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
   )
 
 {-| Tons of useful functions that get imported by default.
@@ -58,7 +58,7 @@ which happen to be radians.
 @docs fst, snd
 
 # Higher-Order Helpers
-@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
 
 -}
 
@@ -616,3 +616,9 @@ marks!
 -}
 type Never = Never Never
 
+{-| The empty function.
+This converts a value of type `Never` into a value of any type, which
+is safe because there are no values of type `Never`.
+-}
+never : Never -> a
+never (Never n) = never n
