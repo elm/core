@@ -348,7 +348,10 @@ max =
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
-This operator short-circuits to `False` if the first argument is `False`.
+
+**Note:** When used in the infix position, like `(left && right)`, the operator
+short-circuits. This means if `left` is `False` we do not bother evaluating `right`
+and just return `False` overall.
 -}
 (&&) : Bool -> Bool -> Bool
 (&&) =
@@ -356,7 +359,10 @@ This operator short-circuits to `False` if the first argument is `False`.
 
 
 {-| The logical OR operator. `True` if one or both inputs are `True`.
-This operator short-circuits to `True` if the first argument is `True`.
+
+**Note:** When used in the infix position, like `(left || right)`, the operator
+short-circuits. This means if `left` is `True` we do not bother evaluating `right`
+and just return `True` overall.
 -}
 (||) : Bool -> Bool -> Bool
 (||) =
