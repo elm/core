@@ -1,4 +1,4 @@
-module Test.Array (tests) where
+module Test.Array exposing (tests)
 
 import Array
 import Basics exposing (..)
@@ -20,7 +20,7 @@ holeArray = List.foldl mergeSplit (Array.fromList [0..100]) [0..100]
 
 mapArray: Array.Array a -> Array.Array a
 mapArray array =
-    Array.indexedMap (\i el -> 
+    Array.indexedMap (\i el ->
         case (Array.get i array) of
             Just x -> x
             Nothing -> el

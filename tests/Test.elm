@@ -1,11 +1,7 @@
-module Main where
+module Main exposing (..)
 
 import Basics exposing (..)
-import Task
-import Signal exposing (Signal)
-
 import ElmTest exposing (..)
-import Console
 
 import Test.Array as Array
 import Test.Basics as Basics
@@ -20,7 +16,6 @@ import Test.Result as Result
 import Test.Set as Set
 import Test.String as String
 import Test.Regex as Regex
-import Test.Trampoline as Trampoline
 
 tests : Test
 tests =
@@ -38,10 +33,8 @@ tests =
         , Set.tests
         , String.tests
         , Regex.tests
-        , Trampoline.tests
         ]
 
 
-port runner : Signal (Task.Task x ())
-port runner = 
-    Console.run (consoleRunner tests)
+main =
+    runSuite tests
