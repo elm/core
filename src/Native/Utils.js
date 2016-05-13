@@ -20,7 +20,9 @@ function eq(rootX, rootY)
 		if (x instanceof Date && y instanceof Date)
 		{
 			if (x.valueOf() !== y.valueOf())
-			{ return false; }
+			{
+				return false;
+			}
 		}
 		else if (typeof x === 'object')
 		{
