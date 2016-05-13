@@ -6,7 +6,6 @@ Every Elm project needs the core libraries. They provide basic functionality inc
 
   * The Basics &mdash; addition, subtraction, etc.
   * Data Structures &mdash; lists, dictionaries, sets, etc.
-  * Signals &mdash; to make Elm programs reactive
 
 
 ## Default Imports
