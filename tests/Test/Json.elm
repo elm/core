@@ -34,7 +34,7 @@ tests =
         , test "undefined" <| testInt False "undefined"
         , test "Decoder expects object finds array, was crashing runtime." <|
             ( assertEqual
-              (Err "I ran into the following problems:\n\nExpecting an object but instead got: []\nI ran into a `fail` decoder")
+              (Err "Expecting an object but instead got: []")
               (Json.Decode.decodeString
                 (Json.Decode.dict Json.Decode.float)
                 "[]"
