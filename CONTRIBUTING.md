@@ -33,7 +33,9 @@ Also, be sure you are testing.
 We are fairly conservative about adding new functions to core libraries.
 If you want to augment the `List` or `Array` library, we recommend creating
 small packages called `list-extras` or `array-extras` that have all the
-features you want.
+features you want. There are already several such packages maintained at
+the [Elm Community organization](https://github.com/elm-community) that
+welcome contributions in the form of pull requests.
 
 Long term, we will set up a process to review `*-extras` packages to move
 stuff into core. By going through packages, it will be much easier to assess
