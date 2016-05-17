@@ -156,7 +156,7 @@ say the errors we get have too much information:
 
     parseInt : String -> Result ParseError Int
 
-    type ParseError =
+    type alias ParseError =
         { message : String
         , code : Int
         , position : (Int,Int)
