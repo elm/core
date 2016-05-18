@@ -466,6 +466,11 @@ customDecoder =
 
         _ ->
             fail (tag ++ " is not a recognized tag for shapes")
+
+The  decoder in the example will parse Json strings such as:
+
+    { "tag": "rectangle", "width": 2, "height": 3}
+    { "tag": "circle", "radius": 2}
 -}
 andThen : Decoder a -> (a -> Decoder b) -> Decoder b
 andThen =
