@@ -1,4 +1,4 @@
-module Json.Decode exposing
+module Json.Decode exposing  -- where
   ( Decoder, Value
   , decodeString, decodeValue
   , string, int, float, bool, null
@@ -442,11 +442,19 @@ customDecoder =
   Native.Json.customAndThen
 
 
-{-| Helpful when one field will determine the shape of a bunch of other fields.
+{-| Helpful when a field tells you about the overall structure of the JSON
+you are dealing with. For example, imagine we are getting JSON representing
+different shapes. Data like this:
+
+    { "tag": "rectangle", "width": 2, "height": 3 }
+    { "tag": "circle", "radius": 2 }
+
+The following `shape` decoder looks at the `tag` to know what other fields to
+expect **and then** it extracts the relevant information.
 
     type Shape
-        = Rectangle Float Float
-        | Circle Float
+      = Rectangle Float Float
+      | Circle Float
 
     shape : Decoder Shape
     shape =
@@ -456,16 +464,13 @@ customDecoder =
     shapeInfo tag =
       case tag of
         "rectangle" ->
-            object2 Rectangle
-              ("width" := float)
-              ("height" := float)
+          object2 Rectangle ("width" := float) ("height" := float)
 
         "circle" ->
-            object1 Circle
-              ("radius" := float)
+          object1 Circle ("radius" := float)
 
         _ ->
-            fail (tag ++ " is not a recognized tag for shapes")
+          fail (tag ++ " is not a recognized tag for shapes")
 -}
 andThen : Decoder a -> (a -> Decoder b) -> Decoder b
 andThen =

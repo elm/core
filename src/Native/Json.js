@@ -231,7 +231,10 @@ function badOneOf(problems)
 	return { tag: 'oneOf', problems: problems };
 }
 
-var bad = { tag: 'fail' };
+function bad(msg)
+{
+	return { tag: 'fail', msg: msg };
+}
 
 function badToString(problem)
 {
@@ -267,7 +270,8 @@ function badToString(problem)
 
 			case 'fail':
 				return 'I ran into a `fail` decoder'
-					+ (context === '_' ? '' : ' at ' + context);
+					+ (context === '_' ? '' : ' at ' + context)
+					+ ': ' + problem.msg;
 		}
 	}
 }
@@ -495,7 +499,7 @@ function runHelp(decoder, value)
 			return badOneOf(errors);
 
 		case 'fail':
-			return bad;
+			return bad(decoder.msg);
 
 		case 'succeed':
 			return ok(decoder.msg);
