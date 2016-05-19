@@ -269,8 +269,9 @@ function badToString(problem)
 					+ ':\n\n' + problems.join('\n');
 
 			case 'fail':
-				return 'I ran into a `fail` ('+problem.msg+') decoder'
-					+ (context === '_' ? '' : ' at ' + context);
+				return 'I ran into a `fail` decoder'
+					+ (context === '_' ? '' : ' at ' + context)
+					+ ': ' + problem.msg;
 		}
 	}
 }
