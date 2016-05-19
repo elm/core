@@ -384,11 +384,14 @@ function toEffect(isCmd, home, taggers, value)
 {
 	function applyTaggers(x)
 	{
-		while (taggers)
+		var current = taggers;
+
+		while (current)
 		{
-			x = taggers.tagger(x);
-			taggers = taggers.rest;
+			x = current.tagger(x);
+			current = current.rest;
 		}
+
 		return x;
 	}
 
@@ -396,7 +399,7 @@ function toEffect(isCmd, home, taggers, value)
 		? effectManagers[home].cmdMap
 		: effectManagers[home].subMap;
 
-	return A2(map, applyTaggers, value)
+	return A2(map, applyTaggers, value);
 }
 
 function insert(isCmd, newEffect, effects)
