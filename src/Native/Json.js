@@ -310,200 +310,214 @@ function run(decoder, value)
 
 function runHelp(decoder, value)
 {
-	switch (decoder.tag)
-	{
-		case 'bool':
-			return (typeof value === 'boolean')
-				? ok(value)
-				: badPrimitive('a Bool', value);
+    if (decoder){
+        switch (decoder.tag)
+        {
+            case 'bool':
+                return (typeof value === 'boolean')
+                    ? ok(value)
+                    : badPrimitive('a Bool', value);
 
-		case 'int':
-			if (typeof value !== 'number') {
-				return badPrimitive('an Int', value);
-			}
+            case 'int':
+                if (typeof value !== 'number') {
+                    return badPrimitive('an Int', value);
+                }
 
-			if (-2147483647 < value && value < 2147483647 && (value | 0) === value) {
-				return ok(value);
-			}
+                if (-2147483647 < value && value < 2147483647 && (value | 0) === value) {
+                    return ok(value);
+                }
 
-			if (isFinite(value) && !(value % 1)) {
-				return ok(value);
-			}
+                if (isFinite(value) && !(value % 1)) {
+                    return ok(value);
+                }
 
-			return badPrimitive('an Int', value);
+                return badPrimitive('an Int', value);
 
-		case 'float':
-			return (typeof value === 'number')
-				? ok(value)
-				: badPrimitive('a Float', value);
+            case 'float':
+                return (typeof value === 'number')
+                    ? ok(value)
+                    : badPrimitive('a Float', value);
 
-		case 'string':
-			return (typeof value === 'string')
-				? ok(value)
-				: (value instanceof String)
-					? ok(value + '')
-					: badPrimitive('a String', value);
+            case 'string':
+                return (typeof value === 'string')
+                    ? ok(value)
+                    : (value instanceof String)
+                        ? ok(value + '')
+                        : badPrimitive('a String', value);
 
-		case 'null':
-			return (value === null)
-				? ok(decoder.value)
-				: badPrimitive('null', value);
+            case 'null':
+                return (value === null)
+                    ? ok(decoder.value)
+                    : badPrimitive('null', value);
 
-		case 'value':
-			return ok(value);
+            case 'value':
+                return ok(value);
 
-		case 'list':
-			if (!(value instanceof Array))
-			{
-				return badPrimitive('a List', value);
-			}
+            case 'list':
+                if (!(value instanceof Array))
+                {
+                    return badPrimitive('a List', value);
+                }
 
-			var list = _elm_lang$core$Native_List.Nil;
-			for (var i = value.length; i--; )
-			{
-				var result = runHelp(decoder.decoder, value[i]);
-				if (result.tag !== 'ok')
-				{
-					return badIndex(i, result)
-				}
-				list = _elm_lang$core$Native_List.Cons(result.value, list);
-			}
-			return ok(list);
+                var list = _elm_lang$core$Native_List.Nil;
+                for (var i = value.length; i--; )
+                {
+                    var result = runHelp(decoder.decoder, value[i]);
+                    if (result)
+                    {
+                        if (result.tag !== 'ok')
+                        {
+                            return badIndex(i, result)
+                        }
+                        list = _elm_lang$core$Native_List.Cons(result.value, list);
+                    }
+                }
+                return ok(list);
 
-		case 'array':
-			if (!(value instanceof Array))
-			{
-				return badPrimitive('an Array', value);
-			}
+            case 'array':
+                if (!(value instanceof Array))
+                {
+                    return badPrimitive('an Array', value);
+                }
 
-			var len = value.length;
-			var array = new Array(len);
-			for (var i = len; i--; )
-			{
-				var result = runHelp(decoder.decoder, value[i]);
-				if (result.tag !== 'ok')
-				{
-					return badIndex(i, result);
-				}
-				array[i] = result.value;
-			}
-			return ok(_elm_lang$core$Native_Array.fromJSArray(array));
+                var len = value.length;
+                var array = new Array(len);
+                for (var i = len; i--; )
+                {
+                    var result = runHelp(decoder.decoder, value[i]);
+                    if (result)
+                    {
+                        if (result.tag !== 'ok')
+                        {
+                            return badIndex(i, result);
+                        }
+                        array[i] = result.value;
+                    }
+                }
+                return ok(_elm_lang$core$Native_Array.fromJSArray(array));
 
-		case 'maybe':
-			var result = runHelp(decoder.decoder, value);
-			return (result.tag === 'ok')
-				? ok(_elm_lang$core$Maybe$Just(result.value))
-				: ok(_elm_lang$core$Maybe$Nothing);
+            case 'maybe':
+                var result = runHelp(decoder.decoder, value);
+                return (result && result.tag === 'ok')
+                    ? ok(_elm_lang$core$Maybe$Just(result.value))
+                    : ok(_elm_lang$core$Maybe$Nothing);
 
-		case 'field':
-			var field = decoder.field;
-			if (typeof value !== 'object' || value === null || !(field in value))
-			{
-				return badPrimitive('an object with a field named `' + field + '`', value);
-			}
+            case 'field':
+                var field = decoder.field;
+                if (typeof value !== 'object' || value === null || !(field in value))
+                {
+                    return badPrimitive('an object with a field named `' + field + '`', value);
+                }
 
-			var result = runHelp(decoder.decoder, value[field]);
-			return (result.tag === 'ok')
-				? result
-				: badField(field, result);
+                var result = runHelp(decoder.decoder, value[field]);
+                return (result && result.tag === 'ok')
+                    ? result
+                    : badField(field, result);
 
-		case 'key-value':
-			if (typeof value !== 'object' || value === null || value instanceof Array)
-			{
-				return badPrimitive('an object', value);
-			}
+            case 'key-value':
+                if (typeof value !== 'object' || value === null || value instanceof Array)
+                {
+                    return badPrimitive('an object', value);
+                }
 
-			var keyValuePairs = _elm_lang$core$Native_List.Nil;
-			for (var key in value)
-			{
-				var result = runHelp(decoder.decoder, value[key]);
-				if (result.tag !== 'ok')
-				{
-					return badField(key, result);
-				}
-				var pair = _elm_lang$core$Native_Utils.Tuple2(key, result.value);
-				keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
-			}
-			return ok(keyValuePairs);
+                var keyValuePairs = _elm_lang$core$Native_List.Nil;
+                for (var key in value)
+                {
+                    var result = runHelp(decoder.decoder, value[key]);
+                    if (result && result.tag !== 'ok')
+                    {
+                        return badField(key, result);
+                    }
+                    var pair = _elm_lang$core$Native_Utils.Tuple2(key, result.value);
+                    keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
+                }
+                return ok(keyValuePairs);
 
-		case 'map-many':
-			var answer = decoder.func;
-			var decoders = decoder.decoders;
-			for (var i = 0; i < decoders.length; i++)
-			{
-				var result = runHelp(decoders[i], value);
-				if (result.tag !== 'ok')
-				{
-					return result;
-				}
-				answer = answer(result.value);
-			}
-			return ok(answer);
+            case 'map-many':
+                var answer = decoder.func;
+                var decoders = decoder.decoders;
+                for (var i = 0; i < decoders.length; i++)
+                {
+                    var result = runHelp(decoders[i], value);
+                    if (result)
+                    {
+                        if (result.tag !== 'ok')
+                        {
+                            return result;
+                        }
+                        answer = answer(result.value);
+                    }
+                }
+                return ok(answer);
 
-		case 'tuple':
-			var decoders = decoder.decoders;
-			var len = decoders.length;
+            case 'tuple':
+                var decoders = decoder.decoders;
+                var len = decoders.length;
 
-			if ( !(value instanceof Array) || value.length !== len )
-			{
-				return badPrimitive('a Tuple with ' + len + ' entries', value);
-			}
+                if ( !(value instanceof Array) || value.length !== len )
+                {
+                    return badPrimitive('a Tuple with ' + len + ' entries', value);
+                }
 
-			var answer = decoder.func;
-			for (var i = 0; i < len; i++)
-			{
-				var result = runHelp(decoders[i], value[i]);
-				if (result.tag !== 'ok')
-				{
-					return badIndex(i, result);
-				}
-				answer = answer(result.value);
-			}
-			return ok(answer);
+                var answer = decoder.func;
+                for (var i = 0; i < len; i++)
+                {
+                    var result = runHelp(decoders[i], value[i]);
+                    if (result)
+                    {
+                        if (result.tag !== 'ok')
+                        {
+                            return badIndex(i, result);
+                        }
+                        answer = answer(result.value);
+                    }
+                }
+                return ok(answer);
 
-		case 'customAndThen':
-			var result = runHelp(decoder.decoder, value);
-			if (result.tag !== 'ok')
-			{
-				return result;
-			}
-			var realResult = decoder.callback(result.value);
-			if (realResult.ctor === 'Err')
-			{
-				return badPrimitive('something custom', value);
-			}
-			return ok(realResult._0);
+            case 'customAndThen':
+                var result = runHelp(decoder.decoder, value);
+                if (result && result.tag !== 'ok')
+                {
+                    return result;
+                }
+                var realResult = decoder.callback(result.value);
+                if (realResult.ctor === 'Err')
+                {
+                    return badPrimitive('something custom', value);
+                }
+                return ok(realResult._0);
 
-		case 'andThen':
-			var result = runHelp(decoder.decoder, value);
-			return (result.tag !== 'ok')
-				? result
-				: runHelp(decoder.callback(result.value), value);
+            case 'andThen':
+                var result = runHelp(decoder.decoder, value);
+                return (result && result.tag !== 'ok')
+                    ? result
+                    : runHelp(decoder.callback(result.value), value);
 
-		case 'oneOf':
-			var errors = [];
-			var temp = decoder.decoders;
-			while (temp.ctor !== '[]')
-			{
-				var result = runHelp(temp._0, value);
+            case 'oneOf':
+                var errors = [];
+                var temp = decoder.decoders;
+                while (temp.ctor !== '[]')
+                {
+                    var result = runHelp(temp._0, value);
 
-				if (result.tag === 'ok')
-				{
-					return result;
-				}
+                    if (result && result.tag === 'ok')
+                    {
+                        return result;
+                    }
 
-				errors.push(result);
+                    errors.push(result);
 
-				temp = temp._1;
-			}
-			return badOneOf(errors);
+                    temp = temp._1;
+                }
+                return badOneOf(errors);
 
-		case 'fail':
-			return bad(decoder.msg);
+            case 'fail':
+                return bad(decoder.msg);
 
-		case 'succeed':
-			return ok(decoder.msg);
-	}
+            case 'succeed':
+                return ok(decoder.msg);
+        }
+    }
 }
 
 
