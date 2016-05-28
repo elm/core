@@ -8,6 +8,7 @@ import Test.Basics as Basics
 import Test.Bitwise as Bitwise
 import Test.Char as Char
 import Test.CodeGen as CodeGen
+import Test.Date as Date
 import Test.Dict as Dict
 import Test.Equality as Equality
 import Test.Json as Json
@@ -25,6 +26,7 @@ tests =
         , Bitwise.tests
         , Char.tests
         , CodeGen.tests
+        , Date.tests
         , Dict.tests
         , Equality.tests
         , Json.tests

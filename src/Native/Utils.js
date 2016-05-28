@@ -16,7 +16,15 @@ function eq(rootX, rootY)
 		{
 			continue;
 		}
-		if (typeof x === 'object')
+
+		if (x instanceof Date && y instanceof Date)
+		{
+			if (x.valueOf() !== y.valueOf())
+			{
+				return false;
+			}
+		}
+		else if (typeof x === 'object')
 		{
 			var c = 0;
 			for (var key in x)
