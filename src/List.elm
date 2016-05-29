@@ -509,7 +509,7 @@ repeatHelp result n value =
 -}
 sort : List comparable -> List comparable
 sort xs =
-  sortBy identity xs
+  Native.List.sortBy identity xs
 
 
 {-| Sort values by a derived property.
@@ -524,8 +524,8 @@ sort xs =
     sortBy String.length ["mouse","cat"] == ["cat","mouse"]
 -}
 sortBy : (a -> comparable) ->  List a -> List a
-sortBy =
-  Native.List.sortBy
+sortBy f =
+  map snd << Native.List.sortBy fst << map (\a -> ( f a, a ))
 
 
 {-| Sort values with a custom comparison function.
