@@ -1,7 +1,7 @@
-module Bitwise
-    ( and, or, xor, complement
-    , shiftLeft, shiftRight, shiftRightLogical
-    ) where
+module Bitwise exposing
+  ( and, or, xor, complement
+  , shiftLeft, shiftRight, shiftRightLogical
+  )
 
 {-| Library for [bitwise operations](http://en.wikipedia.org/wiki/Bitwise_operation).
 

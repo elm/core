@@ -1,33 +1,78 @@
-module Time
-    ( Time, millisecond, second, minute, hour
-    , inMilliseconds, inSeconds, inMinutes, inHours
-    , fps, fpsWhen, every
-    , timestamp, delay, since
-    ) where
+effect module Time where { subscription = MySub } exposing
+  ( Time
+  , now, every
+  , millisecond, second, minute, hour
+  , inMilliseconds, inSeconds, inMinutes, inHours
+  )
 
 {-| Library for working with time.
 
+# Time
+@docs Time, now, every
+
 # Units
-@docs Time, millisecond, second, minute, hour,
-      inMilliseconds, inSeconds, inMinutes, inHours
+@docs millisecond, second, minute, hour,
+  inMilliseconds, inSeconds, inMinutes, inHours
 
-# Tickers
-@docs fps, fpsWhen, every
-
-# Timing
-@docs timestamp, delay, since
 -}
 
+
 import Basics exposing (..)
-import Native.Signal
+import Dict
+import List exposing ((::))
+import Maybe exposing (Maybe(..))
+import Native.Scheduler
 import Native.Time
-import Signal exposing (Signal)
+import Platform
+import Platform.Sub exposing (Sub)
+import Task exposing (Task)
+
+
+
+-- TIMES
 
 
 {-| Type alias to make it clearer when you are working with time values.
-Using the `Time` constants instead of raw numbers is very highly recommended.
+Using the `Time` helpers like `second` and `inSeconds` instead of raw numbers
+is very highly recommended.
 -}
 type alias Time = Float
+
+
+{-| Get the `Time` at the moment when this task is run.
+-}
+now : Task x Time
+now =
+  Native.Time.now
+
+
+{-| Subscribe to the current time. First you provide an interval describing how
+frequently you want updates. Second, you give a tagger that turns a time into a
+message for your `update` function. So if you want to hear about the current
+time every second, you would say something like this:
+
+    type Msg = Tick Time | ...
+
+    subscriptions model =
+      every second Tick
+
+Check out the [Elm Architecture Tutorial][arch] for more info on how
+subscriptions work.
+
+[arch]: https://github.com/evancz/elm-architecture-tutorial/
+
+**Note:** this function is not for animation! You need to use something based
+on `requestAnimationFrame` to get smooth animations. This is based on
+`setInterval` which is better for recurring tasks like “check on something
+every 30 seconds”.
+-}
+every : Time -> (Time -> msg) -> Sub msg
+every interval tagger =
+  subscription (Every interval tagger)
+
+
+
+-- UNITS
 
 
 {-| Units of time, making it easier to specify things like a half-second
@@ -80,78 +125,114 @@ inHours t =
   t / hour
 
 
-{-| Takes desired number of frames per second (FPS). The resulting signal
-gives a sequence of time deltas as quickly as possible until it reaches
-the desired FPS. A time delta is the time between the last frame and the
-current frame.
 
-Note: Calling `fps 30` twice gives two independently running timers.
--}
-fps : number -> Signal Time
-fps targetFrames =
-  fpsWhen targetFrames (Signal.constant True)
+-- SUBSCRIPTIONS
 
 
-{-| Same as the `fps` function, but you can turn it on and off. Allows you
-to do brief animations based on user input without major inefficiencies.
-The first time delta after a pause is always zero, no matter how long
-the pause was. This way summing the deltas will actually give the amount
-of time that the output signal has been running.
--}
-fpsWhen : number -> Signal Bool -> Signal Time
-fpsWhen =
-  Native.Time.fpsWhen
+type MySub msg =
+  Every Time (Time -> msg)
 
 
-{-| Takes a time interval `t`. The resulting signal is the current time, updated
-every `t`.
-
-Note: Calling `every (100 * millisecond)` twice gives two independently running timers.
--}
-every : Time -> Signal Time
-every =
-  Native.Time.every
+subMap : (a -> b) -> MySub a -> MySub b
+subMap f (Every interval tagger) =
+  Every interval (f << tagger)
 
 
-{-| Add a timestamp to any signal. Timestamps increase monotonically. When you
-create `(timestamp Mouse.x)`, an initial timestamp is produced. The timestamp
-updates whenever `Mouse.x` updates.
 
-Timestamp updates are tied to individual events, so `(timestamp Mouse.x)` and
-`(timestamp Mouse.y)` will always have the same timestamp because they rely on
-the same underlying event (`Mouse.position`).
--}
-timestamp : Signal a -> Signal (Time, a)
-timestamp =
-  Native.Signal.timestamp
+-- EFFECT MANAGER
 
 
-{-| Delay a signal by a certain amount of time. So `(delay second Mouse.clicks)`
-will update one second later than any mouse click.
-
-Note: Even calling `delay` with the same number on the same signal twice
-gives two independently firing signals.
--}
-delay : Time -> Signal a -> Signal a
-delay =
-  Native.Signal.delay
+type alias State msg =
+  { taggers : Taggers msg
+  , processes : Processes
+  }
 
 
-{-| Takes a time `t` and any signal. The resulting boolean signal is true for
-time `t` after every event on the input signal. So ``(second `since`
-Mouse.clicks)`` would result in a signal that is true for one second after
-each mouse click and false otherwise.
--}
-since : Time -> Signal a -> Signal Bool
-since time signal =
+type alias Processes =
+  Dict.Dict Time Platform.ProcessId
+
+
+type alias Taggers msg =
+  Dict.Dict Time (List (Time -> msg))
+
+
+init : Task Never (State msg)
+init =
+  Task.succeed (State Dict.empty Dict.empty)
+
+
+onEffects : Platform.Router msg Time -> List (MySub msg) -> State msg -> Task Never (State msg)
+onEffects router subs {processes} =
   let
-    start =
-      Signal.map (always 1) signal
+    newTaggers =
+      List.foldl addMySub Dict.empty subs
 
-    stop =
-      Signal.map (always -1) (delay time signal)
+    leftStep interval taggers (spawnList, existingDict, killTask) =
+      (interval :: spawnList, existingDict, killTask)
 
-    delaydiff =
-      Signal.foldp (+) 0 (Signal.merge start stop)
+    bothStep interval taggers id (spawnList, existingDict, killTask) =
+      (spawnList, Dict.insert interval id existingDict, killTask)
+
+    rightStep _ id (spawnList, existingDict, killTask) =
+      (spawnList, existingDict, Native.Scheduler.kill id `Task.andThen` \_ -> killTask)
+
+    (spawnList, existingDict, killTask) =
+      Dict.merge
+        leftStep
+        bothStep
+        rightStep
+        newTaggers
+        processes
+        ([], Dict.empty, Task.succeed ())
   in
-      Signal.map ((/=) 0) delaydiff
+    killTask
+      `Task.andThen` \_ ->
+
+    spawnHelp router spawnList existingDict
+      `Task.andThen` \newProcesses ->
+
+    Task.succeed (State newTaggers newProcesses)
+
+
+addMySub : MySub msg -> Taggers msg -> Taggers msg
+addMySub (Every interval tagger) state =
+  case Dict.get interval state of
+    Nothing ->
+      Dict.insert interval [tagger] state
+
+    Just taggers ->
+      Dict.insert interval (tagger :: taggers) state
+
+
+spawnHelp : Platform.Router msg Time -> List Time -> Processes -> Task.Task x Processes
+spawnHelp router intervals processes =
+  case intervals of
+    [] ->
+      Task.succeed processes
+
+    interval :: rest ->
+      Native.Scheduler.spawn (setInterval interval (Platform.sendToSelf router interval))
+        `Task.andThen` \id ->
+
+      spawnHelp router rest (Dict.insert interval id processes)
+
+
+onSelfMsg : Platform.Router msg Time -> Time -> State msg -> Task Never (State msg)
+onSelfMsg router interval state =
+  case Dict.get interval state.taggers of
+    Nothing ->
+      Task.succeed state
+
+    Just taggers ->
+      now
+        `Task.andThen` \time ->
+
+      Task.sequence (List.map (\tagger -> Platform.sendToApp router (tagger time)) taggers)
+        `Task.andThen` \_ ->
+
+      Task.succeed state
+
+
+setInterval : Time -> Task Never () -> Task x Never
+setInterval =
+  Native.Time.setInterval_

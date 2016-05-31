@@ -1,4 +1,4 @@
-module Test.Set (tests) where
+module Test.Set exposing (tests)
 
 import Basics exposing (..)
 

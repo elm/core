@@ -1,17 +1,17 @@
-module Basics
-    ( (==), (/=)
-    , (<), (>), (<=), (>=), max, min, Order (..), compare
-    , not, (&&), (||), xor
-    , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
-    , pi, cos, sin, tan, acos, asin, atan, atan2
-    , round, floor, ceiling, truncate, toFloat
-    , degrees, radians, turns
-    , toPolar, fromPolar
-    , isNaN, isInfinite
-    , toString, (++)
-    , fst, snd
-    , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
-    ) where
+module Basics exposing
+  ( (==), (/=)
+  , (<), (>), (<=), (>=), max, min, Order (..), compare
+  , not, (&&), (||), xor
+  , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
+  , pi, cos, sin, tan, acos, asin, atan, atan2
+  , round, floor, ceiling, truncate, toFloat
+  , degrees, radians, turns
+  , toPolar, fromPolar
+  , isNaN, isInfinite
+  , toString, (++)
+  , fst, snd
+  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+  )
 
 {-| Tons of useful functions that get imported by default.
 
@@ -58,13 +58,11 @@ which happen to be radians.
 @docs fst, snd
 
 # Higher-Order Helpers
-@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry
+@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
 
 -}
 
 import Native.Basics
-import Native.Port
-import Native.Runtime
 import Native.Utils
 
 
@@ -350,7 +348,10 @@ max =
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
-This operator short-circuits to `False` if the first argument is `False`.
+
+**Note:** When used in the infix position, like `(left && right)`, the operator
+short-circuits. This means if `left` is `False` we do not bother evaluating `right`
+and just return `False` overall.
 -}
 (&&) : Bool -> Bool -> Bool
 (&&) =
@@ -358,7 +359,10 @@ This operator short-circuits to `False` if the first argument is `False`.
 
 
 {-| The logical OR operator. `True` if one or both inputs are `True`.
-This operator short-circuits to `True` if the first argument is `True`.
+
+**Note:** When used in the infix position, like `(left || right)`, the operator
+short-circuits. This means if `left` is `True` we do not bother evaluating `right`
+and just return `True` overall.
 -}
 (||) : Bool -> Bool -> Bool
 (||) =
@@ -600,3 +604,15 @@ This combines two arguments into a single pair.
 uncurry : (a -> b -> c) -> (a,b) -> c
 uncurry f (a,b) =
   f a b
+
+
+{-| A type that is "uninhabited". There are no values of type `Never`, and its
+primary use is demanding that certain tasks cannot possibly fail.
+
+For example, a task with type `(Task Never Int)` must *always* succeed with an
+integer. For the task to fail, someone would need to say `(Task.fail ???)` but
+since there is no value with type `Never` they could not fill in the question
+marks!
+-}
+type Never = Never Never
+

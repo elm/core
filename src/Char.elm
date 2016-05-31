@@ -1,8 +1,8 @@
-module Char
-    ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
-    , toUpper, toLower, toLocaleUpper, toLocaleLower
-    , KeyCode, toCode, fromCode
-    ) where
+module Char exposing
+  ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
+  , toUpper, toLower, toLocaleUpper, toLocaleLower
+  , KeyCode, toCode, fromCode
+  )
 
 {-| Functions for working with characters. Character literals are enclosed in
 `'a'` pair of single quotes.
@@ -83,22 +83,21 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
-{-| In this library, we use integers to represent the key codes coming from the
-keyboard. You can use [`toCode`](#toCode) and [`fromCode`](#fromCode)
-to convert between key codes and characters.
+{-| Keyboard keys can be represented as integers. These are called *key codes*.
+You can use [`toCode`](#toCode) and [`fromCode`](#fromCode) to convert between
+key codes and characters.
 -}
 type alias KeyCode = Int
 
 
-{-| Convert to unicode. Used with the [`Keyboard`](Keyboard) library,
-which expects the input to be uppercase.
+{-| Convert to key code.
 -}
 toCode : Char -> KeyCode
 toCode =
   Native.Char.toCode
 
 
-{-| Convert from unicode. -}
+{-| Convert from key code. -}
 fromCode : KeyCode -> Char
 fromCode =
   Native.Char.fromCode

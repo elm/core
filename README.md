@@ -6,7 +6,6 @@ Every Elm project needs the core libraries. They provide basic functionality inc
 
   * The Basics &mdash; addition, subtraction, etc.
   * Data Structures &mdash; lists, dictionaries, sets, etc.
-  * Signals &mdash; to make Elm programs reactive
 
 
 ## Default Imports
@@ -19,7 +18,9 @@ import Debug
 import List exposing ( List, (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )
 import Result exposing ( Result( Ok, Err ) )
-import Signal exposing ( Signal )
+import Platform exposing ( Program )
+import Platform.Cmd exposing ( Cmd, (!) )
+import Platform.Sub exposing ( Sub )
 ```
 
 The intention is to include things that are both extremely useful and very

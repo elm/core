@@ -1,4 +1,4 @@
-module Test.Basics (tests) where
+module Test.Basics exposing (tests)
 
 import Basics exposing (..)
 import ElmTest exposing (..)

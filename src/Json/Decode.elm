@@ -1,15 +1,15 @@
-module Json.Decode
-    ( Decoder, Value
-    , decodeString, decodeValue
-    , string, int, float, bool, null
-    , list, array
-    , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
-    , (:=), at
-    , object1, object2, object3, object4, object5, object6, object7, object8
-    , keyValuePairs, dict
-    , maybe, oneOf, map, fail, succeed, andThen
-    , value, customDecoder
-    ) where
+module Json.Decode exposing  -- where
+  ( Decoder, Value
+  , decodeString, decodeValue
+  , string, int, float, bool, null
+  , list, array
+  , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
+  , (:=), at
+  , object1, object2, object3, object4, object5, object6, object7, object8
+  , keyValuePairs, dict
+  , maybe, oneOf, map, fail, succeed, andThen
+  , value, customDecoder
+  )
 
 {-| A way to turn Json values into Elm values. A `Decoder a` represents a
 decoding operation that will either produce a value of type `a`, or fail.
@@ -40,14 +40,13 @@ decoding operation that will either produce a value of type `a`, or fail.
 -}
 
 
-import Native.Json
 import Array exposing (Array)
 import Dict exposing (Dict)
 import Json.Encode as JsEncode
 import List
 import Maybe exposing (Maybe)
 import Result exposing (Result)
-
+import Native.Json
 
 {-| Represents a way of decoding JSON values. If you have a `(Decoder (List String))`
 it will attempt to take some JSON value and turn it into a list of strings.
@@ -84,7 +83,7 @@ the `oneOf` function.
 -}
 map : (a -> b) -> Decoder a -> Decoder b
 map =
-    Native.Json.decodeObject1
+  Native.Json.decodeObject1
 
 
 {-| Using a certain decoder, attempt to parse a JSON string. If the decoder
@@ -95,7 +94,7 @@ fails, you will get a string message telling you why.
 -}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
-    Native.Json.runDecoderString
+  Native.Json.runOnString
 
 
 -- OBJECTS
@@ -266,7 +265,7 @@ oneOf =
 -}
 string : Decoder String
 string =
-    Native.Json.decodeString
+  Native.Json.decodePrimitive "string"
 
 
 {-| Extract a float.
@@ -279,7 +278,7 @@ string =
 -}
 float : Decoder Float
 float =
-    Native.Json.decodeFloat
+  Native.Json.decodePrimitive "float"
 
 
 {-| Extract an integer.
@@ -292,7 +291,7 @@ float =
 -}
 int : Decoder Int
 int =
-    Native.Json.decodeInt
+  Native.Json.decodePrimitive "int"
 
 
 {-| Extract a boolean.
@@ -305,7 +304,7 @@ int =
 -}
 bool : Decoder Bool
 bool =
-    Native.Json.decodeBool
+  Native.Json.decodePrimitive "bool"
 
 
 {-| Extract a List from a JS array.
@@ -317,8 +316,8 @@ bool =
         list int
 -}
 list : Decoder a -> Decoder (List a)
-list =
-    Native.Json.decodeList
+list decoder =
+  Native.Json.decodeContainer "list" decoder
 
 
 {-| Extract an Array from a JS array.
@@ -330,8 +329,8 @@ list =
         array int
 -}
 array : Decoder a -> Decoder (Array a)
-array =
-    Native.Json.decodeArray
+array decoder =
+  Native.Json.decodeContainer "array" decoder
 
 
 {-| Decode null as the value given, and fail otherwise. Primarily useful for
@@ -353,7 +352,7 @@ This decoder treats `null` as `Nothing`, and otherwise tries to produce a
 -}
 null : a -> Decoder a
 null =
-    Native.Json.decodeNull
+  Native.Json.decodeNull
 
 
 {-| Extract a Maybe value, wrapping successes with `Just` and turning any
@@ -384,8 +383,8 @@ The following code decodes JSON objects that may not have a profession field.
           (maybe ("profession" := string))
 -}
 maybe : Decoder a -> Decoder (Maybe a)
-maybe =
-    Native.Json.decodeMaybe
+maybe decoder =
+  Native.Json.decodeContainer "maybe" decoder
 
 
 {-| Bring in an arbitrary JSON value. Useful if you need to work with crazily
@@ -410,7 +409,7 @@ type.
 -}
 value : Decoder Value
 value =
-    Native.Json.decodeValue
+  Native.Json.decodePrimitive "value"
 
 
 {-| Using a certain decoder, attempt to parse a raw `Json.Value`. You can pass
@@ -432,7 +431,7 @@ automatically.
 -}
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
-    Native.Json.runDecoderValue
+  Native.Json.run
 
 
 {-| Create a custom decoder that may do some fancy computation. See the `value`
@@ -440,14 +439,22 @@ documentation for an example usage.
 -}
 customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
 customDecoder =
-    Native.Json.customDecoder
+  Native.Json.customAndThen
 
 
-{-| Helpful when one field will determine the shape of a bunch of other fields.
+{-| Helpful when a field tells you about the overall structure of the JSON
+you are dealing with. For example, imagine we are getting JSON representing
+different shapes. Data like this:
+
+    { "tag": "rectangle", "width": 2, "height": 3 }
+    { "tag": "circle", "radius": 2 }
+
+The following `shape` decoder looks at the `tag` to know what other fields to
+expect **and then** it extracts the relevant information.
 
     type Shape
-        = Rectangle Float Float
-        | Circle Float
+      = Rectangle Float Float
+      | Circle Float
 
     shape : Decoder Shape
     shape =
@@ -457,20 +464,17 @@ customDecoder =
     shapeInfo tag =
       case tag of
         "rectangle" ->
-            object2 Rectangle
-              ("width" := float)
-              ("height" := float)
+          object2 Rectangle ("width" := float) ("height" := float)
 
         "circle" ->
-            object1 Circle
-              ("radius" := float)
+          object1 Circle ("radius" := float)
 
         _ ->
-            fail (tag ++ " is not a recognized tag for shapes")
+          fail (tag ++ " is not a recognized tag for shapes")
 -}
 andThen : Decoder a -> (a -> Decoder b) -> Decoder b
 andThen =
-    Native.Json.andThen
+  Native.Json.andThen
 
 
 {-| A decoder that always fails. Useful when paired with `andThen` or `oneOf`
@@ -488,7 +492,7 @@ the last option.
 -}
 fail : String -> Decoder a
 fail =
-    Native.Json.fail
+  Native.Json.fail
 
 
 {-| A decoder that always succeeds. Useful when paired with `andThen` or
@@ -507,7 +511,7 @@ missing.
 -}
 succeed : a -> Decoder a
 succeed =
-    Native.Json.succeed
+  Native.Json.succeed
 
 
 -- TUPLES
@@ -515,7 +519,7 @@ succeed =
 {-| Handle an array with exactly one element.
 
     extractString : Decoder String
-    extractString = 
+    extractString =
         tuple1 identity string
 
     authorship : Decoder String

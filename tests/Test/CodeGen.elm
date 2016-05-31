@@ -1,4 +1,4 @@
-module Test.CodeGen (tests) where
+module Test.CodeGen exposing (tests)
 
 import Basics exposing (..)
 import ElmTest exposing (..)

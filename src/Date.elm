@@ -1,15 +1,16 @@
-module Date
-    ( Date, fromString, toTime, fromTime
-    , year, month, Month(..)
-    , day, dayOfWeek, Day(..)
-    , hour, minute, second, millisecond
-    ) where
+module Date exposing
+  ( Date, fromString, toTime, fromTime
+  , year, month, Month(..)
+  , day, dayOfWeek, Day(..)
+  , hour, minute, second, millisecond
+  , now
+  )
 
 {-| Library for working with dates. Email the mailing list if you encounter
 issues with internationalization or locale formatting.
 
 # Dates
-@docs Date
+@docs Date, now
 
 # Conversions
 @docs fromString, toTime, fromTime
@@ -20,13 +21,29 @@ issues with internationalization or locale formatting.
 -}
 
 import Native.Date
+import Task exposing (Task)
 import Time exposing (Time)
 import Result exposing (Result)
+
+
+
+-- DATES
 
 
 {-| Representation of a date.
 -}
 type Date = Date
+
+
+{-| Get the `Date` at the moment when this task is run.
+-}
+now : Task x Date
+now =
+  Task.map fromTime Time.now
+
+
+
+-- CONVERSIONS AND EXTRACTIONS
 
 
 {-| Represents the days of the week.
@@ -46,19 +63,23 @@ type Month
 -}
 fromString : String -> Result String Date
 fromString =
-  Native.Date.read
+  Native.Date.fromString
 
 
-{-| Convert a date into a time since midnight (UTC) of 1 January 1970 (i.e.
-[UNIX time](http://en.wikipedia.org/wiki/Unix_time)). Given the date 23 June
-1990 at 11:45AM this returns the corresponding time.
+{-| Convert a `Date` to a time in milliseconds.
+
+A time is the number of milliseconds since
+[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
 -}
 toTime : Date -> Time
 toTime =
   Native.Date.toTime
 
 
-{-| Take a UNIX time and convert it to a `Date`.
+{-| Convert a time in milliseconds into a `Date`.
+
+A time is the number of milliseconds since
+[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
 -}
 fromTime : Time -> Date
 fromTime =
@@ -74,7 +95,7 @@ year =
 
 
 {-| Extract the month of a given date. Given the date 23 June 1990 at 11:45AM
-this returns the Month `Jun` as defined below.
+this returns the month `Jun` as defined below.
 -}
 month : Date -> Month
 month =
@@ -90,7 +111,7 @@ day =
 
 
 {-| Extract the day of the week for a given date. Given the date 23 June
-1990 at 11:45AM this returns the Day `Sat` as defined below.
+1990 at 11:45AM this returns the day `Sat` as defined below.
 -}
 dayOfWeek : Date -> Day
 dayOfWeek =
@@ -127,4 +148,3 @@ this returns the integer `123`.
 millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
-

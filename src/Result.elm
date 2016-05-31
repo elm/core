@@ -1,10 +1,10 @@
-module Result
-    ( Result(..)
-    , withDefault
-    , map, map2, map3, map4, map5
-    , andThen
-    , toMaybe, fromMaybe, formatError
-    ) where
+module Result exposing
+  ( Result(..)
+  , withDefault
+  , map, map2, map3, map4, map5
+  , andThen
+  , toMaybe, fromMaybe, formatError
+  )
 
 {-| A `Result` is the result of a computation that may fail. This is a great
 way to manage errors in Elm.
@@ -156,7 +156,7 @@ say the errors we get have too much information:
 
     parseInt : String -> Result ParseError Int
 
-    type ParseError =
+    type alias ParseError =
         { message : String
         , code : Int
         , position : (Int,Int)

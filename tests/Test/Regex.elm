@@ -1,4 +1,4 @@
-module Test.Regex (tests) where
+module Test.Regex exposing (tests)
 
 import Basics exposing (..)
 
