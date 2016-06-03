@@ -236,6 +236,11 @@ function bad(msg)
 	return { tag: 'fail', msg: msg };
 }
 
+function badWithCustomMessage(msg)
+{
+	return { tag: 'custom', msg: msg };
+}
+
 function badToString(problem)
 {
 	var context = '_';
@@ -272,6 +277,9 @@ function badToString(problem)
 				return 'I ran into a `fail` decoder'
 					+ (context === '_' ? '' : ' at ' + context)
 					+ ': ' + problem.msg;
+
+			case 'custom':
+				return problem.msg;
 		}
 	}
 }
@@ -470,7 +478,7 @@ function runHelp(decoder, value)
 			var realResult = decoder.callback(result.value);
 			if (realResult.ctor === 'Err')
 			{
-				return badPrimitive('something custom', value);
+				return badWithCustomMessage(realResult._0);
 			}
 			return ok(realResult._0);
 
