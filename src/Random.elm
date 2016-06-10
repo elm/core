@@ -50,6 +50,7 @@ module. It has a period of roughly 2.30584e18.
 -}
 
 import Basics exposing (..)
+import Bitwise
 import List exposing ((::))
 import Platform
 import Platform.Cmd exposing (Cmd)
@@ -87,39 +88,42 @@ This function *can* produce values outside of the range [[`minInt`](#minInt),
 -}
 int : Int -> Int -> Generator Int
 int a b =
-  Generator <| \(Seed seed) ->
+  Generator <| \seed0 ->
     let
       (lo,hi) =
         if a < b then (a,b) else (b,a)
 
-      k = hi - lo + 1
-      -- 2^31 - 87
-      base = 2147483561
-      n = iLogBase base k
+      range =
+        hi - lo + 1
 
-      f n acc state =
-        case n of
-          0 -> (acc, state)
-          _ ->
-            let
-              (x, state') = seed.next state
-            in
-              f (n - 1) (x + acc * base) state'
-
-      (v, state') =
-        f n 1 seed.state
     in
-      ( lo + v % k
-      , Seed { seed | state = state' }
-      )
+      -- fast path for power of 2
+      if ((range & (range - 1)) == 0) then
+          (((peel seed0 & (range - 1)) >>> 0) + lo, next seed0)
+      else
+        let
+          threshhold =
+            -- essentially: period % range
+            -- define range and paste this into node if you're confused
+            ((-range >>> 0) % range) >>> 0
 
+          -- See "Explanation of the PCG algorithm" for why this is required.
+          accountForBias : Seed -> ( Int, Seed )
+          accountForBias seed =
+            let
+              x =
+                peel seed
 
-iLogBase : Int -> Int -> Int
-iLogBase b i =
-  if i < b then
-    1
-  else
-    1 + iLogBase b (i // b)
+              seedN =
+                next seed
+            in
+              if x < threshhold then
+              -- in practice this recurses almost never
+                accountForBias seedN
+              else
+                ( x % range + lo, seedN )
+        in
+              accountForBias seed0
 
 
 {-| The maximum value for randomly generated 32-bit ints: 2147483647 -}
@@ -143,22 +147,37 @@ that produces decimals between 0 and 1.
 -}
 float : Float -> Float -> Generator Float
 float a b =
-  Generator <| \seed ->
+  Generator <| \seed0 ->
     let
-      (lo, hi) =
-        if a < b then (a,b) else (b,a)
+      -- Get 64 bits of randomness
+      seed1 =
+        next seed0
 
-      (number, newSeed) =
-        step (int minInt maxInt) seed
+      n0 =
+        peel seed0
 
-      negativeOneToOne =
-        toFloat number / toFloat (maxInt - minInt)
+      n1 =
+        peel seed1
+
+      -- Get a uniformly distributed IEEE-754 double between 0.0 and 1.0
+      hi =
+        toFloat (n0 & 0x03FFFFFF) * 1.0
+
+      lo =
+        toFloat (n1 & 0x07FFFFFF) * 1.0
+
+      val =
+        -- These magic constants are 2^27 and 2^53
+        ((hi * 134217728.0) + lo) / 9007199254740992.0
+
+      -- Scale it into our range
+      range =
+        abs (b - a)
 
       scaled =
-        (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
+        val * range + a
     in
-      (scaled, newSeed)
-
+      ( scaled, next seed1 )
 
 
 -- DATA STRUCTURES
@@ -341,6 +360,119 @@ andThen (Generator generate) callback =
 
 -- IMPLEMENTATION
 
+{- Explanation of the PCG algorithm
+
+    PCG uses 64 bits of state. There is one function (next) to derive the next
+    state and another to obtain 32 psuedo-random bits from the current state.
+
+    Getting the next state is easy: multiply by a magic factor, and then add an
+    increment. In this implementation, we're using a constant, magic increment.
+    BUT: you can use any odd 64-bit integer you like, keep it in the seed (so
+    128 bits of state), and pass it on to the next seed unchanged. (You can
+    generate the increment from the RNG itself if you have to.) If two seeds
+    have different increments, their random numbers from the two seeds will
+    never match up; they are completely independent. This is very helpful for
+    isolated components or multithreading.
+
+    Transforming a seed into a random number is more complicated, but
+    essentially you use the "most random" bits to pick some way of scrambling
+    the remaining bits. Once you have 32 random bits, you have to turn it into a
+    number. For integers, we first check if the range is a power of two. If it
+    is, we can mask part of the value and be done. If not, we need to account
+    for bias.
+
+    Let's say you want a random number between 1 and 7 but I can only generate
+    random numbers between 1 and 32. If I modulus by result by 7, I'm biased,
+    because there are more random numbers that lead to 1 than 7. So instead, I
+    check to see if my random number exceeds 28 (the largest multiple of 7 less
+    than 32). If it does, I reroll, otherwise I mod by seven. This sounds
+    wateful, except that instead of 32 it's 2^32, so in practice it's hard to
+    notice. So that's how we get random ints. There's another process from
+    floats, but I don't understand it very well.
+
+    A note on bitwise ops: x >>> 0 is used throughout this file to force values
+    into 32-bit integers. Don't let it freak you out.
+-}
+
+
+(&) =
+    Bitwise.and
+
+
+-- Beware that we're shadowed function composition
+(<<) =
+    Bitwise.shiftLeft
+
+
+(>>>) =
+    Bitwise.shiftRightLogical
+
+
+-- A private type used to represent 64-bit integers.
+type Int64
+    = Int64 Int Int
+
+
+{-| A `Seed` is the source of randomness in this whole system. Whenever
+you want to use a generator, you need to pair it with a seed.
+-}
+type Seed =
+  Seed Int64
+
+
+magicFactor : Int64
+magicFactor =
+    Int64 0x5851F42D 0x4C957F2D
+
+
+magicIncrement : Int64
+magicIncrement =
+    Int64 0x14057B7E 0xF767814F
+
+
+-- A private function to derive the next seed
+next : Seed -> Seed
+next (Seed state0) =
+    let
+        state1 =
+            mul64 state0 magicFactor
+
+        state2 =
+            add64 state1 magicIncrement
+    in
+        Seed state2
+
+
+-- A private function to obtain a psuedorandom 32-bit integer
+peel : Seed -> Int
+peel (Seed (Int64 oldHi oldLo)) =
+    let
+        -- get least sig. 32 bits of ((oldstate >> 18) ^ oldstate) >> 27
+        xsHi =
+            oldHi >>> 18
+
+        xsLo =
+            ((oldLo >>> 18) `Bitwise.or` (oldHi << 14)) >>> 0
+
+        xsHi' =
+            (xsHi `Bitwise.xor` oldHi) >>> 0
+
+        xsLo' =
+            (xsLo `Bitwise.xor` oldLo) >>> 0
+
+        xorshifted =
+            ((xsLo' >>> 27) `Bitwise.or` (xsHi' << 5)) >>> 0
+
+        -- rotate xorshifted right a random amount, based on the most sig. 5 bits
+        -- bits of the old state.
+        rot =
+            oldHi >>> 27
+
+        rot2 =
+            ((-rot >>> 0) & 31) >>> 0
+    in
+        ((xorshifted >>> rot) `Bitwise.or` (xorshifted << rot2)) >>> 0
+
 
 {-| A `Generator` is like a recipe for generating certain random values. So a
 `Generator Int` describes how to generate integers and a `Generator String`
@@ -351,21 +483,6 @@ functions like [`generate`](#generate) and [`initialSeed`](#initialSeed).
 -}
 type Generator a =
     Generator (Seed -> (a, Seed))
-
-
-type State = State Int Int
-
-
-{-| A `Seed` is the source of randomness in this whole system. Whenever
-you want to use a generator, you need to pair it with a seed.
--}
-type Seed =
-  Seed
-    { state : State
-    , next  : State -> (Int, State)
-    , split : State -> (State, State)
-    , range : State -> (Int,Int)
-    }
 
 
 {-| Generate a random value as specified by a given `Generator`.
@@ -403,78 +520,12 @@ the current time.
 -}
 initialSeed : Int -> Seed
 initialSeed n =
-  Seed
-    { state = initState n
-    , next = next
-    , split = split
-    , range = range
-    }
-
-
-{-| Produce the initial generator state. Distinct arguments should be likely
-to produce distinct generator states.
--}
-initState : Int -> State
-initState s' =
-  let
-    s = max s' -s'
-    q  = s // (magicNum6-1)
-    s1 = s %  (magicNum6-1)
-    s2 = q %  (magicNum7-1)
-  in
-    State (s1+1) (s2+1)
-
-
-magicNum0 = 40014
-magicNum1 = 53668
-magicNum2 = 12211
-magicNum3 = 52774
-magicNum4 = 40692
-magicNum5 = 3791
-magicNum6 = 2147483563
-magicNum7 = 2137383399
-magicNum8 = 2147483562
-
-
-next : State -> (Int, State)
-next (State s1 s2) =
-  -- Div always rounds down and so random numbers are biased
-  -- ideally we would use division that rounds towards zero so
-  -- that in the negative case it rounds up and in the positive case
-  -- it rounds down. Thus half the time it rounds up and half the time it
-  -- rounds down
-  let
-    k = s1 // magicNum1
-    s1' = magicNum0 * (s1 - k * magicNum1) - k * magicNum2
-    s1'' = if s1' < 0 then s1' + magicNum6 else s1'
-    k' = s2 // magicNum3
-    s2' = magicNum4 * (s2 - k' * magicNum3) - k' * magicNum5
-    s2'' = if s2' < 0 then s2' + magicNum7 else s2'
-    z = s1'' - s2''
-    z' = if z < 1 then z + magicNum8 else z
-  in
-    (z', State s1'' s2'')
-
-
-split : State -> (State, State)
-split (State s1 s2 as std) =
-  let
-    new_s1 =
-      if s1 == magicNum6-1 then 1 else s1 + 1
-
-    new_s2 =
-      if s2 == 1 then magicNum7-1 else s2 - 1
-
-    (State t1 t2) =
-      snd (next std)
-  in
-    (State new_s1 t2, State t1 new_s2)
-
-
-range : State -> (Int,Int)
-range _ =
-    (0, magicNum8)
-
+    let
+      intermediateState =
+        -- The least significant 32 bits are zeroes. It works, but it's not ideal.
+        add64 magicIncrement (Int64 (n >>> 0) 0)
+    in
+      next (Seed intermediateState)
 
 
 -- MANAGER
@@ -527,3 +578,91 @@ onEffects router commands seed =
 onSelfMsg : Platform.Router msg Never -> Never -> Seed -> Task Never Seed
 onSelfMsg _ _ seed =
   Task.succeed seed
+
+
+-- 64-bit Arithmetic helpers
+
+
+mul32 : Int -> Int -> Int
+mul32 a b =
+    let
+        ah =
+            (a >>> 16) & 0xFFFF
+
+        al =
+            a & 0xFFFF
+
+        bh =
+            (b >>> 16) & 0xFFFF
+
+        bl =
+            b & 0xFFFF
+    in
+        (al * bl) + (((ah * bl + al * bh) << 16) >>> 0) |> Bitwise.or 0
+
+
+mul64 : Int64 -> Int64 -> Int64
+mul64 (Int64 aHi aLo) (Int64 bHi bLo) =
+    let
+        -- this is taken from a mutable implementation, so there are a lot of primes.
+        c1 =
+            (aLo >>> 16) * (bLo & 0xFFFF) >>> 0
+
+        c0 =
+            (aLo & 0xFFFF) * (bLo >>> 16) >>> 0
+
+        lo =
+            ((aLo & 0xFFFF) * (bLo & 0xFFFF)) >>> 0
+
+        hi =
+            ((aLo >>> 16) * (bLo >>> 16)) + ((c0 >>> 16) + (c1 >>> 16)) >>> 0
+
+        c0' =
+            (c0 << 16) >>> 0
+
+        lo' =
+            (lo + c0') >>> 0
+
+        hi' =
+            if (lo' >>> 0) < (c0' >>> 0) then
+                (hi + 1) >>> 0
+            else
+                hi
+
+        c1' =
+            (c1 << 16) >>> 0
+
+        lo'' =
+            (lo' + c1') >>> 0
+
+        hi'' =
+            if (lo'' >>> 0) < (c1' >>> 0) then
+                (hi' + 1) >>> 0
+            else
+                hi'
+
+        hi''' =
+            (hi'' + mul32 aLo bHi) >>> 0
+
+        hi'''' =
+            (hi''' + mul32 aHi bLo) >>> 0
+    in
+        Int64 hi'''' lo''
+
+
+add64 : Int64 -> Int64 -> Int64
+add64 (Int64 aHi aLo) (Int64 bHi bLo) =
+    let
+        hi =
+            (aHi + bHi) >>> 0
+
+        lo =
+            (aLo + bLo) >>> 0
+
+        hi' =
+            if ((lo >>> 0) < (aLo >>> 0)) then
+                (hi + 1) `Bitwise.or` 0
+            else
+                hi
+    in
+        Int64 hi' lo
