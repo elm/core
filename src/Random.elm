@@ -21,10 +21,9 @@ similarly.
 
 [json]: https://evancz.gitbooks.io/an-introduction-to-elm/content/interop/json.html
 
-> *Note:* This is an implementation of the Portable Combined Generator of
-L'Ecuyer for 32-bit computers. It is almost a direct translation from the
-[System.Random](http://hackage.haskell.org/package/random-1.0.1.1/docs/System-Random.html)
-module. It has a period of roughly 2.30584e18.
+This is an implementation of [Permuted Congruential
+Generators](http://www.pcg-random.org/) by M. E. O'Neil, and is not
+cryptographically secure.
 
 # Generators
 @docs Generator
@@ -50,6 +49,7 @@ module. It has a period of roughly 2.30584e18.
 -}
 
 import Basics exposing (..)
+import Bitwise
 import List exposing ((::))
 import Platform
 import Platform.Cmd exposing (Cmd)
@@ -73,7 +73,7 @@ simulates a coin flip that may land heads or tails.
 -}
 bool : Generator Bool
 bool =
-  map ((==) 1) (int 0 1)
+     map ((==) 1) (int 0 1)
 
 
 {-| Generate 32-bit integers in a given range.
@@ -88,39 +88,43 @@ This function *can* produce values outside of the range [[`minInt`](#minInt),
 -}
 int : Int -> Int -> Generator Int
 int a b =
-  Generator <| \(Seed seed) ->
-    let
-      (lo,hi) =
-        if a < b then (a,b) else (b,a)
-
-      k = hi - lo + 1
-      -- 2^31 - 87
-      base = 2147483561
-      n = iLogBase base k
-
-      f n acc state =
-        case n of
-          0 -> (acc, state)
-          _ ->
+    Generator <|
+        \seed0 ->
             let
-              (x, nextState) = seed.next state
+                ( lo, hi ) =
+                    if a < b then
+                        ( a, b )
+                    else
+                        ( b, a )
+
+                range =
+                    hi - lo + 1
             in
-              f (n - 1) (x + acc * base) nextState
+                -- fast path for power of 2
+                if (range |> Bitwise.and (range - 1)) == 0 then
+                    ( (peel seed0 |> Bitwise.and (range - 1) |> Bitwise.shiftRightZfBy 0) + lo, next seed0 )
+                else
+                    let
+                        threshhold =
+                            -- essentially: period % max
+                            rem (-range |> Bitwise.shiftRightZfBy 0) range |> Bitwise.shiftRightZfBy 0
 
-      (v, nextState) =
-        f n 1 seed.state
-    in
-      ( lo + v % k
-      , Seed { seed | state = nextState }
-      )
+                        accountForBias : Seed -> ( Int, Seed )
+                        accountForBias seed =
+                            let
+                                x =
+                                    peel seed
 
-
-iLogBase : Int -> Int -> Int
-iLogBase b i =
-  if i < b then
-    1
-  else
-    1 + iLogBase b (i // b)
+                                seedN =
+                                    next seed
+                            in
+                                if x < threshhold then
+                                    -- in practice this recurses almost never
+                                    accountForBias seedN
+                                else
+                                    ( rem x range + lo, seedN )
+                    in
+                        accountForBias seed0
 
 
 {-| The maximum value for randomly generated 32-bit ints: 2147483647 -}
@@ -144,22 +148,37 @@ that produces decimals between 0 and 1.
 -}
 float : Float -> Float -> Generator Float
 float a b =
-  Generator <| \seed ->
-    let
-      (lo, hi) =
-        if a < b then (a,b) else (b,a)
+    Generator <| \seed0 ->
+        let
+            -- Get 64 bits of randomness
+            seed1 =
+                next seed0
 
-      (number, newSeed) =
-        step (int minInt maxInt) seed
+            n0 =
+                peel seed0
 
-      negativeOneToOne =
-        toFloat number / toFloat (maxInt - minInt)
+            n1 =
+                peel seed1
 
-      scaled =
-        (lo+hi)/2 + ((hi-lo) * negativeOneToOne)
-    in
-      (scaled, newSeed)
+            -- Get a uniformly distributed IEEE-754 double between 0.0 and 1.0
+            hi =
+                toFloat (n0 |> Bitwise.and 0x03FFFFFF) * 1.0
 
+            lo =
+                toFloat (n1 |> Bitwise.and 0x07FFFFFF) * 1.0
+
+            val =
+                -- These magic constants are 2^27 and 2^53
+                ((hi * 134217728.0) + lo) / 9007199254740992.0
+
+            -- Scale it into our range
+            range =
+                abs (b - a)
+
+            scaled =
+                val * range + a
+        in
+            ( scaled, next seed1 )
 
 
 -- DATA STRUCTURES
@@ -346,6 +365,72 @@ andThen callback (Generator generate) =
 
 -- IMPLEMENTATION
 
+{- Explanation of the PCG algorithm
+
+    This is a special variation (dubbed RXS-M-SH) that produces 32
+    bits of output by keeping 32 bits of state. There is one function
+    (next) to derive the following state and another (peel) to obtain 32
+    psuedo-random bits from the current state.
+
+    Getting the next state is easy: multiply by a magic factor, and then add an
+    increment. In this implementation, we're using a hard-coded, magic
+    increment. This is a simplification from the 3rd party library, which
+    carries the increment in the seed. If two seeds have different increments,
+    their random numbers from the two seeds will never match up; they are
+    completely independent. This is very helpful for isolated components or
+    multithreading, and elm-test relies on this feature.
+
+    Transforming a seed into 32 random bits is more complicated, but
+    essentially you use the "most random" bits to pick some way of scrambling
+    the remaining bits. Beyond that, see section 6.3.4 of the [paper].
+
+    [paper](http://www.pcg-random.org/paper)
+
+    Once we have 32 random bits, we have to turn it into a number. For integers,
+    we first check if the range is a power of two. If it is, we can mask part of
+    the value and be done. If not, we need to account for bias.
+
+    Let's say you want a random number between 1 and 7 but I can only generate
+    random numbers between 1 and 32. If I modulus by result by 7, I'm biased,
+    because there are more random numbers that lead to 1 than 7. So instead, I
+    check to see if my random number exceeds 28 (the largest multiple of 7 less
+    than 32). If it does, I reroll, otherwise I mod by seven. This sounds
+    wateful, except that instead of 32 it's 2^32, so in practice it's hard to
+    notice. So that's how we get random ints. There's another process from
+    floats, but I don't understand it very well.
+-}
+
+
+{-| A `Seed` is the source of randomness in the whole system. It hides the
+current state of the random number generator.
+
+Generators, not seeds, are the primary data structure for generating random
+values. Generators are much easier to chain and combine than functions that take
+and return seeds. Creating and managing seeds should happen "high up" in your
+program.
+-}
+type Seed
+    = Seed Int
+
+-- step the RNG to produce the next seed
+next : Seed -> Seed
+next (Seed state0) =
+    -- The magic constants are from Numerical Recipes and are inlined for perf.
+    Seed ((state0 * 1664525) + 1013904223 |> Bitwise.shiftRightZfBy 0)
+
+
+-- obtain a psuedorandom 32-bit integer from a seed
+peel : Seed -> Int
+peel (Seed state) =
+    -- This is the RXS-M-SH version of PCG, see section 6.3.4 of the paper
+    -- and line 184 of pcg_variants.h in the 0.94 C implementation
+    let
+        word =
+            ((state |> Bitwise.shiftRightZfBy ((state |> Bitwise.shiftRightZfBy 28) + 4)) |> Bitwise.xor state) * 277803737
+    in
+        Bitwise.xor (word |> Bitwise.shiftRightZfBy 22) word
+            |> Bitwise.shiftRightZfBy 0
+
 
 {-| A `Generator` is like a recipe for generating certain random values. So a
 `Generator Int` describes how to generate integers and a `Generator String`
@@ -358,128 +443,81 @@ type Generator a =
     Generator (Seed -> (a, Seed))
 
 
-type State = State Int Int
+{-| Generate a random value as specified by a given `Generator`, using a `Seed`
+and returning a new one.
 
-
-{-| A `Seed` is the source of randomness in this whole system. Whenever
-you want to use a generator, you need to pair it with a seed.
--}
-type Seed =
-  Seed
-    { state : State
-    , next  : State -> (Int, State)
-    , split : State -> (State, State)
-    , range : State -> (Int,Int)
-    }
-
-
-{-| Generate a random value as specified by a given `Generator`.
-
-In the following example, we are trying to generate a number between 0 and 100
-with the `int 0 100` generator. Each time we call `step` we need to provide a
-seed. This will produce a random number and a *new* seed to use if we want to
+In the following example, we are trying to generate numbers between 0 and 100
+with the `int 0 100` generator. Each time we call `generate` we need to provide
+a seed. This will produce a random number and a *new* seed to use if we want to
 run other generators later.
 
-So here it is done right, where we get a new seed from each `step` call and
-thread that through.
+    (x, seed1) = step (int 0 100) seed0
+    (y, seed2) = step (int 0 100) seed1
+    (z, seed3) = step (int 0 100) seed2
+    [x, y, z] -- [85, 0, 38]
 
-    seed0 = initialSeed 31415
-
-    -- step (int 0 100) seed0 ==> (42, seed1)
-    -- step (int 0 100) seed1 ==> (31, seed2)
-    -- step (int 0 100) seed2 ==> (99, seed3)
-
-Notice that we use different seeds on each line. This is important! If you use
+Notice that we use different seeds on each line. This is important! If you reuse
 the same seed, you get the same results.
 
-    -- step (int 0 100) seed0 ==> (42, seed1)
-    -- step (int 0 100) seed0 ==> (42, seed1)
-    -- step (int 0 100) seed0 ==> (42, seed1)
+    (x, _) = step (int 0 100) seed0
+    (y, _) = step (int 0 100) seed0
+    (z, _) = step (int 0 100) seed0
+    [x,y,z] -- [85, 85, 85]
+
+As you can see, threading seeds through many calls to `step` is tedious and
+error-prone. That's why this library includes many functions to build more
+complicated generators, allowing you to call `step` only a small number of
+times.
+
+Our example is best written as:
+
+    (xs, newSeed) = step (list 3 <| int 0 100) seed0
+    xs -- [85, 0, 38]
+
 -}
 step : Generator a -> Seed -> (a, Seed)
 step (Generator generator) seed =
   generator seed
 
 
-{-| Create a &ldquo;seed&rdquo; of randomness which makes it possible to
-generate random values. If you use the same seed many times, it will result
-in the same thing every time! A good way to get an unexpected seed is to use
-the current time.
+{-| Initialize the state of the random number generator. The input should be
+a randomly chosen 32-bit integer. You can generate and copy random integers to
+create a reproducible psuedo-random generator.
+
+    $ node
+    > Math.floor(Math.random()*0xFFFFFFFF)
+    227852860
+
+    -- Elm
+    seed0 : Seed
+    seed0 = initialSeed 227852860
+
+Alternatively, you can generate the random integers on page load and pass them
+through a port. The program will be different every time.
+
+    -- Elm
+    port randomSeed : Int
+
+    seed0 : Seed
+    seed0 = initialSeed randomSeed
+
+    -- JS
+    Elm.ModuleName.fullscreen(
+      { randomSeed: Math.floor(Math.random()*0xFFFFFFFF) })
+
+Either way, you should initialize a random seed only once. After that, whenever
+you use a seed, you'll get another one back.
 -}
 initialSeed : Int -> Seed
-initialSeed n =
-  Seed
-    { state = initState n
-    , next = next
-    , split = split
-    , range = range
-    }
+initialSeed x =
+    let
+        (Seed state1) =
+            next (Seed 0)
 
-
-{-| Produce the initial generator state. Distinct arguments should be likely
-to produce distinct generator states.
--}
-initState : Int -> State
-initState seed =
-  let
-    s = max seed -seed
-    q  = s // (magicNum6-1)
-    s1 = s %  (magicNum6-1)
-    s2 = q %  (magicNum7-1)
-  in
-    State (s1+1) (s2+1)
-
-
-magicNum0 = 40014
-magicNum1 = 53668
-magicNum2 = 12211
-magicNum3 = 52774
-magicNum4 = 40692
-magicNum5 = 3791
-magicNum6 = 2147483563
-magicNum7 = 2147483399
-magicNum8 = 2147483562
-
-
-next : State -> (Int, State)
-next (State state1 state2) =
-  -- Div always rounds down and so random numbers are biased
-  -- ideally we would use division that rounds towards zero so
-  -- that in the negative case it rounds up and in the positive case
-  -- it rounds down. Thus half the time it rounds up and half the time it
-  -- rounds down
-  let
-    k1 = state1 // magicNum1
-    rawState1 = magicNum0 * (state1 - k1 * magicNum1) - k1 * magicNum2
-    newState1 = if rawState1 < 0 then rawState1 + magicNum6 else rawState1
-    k2 = state2 // magicNum3
-    rawState2 = magicNum4 * (state2 - k2 * magicNum3) - k2 * magicNum5
-    newState2 = if rawState2 < 0 then rawState2 + magicNum7 else rawState2
-    z = newState1 - newState2
-    newZ = if z < 1 then z + magicNum8 else z
-  in
-    (newZ, State newState1 newState2)
-
-
-split : State -> (State, State)
-split (State s1 s2 as std) =
-  let
-    new_s1 =
-      if s1 == magicNum6-1 then 1 else s1 + 1
-
-    new_s2 =
-      if s2 == 1 then magicNum7-1 else s2 - 1
-
-    (State t1 t2) =
-      Tuple.second (next std)
-  in
-    (State new_s1 t2, State t1 new_s2)
-
-
-range : State -> (Int,Int)
-range _ =
-    (0, magicNum8)
-
+        state2 =
+            state1 + x |> Bitwise.shiftRightZfBy 0
+    in
+        next (Seed state2)
 
 
 -- MANAGER
@@ -530,3 +568,24 @@ onEffects router commands seed =
 onSelfMsg : Platform.Router msg Never -> Never -> Seed -> Task Never Seed
 onSelfMsg _ _ seed =
   Task.succeed seed
+
+
+-- multiply 32-bit integers without overflow
+mul32 : Int -> Int -> Int
+mul32 a b =
+    let
+        ah =
+            (a |> Bitwise.shiftRightZfBy 16) |> Bitwise.and 0xFFFF
+
+        al =
+            Bitwise.and a 0xFFFF
+
+        bh =
+            (b |> Bitwise.shiftRightZfBy 16) |> Bitwise.and 0xFFFF
+
+        bl =
+            Bitwise.and b 0xFFFF
+    in
+        -- The Bitwise.or could probably be replaced with shiftRightZfBy but I'm not positive?
+        (al * bl) + (((ah * bl + al * bh) |> Bitwise.shiftLeftBy 16) |> Bitwise.shiftRightZfBy 0) |> Bitwise.or 0
+
