@@ -192,7 +192,7 @@ function indexes(sub, str)
 	var subLen = sub.length;
 	var i = 0;
 	var is = [];
-	while ((i = str.indexOf(sub, i)) > -1)
+	while (subLen > 0 && (i = str.indexOf(sub, i)) > -1)
 	{
 		is.push(i);
 		i = i + subLen;
