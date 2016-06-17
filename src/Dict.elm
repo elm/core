@@ -541,7 +541,7 @@ merge leftStep bothStep rightStep leftDict rightDict initialResult =
 
         (lKey, lValue) :: rest ->
           if lKey < rKey then
-            (rest, leftStep lKey lValue result)
+            stepState rKey rValue (rest, leftStep lKey lValue result)
 
           else if lKey > rKey then
             (list, rightStep rKey rValue result)
