@@ -48,6 +48,11 @@ function eqHelp(x, y, depth, stack)
 		return false
 	}
 
+	if (x instanceof Date)
+	{
+		return x.getTime() === y.getTime();
+	}
+
 	if (!('ctor' in x))
 	{
 		for (var key in x)

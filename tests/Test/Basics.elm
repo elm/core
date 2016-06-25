@@ -2,6 +2,7 @@ module Test.Basics exposing (tests)
 
 import Array
 import Basics exposing (..)
+import Date
 import Set
 import ElmTest exposing (..)
 
@@ -30,6 +31,8 @@ tests =
             , test "array equality" <| assertEqual (Array.fromList [1,1,1,1]) (Array.repeat 4 1)
             , test "set equality" <| assertEqual (Set.fromList [1,2]) (Set.fromList [2,1])
             , test "char equality" <| assertNotEqual '0' '饑'
+            , test "date equality" <| assertEqual (Date.fromString "2/7/1992") (Date.fromString "2/7/1992")
+            , test "date equality" <| assertNotEqual (Date.fromString "11/16/1995") (Date.fromString "2/7/1992")
             ]
         toStringTests = suite "toString Tests"
             [ test "toString Int" <| assertEqual "42" (toString 42)
