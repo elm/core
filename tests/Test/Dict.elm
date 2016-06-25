@@ -40,10 +40,40 @@ tests =
         [ test "filter" <| assertEqual (Dict.singleton "Tom" "cat") (Dict.filter (\k v -> k == "Tom") animals)
         , test "partition" <| assertEqual (Dict.singleton "Tom" "cat", Dict.singleton "Jerry" "mouse") (Dict.partition (\k v -> k == "Tom") animals)
         ]
+      mergeTests =
+          let
+              insertBoth key leftVal rightVal dict =
+                  Dict.insert key (leftVal ++ rightVal) dict
+              s1 =
+                  Dict.empty |> Dict.insert "u1" [ 1 ]
+              s2 =
+                  Dict.empty |> Dict.insert "u2" [ 2 ]
+              s23 =
+                  Dict.empty |> Dict.insert "u2" [ 3 ]
+              b1 =
+                  List.map (\i -> (i, [i])) [1..10] |> Dict.fromList
+              b2 =
+                  List.map (\i -> (i, [i])) [5..15] |> Dict.fromList
+              bExpected =
+                  [(1,[1]),(2,[2]),(3,[3]),(4,[4]),(5,[5,5]),(6,[6,6]),(7,[7,7]),(8,[8,8]),(9,[9,9]),(10,[10,10]),(11,[11]),(12,[12]),(13,[13]),(14,[14]),(15,[15])]
+          in
+              suite "merge Tests"
+                  [ test "merge empties" <| assertEqual (Dict.empty)
+                    (Dict.merge Dict.insert insertBoth Dict.insert Dict.empty Dict.empty Dict.empty)
+                  , test "merge singletons in order" <| assertEqual [("u1", [1]), ("u2", [2])]
+                      ((Dict.merge Dict.insert insertBoth Dict.insert s1 s2 Dict.empty) |> Dict.toList)
+                  , test "merge singletons out of order" <| assertEqual [("u1", [1]), ("u2", [2])]
+                      ((Dict.merge Dict.insert insertBoth Dict.insert s2 s1 Dict.empty) |> Dict.toList)
+                  , test "merge with duplicate key" <| assertEqual [("u2", [2, 3])]
+                      ((Dict.merge Dict.insert insertBoth Dict.insert s2 s23 Dict.empty) |> Dict.toList)
+                  , test "partially overlapping" <| assertEqual bExpected
+                      ((Dict.merge Dict.insert insertBoth Dict.insert b1 b2 Dict.empty) |> Dict.toList)
+                  ]
   in
     suite "Dict Tests"
     [ buildTests
     , queryTests
     , combineTests
     , transformTests
+    , mergeTests
     ]
