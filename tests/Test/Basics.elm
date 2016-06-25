@@ -1,6 +1,8 @@
 module Test.Basics exposing (tests)
 
+import Array
 import Basics exposing (..)
+import Set
 import ElmTest exposing (..)
 
 tests : Test
@@ -25,8 +27,9 @@ tests =
             , test "compare 'f' 'f'" <| assertEqual EQ (compare 'f' 'f')
             , test "compare (1, 2, 3, 4, 5, 6) (0, 1, 2, 3, 4, 5)" <| assertEqual GT (compare (1, 2, 3, 4, 5, 6) (0, 1, 2, 3, 4, 5))
             , test "compare ['a'] ['b']" <| assertEqual LT (compare ['a'] ['b'])
-            , test "==" <| assertEqual True (sqrt == sqrt)
-            , test "/=" <| assertEqual False (sqrt /= sqrt)
+            , test "array equality" <| assertEqual (Array.fromList [1,1,1,1]) (Array.repeat 4 1)
+            , test "set equality" <| assertEqual (Set.fromList [1,2]) (Set.fromList [2,1])
+            , test "char equality" <| assertNotEqual '0' '饑'
             ]
         toStringTests = suite "toString Tests"
             [ test "toString Int" <| assertEqual "42" (toString 42)
