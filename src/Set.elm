@@ -12,8 +12,7 @@ module Set exposing
 includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or lists
 of comparable types.
 
-Insert, remove, and query operations all take *O(log n)* time. Set equality with
-`(==)` is unreliable and should not be used.
+Insert, remove, and query operations all take *O(log n)* time.
 
 # Sets
 @docs Set

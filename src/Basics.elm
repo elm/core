@@ -276,13 +276,34 @@ e =
   Native.Basics.e
 
 
-{-|-}
+{-| Check if values are &ldquo;the same&rdquo;.
+
+**Note:** Elm uses structural equality on tuples, records, and user-defined
+union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
+This is not true in languages like JavaScript that use reference equality on
+objects.
+
+**Note:** Equality (in the Elm sense) is not possible for certain types. For
+example, the functions `(\n -> n + 1)` and `(\n -> 1 + n)` are &ldquo;the
+same&rdquo; but detecting this in general is [undecidable][]. In a future
+release, the compiler will detect when `(==)` is used with problematic
+types and provide a helpful error message. This will require quite serious
+infrastructure work that makes sense to batch with another big project, so the
+stopgap is to crash as quickly as possible. Problematic types include functions
+and JavaScript values like `Json.Encode.Value` which could contain functions
+if passed through a port.
+
+[undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
+-}
 (==) : a -> a -> Bool
 (==) =
   Native.Basics.eq
 
 
-{-|-}
+{-| Check if values are not &ldquo;the same&rdquo;.
+
+So `(a /= b)` is the same as `(not (a == b))`.
+-}
 (/=) : a -> a -> Bool
 (/=) =
   Native.Basics.neq
