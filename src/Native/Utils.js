@@ -71,6 +71,11 @@ function eqHelp(x, y, depth, stack)
 		x = _elm_lang$core$Dict$toList(x);
 		y = _elm_lang$core$Dict$toList(y);
 	}
+	if (x.ctor === 'Set_elm_builtin')
+	{
+		x = _elm_lang$core$Set$toList(x);
+		y = _elm_lang$core$Set$toList(y);
+	}
 
 	// check if lists are equal without recursion
 	if (x.ctor === '::')
