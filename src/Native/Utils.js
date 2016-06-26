@@ -404,11 +404,7 @@ function toString(v)
 			if (v.ctor === 'Set_elm_builtin')
 			{
 				name = 'Set';
-				list = A2(
-					_elm_lang$core$List$map,
-					function(x) {return x._0; },
-					_elm_lang$core$Dict$toList(v._0)
-				);
+				list = _elm_lang$core$Set$toList(v._0);
 			}
 			else
 			{
