@@ -433,6 +433,11 @@ function toString(v)
 			return '<' + v.toString() + '>';
 		}
 
+		if (v.elm_web_socket)
+		{
+			return '<websocket>';
+		}
+
 		var output = [];
 		for (var k in v)
 		{
