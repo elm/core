@@ -432,7 +432,7 @@ magicNum3 = 52774
 magicNum4 = 40692
 magicNum5 = 3791
 magicNum6 = 2147483563
-magicNum7 = 2137383399
+magicNum7 = 2147483399
 magicNum8 = 2147483562
 
 
