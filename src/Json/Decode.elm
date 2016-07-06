@@ -336,7 +336,7 @@ array decoder =
 {-| Decode null as the value given, and fail otherwise. Primarily useful for
 creating *other* decoders.
 
-    numbers : Decoder [Int]
+    numbers : Decoder (List Int)
     numbers =
         list (oneOf [ int, null 0 ])
 
