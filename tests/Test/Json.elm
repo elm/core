@@ -2,12 +2,19 @@ module Test.Json exposing (tests)
 
 import Basics exposing (..)
 import Result exposing (..)
-import Json.Decode
+import Json.Decode exposing ((:=))
 
 import ElmTest exposing (..)
 
 tests : Test
 tests =
+  suite "Json decode"
+    [ intTests
+    , customTests
+    ]
+
+intTests : Test
+intTests =
   let testInt val str =
         case Json.Decode.decodeString Json.Decode.int str of
           Ok _ -> assertEqual val True
@@ -41,3 +48,19 @@ tests =
               )
             )
         ]
+
+customTests : Test
+customTests =
+  let
+    jsonString =
+      """{ "foo": "bar" }"""
+
+    myDecoder =
+      Json.Decode.customDecoder ("foo" := Json.Decode.string) (\_ -> Err "I want to see this message!")
+
+    assertion =
+      assertEqual (Err "I want to see this message!") (Json.Decode.decodeString myDecoder jsonString)
+
+  in
+    test "custom decoders preserve error messages" assertion
+
