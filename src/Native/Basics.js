@@ -73,7 +73,7 @@ function isInfinite(n)
 
 function truncate(n)
 {
-	return Math.trunc(n);
+	return n < 0 ? Math.ceil(n) : Math.floor(n);
 }
 
 function degrees(d)
