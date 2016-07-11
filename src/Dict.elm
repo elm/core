@@ -501,14 +501,14 @@ union t1 t2 =
 {-| Keep a key-value pair when its key appears in the second dictionary.
 Preference is given to values in the first dictionary.
 -}
-intersect : Dict comparable a -> Dict comparable b -> Dict comparable a
+intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
 intersect t1 t2 =
   filter (\k _ -> member k t2) t1
 
 
 {-| Keep a key-value pair when its key does not appear in the second dictionary.
 -}
-diff : Dict comparable a -> Dict comparable b -> Dict comparable a
+diff : Dict comparable v -> Dict comparable v -> Dict comparable v
 diff t1 t2 =
   foldl (\k v t -> remove k t) t1 t2
 
