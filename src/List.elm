@@ -459,12 +459,16 @@ take n list =
     []
 
   else
-    case list of
-      [] ->
-        list
+    let
+      takeCons x (i, xs) =
+        if n < i then
+          (i - 1, xs)
 
-      x :: xs ->
-        x :: take (n - 1) xs
+        else  
+          (i - 1, x :: xs)        
+    in
+      foldr takeCons (length list, []) list
+        |> snd
 
 
 {-| Drop the first *n* members of a list.
