@@ -1,5 +1,5 @@
 module Platform exposing
-  ( Program
+  ( Program, program, programWithFlags
   , Task, ProcessId
   , Router, sendToApp, sendToSelf
   )
@@ -7,7 +7,7 @@ module Platform exposing
 {-|
 
 # Programs
-@docs Program
+@docs Program, program, programWithFlags
 
 # Platform Internals
 
@@ -28,33 +28,70 @@ curious? Public discussions of your explorations should be framed accordingly.
 import Basics exposing (Never)
 import Native.Platform
 import Native.Scheduler
+import Platform.Cmd exposing (Cmd)
+import Platform.Sub exposing (Sub)
 
 
 
 -- PROGRAMS
 
 
-{-| Every Elm project will define `main` to be some sort of `Program`. A
-`Program` value captures all the details needed to manage your application,
-including how to initialize things, how to respond to events, etc.
+{-| A `Program` describes how to manage your Elm app.
 
-The type of a `Program` includes a `flags` type variable which describes the
-data we need to start a program. So say our program needs to be given a `userID`
-and `token` to get started:
+You can create [headless][] programs with the [`program`](#program) and
+[`programWithFlags`](#programWithFlags) functions. Similar functions exist in
+[`Html.App`][app] that let you specify a view.
 
-    MyApp.main : Program { userID : String, token : Int }
+[headless]: https://en.wikipedia.org/wiki/Headless_software
+[app]: http://package.elm-lang.org/packages/elm-lang/html/latest/Html-App
 
-So when we initialize this program in JavaScript, we can give the necessary flags
-really easily!
-
-```javascript
-Elm.MyApp.fullscreen({
-    userID: "Tom",
-    token: 42
-});
-```
+Honestly, it is totally normal if this seems crazy at first. The best way to
+understand is to work through [guide.elm-lang.org](http://guide.elm-lang.org/).
+It makes way more sense in context!
 -}
 type Program flags = Program
+
+
+{-| Create a [headless][] program. This is great if you want to use Elm as the
+&ldquo;brain&rdquo; for something else. You can still communicate with JS via
+ports and manage your model, you just do not have to specify a `view`.
+
+[headless]: https://en.wikipedia.org/wiki/Headless_software
+
+Initializing a headless program from JavaScript looks like this:
+
+```javascript
+var app = Elm.MyThing.worker();
+```
+-}
+program
+  : { init : (model, Cmd msg)
+    , update : msg -> model -> (model, Cmd msg)
+    , subscriptions : model -> Sub msg
+    }
+  -> Program Never
+program =
+  Native.Platform.program
+
+
+{-| Same as [`program`](#program), but you can provide flags. Initializing a
+headless program (with flags) from JavaScript looks like this:
+
+```javascript
+var app = Elm.MyThing.worker({ user: 'Tom', token: 1234 });
+```
+
+Whatever argument you provide to `worker` will get converted to an Elm value,
+allowing you to configure your Elm program however you want from JavaScript!
+-}
+programWithFlags
+  : { init : flags -> (model, Cmd msg)
+    , update : msg -> model -> (model, Cmd msg)
+    , subscriptions : model -> Sub msg
+    }
+  -> Program flags
+programWithFlags =
+  Native.Platform.programWithFlags
 
 
 
