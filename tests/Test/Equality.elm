@@ -19,8 +19,10 @@ tests =
         ]
       recordTests = suite "Record equality"
         [ test "empty same" <| assert ({} == {})
-        , test "ctor same" <| assert ({ctor = Just 3} == {ctor = Just 3})
-        , test "ctor diff" <| assert ({ctor = Just 3} /= {ctor = Nothing})
+        , test "ctor same" <| assert ({field = Just 3} == {field = Just 3})
+        , test "ctor same, special case" <| assert ({ctor = Just 3} == {ctor = Just 3})
+        , test "ctor diff" <| assert ({field = Just 3} /= {field = Nothing})
+        , test "ctor diff, special case" <| assert ({ctor = Just 3} /= {ctor = Nothing})
         ]
   in
       suite "Equality Tests" [diffTests, recordTests]
