@@ -113,7 +113,7 @@ function eqHelp(x, y, depth, stack)
 		return true;
 	}
 
-	if (x.ctor !== y.ctor)
+	if (!eqHelp(x.ctor, y.ctor, depth + 1, stack))
 	{
 		return false;
 	}
