@@ -17,7 +17,7 @@ function program(impl)
 				{
 					throw new Error(
 						'The `' + moduleName + '` module does not need flags.\n'
-						'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
+						+ 'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
 					);
 				}
 
