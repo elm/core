@@ -274,7 +274,7 @@ function badToString(problem)
 					+ ':\n\n' + problems.join('\n');
 
 			case 'custom':
-				return 'A `customDecode` failed'
+				return 'A `customDecoder` failed'
 					+ (context === '_' ? '' : ' at ' + context)
 					+ ' with the message: ' + problem.msg;
 
