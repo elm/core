@@ -4,7 +4,6 @@ import Basics exposing (..)
 import Result exposing (..)
 import Json.Decode exposing ((:=))
 import String
-import Debug
 
 import ElmTest exposing (..)
 
@@ -62,16 +61,19 @@ customTests =
     myDecoder =
       Json.Decode.customDecoder ("foo" := Json.Decode.string) (\_ -> Err customErrorMessage)
 
-    resultErrorMessage =
+    assertion  =
       case Json.Decode.decodeString myDecoder jsonString of
         Ok _ ->
-          Debug.crash "Issue in Json/customTests: expected `customDecoder` to produce a value of type Err, but got Ok"
+          fail "expected `customDecoder` to produce a value of type Err, but got Ok"
 
         Err message ->
-          message
+          case (String.contains customErrorMessage message) of
+            True ->
+              pass
 
-    assertion =
-      assert (String.contains customErrorMessage resultErrorMessage)
+            False ->
+              fail ("expected `customDecoder` to preserve user's error message '" ++ customErrorMessage ++ "'; instead got '" ++ message ++ "'")
+
 
   in
     test "custom decoders preserve error messages" assertion
