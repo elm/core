@@ -3,6 +3,8 @@ module Test.Json exposing (tests)
 import Basics exposing (..)
 import Result exposing (..)
 import Json.Decode exposing ((:=))
+import String
+import Debug
 
 import ElmTest exposing (..)
 
@@ -60,10 +62,16 @@ customTests =
     myDecoder =
       Json.Decode.customDecoder ("foo" := Json.Decode.string) (\_ -> Err customErrorMessage)
 
-    expectedErrorMessage = "A `customDecoder` failed with the message: " ++ customErrorMessage
+    resultErrorMessage =
+      case Json.Decode.decodeString myDecoder jsonString of
+        Ok _ ->
+          Debug.crash "Issue in Json/customTests: expected `customDecoder` to produce a value of type Err, but got Ok"
+
+        Err message ->
+          message
 
     assertion =
-      assertEqual (Err expectedErrorMessage) (Json.Decode.decodeString myDecoder jsonString)
+      assert (String.contains customErrorMessage resultErrorMessage)
 
   in
     test "custom decoders preserve error messages" assertion
