@@ -17,6 +17,8 @@ tests =
         , test "endsWith" (assert <| String.endsWith "ship" "spaceship")
         , test "reverse" <| assertEqual "desserts" (String.reverse "stressed")
         , test "repeat" <| assertEqual "hahaha" (String.repeat 3 "ha")
+        , test "indexes" <| assertEqual [ 0, 2 ] (String.indexes "a" "aha")
+        , test "empty indexes" <| assertEqual [] (String.indexes "" "aha")
         ]
 
       combiningTests = suite "Combining Strings"
