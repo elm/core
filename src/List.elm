@@ -455,14 +455,11 @@ intersperse sep xs =
 -}
 take : Int -> List a -> List a
 take n list =
-  if n < 5000 then
-    takeFast n list
-  else
-    takeTailRec n list
+  takeFast 0 n list
 
-        
-takeFast : Int -> List a -> List a
-takeFast n list =
+      
+takeFast : Int -> Int -> List a -> List a
+takeFast ctr n list =
   if n <= 0 then
     []
   else
@@ -480,11 +477,13 @@ takeFast n list =
         [ x, y, z ]
 
       ( _, x :: y :: z :: w :: tl ) ->
-        x :: y :: z :: w :: (takeFast (n - 4) tl)
+        if ctr > 1000 then
+          x :: y :: z :: w :: takeTailRec (n - 4) tl
+        else
+          x :: y :: z :: w :: takeFast (ctr + 1) (n - 4) tl
 
       _ ->
         list
-
 
 takeTailRec : Int -> List a -> List a
 takeTailRec n list =
