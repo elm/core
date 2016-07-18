@@ -455,16 +455,53 @@ intersperse sep xs =
 -}
 take : Int -> List a -> List a
 take n list =
+  if n < 5000 then
+    takeFast n list
+  else
+    takeTailRec n list
+
+        
+takeFast : Int -> List a -> List a
+takeFast n list =
   if n <= 0 then
     []
+  else
+    case ( n, list ) of
+      ( _, [] ) ->
+        list
 
+      ( 1, x :: _ ) ->
+        [ x ]
+
+      ( 2, x :: y :: _ ) ->
+        [ x, y ]
+
+      ( 3, x :: y :: z :: _ ) ->
+        [ x, y, z ]
+
+      ( _, x :: y :: z :: w :: tl ) ->
+        x :: y :: z :: w :: (takeFast (n - 4) tl)
+
+      _ ->
+        list
+
+
+takeTailRec : Int -> List a -> List a
+takeTailRec n list =
+  reverse (takeReverse n list [])
+
+      
+takeReverse : Int -> List a -> List a -> List a
+takeReverse n list taken =
+  if n <= 0 then
+    taken
   else
     case list of
       [] ->
-        list
+        taken
 
       x :: xs ->
-        x :: take (n - 1) xs
+        takeReverse (n - 1) xs (x :: taken)
 
 
 {-| Drop the first *n* members of a list.
