@@ -193,14 +193,16 @@ function indexes(sub, str)
 	var i = 0;
 	var is = [];
 	
-	if (subLen > 0)
+	if (subLen < 1)
 	{
-		while ((i = str.indexOf(sub, i)) > -1)
-		{
-			is.push(i);
-			i = i + subLen;
-		}	
+		return _elm_lang$core$Native_List.Nil;
 	}
+
+	while ((i = str.indexOf(sub, i)) > -1)
+	{
+		is.push(i);
+		i = i + subLen;
+	}	
 	
 	return _elm_lang$core$Native_List.fromArray(is);
 }
