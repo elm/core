@@ -4,6 +4,7 @@ import Array
 import Basics exposing (..)
 import Date
 import Set
+import Dict
 import ElmTest exposing (..)
 
 tests : Test
@@ -30,6 +31,7 @@ tests =
             , test "compare ['a'] ['b']" <| assertEqual LT (compare ['a'] ['b'])
             , test "array equality" <| assertEqual (Array.fromList [1,1,1,1]) (Array.repeat 4 1)
             , test "set equality" <| assertEqual (Set.fromList [1,2]) (Set.fromList [2,1])
+            , test "dict equality" <| assertEqual (Dict.fromList [(1,1),(2,2)]) (Dict.fromList [(2,2),(1,1)])
             , test "char equality" <| assertNotEqual '0' '饑'
             , test "date equality" <| assertEqual (Date.fromString "2/7/1992") (Date.fromString "2/7/1992")
             , test "date equality" <| assertNotEqual (Date.fromString "11/16/1995") (Date.fromString "2/7/1992")
