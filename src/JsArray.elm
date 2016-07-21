@@ -35,6 +35,7 @@ implementation, the number of functions in this module is rather sparse.
 -}
 
 import Native.JsArray
+import Maybe exposing (Maybe)
 
 
 {-| A native Javascript Array. Can contain any kind of element.
