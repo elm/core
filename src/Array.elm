@@ -206,6 +206,9 @@ push a arr =
         }
 
 
+{-| Takes a fully populated (size == 32) array of nodes and place it at the
+correct position in the tree.
+-}
 tailPush : Int -> Int -> Tree a -> Tree a -> Tree a
 tailPush shift idx tail tree =
     let
@@ -222,6 +225,7 @@ tailPush shift idx tail tree =
                         in
                             JsArray.set pos (SubTree newSub) tree
 
+                    -- We have reached the bottom of the tree, new level required.
                     Value _ ->
                         JsArray.singleton (SubTree tree)
                             |> tailPush shift idx tail
@@ -283,6 +287,10 @@ get idx arr =
         getRecursive arr.startShift idx arr.tree
 
 
+{-| Search tree for value at given position.
+Will crash if the value does not exist, so make sure the index is in bounds,
+and that the index is not found in the tail.
+-}
 getRecursive : Int -> Int -> Tree a -> Maybe a
 getRecursive shift idx tree =
     let
@@ -325,6 +333,10 @@ set idx val arr =
         }
 
 
+{-| Replace an existing value in the tree.
+Will crash if the value does not exist, so make sure the index is in bounds,
+and that the index is not found in the tail.
+-}
 setRecursive : Int -> Int -> a -> Tree a -> Tree a
 setRecursive shift idx val tree =
     let
@@ -471,6 +483,10 @@ slice from to arr =
                 snd <| foldl foldl' ( 0, empty ) arr
 
 
+{-| Translate a relative index to an actual index.
+
+    translateIndex -1 array == Array.length array - 1
+-}
 translateIndex : Int -> Array a -> Int
 translateIndex idx arr =
     let
