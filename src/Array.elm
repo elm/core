@@ -49,6 +49,7 @@ import Bitwise
 import Debug
 import Maybe exposing (Maybe(Just, Nothing))
 import List exposing ((::))
+import Native.Array
 
 
 {-| Representation of fast immutable arrays. You can create arrays of integers
