@@ -21,17 +21,21 @@ function length(arr) {
 }
 
 function get(idx, arr) {
-    var val = arr._0[idx];
-    if (val) {
-        return _elm_lang$core$Maybe$Just(val);
+    if (idx < 0 || idx >= length(arr)) {
+        return _elm_lang$core$Maybe$Nothing;
     }
 
-    return _elm_lang$core$Maybe$Nothing;
+    return _elm_lang$core$Maybe$Just(arr._0[idx]);
 }
 
 function set(idx, val, arr) {
+    if (idx < 0 || idx >= length(arr)) {
+        return arr;
+    }
+
     var copy = arr._0.slice();
     copy[idx] = val;
+
     return {
         ctor: 'JsArray',
         _0: copy
@@ -49,10 +53,9 @@ function push(val, arr) {
 
 function foldl(f, init, arr) {
     var a = init,
-        len = length(arr),
-        i;
+        len = length(arr);
 
-    for (i = 0; i < len; i++) {
+    for (var i = 0; i < len; i++) {
         a = A2(f, arr._0[i], a);
     }
 
@@ -60,10 +63,9 @@ function foldl(f, init, arr) {
 }
 
 function foldr(f, init, arr) {
-    var a = init,
-        i;
+    var a = init;
 
-    for (i = length(arr) - 1; i >= 0; i--) {
+    for (var i = length(arr) - 1; i >= 0; i--) {
         a = A2(f, arr._0[i], a);
     }
 
