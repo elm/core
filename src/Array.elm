@@ -195,7 +195,7 @@ push a arr =
         , startShift = newShift
         , tree =
             if newShift > arr.startShift then
-                JsArray.push (SubTree newTree) JsArray.empty
+                JsArray.singleton (SubTree newTree)
             else
                 newTree
         , tail =
@@ -223,7 +223,7 @@ tailPush shift idx tail tree =
                             JsArray.set pos (SubTree newSub) tree
 
                     Value _ ->
-                        JsArray.push (SubTree tree) JsArray.empty
+                        JsArray.singleton (SubTree tree)
                             |> tailPush shift idx tail
 
             Nothing ->
