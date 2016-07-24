@@ -482,7 +482,7 @@ translateIndex idx arr =
     in
         if posIndex < 0 then
             0
-        else if posIndex >= arr.length then
+        else if posIndex > arr.length then
             arr.length - 1
         else
             posIndex
