@@ -94,25 +94,6 @@ function eqHelp(x, y, depth, stack)
 		return a.ctor === b.ctor;
 	}
 
-	// check if Arrays are equal
-	if (x.ctor === '_Array')
-	{
-		var xs = _elm_lang$core$Native_Array.toJSArray(x);
-		var ys = _elm_lang$core$Native_Array.toJSArray(y);
-		if (xs.length !== ys.length)
-		{
-			return false;
-		}
-		for (var i = 0; i < xs.length; i++)
-		{
-			if (!eqHelp(xs[i], ys[i], depth + 1, stack))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
 	if (!eqHelp(x.ctor, y.ctor, depth + 1, stack))
 	{
 		return false;
