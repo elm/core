@@ -49,7 +49,7 @@ Honestly, it is totally normal if this seems crazy at first. The best way to
 understand is to work through [guide.elm-lang.org](http://guide.elm-lang.org/).
 It makes way more sense in context!
 -}
-type Program flags = Program
+type Program flags model msg = Program
 
 
 {-| Create a [headless][] program. This is great if you want to use Elm as the
@@ -69,7 +69,7 @@ program
     , update : msg -> model -> (model, Cmd msg)
     , subscriptions : model -> Sub msg
     }
-  -> Program Never
+  -> Program Never model msg
 program =
   Native.Platform.program
 
@@ -89,7 +89,7 @@ programWithFlags
     , update : msg -> model -> (model, Cmd msg)
     , subscriptions : model -> Sub msg
     }
-  -> Program flags
+  -> Program flags model msg
 programWithFlags =
   Native.Platform.programWithFlags
 
