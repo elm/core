@@ -25,7 +25,6 @@ function program(impl)
 					impl.init,
 					impl.update,
 					impl.subscriptions,
-					function view(model) {},
 					renderer
 				);
 			};
@@ -64,7 +63,6 @@ function programWithFlags(impl)
 					impl.init(result._0),
 					impl.update,
 					impl.subscriptions,
-					function view(model) {},
 					renderer
 				);
 			};
@@ -99,7 +97,7 @@ function htmlToProgram(vnode)
 
 // INITIALIZE A PROGRAM
 
-function initialize(init, update, subscriptions, view, renderer)
+function initialize(init, update, subscriptions, renderer)
 {
 	// ambient state
 	var managers = {};
@@ -108,7 +106,7 @@ function initialize(init, update, subscriptions, view, renderer)
 	// init and update state in main process
 	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
 		var model = init._0;
-		updateView = renderer(enqueue, view(model));
+		updateView = renderer(enqueue, model);
 		var cmds = init._1;
 		var subs = subscriptions(model);
 		dispatchEffects(managers, cmds, subs);
@@ -120,7 +118,7 @@ function initialize(init, update, subscriptions, view, renderer)
 		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
 			var results = A2(update, msg, model);
 			model = results._0;
-			updateView(view(model));
+			updateView(model);
 			var cmds = results._1;
 			var subs = subscriptions(model);
 			dispatchEffects(managers, cmds, subs);
