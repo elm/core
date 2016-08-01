@@ -62,35 +62,31 @@ none =
 
 {-| This function is a shorthand for returning a `(model, Cmd msg)` value. It's a combination of `(,)` and `Cmd.batch`. See how this can make the following `update` function more readable, both for `Cmd.batch`ing commands, and for the common case of returning `(model, Cmd.none)`:
 
-```
-update msg model =
-    case msg of
-        DoThings ->
-            ( model, Cmd.batch [ someCmd, someOtherCmd ] )
+    update msg model =
+        case msg of
+            DoThings ->
+                ( model, Cmd.batch [ someCmd, someOtherCmd ] )
 
-        NewValues a b ->
-            ( { model
-                | a = a
-                , b = b
-              }
-            , Cmd.none
-            )
-```
+            NewValues a b ->
+                ( { model
+                    | a = a
+                    , b = b
+                  }
+                , Cmd.none
+                )
 
-becomes
+becomes:
 
-```
-update msg model =
-    case msg of
-        DoThings ->
-            model ! [ someCmd, someOtherCmd ]
+    update msg model =
+        case msg of
+            DoThings ->
+                model ! [ someCmd, someOtherCmd ]
 
-        NewValues a b ->
-            { model
-                | a = a
-                , b = b
-            } ! []
-```
+            NewValues a b ->
+                { model
+                    | a = a
+                    , b = b
+                } ! []
 -}
 (!) : model -> List (Cmd msg) -> (model, Cmd msg)
 (!) model commands =
