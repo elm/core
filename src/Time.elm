@@ -65,6 +65,15 @@ subscriptions work.
 on `requestAnimationFrame` to get smooth animations. This is based on
 `setInterval` which is better for recurring tasks like “check on something
 every 30 seconds”.
+
+**Also note:** due to browsers restrictions on minimal timeout delays your
+updates may get clamped. In an active window (i.e. when browser tab is
+visible) updates will usually be clamped to 4ms. That means if you set one
+subscription to 1ms and another to 4ms, they will produce messages equally
+often on average. In an inactive window the minimum delay is usually 1000ms!
+[More on that on timeouts clamping MDN][clamping]
+
+[clamping]: https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout#Reasons_for_delays_longer_than_specified
 -}
 every : Time -> (Time -> msg) -> Sub msg
 every interval tagger =
