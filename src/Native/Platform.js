@@ -518,6 +518,8 @@ var incomingPortMap = F2(function subMap(tagger, finalTagger)
 
 function setupIncomingPort(name, callback)
 {
+	var onEffectsCalled = false;
+	var enqueuedBeforeSetup = [];
 	var subs = _elm_lang$core$Native_List.Nil;
 	var converter = effectManagers[name].converter;
 
@@ -528,6 +530,11 @@ function setupIncomingPort(name, callback)
 	function onEffects(router, subList, state)
 	{
 		subs = subList;
+		if (!onEffectsCalled) {
+			onEffectsCalled = true;
+			enqueuedBeforeSetup.forEach(actuallySend);
+			enqueuedBeforeSetup = null;
+		}
 		return init;
 	}
 
@@ -538,7 +545,16 @@ function setupIncomingPort(name, callback)
 
 	function send(value)
 	{
-		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, value);
+		if (!onEffectsCalled) {
+			enqueuedBeforeSetup.push(value)
+		} else {
+			actuallySend(value);
+		}
+	}
+
+	function actuallySend(incomingValue)
+	{
+		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
 		if (result.ctor === 'Err')
 		{
 			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
