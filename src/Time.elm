@@ -71,7 +71,7 @@ updates may get clamped. In an active window (i.e. when browser tab is
 visible) updates will usually be clamped to 4ms. That means if you set one
 subscription to 1ms and another to 4ms, they will produce messages equally
 often on average. In an inactive window the minimum delay is usually 1000ms!
-[More on that on timeouts clamping MDN][clamping]
+[More on timeouts clamping MDN][clamping]
 
 [clamping]: https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout#Reasons_for_delays_longer_than_specified
 -}
