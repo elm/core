@@ -561,7 +561,7 @@ function setupIncomingPort(name, callback)
 
 	function preInitSend(value)
 	{
-		sentBeforeInit.push(value)
+		sentBeforeInit.push(value);
 	}
 
 	function postInitSend(incomingValue)
