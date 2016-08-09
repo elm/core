@@ -532,7 +532,7 @@ function setupIncomingPort(name, callback)
 		subs = subList;
 		if (!onEffectsCalled) {
 			onEffectsCalled = true;
-			enqueuedBeforeSetup.forEach(actuallySend);
+			enqueuedBeforeSetup.forEach(internalSend);
 			enqueuedBeforeSetup = null;
 		}
 		return init;
@@ -548,11 +548,11 @@ function setupIncomingPort(name, callback)
 		if (!onEffectsCalled) {
 			enqueuedBeforeSetup.push(value)
 		} else {
-			actuallySend(value);
+			internalSend(value);
 		}
 	}
 
-	function actuallySend(incomingValue)
+	function internalSend(incomingValue)
 	{
 		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
 		if (result.ctor === 'Err')
