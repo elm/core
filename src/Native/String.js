@@ -151,7 +151,6 @@ function toLower(str)
 	return str.toLowerCase();
 }
 
-var missingEncodableCharacters = /[!'()*]/g;
 function uriEncode(string)
 {
   return encodeURIComponent(string);
