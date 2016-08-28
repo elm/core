@@ -19,6 +19,8 @@ tests =
         , test "repeat" <| assertEqual "hahaha" (String.repeat 3 "ha")
         , test "indexes" <| assertEqual [ 0, 2 ] (String.indexes "a" "aha")
         , test "empty indexes" <| assertEqual [] (String.indexes "" "aha")
+        , test "uriEncode" <| assertEqual "hello%20world" (String.uriEncode "hello world")
+        , test "uriDecode" <| assertEqual "hello world" (String.uriDecode "hello%20world")
         ]
 
       combiningTests = suite "Combining Strings"
