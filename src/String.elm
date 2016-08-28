@@ -4,7 +4,7 @@ module String exposing
   , slice, left, right, dropLeft, dropRight
   , contains, startsWith, endsWith, indexes, indices
   , toInt, toFloat, toList, fromList
-  , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
+  , toUpper, toLower, uriEncode, uriDecode, pad, padLeft, padRight, trim, trimLeft, trimRight
   , map, filter, foldl, foldr, any, all
   )
 
@@ -335,6 +335,24 @@ toLower =
   Native.String.toLower
 
 
+{-| Escape a string as a segment of a URL
+
+    uriEncode "hello, world" == "hello%2C%20world"
+-}
+uriEncode : String -> String
+uriEncode =
+  Native.String.uriEncode
+
+
+{-| Unescape a string from a segment of a URL to an ordinary string
+
+    uriDecode "hello%2C%20world" == "hello, world"
+-}
+uriDecode : String -> String
+uriDecode =
+  Native.String.uriDecode
+
+
 {-| Determine whether *any* characters satisfy a predicate.
 
     any isDigit "90210" == True
@@ -461,4 +479,3 @@ something.
 fromList : List Char -> String
 fromList =
   Native.String.fromList
-

@@ -151,6 +151,20 @@ function toLower(str)
 	return str.toLowerCase();
 }
 
+var missingEncodableCharacters = /[!'()*]/g;
+function uriEncode(string)
+{
+  return encodeURIComponent(string)
+		.replace(missingEncodableCharacters, function(c)
+		{
+	    return '%' + c.charCodeAt(0).toString(16);
+	  });
+}
+function uriDecode(string)
+{
+	return decodeURIComponent(string);
+}
+
 function any(pred, str)
 {
 	for (var i = str.length; i--; )
@@ -190,7 +204,7 @@ function endsWith(sub, str)
 function indexes(sub, str)
 {
 	var subLen = sub.length;
-	
+
 	if (subLen < 1)
 	{
 		return _elm_lang$core$Native_List.Nil;
@@ -203,8 +217,8 @@ function indexes(sub, str)
 	{
 		is.push(i);
 		i = i + subLen;
-	}	
-	
+	}
+
 	return _elm_lang$core$Native_List.fromArray(is);
 }
 
@@ -317,6 +331,9 @@ return {
 
 	toUpper: toUpper,
 	toLower: toLower,
+
+	uriEncode: uriEncode,
+	uriDecode: uriDecode,
 
 	any: F2(any),
 	all: F2(all),
