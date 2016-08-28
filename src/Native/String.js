@@ -154,11 +154,7 @@ function toLower(str)
 var missingEncodableCharacters = /[!'()*]/g;
 function uriEncode(string)
 {
-  return encodeURIComponent(string)
-		.replace(missingEncodableCharacters, function(c)
-		{
-	    return '%' + c.charCodeAt(0).toString(16);
-	  });
+  return encodeURIComponent(string);
 }
 function uriDecode(string)
 {
