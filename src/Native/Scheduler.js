@@ -131,6 +131,8 @@ function step(numSteps, process)
 {
 	while (numSteps < MAX_STEPS)
 	{
+    if (process.root === null) break;
+
 		var ctor = process.root.ctor;
 
 		if (ctor === '_Task_succeed')
