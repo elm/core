@@ -128,7 +128,48 @@ member x xs =
 -}
 map : (a -> b) -> List a -> List b
 map f xs =
-  foldr (\x acc -> f x :: acc) [] xs
+  mapHelp f xs 0
+
+
+mapHelp : (a -> b) -> List a -> Int -> List b
+mapHelp f xs ctr =
+  case xs of
+    [] ->
+      []
+
+    [ s ] ->
+      [ f s ]
+
+    [ s, t ] ->
+      [ f s, f t ]
+
+    [ s, t, u ] ->
+      [ f s, f t, f u ]
+
+    [ s, t, u, v ] ->
+      [ f s, f t, f u, f v ]
+
+    [ s, t, u, v, w ] ->
+      [ f s, f t, f u, f v, f w ]
+
+    [ s, t, u, v, w, x ] ->
+      [ f s, f t, f u, f v, f w, f x ]
+
+    [ s, t, u, v, w, x, y ] ->
+      [ f s, f t, f u, f v, f w, f x, f y ]
+
+    s :: t :: u :: v :: w :: x :: y :: z :: tl ->
+      f s :: f t :: f u :: f v :: f w :: f x :: f y :: f z
+        :: (if ctr < 500 then
+            mapHelp f tl (ctr + 1)
+          else
+            mapTailRec f tl
+           )
+
+
+mapTailRec : (a -> b) -> List a -> List b
+mapTailRec f xs =
+  reverse (foldl (\hd acc -> f hd :: acc) [] xs)
 
 
 {-| Same as `map` but the function is also applied to the index of each
