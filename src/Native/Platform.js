@@ -21,6 +21,13 @@ function addPublicModule(object, name, main)
 
 	object['fullscreen'] = function fullscreen(flags)
 	{
+		// document.body needs to be defined here. Throw if it's not.
+		if (document.body === null || document.body === undefined) {
+			throw new Error('Elm is being initialized above the body tag, ' +
+			'document.body is: ' + document.body + '\n Elm needs to be initialized' +
+			' inside the <body> tag. Please move this script tag: ' +
+			'<script src="elm.js> back into the <body> tag of your index.html file');
+		}
 		return init(document.body, flags, true);
 	};
 }
