@@ -21,7 +21,7 @@ function addPublicModule(object, name, main)
 
 	object['fullscreen'] = function fullscreen(flags)
 	{
-		return init(document.body, flags, true);
+		return init(document.documentElement, flags, true);
 	};
 }
 
