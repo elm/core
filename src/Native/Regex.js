@@ -14,6 +14,13 @@ function regex(raw)
 {
 	return new RegExp(raw, 'g');
 }
+function safeRegex(raw)
+{	try {
+		return _elm_lang$core$Maybe$Just(new RegExp(raw, 'g'));
+	} catch (e) {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
 
 function contains(re, string)
 {
@@ -105,6 +112,7 @@ function split(n, re, str)
 
 return {
 	regex: regex,
+	safeRegex: safeRegex,
 	caseInsensitive: caseInsensitive,
 	escape: escape,
 

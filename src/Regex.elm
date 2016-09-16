@@ -3,6 +3,7 @@ module Regex exposing
   , regex, escape, caseInsensitive
   , HowMany(..), Match
   , contains, find, replace, split
+  , safeRegex
   )
 
 {-| A library for working with regular expressions. It uses [the
@@ -51,6 +52,15 @@ regex : String -> Regex
 regex =
   Native.Regex.regex
 
+
+{-| Create a Regex that matches patterns (see regex)
+
+Returns Nothing if the regex string is invalid.
+
+-}
+safeRegex : String -> Maybe Regex
+safeRegex =
+  Native.Regex.safeRegex
 
 
 {-| Make a regex case insensitive -}
