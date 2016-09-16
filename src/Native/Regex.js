@@ -15,9 +15,13 @@ function regex(raw)
 	return new RegExp(raw, 'g');
 }
 function safeRegex(raw)
-{	try {
+{	
+	try 
+	{
 		return _elm_lang$core$Maybe$Just(new RegExp(raw, 'g'));
-	} catch (e) {
+	} 
+	catch (e) 
+	{
 		return _elm_lang$core$Maybe$Nothing;
 	}
 }
