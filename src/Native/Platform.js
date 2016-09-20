@@ -458,10 +458,12 @@ function setupOutgoingPort(name)
 	{
 		while (cmdList.ctor !== '[]')
 		{
+			// grab a separate reference to subs in case unsubscribe is called
+			var currentSubs = subs;
 			var value = converter(cmdList._0);
-			for (var i = 0; i < subs.length; i++)
+			for (var i = 0; i < currentSubs.length; i++)
 			{
-				subs[i](value);
+				currentSubs[i](value);
 			}
 			cmdList = cmdList._1;
 		}
@@ -480,6 +482,9 @@ function setupOutgoingPort(name)
 
 	function unsubscribe(callback)
 	{
+		// copy subs into a new array in case unsubscribe is called within a
+		// subscribed callback
+		subs = subs.slice();
 		var index = subs.indexOf(callback);
 		if (index >= 0)
 		{
