@@ -60,7 +60,9 @@ none =
   batch []
 
 
-{-|-}
+{-| Instead of writing `(model, Cmd.none)` a bunch of times in your update 
+function, `!` is a useful shorthand. `model ! [] == (model, Cmd.none)` 
+-}
 (!) : model -> List (Cmd msg) -> (model, Cmd msg)
 (!) model commands =
   (model, batch commands)
