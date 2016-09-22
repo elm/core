@@ -1,7 +1,7 @@
 module List exposing
   ( isEmpty, length, reverse, member
   , head, tail, filter, take, drop
-  , repeat, (::), append, concat, intersperse
+  , repeat, range, (::), append, concat, intersperse
   , partition, unzip
   , map, map2, map3, map4, map5
   , filterMap, concatMap, indexedMap
@@ -20,7 +20,7 @@ list must have the same type.
 @docs head, tail, filter, take, drop
 
 # Putting Lists Together
-@docs repeat, (::), append, concat, intersperse
+@docs repeat, range, (::), append, concat, intersperse
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -138,7 +138,7 @@ element (starting at zero).
 -}
 indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
-  map2 f [ 0 .. length xs - 1 ] xs
+  map2 f (range 0 (length xs - 1)) xs
 
 
 {-| Reduce a list from the left.
@@ -457,7 +457,7 @@ take : Int -> List a -> List a
 take n list =
   takeFast 0 n list
 
-      
+
 takeFast : Int -> Int -> List a -> List a
 takeFast ctr n list =
   if n <= 0 then
@@ -489,7 +489,7 @@ takeTailRec : Int -> List a -> List a
 takeTailRec n list =
   reverse (takeReverse n list [])
 
-      
+
 takeReverse : Int -> List a -> List a -> List a
 takeReverse n list taken =
   if n <= 0 then
@@ -537,6 +537,27 @@ repeatHelp result n value =
 
   else
     repeatHelp (value :: result) (n-1) value
+
+
+{-| Create a list of numbers, every element increasing by one.
+You give the lowest and highest number that should be in the list.
+
+    range 3 6 == [3, 4, 5, 6]
+    range 3 3 == [3]
+    range 6 3 == []
+-}
+range : Int -> Int -> List Int
+range lo hi =
+  rangeHelp lo hi []
+
+
+rangeHelp : Int -> Int -> List Int -> List Int
+rangeHelp lo hi list =
+  if lo <= hi then
+    rangeHelp lo (hi - 1) (hi :: list)
+
+  else
+    list
 
 
 {-| Sort values from lowest to highest
