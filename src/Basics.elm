@@ -130,7 +130,6 @@ infixr 8 ^
 
 infixl 7 //
 infixl 7 %
-infixl 7 `rem`
 
 
 {-| Integer division. The remainder is discarded. -}
@@ -141,8 +140,10 @@ infixl 7 `rem`
 
 {-| Find the remainder after dividing one number by another.
 
-     7 `rem` 2 == 1
-    -1 `rem` 4 == -1
+    rem 11 4 == 3
+    rem 12 4 == 0
+    rem 13 4 == 1
+    rem -1 4 == -1
 -}
 rem : Int -> Int -> Int
 rem =

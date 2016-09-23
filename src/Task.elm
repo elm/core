@@ -30,7 +30,7 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 
 -}
 
-import Basics exposing (Never)
+import Basics exposing (Never, (<|))
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
@@ -84,8 +84,7 @@ fail =
 -}
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
-  taskA
-    `andThen` \a -> succeed (func a)
+  andThen taskA <| \a -> succeed (func a)
 
 
 {-| Put the results of two tasks together. If either task fails, the whole
@@ -96,39 +95,39 @@ finished before the second task starts.
 -}
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
-  taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> succeed (func a b)
+  andThen taskA <| \a ->
+  andThen taskB <| \b ->
+    succeed (func a b)
 
 
 {-|-}
 map3 : (a -> b -> c -> result) -> Task x a -> Task x b -> Task x c -> Task x result
 map3 func taskA taskB taskC =
-  taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> taskC
-    `andThen` \c -> succeed (func a b c)
+  andThen taskA <| \a ->
+  andThen taskB <| \b ->
+  andThen taskC <| \c ->
+    succeed (func a b c)
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x result
 map4 func taskA taskB taskC taskD =
-  taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> taskC
-    `andThen` \c -> taskD
-    `andThen` \d -> succeed (func a b c d)
+  andThen taskA <| \a ->
+  andThen taskB <| \b ->
+  andThen taskC <| \c ->
+  andThen taskD <| \d ->
+    succeed (func a b c d)
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x e -> Task x result
 map5 func taskA taskB taskC taskD taskE =
-  taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> taskC
-    `andThen` \c -> taskD
-    `andThen` \d -> taskE
-    `andThen` \e -> succeed (func a b c d e)
+  andThen taskA <| \a ->
+  andThen taskB <| \b ->
+  andThen taskC <| \c ->
+  andThen taskD <| \d ->
+  andThen taskE <| \e ->
+    succeed (func a b c d e)
 
 
 {-| Put the results of two tasks together. If either task fails, the whole
@@ -142,9 +141,9 @@ all into a single function.
 -}
 andMap : Task x (a -> b) -> Task x a -> Task x b
 andMap taskFunc taskValue =
-  taskFunc
-    `andThen` \func -> taskValue
-    `andThen` \value -> succeed (func value)
+  andThen taskFunc <| \func ->
+  andThen taskValue <| \value ->
+    succeed (func value)
 
 
 {-| Start with a list of tasks, and turn them into a single task that returns a
@@ -207,7 +206,7 @@ types to match up.
 -}
 mapError : (x -> y) -> Task x a -> Task y a
 mapError f task =
-  task `onError` \err -> fail (f err)
+  onError task <| \err -> fail (f err)
 
 
 {-| Translate a task that can fail into a task that can never fail, by
@@ -220,7 +219,7 @@ This means you can handle the error with the `Maybe` module instead.
 -}
 toMaybe : Task x a -> Task never (Maybe a)
 toMaybe task =
-  map Just task `onError` (\_ -> succeed Nothing)
+  onError (map Just task) <| \_ -> succeed Nothing
 
 
 {-| If you are chaining together a bunch of tasks, it may be useful to treat
@@ -249,7 +248,7 @@ This means you can handle the error with the `Result` module instead.
 -}
 toResult : Task x a -> Task never (Result x a)
 toResult task =
-  map Ok task `onError` (\msg -> succeed (Err msg))
+  onError (map Ok task) (\msg -> succeed (Err msg))
 
 
 {-| If you are chaining together a bunch of tasks, it may be useful to treat
@@ -284,7 +283,7 @@ application.
 -}
 perform : (x -> msg) -> (a -> msg) -> Task x a -> Cmd msg
 perform onFail onSuccess task =
-  command (T (map onSuccess task `onError` \x -> succeed (onFail x)))
+  command (T (onError (map onSuccess task) (\x -> succeed (onFail x))))
 
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
@@ -315,5 +314,5 @@ onSelfMsg _ _ _ =
 
 spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
 spawnCmd router (T task) =
-  Native.Scheduler.spawn (task `andThen` Platform.sendToApp router)
+  Native.Scheduler.spawn (andThen task (Platform.sendToApp router))
 

@@ -189,7 +189,7 @@ rgbToHsl red green blue =
     hue =
       degrees 60 *
         if cMax == r then
-          ((g - b) / c) `fmod` 6
+          fmod ((g - b) / c) 6
         else if cMax == g then
           ((b - r) / c) + 2
         else {- cMax == b -}

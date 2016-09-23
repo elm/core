@@ -503,7 +503,7 @@ cmdMap func (Generate generator) =
 
 init : Task Never Seed
 init =
-  Time.now `Task.andThen` \t ->
+  Task.andThen Time.now <| \t ->
     Task.succeed (initialSeed (round t))
 
 
@@ -518,10 +518,8 @@ onEffects router commands seed =
         (value, newSeed) =
           step generator seed
       in
-        Platform.sendToApp router value
-          `Task.andThen` \_ ->
-
-        onEffects router rest newSeed
+        Task.andThen (Platform.sendToApp router value) <| \_ ->
+          onEffects router rest newSeed
 
 
 onSelfMsg : Platform.Router msg Never -> Never -> Seed -> Task Never Seed

@@ -174,7 +174,10 @@ onEffects router subs {processes} =
       (spawnList, Dict.insert interval id existingDict, killTask)
 
     rightStep _ id (spawnList, existingDict, killTask) =
-      (spawnList, existingDict, Native.Scheduler.kill id `Task.andThen` \_ -> killTask)
+      ( spawnList
+      , existingDict
+      , Task.andThen (Native.Scheduler.kill id) (\_ -> killTask)
+      )
 
     (spawnList, existingDict, killTask) =
       Dict.merge
@@ -185,13 +188,9 @@ onEffects router subs {processes} =
         processes
         ([], Dict.empty, Task.succeed ())
   in
-    killTask
-      `Task.andThen` \_ ->
-
-    spawnHelp router spawnList existingDict
-      `Task.andThen` \newProcesses ->
-
-    Task.succeed (State newTaggers newProcesses)
+    Task.andThen killTask <| \_ ->
+    Task.andThen (spawnHelp router spawnList existingDict) <| \newProcesses ->
+      Task.succeed (State newTaggers newProcesses)
 
 
 addMySub : MySub msg -> Taggers msg -> Taggers msg
@@ -211,10 +210,12 @@ spawnHelp router intervals processes =
       Task.succeed processes
 
     interval :: rest ->
-      Native.Scheduler.spawn (setInterval interval (Platform.sendToSelf router interval))
-        `Task.andThen` \id ->
-
-      spawnHelp router rest (Dict.insert interval id processes)
+      let
+        spawnTimer =
+          Native.Scheduler.spawn (setInterval interval (Platform.sendToSelf router interval))
+      in
+        Task.andThen spawnTimer <| \id ->
+          spawnHelp router rest (Dict.insert interval id processes)
 
 
 onSelfMsg : Platform.Router msg Time -> Time -> State msg -> Task Never (State msg)
@@ -224,13 +225,12 @@ onSelfMsg router interval state =
       Task.succeed state
 
     Just taggers ->
-      now
-        `Task.andThen` \time ->
-
-      Task.sequence (List.map (\tagger -> Platform.sendToApp router (tagger time)) taggers)
-        `Task.andThen` \_ ->
-
-      Task.succeed state
+      let
+        tellTaggers time =
+          Task.sequence (List.map (\tagger -> Platform.sendToApp router (tagger time)) taggers)
+      in
+        Task.andThen (Task.andThen now tellTaggers) <| \_ ->
+          Task.succeed state
 
 
 setInterval : Time -> Task Never () -> Task x Never
