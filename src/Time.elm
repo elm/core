@@ -176,7 +176,8 @@ onEffects router subs {processes} =
     rightStep _ id (spawnList, existingDict, killTask) =
       ( spawnList
       , existingDict
-      , Task.andThen (Native.Scheduler.kill id) (\_ -> killTask)
+      , Native.Scheduler.kill id
+          |> Task.andThen (\_ -> killTask)
       )
 
     (spawnList, existingDict, killTask) =
@@ -188,9 +189,9 @@ onEffects router subs {processes} =
         processes
         ([], Dict.empty, Task.succeed ())
   in
-    Task.andThen killTask <| \_ ->
-    Task.andThen (spawnHelp router spawnList existingDict) <| \newProcesses ->
-      Task.succeed (State newTaggers newProcesses)
+    killTask
+      |> Task.andThen (\_ -> spawnHelp router spawnList existingDict)
+      |> Task.andThen (\newProcesses -> Task.succeed (State newTaggers newProcesses))
 
 
 addMySub : MySub msg -> Taggers msg -> Taggers msg
@@ -213,9 +214,12 @@ spawnHelp router intervals processes =
       let
         spawnTimer =
           Native.Scheduler.spawn (setInterval interval (Platform.sendToSelf router interval))
-      in
-        Task.andThen spawnTimer <| \id ->
+
+        spawnRest id =
           spawnHelp router rest (Dict.insert interval id processes)
+      in
+        spawnTimer
+          |> Task.andThen spawnRest
 
 
 onSelfMsg : Platform.Router msg Time -> Time -> State msg -> Task Never (State msg)
@@ -229,8 +233,9 @@ onSelfMsg router interval state =
         tellTaggers time =
           Task.sequence (List.map (\tagger -> Platform.sendToApp router (tagger time)) taggers)
       in
-        Task.andThen (Task.andThen now tellTaggers) <| \_ ->
-          Task.succeed state
+        now
+          |> Task.andThen tellTaggers
+          |> Task.andThen (\_ -> Task.succeed state)
 
 
 setInterval : Time -> Task Never () -> Task x Never

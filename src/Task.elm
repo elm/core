@@ -1,7 +1,7 @@
 effect module Task where { command = MyCmd } exposing
   ( Task
   , succeed, fail
-  , map, map2, map3, map4, map5, andMap
+  , map, map2, map3, map4, map5
   , sequence
   , andThen
   , onError, mapError
@@ -17,7 +17,7 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 @docs Task, succeed, fail
 
 # Mapping
-@docs map, map2, map3, map4, map5, andMap
+@docs map, map2, map3, map4, map5
 
 # Chaining
 @docs andThen, sequence
@@ -30,7 +30,7 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 
 -}
 
-import Basics exposing (Never, (<|))
+import Basics exposing (Never, (|>), (<<))
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
@@ -84,7 +84,8 @@ fail =
 -}
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
-  andThen taskA <| \a -> succeed (func a)
+  taskA
+    |> andThen (\a -> succeed (func a))
 
 
 {-| Put the results of two tasks together. If either task fails, the whole
@@ -95,55 +96,39 @@ finished before the second task starts.
 -}
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
-  andThen taskA <| \a ->
-  andThen taskB <| \b ->
-    succeed (func a b)
+  taskA
+    |> andThen (\a -> taskB
+    |> andThen (\b -> succeed (func a b)))
 
 
 {-|-}
 map3 : (a -> b -> c -> result) -> Task x a -> Task x b -> Task x c -> Task x result
 map3 func taskA taskB taskC =
-  andThen taskA <| \a ->
-  andThen taskB <| \b ->
-  andThen taskC <| \c ->
-    succeed (func a b c)
+  taskA
+    |> andThen (\a -> taskB
+    |> andThen (\b -> taskC
+    |> andThen (\c -> succeed (func a b c))))
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x result
 map4 func taskA taskB taskC taskD =
-  andThen taskA <| \a ->
-  andThen taskB <| \b ->
-  andThen taskC <| \c ->
-  andThen taskD <| \d ->
-    succeed (func a b c d)
+  taskA
+    |> andThen (\a -> taskB
+    |> andThen (\b -> taskC
+    |> andThen (\c -> taskD
+    |> andThen (\d -> succeed (func a b c d)))))
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x e -> Task x result
 map5 func taskA taskB taskC taskD taskE =
-  andThen taskA <| \a ->
-  andThen taskB <| \b ->
-  andThen taskC <| \c ->
-  andThen taskD <| \d ->
-  andThen taskE <| \e ->
-    succeed (func a b c d e)
-
-
-{-| Put the results of two tasks together. If either task fails, the whole
-thing fails. It also runs in order so the first task will be completely
-finished before the second task starts.
-
-This function makes it possible to chain tons of tasks together and pipe them
-all into a single function.
-
-    (f `map` task1 `andMap` task2 `andMap` task3) -- map3 f task1 task2 task3
--}
-andMap : Task x (a -> b) -> Task x a -> Task x b
-andMap taskFunc taskValue =
-  andThen taskFunc <| \func ->
-  andThen taskValue <| \value ->
-    succeed (func value)
+  taskA
+    |> andThen (\a -> taskB
+    |> andThen (\b -> taskC
+    |> andThen (\c -> taskD
+    |> andThen (\d -> taskE
+    |> andThen (\e -> succeed (func a b c d e))))))
 
 
 {-| Start with a list of tasks, and turn them into a single task that returns a
@@ -172,12 +157,14 @@ sequence tasks =
 successful, you give the result to the callback resulting in another task. This
 task then gets run.
 
-    succeed 2 `andThen` (\n -> succeed (n + 2)) -- succeed 4
+    succeed 2
+      |> andThen (\n -> succeed (n + 2))
+      -- succeed 4
 
 This is useful for chaining tasks together. Maybe you need to get a user from
 your servers *and then* lookup their picture once you know their name.
 -}
-andThen : Task x a -> (a -> Task x b) -> Task x b
+andThen : (a -> Task x b) -> Task x a -> Task x b
 andThen =
   Native.Scheduler.andThen
 
@@ -187,10 +174,15 @@ andThen =
 {-| Recover from a failure in a task. If the given task fails, we use the
 callback to recover.
 
-    fail "file not found" `onError` (\msg -> succeed 42) -- succeed 42
-    succeed 9 `onError` (\msg -> succeed 42)             -- succeed 9
+    fail "file not found"
+      |> onError (\msg -> succeed 42)
+      -- succeed 42
+
+    succeed 9
+      |> onError (\msg -> succeed 42)
+      -- succeed 9
 -}
-onError : Task x a -> (x -> Task y a) -> Task y a
+onError : (x -> Task y a) -> Task x a -> Task y a
 onError =
   Native.Scheduler.onError
 
@@ -205,8 +197,9 @@ types to match up.
       sequence [ mapError Http serverTask, mapError WebGL textureTask ]
 -}
 mapError : (x -> y) -> Task x a -> Task y a
-mapError f task =
-  onError task <| \err -> fail (f err)
+mapError convert task =
+  task
+    |> onError (fail << convert)
 
 
 {-| Translate a task that can fail into a task that can never fail, by
@@ -219,7 +212,9 @@ This means you can handle the error with the `Maybe` module instead.
 -}
 toMaybe : Task x a -> Task never (Maybe a)
 toMaybe task =
-  onError (map Just task) <| \_ -> succeed Nothing
+  task
+    |> andThen (succeed << Just)
+    |> onError (\_ -> succeed Nothing)
 
 
 {-| If you are chaining together a bunch of tasks, it may be useful to treat
@@ -248,7 +243,9 @@ This means you can handle the error with the `Result` module instead.
 -}
 toResult : Task x a -> Task never (Result x a)
 toResult task =
-  onError (map Ok task) (\msg -> succeed (Err msg))
+  task
+    |> andThen (succeed << Ok)
+    |> onError (succeed << Err)
 
 
 {-| If you are chaining together a bunch of tasks, it may be useful to treat
@@ -283,7 +280,11 @@ application.
 -}
 perform : (x -> msg) -> (a -> msg) -> Task x a -> Cmd msg
 perform onFail onSuccess task =
-  command (T (onError (map onSuccess task) (\x -> succeed (onFail x))))
+  command (T (
+    task
+      |> andThen (succeed << onSuccess)
+      |> onError (succeed << onFail)
+  ))
 
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
@@ -314,5 +315,8 @@ onSelfMsg _ _ _ =
 
 spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
 spawnCmd router (T task) =
-  Native.Scheduler.spawn (andThen task (Platform.sendToApp router))
+  Native.Scheduler.spawn (
+    task
+      |> andThen (Platform.sendToApp router)
+  )
 
