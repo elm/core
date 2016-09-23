@@ -138,8 +138,8 @@ map5 func ma mb mc md me =
 {-| Chain together many computations that may fail. It is helpful to see its
 definition:
 
-    andThen : Maybe a -> (a -> Maybe b) -> Maybe b
-    andThen maybe callback =
+    andThen : (a -> Maybe b) -> Maybe a -> Maybe b
+    andThen callback maybe =
         case maybe of
             Just value ->
                 callback value
@@ -160,15 +160,19 @@ first month from a `List` and then make sure it is between 1 and 12:
 
     getFirstMonth : List Int -> Maybe Int
     getFirstMonth months =
-        head months `andThen` toValidMonth
+        head months
+          |> andThen toValidMonth
 
 If `head` fails and results in `Nothing` (because the `List` was `empty`),
 this entire chain of operations will short-circuit and result in `Nothing`.
 If `toValidMonth` results in `Nothing`, again the chain of computations
 will result in `Nothing`.
 -}
-andThen : Maybe a -> (a -> Maybe b) -> Maybe b
-andThen maybeValue callback =
+andThen : (a -> Maybe b) -> Maybe a -> Maybe b
+andThen callback maybeValue =
     case maybeValue of
-        Just value -> callback value
-        Nothing -> Nothing
+        Just value ->
+            callback value
+
+        Nothing ->
+            Nothing
