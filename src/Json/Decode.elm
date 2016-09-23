@@ -1,4 +1,4 @@
-module Json.Decode exposing  -- where
+module Json.Decode exposing
   ( Decoder, Value
   , decodeString, decodeValue
   , string, int, float, bool, null
