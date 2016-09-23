@@ -91,7 +91,10 @@ paired with its index.
 -}
 toIndexedList : Array a -> List (Int, a)
 toIndexedList array =
-  List.map2 (,) [ 0 .. Native.Array.length array - 1 ] (Native.Array.toList array)
+  List.map2
+    (,)
+    (List.range 0 (Native.Array.length array - 1))
+    (Native.Array.toList array)
 
 
 {-| Apply a function on every element in an array.
