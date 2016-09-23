@@ -318,15 +318,19 @@ lowercase letters.
 
     letter : Generator Char
     letter =
-      bool `andThen` \b ->
-        if b then uppercaseLetter else lowercaseLetter
+      bool
+        |> andThen upperOrLower
+
+    upperOrLower : Bool -> Generator Char
+    upperOrLower b =
+      if b then uppercaseLetter else lowercaseLetter
 
     -- bool : Generator Bool
     -- uppercaseLetter : Generator Char
     -- lowercaseLetter : Generator Char
 -}
-andThen : Generator a -> (a -> Generator b) -> Generator b
-andThen (Generator generate) callback =
+andThen : (a -> Generator b) -> Generator a -> Generator b
+andThen callback (Generator generate) =
   Generator <| \seed ->
     let
       (result, newSeed) =
