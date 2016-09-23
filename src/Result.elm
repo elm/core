@@ -113,8 +113,8 @@ map5 func ra rb rc rd re =
 {-| Chain together a sequence of computations that may fail. It is helpful
 to see its definition:
 
-    andThen : Result e a -> (a -> Result e b) -> Result e b
-    andThen result callback =
+    andThen : (a -> Result e b) -> Result e a -> Result e b
+    andThen callback result =
         case result of
           Ok value -> callback value
           Err msg -> Err msg
@@ -131,7 +131,8 @@ a month and make sure it is between 1 and 12:
 
     toMonth : String -> Result String Int
     toMonth rawString =
-        toInt rawString `andThen` toValidMonth
+        toInt rawString
+          |> andThen toValidMonth
 
     -- toMonth "4" == Ok 4
     -- toMonth "9" == Ok 9
@@ -143,11 +144,14 @@ message. It is often best to create a custom type that explicitly represents
 the exact ways your computation may fail. This way it is easy to handle in your
 code.
 -}
-andThen : Result x a -> (a -> Result x b) -> Result x b
-andThen result callback =
+andThen : (a -> Result x b) -> Result x a -> Result x b
+andThen callback result =
     case result of
-      Ok value -> callback value
-      Err msg -> Err msg
+      Ok value ->
+        callback value
+
+      Err msg ->
+        Err msg
 
 
 {-| Format the error value of a result. If the result is `Ok`, it stays exactly
