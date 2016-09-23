@@ -458,7 +458,8 @@ expect **and then** it extracts the relevant information.
 
     shape : Decoder Shape
     shape =
-      ("tag" := string) `andThen` shapeInfo
+      ("tag" := string)
+        |> andThen shapeInfo
 
     shapeInfo : String -> Decoder Shape
     shapeInfo tag =
@@ -472,7 +473,7 @@ expect **and then** it extracts the relevant information.
         _ ->
           fail (tag ++ " is not a recognized tag for shapes")
 -}
-andThen : Decoder a -> (a -> Decoder b) -> Decoder b
+andThen : (a -> Decoder b) -> Decoder a -> Decoder b
 andThen =
   Native.Json.andThen
 

@@ -88,7 +88,7 @@ function decodeTuple(f, decoders)
 	};
 }
 
-function andThen(decoder, callback)
+function andThen(callback, decoder)
 {
 	return {
 		ctor: '<decoder>',
