@@ -3,7 +3,7 @@ module Result exposing
   , withDefault
   , map, map2, map3, map4, map5
   , andThen
-  , toMaybe, fromMaybe, formatError
+  , toMaybe, fromMaybe, mapError
   )
 
 {-| A `Result` is the result of a computation that may fail. This is a great
@@ -19,7 +19,7 @@ way to manage errors in Elm.
 @docs andThen
 
 # Handling Errors
-@docs withDefault, toMaybe, fromMaybe, formatError
+@docs withDefault, toMaybe, fromMaybe, mapError
 -}
 
 import Maybe exposing ( Maybe(Just, Nothing) )
@@ -154,9 +154,8 @@ andThen callback result =
         Err msg
 
 
-{-| Format the error value of a result. If the result is `Ok`, it stays exactly
-the same, but if the result is an `Err` we will format the error. For example,
-say the errors we get have too much information:
+{-| Transform an `Err` value. For example, say the errors we get have too much
+information:
 
     parseInt : String -> Result ParseError Int
 
@@ -166,14 +165,17 @@ say the errors we get have too much information:
         , position : (Int,Int)
         }
 
-    formatError .message (parseInt "123") == Ok 123
-    formatError .message (parseInt "abc") == Err "char 'a' is not a number"
+    mapError .message (parseInt "123") == Ok 123
+    mapError .message (parseInt "abc") == Err "char 'a' is not a number"
 -}
-formatError : (error -> error') -> Result error a -> Result error' a
-formatError f result =
+mapError : (x -> y) -> Result x a -> Result y a
+mapError f result =
     case result of
-      Ok  v -> Ok v
-      Err e -> Err (f e)
+      Ok v ->
+        Ok v
+
+      Err e ->
+        Err (f e)
 
 
 {-| Convert to a simpler `Maybe` if the actual error message is not needed or
