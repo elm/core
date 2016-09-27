@@ -232,10 +232,10 @@ function spawnLoop(init, onMessage)
 		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
 			return onMessage(msg, state);
 		});
-		return A2(andThen, handleMsg, loop);
+		return A2(andThen, loop, handleMsg);
 	}
 
-	var task = A2(andThen, init, loop);
+	var task = A2(andThen, loop, init);
 
 	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
 }
