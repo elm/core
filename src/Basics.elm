@@ -628,13 +628,42 @@ uncurry f (a,b) =
   f a b
 
 
-{-| A type that is "uninhabited". There are no values of type `Never`, and its
-primary use is demanding that certain tasks cannot possibly fail.
+{-| A value that can never happen! For context:
 
-For example, a task with type `(Task Never Int)` must *always* succeed with an
-integer. For the task to fail, someone would need to say `(Task.fail ???)` but
-since there is no value with type `Never` they could not fill in the question
-marks!
+  - The boolean type `Bool` has two values: `True` and `False`
+  - The unit type `()` has one value: `()`
+  - The never type `Never` has no values!
+
+You may see it in the wild in `Html Never` which means this HTML will never
+produce any messages. You would need to write an event handler like
+`onClick ??? : Attribute Never` but how can we fill in the question marks?!
+So there cannot be any event handlers on that HTML.
+
+You may also see this used with tasks that never fail, like `Task Never ()`.
+
+The `Never` type is useful for restricting *arguments* to a function. Maybe my
+API can only accept HTML without event handlers, so I require `Html Never` and
+users can give `Html msg` and everything will go fine. Generally speaking, you
+do not want `Never` in your return types though.
 -}
-type Never = Never Never
+type Never = JustOneMore Never
 
+
+{-| A function that can never be called. Seems extremely pointless, but this
+can be useful with if you want to use `Time.now` or some other task that
+always succeeds:
+
+    type Msg = CurrentTime Time | ...
+
+    getTime : Cmd Msg
+    getTime =
+      Task.perform never CurrentTime Time.now
+
+We know that the `Time.now` task can never fail from the type `Task x Time`,
+but `Task.perform` still wants us to handle the error case. So the `never`
+function is basically telling the type system, make sure no one ever calls
+me!
+-}
+never : Never -> a
+never (JustOneMore nvr) =
+  never nvr
