@@ -272,18 +272,32 @@ type MyCmd msg =
   T (Task Never msg)
 
 
-{-| Command the runtime system to perform a task. The most important argument
-is the `Task` which describes what you want to happen. But you also need to
-provide functions to tag the two possible outcomes of the task. It can fail or
-succeed, but either way, you need to have a message to feed back into your
-application.
+{-| Command the Elm runtime to perform a task. So if you want to get the
+current time you might say:
+
+    import Task
+    import Time exposing (Time)
+
+    type Msg = Click | NewTime (Result Never Time)
+
+    update : Msg -> Model -> Model
+    update msg model =
+      case msg of
+        Click ->
+          ( model, Task.perform NewTime Time.now )
+
+        NewTime (Ok time) ->
+          ...
+
+        NewTime (Err msg) ->
+          never msg
 -}
-perform : (x -> msg) -> (a -> msg) -> Task x a -> Cmd msg
-perform onFail onSuccess task =
+perform : (Result x a -> msg) -> Task x a -> Cmd msg
+perform resultToMessage task =
   command (T (
     task
-      |> andThen (succeed << onSuccess)
-      |> onError (succeed << onFail)
+      |> andThen (succeed << resultToMessage << Ok)
+      |> onError (succeed << resultToMessage << Err)
   ))
 
 
