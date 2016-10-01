@@ -5,9 +5,9 @@ return {
 	or: F2(function or(a, b) { return a | b; }),
 	xor: F2(function xor(a, b) { return a ^ b; }),
 	complement: function complement(a) { return ~a; },
-	leftShift: F2(function(offset, a) { return a << offset; }),
-	rightShift: F2(function(offset, a) { return a >> offset; }),
-	logicalRightShift: F2(function(offset, a) { return a >>> offset; })
+	shiftLeftBy: F2(function(offset, a) { return a << offset; }),
+	shiftRightBy: F2(function(offset, a) { return a >> offset; }),
+	shiftRightZfBy: F2(function(offset, a) { return a >>> offset; })
 };
 
 }();
