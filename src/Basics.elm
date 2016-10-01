@@ -10,7 +10,7 @@ module Basics exposing
   , isNaN, isInfinite
   , toString, (++)
   , fst, snd
-  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
   )
 
 {-| Tons of useful functions that get imported by default.
@@ -58,7 +58,7 @@ which happen to be radians.
 @docs fst, snd
 
 # Higher-Order Helpers
-@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
 
 -}
 
