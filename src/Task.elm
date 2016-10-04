@@ -6,7 +6,7 @@ effect module Task where { command = MyCmd } exposing
   , andThen
   , onError, mapError
   , toMaybe, fromMaybe, toResult, fromResult
-  , perform
+  , perform, attempt
   )
 
 {-| Tasks make it easy to describe asynchronous operations that may fail, like
@@ -26,7 +26,7 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 @docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
 
 # Commands
-@docs perform
+@docs perform, attempt
 
 -}
 
@@ -269,16 +269,17 @@ fromResult result =
 
 
 type MyCmd msg =
-  T (Task Never msg)
+  Perform (Task Never msg)
 
 
-{-| Command the Elm runtime to perform a task. So if you want to get the
-current time you might say:
+{-| The only way to *do* things in Elm is to give commands to the Elm runtime.
+So we describe some complex behavior with a `Task` and then command the runtime
+to `perform` that task. For example, getting the current time looks like this:
 
     import Task
     import Time exposing (Time)
 
-    type Msg = Click | NewTime (Result Never Time)
+    type Msg = Click | NewTime Time
 
     update : Msg -> Model -> Model
     update msg model =
@@ -286,15 +287,19 @@ current time you might say:
         Click ->
           ( model, Task.perform NewTime Time.now )
 
-        NewTime (Ok time) ->
+        NewTime time ->
           ...
-
-        NewTime (Err msg) ->
-          never msg
 -}
-perform : (Result x a -> msg) -> Task x a -> Cmd msg
-perform resultToMessage task =
-  command (T (
+perform : (a -> msg) -> Task Never a -> Cmd msg
+perform toMessage task =
+  command (Perform (map toMessage task))
+
+
+{-| Command the Elm runtime to attempt a task that might fail!
+-}
+attempt : (Result x a -> msg) -> Task x a -> Cmd msg
+attempt resultToMessage task =
+  command (Perform (
     task
       |> andThen (succeed << resultToMessage << Ok)
       |> onError (succeed << resultToMessage << Err)
@@ -302,8 +307,8 @@ perform resultToMessage task =
 
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
-cmdMap tagger (T task) =
-  T (map tagger task)
+cmdMap tagger (Perform task) =
+  Perform (map tagger task)
 
 
 
@@ -328,7 +333,7 @@ onSelfMsg _ _ _ =
 
 
 spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
-spawnCmd router (T task) =
+spawnCmd router (Perform task) =
   Native.Scheduler.spawn (
     task
       |> andThen (Platform.sendToApp router)
