@@ -5,7 +5,6 @@ effect module Task where { command = MyCmd } exposing
   , sequence
   , andThen
   , onError, mapError
-  , toMaybe, fromMaybe, toResult, fromResult
   , perform, attempt
   )
 
@@ -23,7 +22,7 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 @docs andThen, sequence
 
 # Errors
-@docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
+@docs onError, mapError
 
 # Commands
 @docs perform, attempt
@@ -200,68 +199,6 @@ mapError : (x -> y) -> Task x a -> Task y a
 mapError convert task =
   task
     |> onError (fail << convert)
-
-
-{-| Translate a task that can fail into a task that can never fail, by
-converting any failure into `Nothing` and any success into `Just` something.
-
-    toMaybe (fail "file not found") -- succeed Nothing
-    toMaybe (succeed 42)            -- succeed (Just 42)
-
-This means you can handle the error with the `Maybe` module instead.
--}
-toMaybe : Task x a -> Task never (Maybe a)
-toMaybe task =
-  task
-    |> andThen (succeed << Just)
-    |> onError (\_ -> succeed Nothing)
-
-
-{-| If you are chaining together a bunch of tasks, it may be useful to treat
-a maybe value like a task.
-
-    fromMaybe "file not found" Nothing   -- fail "file not found"
-    fromMaybe "file not found" (Just 42) -- succeed 42
--}
-fromMaybe : x -> Maybe a -> Task x a
-fromMaybe default maybe =
-  case maybe of
-    Just value ->
-      succeed value
-
-    Nothing ->
-      fail default
-
-
-{-| Translate a task that can fail into a task that can never fail, by
-converting any failure into `Err` something and any success into `Ok` something.
-
-    toResult (fail "file not found") -- succeed (Err "file not found")
-    toResult (succeed 42)            -- succeed (Ok 42)
-
-This means you can handle the error with the `Result` module instead.
--}
-toResult : Task x a -> Task never (Result x a)
-toResult task =
-  task
-    |> andThen (succeed << Ok)
-    |> onError (succeed << Err)
-
-
-{-| If you are chaining together a bunch of tasks, it may be useful to treat
-a result like a task.
-
-    fromResult (Err "file not found") -- fail "file not found"
-    fromResult (Ok 42)                -- succeed 42
--}
-fromResult : Result x a -> Task x a
-fromResult result =
-  case result of
-    Ok value ->
-      succeed value
-
-    Err msg ->
-      fail msg
 
 
 
