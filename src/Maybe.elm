@@ -3,7 +3,6 @@ module Maybe exposing
   , andThen
   , map, map2, map3, map4, map5
   , withDefault
-  , oneOf
   )
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
@@ -13,11 +12,10 @@ you with optional arguments, error handling, and records with optional fields.
 @docs Maybe
 
 # Common Helpers
-@docs withDefault, oneOf, map, map2, map3, map4, map5
+@docs withDefault, map, map2, map3, map4, map5
 
 # Chaining Maybes
 @docs andThen
-
 -}
 
 {-| Represent values that may or may not exist. It can be useful if you have a
@@ -53,25 +51,6 @@ withDefault default maybe =
     case maybe of
       Just value -> value
       Nothing -> default
-
-
-{-| Pick the first `Maybe` that actually has a value. Useful when you want to
-try a couple different things, but there is no default value.
-
-    oneOf [ Nothing, Just 42, Just 71 ] == Just 42
-    oneOf [ Nothing, Nothing, Just 71 ] == Just 71
-    oneOf [ Nothing, Nothing, Nothing ] == Nothing
--}
-oneOf : List (Maybe a) -> Maybe a
-oneOf maybes =
-  case maybes of
-    [] ->
-        Nothing
-
-    maybe :: rest ->
-        case maybe of
-          Nothing -> oneOf rest
-          Just _ -> maybe
 
 
 {-| Transform a `Maybe` value with a given function:
