@@ -3,10 +3,37 @@ module Json.Decode exposing
   , list, array, dict, keyValuePairs
   , field, at, index
   , maybe, oneOf
-  , object1, object2, object3, object4, object5, object6, object7, object8
   , decodeString, decodeValue, Value
-  , map, succeed, fail, andThen, lazy, value, null
+  , object1, object2, object3, object4, object5, object6, object7, object8
+  , map, lazy, value, null, succeed, fail, andThen
   )
+
+{-| Turn JSON values into Elm values. Definitely check out this [intro to
+JSON decoders][guide] to get a feel for how this library works!
+
+[guide]: https://guide.elm-lang.org/interop/json.html
+
+# Primitives
+@docs Decoder, string, bool, int, float
+
+# Data Structures
+@docs list, array, dict, keyValuePairs
+
+# Object Primitives
+@docs field, at, index
+
+# Inconsistent Structure
+@docs maybe, oneOf
+
+# Run Decoders
+@docs decodeString, decodeValue, Value
+
+# Mapping
+@docs object1, object2, object3, object4, object5, object6, object7, object8
+
+# Fancy Decoding
+@docs map, lazy, value, null, succeed, fail, andThen
+-}
 
 
 import Array exposing (Array)
