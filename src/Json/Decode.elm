@@ -5,9 +5,8 @@ module Json.Decode exposing
   , maybe, oneOf
   , object1, object2, object3, object4, object5, object6, object7, object8
   , decodeString, decodeValue, Value
-  , map, succeed, fail, andThen, value, null
+  , map, succeed, fail, andThen, lazy, value, null
   )
-
 
 
 import Array exposing (Array)
@@ -15,7 +14,7 @@ import Dict exposing (Dict)
 import Json.Encode as JsEncode
 import List
 import Maybe exposing (Maybe)
-import Result exposing (Result)
+import Result exposing (Result(..))
 import Native.Json
 
 
@@ -185,6 +184,46 @@ fail =
 andThen : (a -> Decoder b) -> Decoder a -> Decoder b
 andThen =
   Native.Json.andThen
+
+
+{-| Sometimes you have JSON with recursive structure, like nested comments.
+You can use `lazy` to make sure your decoder unrolls lazily.
+
+    type alias Comment =
+      { message : String
+      , responses : Responses
+      }
+
+    type Responses = Responses (List Comment)
+
+    comment : Decoder Comment
+    comment =
+      object Comment
+        |> required "message" string
+        |> required "responses" (map Responses (list (lazy (\_ -> comment))))
+
+If we had said `list comment` instead, we would start expanding the value
+infinitely. What is a `comment`? It is a decoder for objects where the
+`responses` field contains comments. What is a `comment` though? Etc.
+
+By using `list (lazy (\_ -> comment))` we make sure the decoder only expands
+to be as deep as the JSON we are given. You can read more about recursive data
+structures [here][].
+
+[here]: https://github.com/elm-lang/elm-compiler/blob/master/hints/recursive-alias.md
+-}
+lazy : (() -> Decoder a) -> Decoder a
+lazy thunk =
+  let
+    lazilyDecode jsValue =
+      case decodeValue (thunk ()) jsValue of
+        Ok value ->
+          succeed value
+
+        Err msg ->
+          fail msg
+  in
+    andThen lazilyDecode value
 
 
 value : Decoder Value
