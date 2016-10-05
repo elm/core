@@ -411,16 +411,55 @@ type alias Value = JsEncode.Value
 -- FANCY PRIMITIVES
 
 
+{-| Ignore the JSON and produce a certain Elm value.
+
+    decodeString (succeed 42) "true"    == Ok 42
+    decodeString (succeed 42) "[1,2,3]" == Ok 42
+    decodeString (succeed 42) "hello"   == Err ... -- this is not a valid JSON string
+
+This is handy when used with `oneOf` or `andThen`.
+-}
 succeed : a -> Decoder a
 succeed =
   Native.Json.succeed
 
 
+{-| Ignore the JSON and make the decoder fail. This is handy when used with
+`oneOf` or `andThen` where you want to give a custom error message in some
+case.
+
+See the [`andThen`](#andThen) docs for an example.
+-}
 fail : String -> Decoder a
 fail =
   Native.Json.fail
 
 
+{-| Create decoders that depend on previous results. If you are creating
+versioned data, you might do something like this:
+
+    info : Decoder Info
+    info =
+      field "version" int
+        |> andThen infoHelp
+
+    infoHelp : Int -> Decoder Info
+    infoHelp version =
+      case version of
+        4 ->
+          infoDecoder4
+
+        3 ->
+          infoDecoder3
+
+        _ ->
+          fail <|
+            "Trying to decode info, but version "
+            ++ toString version ++ " is not supported."
+
+    -- infoDecoder4 : Decoder Info
+    -- infoDecoder3 : Decoder Info
+-}
 andThen : (a -> Decoder b) -> Decoder a -> Decoder b
 andThen =
   Native.Json.andThen
@@ -466,11 +505,25 @@ lazy thunk =
     andThen lazilyDecode value
 
 
+{-| Do not do anything with a JSON value, just bring it into Elm as a `Value`.
+This can be useful if you have particularly crazy data that you would like to
+deal with later. Or if you are going to send it out a port and do not care
+about its structure.
+-}
 value : Decoder Value
 value =
   Native.Json.decodePrimitive "value"
 
 
+{-| Decode a `null` value into some Elm value.
+
+    decodeString (null False) "null" == Ok False
+    decodeString (null 42) "null"    == Ok 42
+    decodeString (null 42) "42"      == Err ..
+    decodeString (null 42) "false"   == Err ..
+
+So if you ever see a `null`, this will return whatever value you specified.
+-}
 null : a -> Decoder a
 null =
   Native.Json.decodeNull
