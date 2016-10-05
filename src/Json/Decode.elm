@@ -4,8 +4,8 @@ module Json.Decode exposing
   , field, at, index
   , maybe, oneOf
   , decodeString, decodeValue, Value
-  , object1, object2, object3, object4, object5, object6, object7, object8
-  , map, lazy, value, null, succeed, fail, andThen
+  , map, map2, map3, map4, map5, map6, map7, map8
+  , lazy, value, null, succeed, fail, andThen
   )
 
 {-| Turn JSON values into Elm values. Definitely check out this [intro to
@@ -29,10 +29,10 @@ JSON decoders][guide] to get a feel for how this library works!
 @docs decodeString, decodeValue, Value
 
 # Mapping
-@docs object1, object2, object3, object4, object5, object6, object7, object8
+@docs map, map2, map3, map4, map5, map6, map7, map8
 
 # Fancy Decoding
-@docs map, lazy, value, null, succeed, fail, andThen
+@docs lazy, value, null, succeed, fail, andThen
 -}
 
 
@@ -132,44 +132,44 @@ oneOf =
 -- OBJECT HELPERS
 
 
-object1 : (a -> value) -> Decoder a -> Decoder value
-object1 =
-    Native.Json.decodeObject1
+map : (a -> value) -> Decoder a -> Decoder value
+map =
+    Native.Json.map1
 
 
-object2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
-object2 =
-    Native.Json.decodeObject2
+map2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
+map2 =
+    Native.Json.map2
 
 
-object3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
-object3 =
-    Native.Json.decodeObject3
+map3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
+map3 =
+    Native.Json.map3
 
 
-object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
-object4 =
-    Native.Json.decodeObject4
+map4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
+map4 =
+    Native.Json.map4
 
 
-object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
-object5 =
-    Native.Json.decodeObject5
+map5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
+map5 =
+    Native.Json.map5
 
 
-object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
-object6 =
-    Native.Json.decodeObject6
+map6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
+map6 =
+    Native.Json.map6
 
 
-object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
-object7 =
-    Native.Json.decodeObject7
+map7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
+map7 =
+    Native.Json.map7
 
 
-object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
-object8 =
-    Native.Json.decodeObject8
+map8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
+map8 =
+    Native.Json.map8
 
 
 
@@ -191,11 +191,6 @@ type alias Value = JsEncode.Value
 
 
 -- FANCY PRIMITIVES
-
-
-map : (a -> b) -> Decoder a -> Decoder b
-map =
-  Native.Json.decodeObject1
 
 
 succeed : a -> Decoder a
