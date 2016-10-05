@@ -1,13 +1,11 @@
 module Json.Decode exposing
-  ( Decoder, Value
-  , decodeString, decodeValue
-  , string, int, float, bool, null
-  , list, array
-  , field, index, at
+  ( Decoder, string, bool, int, float
+  , list, array, dict, keyValuePairs
+  , field, at, index
+  , maybe, oneOf
   , object1, object2, object3, object4, object5, object6, object7, object8
-  , keyValuePairs, dict
-  , maybe, oneOf, map, fail, succeed, andThen
-  , value, customDecoder
+  , decodeString, decodeValue, Value
+  , map, succeed, fail, andThen, value, null, customDecoder
   )
 
 
@@ -21,28 +19,59 @@ import Result exposing (Result)
 import Native.Json
 
 
+
+-- PRIMITIVES
+
+
 type Decoder a = Decoder
 
 
-
-type alias Value = JsEncode.Value
-
-
-map : (a -> b) -> Decoder a -> Decoder b
-map =
-  Native.Json.decodeObject1
+string : Decoder String
+string =
+  Native.Json.decodePrimitive "string"
 
 
-decodeString : Decoder a -> String -> Result String a
-decodeString =
-  Native.Json.runOnString
+bool : Decoder Bool
+bool =
+  Native.Json.decodePrimitive "bool"
 
 
--- OBJECTS
+int : Decoder Int
+int =
+  Native.Json.decodePrimitive "int"
 
-at : List String -> Decoder a -> Decoder a
-at fields decoder =
-    List.foldr field decoder fields
+
+float : Decoder Float
+float =
+  Native.Json.decodePrimitive "float"
+
+
+
+-- DATA STRUCTURES
+
+
+list : Decoder a -> Decoder (List a)
+list decoder =
+  Native.Json.decodeContainer "list" decoder
+
+
+array : Decoder a -> Decoder (Array a)
+array decoder =
+  Native.Json.decodeContainer "array" decoder
+
+
+dict : Decoder a -> Decoder (Dict String a)
+dict decoder =
+    map Dict.fromList (keyValuePairs decoder)
+
+
+keyValuePairs : Decoder a -> Decoder (List (String, a))
+keyValuePairs =
+    Native.Json.decodeKeyValuePairs
+
+
+
+-- OBJECT PRIMITIVES
 
 
 field : String -> Decoder a -> Decoder a
@@ -50,9 +79,31 @@ field =
     Native.Json.decodeField
 
 
+at : List String -> Decoder a -> Decoder a
+at fields decoder =
+    List.foldr field decoder fields
+
+
 index : Int -> Decoder a -> Decoder a
 index =
     Native.Json.decodeIndex
+
+
+-- WEIRD STRUCTURE
+
+
+maybe : Decoder a -> Decoder (Maybe a)
+maybe decoder =
+  Native.Json.decodeContainer "maybe" decoder
+
+
+oneOf : List (Decoder a) -> Decoder a
+oneOf =
+    Native.Json.oneOf
+
+
+
+-- OBJECT HELPERS
 
 
 object1 : (a -> value) -> Decoder a -> Decoder value
@@ -95,65 +146,13 @@ object8 =
     Native.Json.decodeObject8
 
 
-keyValuePairs : Decoder a -> Decoder (List (String, a))
-keyValuePairs =
-    Native.Json.decodeKeyValuePairs
+
+-- RUN DECODERS
 
 
-dict : Decoder a -> Decoder (Dict String a)
-dict decoder =
-    map Dict.fromList (keyValuePairs decoder)
-
-
-
-oneOf : List (Decoder a) -> Decoder a
-oneOf =
-    Native.Json.oneOf
-
-
-string : Decoder String
-string =
-  Native.Json.decodePrimitive "string"
-
-
-float : Decoder Float
-float =
-  Native.Json.decodePrimitive "float"
-
-
-int : Decoder Int
-int =
-  Native.Json.decodePrimitive "int"
-
-
-bool : Decoder Bool
-bool =
-  Native.Json.decodePrimitive "bool"
-
-
-list : Decoder a -> Decoder (List a)
-list decoder =
-  Native.Json.decodeContainer "list" decoder
-
-
-array : Decoder a -> Decoder (Array a)
-array decoder =
-  Native.Json.decodeContainer "array" decoder
-
-
-null : a -> Decoder a
-null =
-  Native.Json.decodeNull
-
-
-maybe : Decoder a -> Decoder (Maybe a)
-maybe decoder =
-  Native.Json.decodeContainer "maybe" decoder
-
-
-value : Decoder Value
-value =
-  Native.Json.decodePrimitive "value"
+decodeString : Decoder a -> String -> Result String a
+decodeString =
+  Native.Json.runOnString
 
 
 decodeValue : Decoder a -> Value -> Result String a
@@ -161,14 +160,21 @@ decodeValue =
   Native.Json.run
 
 
-customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
-customDecoder =
-  Native.Json.customAndThen
+type alias Value = JsEncode.Value
 
 
-andThen : (a -> Decoder b) -> Decoder a -> Decoder b
-andThen =
-  Native.Json.andThen
+
+-- FANCY PRIMITIVES
+
+
+map : (a -> b) -> Decoder a -> Decoder b
+map =
+  Native.Json.decodeObject1
+
+
+succeed : a -> Decoder a
+succeed =
+  Native.Json.succeed
 
 
 fail : String -> Decoder a
@@ -176,6 +182,22 @@ fail =
   Native.Json.fail
 
 
-succeed : a -> Decoder a
-succeed =
-  Native.Json.succeed
+andThen : (a -> Decoder b) -> Decoder a -> Decoder b
+andThen =
+  Native.Json.andThen
+
+
+value : Decoder Value
+value =
+  Native.Json.decodePrimitive "value"
+
+
+null : a -> Decoder a
+null =
+  Native.Json.decodeNull
+
+
+customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
+customDecoder =
+  Native.Json.customAndThen
+
