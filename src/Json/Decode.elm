@@ -49,24 +49,58 @@ import Native.Json
 -- PRIMITIVES
 
 
+{-| A value that knows how to decode JSON values.
+-}
 type Decoder a = Decoder
 
 
+{-| Decode a JSON string into an Elm `String`.
+
+    decodeString string "true"              == Err ...
+    decodeString string "42"                == Err ...
+    decodeString string "3.14"              == Err ...
+    decodeString string "\"hello\""         == Ok "hello"
+    decodeString string "{ \"hello\": 42 }" == Err ...
+-}
 string : Decoder String
 string =
   Native.Json.decodePrimitive "string"
 
 
+{-| Decode a JSON boolean into an Elm `Bool`.
+
+    decodeString bool "true"              == Ok True
+    decodeString bool "42"                == Err ...
+    decodeString bool "3.14"              == Err ...
+    decodeString bool "\"hello\""         == Err ...
+    decodeString bool "{ \"hello\": 42 }" == Err ...
+-}
 bool : Decoder Bool
 bool =
   Native.Json.decodePrimitive "bool"
 
 
+{-| Decode a JSON number into an Elm `Int`.
+
+    decodeString int "true"              == Err ...
+    decodeString int "42"                == Ok 42
+    decodeString int "3.14"              == Err ...
+    decodeString int "\"hello\""         == Err ...
+    decodeString int "{ \"hello\": 42 }" == Err ...
+-}
 int : Decoder Int
 int =
   Native.Json.decodePrimitive "int"
 
 
+{-| Decode a JSON number into an Elm `Float`.
+
+    decodeString float "true"              == Err ..
+    decodeString float "42"                == Ok 42
+    decodeString float "3.14"              == Ok 3.14
+    decodeString float "\"hello\""         == Err ...
+    decodeString float "{ \"hello\": 42 }" == Err ...
+-}
 float : Decoder Float
 float =
   Native.Json.decodePrimitive "float"
