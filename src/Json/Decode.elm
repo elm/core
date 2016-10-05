@@ -125,24 +125,44 @@ nullable decoder =
     ]
 
 
+{-| Decode a JSON array into an Elm `List`.
+
+    decodeString (list int) "[1,2,3]"       == Ok [1,2,3]
+    decodeString (list bool) "[true,false]" == Ok [True,False]
+-}
 list : Decoder a -> Decoder (List a)
 list decoder =
   Native.Json.decodeContainer "list" decoder
 
 
+{-| Decode a JSON array into an Elm `Array`.
+
+    decodeString (array int) "[1,2,3]"       == Ok (Array.fromList [1,2,3])
+    decodeString (array bool) "[true,false]" == Ok (Array.fromList [True,False])
+-}
 array : Decoder a -> Decoder (Array a)
 array decoder =
   Native.Json.decodeContainer "array" decoder
 
 
+{-| Decode a JSON object into an Elm `Dict`.
+
+    decodeString (dict int) "{ \"alice\": 42, \"bob\": 99 }"
+      == Dict.fromList [("alice", 42), ("bob", 99)]
+-}
 dict : Decoder a -> Decoder (Dict String a)
 dict decoder =
-    map Dict.fromList (keyValuePairs decoder)
+  map Dict.fromList (keyValuePairs decoder)
 
 
+{-| Decode a JSON object into an Elm `List` of pairs.
+
+    decodeString (keyValuePairs int) "{ \"alice\": 42, \"bob\": 99 }"
+      == [("alice", 42), ("bob", 99)]
+-}
 keyValuePairs : Decoder a -> Decoder (List (String, a))
 keyValuePairs =
-    Native.Json.decodeKeyValuePairs
+  Native.Json.decodeKeyValuePairs
 
 
 
