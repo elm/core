@@ -3,7 +3,7 @@ module Json.Decode exposing
   , decodeString, decodeValue
   , string, int, float, bool, null
   , list, array
-  , field, at
+  , field, index, at
   , object1, object2, object3, object4, object5, object6, object7, object8
   , keyValuePairs, dict
   , maybe, oneOf, map, fail, succeed, andThen
@@ -48,6 +48,11 @@ at fields decoder =
 field : String -> Decoder a -> Decoder a
 field =
     Native.Json.decodeField
+
+
+index : Int -> Decoder a -> Decoder a
+index =
+    Native.Json.decodeIndex
 
 
 object1 : (a -> value) -> Decoder a -> Decoder value
