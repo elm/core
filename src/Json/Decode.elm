@@ -29,6 +29,13 @@ JSON decoders][guide] to get a feel for how this library works!
 @docs decodeString, decodeValue, Value
 
 # Mapping
+
+**Note:** If you run out of map functions, take a look at [elm-decode-pipeline][pipe]
+which makes it easier to handle large objects, but produces lower quality type
+errors.
+
+[pipe]: http://package.elm-lang.org/packages/NoRedInk/elm-decode-pipeline/latest
+
 @docs map, map2, map3, map4, map5, map6, map7, map8
 
 # Fancy Decoding
@@ -180,6 +187,8 @@ keyValuePairs =
 
 The object *can* have other fields. Lots of them! The only thing this decoder
 cares about is if `x` is present and that the value there is an `Int`.
+
+Check out [`map2`](#map2) to see how to decode multiple fields!
 -}
 field : String -> Decoder a -> Decoder a
 field =
@@ -270,44 +279,100 @@ oneOf =
 
 
 
--- OBJECT HELPERS
+-- MAPPING
 
 
+{-| Transform a decoder. Maybe you just want to know the length of a string:
+
+    import String
+
+    stringLength : Decoder Int
+    stringLength =
+      map String.length string
+
+It is often helpful to use `map` with `oneOf`, like when defining `nullable`:
+
+    nullable : Decoder a -> Decoder (Maybe a)
+    nullable decoder =
+      oneOf
+        [ null Nothing
+        , map Just decoder
+        ]
+-}
 map : (a -> value) -> Decoder a -> Decoder value
 map =
     Native.Json.map1
 
 
+{-| Try two decoders and then combine the result. We can use this to decode
+objects with many fields:
+
+    type alias Point = { x : Float, y : Float }
+
+    point : Decoder Point
+    point =
+      map2 Point
+        (field "x" float)
+        (field "y" float)
+
+    -- decodeString point """{ "x": 3, "y": 4 }""" == Ok { x = 3, y = 4 }
+
+It tries each individual decoder and puts the result together with the `Point`
+constructor.
+-}
 map2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 map2 =
     Native.Json.map2
 
 
+{-| Try three decoders and then combine the result. We can use this to decode
+objects with many fields:
+
+    type alias Person = { name : String, age : Int, height : Float }
+
+    person : Decoder Person
+    person =
+      map3 Person
+        (at ["name"] string)
+        (at ["info","age"] int)
+        (at ["info","height"] float)
+
+    -- json = """{ "name": "tom", "info": { "age": 42, "height": 1.8 } }"""
+    -- decodeString point json == Ok { name = "tom", age = 42, height = 1.8 }
+
+Like `map2` it tries each decoder in order and then give the results to the
+`Person` constructor. That can be any function though!
+-}
 map3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 map3 =
     Native.Json.map3
 
 
+{-|-}
 map4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 map4 =
     Native.Json.map4
 
 
+{-|-}
 map5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 map5 =
     Native.Json.map5
 
 
+{-|-}
 map6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 map6 =
     Native.Json.map6
 
 
+{-|-}
 map7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 map7 =
     Native.Json.map7
 
 
+{-|-}
 map8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 map8 =
     Native.Json.map8
@@ -317,16 +382,28 @@ map8 =
 -- RUN DECODERS
 
 
+{-| Parse the given string into a JSON value and then run the `Decoder` on it.
+This will fail if the string is not well-formed JSON or if the `Decoder`
+fails for some reason.
+
+    decodeString int "4"     == Ok 4
+    decodeString int "1 + 2" == Err ...
+-}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
   Native.Json.runOnString
 
 
+{-| Run a `Decoder` on some JSON `Value`. You can send these JSON values
+through ports, so that is probably the main time you would use this function.
+-}
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
   Native.Json.run
 
 
+{-| A JSON value.
+-}
 type alias Value = JsEncode.Value
 
 
