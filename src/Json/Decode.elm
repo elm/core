@@ -1,6 +1,6 @@
 module Json.Decode exposing
   ( Decoder, string, bool, int, float
-  , list, array, dict, keyValuePairs
+  , nullable, list, array, dict, keyValuePairs
   , field, at, index
   , maybe, oneOf
   , decodeString, decodeValue, Value
@@ -17,7 +17,7 @@ JSON decoders][guide] to get a feel for how this library works!
 @docs Decoder, string, bool, int, float
 
 # Data Structures
-@docs list, array, dict, keyValuePairs
+@docs nullable, list, array, dict, keyValuePairs
 
 # Object Primitives
 @docs field, at, index
@@ -108,6 +108,21 @@ float =
 
 
 -- DATA STRUCTURES
+
+
+{-| Decode a nullable JSON value into an Elm value.
+
+    decodeString (nullable int) "13"    == Ok (Just 13)
+    decodeString (nullable int) "42"    == Ok (Just 42)
+    decodeString (nullable int) "null"  == Ok Nothing
+    decodeString (nullable int) "true"  == Err ..
+-}
+nullable : Decoder a -> Decoder (Maybe a)
+nullable decoder =
+  oneOf
+    [ null Nothing
+    , map Just decoder
+    ]
 
 
 list : Decoder a -> Decoder (List a)
