@@ -169,19 +169,52 @@ keyValuePairs =
 -- OBJECT PRIMITIVES
 
 
+{-| Decode a JSON object, requiring a particular field.
+
+    decodeString (field "x" int) "{ \"x\": 3 }"            == Ok 3
+    decodeString (field "x" int) "{ \"x\": 3, \"y\": 4 }"  == Ok 3
+    decodeString (field "x" int) "{ \"x\": true }"         == Err ...
+    decodeString (field "x" int) "{ \"y\": 4 }"            == Err ...
+
+    decodeString (field "name" string) "{ \"name\": \"tom\" }" == Ok "tom"
+
+The object *can* have other fields. Lots of them! The only thing this decoder
+cares about is if `x` is present and that the value there is an `Int`.
+-}
 field : String -> Decoder a -> Decoder a
 field =
     Native.Json.decodeField
 
 
+{-| Decode a nested JSON object, requiring certain fields.
+
+    json = """{ "person": { "name": "tom", "age": 42 } }"""
+
+    decodeString (at ["person", "name"] string) json  == Ok "tom"
+    decodeString (at ["person", "age" ] int   ) json  == Ok "42
+
+This is really just a shorthand for saying things like:
+
+    field "person" (field "name" string) == at ["person","name"] string
+-}
 at : List String -> Decoder a -> Decoder a
 at fields decoder =
     List.foldr field decoder fields
 
 
+{-| Decode a JSON array, requiring a particular index.
+
+    json = """[ "alice", "bob", "chuck" ]"""
+
+    decodeString (index 0 string) json  == Ok "alice"
+    decodeString (index 1 string) json  == Ok "bob"
+    decodeString (index 2 string) json  == Ok "chuck"
+    decodeString (index 3 string) json  == Err ...
+-}
 index : Int -> Decoder a -> Decoder a
 index =
     Native.Json.decodeIndex
+
 
 
 -- WEIRD STRUCTURE
