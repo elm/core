@@ -5,7 +5,7 @@ module Json.Decode exposing
   , maybe, oneOf
   , object1, object2, object3, object4, object5, object6, object7, object8
   , decodeString, decodeValue, Value
-  , map, succeed, fail, andThen, value, null, customDecoder
+  , map, succeed, fail, andThen, value, null
   )
 
 
@@ -195,9 +195,3 @@ value =
 null : a -> Decoder a
 null =
   Native.Json.decodeNull
-
-
-customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
-customDecoder =
-  Native.Json.customAndThen
-

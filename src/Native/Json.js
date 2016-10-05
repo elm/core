@@ -98,16 +98,6 @@ function andThen(callback, decoder)
 	};
 }
 
-function customAndThen(decoder, callback)
-{
-	return {
-		ctor: '<decoder>',
-		tag: 'customAndThen',
-		decoder: decoder,
-		callback: callback
-	};
-}
-
 function oneOf(decoders)
 {
 	return {
@@ -193,11 +183,6 @@ function badOneOf(problems)
 	return { tag: 'oneOf', problems: problems };
 }
 
-function badCustom(msg)
-{
-	return { tag: 'custom', msg: msg };
-}
-
 function bad(msg)
 {
 	return { tag: 'fail', msg: msg };
@@ -239,11 +224,6 @@ function badToString(problem)
 				return 'I ran into the following problems'
 					+ (context === '_' ? '' : ' at ' + context)
 					+ ':\n\n' + problems.join('\n');
-
-			case 'custom':
-				return 'A `customDecoder` failed'
-					+ (context === '_' ? '' : ' at ' + context)
-					+ ' with the message: ' + problem.msg;
 
 			case 'fail':
 				return 'I ran into a `fail` decoder'
@@ -429,19 +409,6 @@ function runHelp(decoder, value)
 			}
 			return ok(answer);
 
-		case 'customAndThen':
-			var result = runHelp(decoder.decoder, value);
-			if (result.tag !== 'ok')
-			{
-				return result;
-			}
-			var realResult = decoder.callback(result.value);
-			if (realResult.ctor === 'Err')
-			{
-				return badCustom(realResult._0);
-			}
-			return ok(realResult._0);
-
 		case 'andThen':
 			var result = runHelp(decoder.decoder, value);
 			return (result.tag !== 'ok')
@@ -525,7 +492,6 @@ function equality(a, b)
 			return listEquality(a.decoders, b.decoders);
 
 		case 'andThen':
-		case 'customAndThen':
 			return a.callback === b.callback && equality(a.decoder, b.decoder);
 
 		case 'oneOf':
@@ -598,7 +564,6 @@ return {
 	decodeKeyValuePairs: decodeKeyValuePairs,
 
 	andThen: F2(andThen),
-	customAndThen: F2(customAndThen),
 	fail: fail,
 	succeed: succeed,
 	oneOf: oneOf,
