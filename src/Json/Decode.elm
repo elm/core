@@ -3,7 +3,6 @@ module Json.Decode exposing
   , decodeString, decodeValue
   , string, int, float, bool, null
   , list, array
-  , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
   , (:=), at
   , object1, object2, object3, object4, object5, object6, object7, object8
   , keyValuePairs, dict
@@ -24,8 +23,7 @@ decoding operation that will either produce a value of type `a`, or fail.
 @docs string, int, float, bool, null
 
 # Arrays
-@docs list, array,
-  tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
+@docs list, array
 
 # Objects
 @docs (:=), at,
@@ -513,86 +511,3 @@ missing.
 succeed : a -> Decoder a
 succeed =
   Native.Json.succeed
-
-
--- TUPLES
-
-{-| Handle an array with exactly one element.
-
-    extractString : Decoder String
-    extractString =
-        tuple1 identity string
-
-    authorship : Decoder String
-    authorship =
-        oneOf
-          [ tuple1 (\author -> "Author: " ++ author) string
-          , list string |> map (\authors -> "Co-authors: " ++ String.join ", " authors)
-          ]
--}
-tuple1 : (a -> value) -> Decoder a -> Decoder value
-tuple1 =
-    Native.Json.decodeTuple1
-
-
-{-| Handle an array with exactly two elements. Useful for points and simple
-pairs.
-
-    -- [3,4] or [0,0]
-    point : Decoder (Float,Float)
-    point =
-        tuple2 (,) float float
-
-    -- ["John","Doe"] or ["Hermann","Hesse"]
-    name : Decoder Name
-    name =
-        tuple2 Name string string
-
-    type alias Name = { first : String, last : String }
--}
-tuple2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
-tuple2 =
-    Native.Json.decodeTuple2
-
-
-{-| Handle an array with exactly three elements.
-
-    -- [3,4,5] or [0,0,0]
-    point3D : Decoder (Float,Float,Float)
-    point3D =
-        tuple3 (,,) float float float
-
--}
-tuple3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
-tuple3 =
-    Native.Json.decodeTuple3
-
-
-{-|-}
-tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
-tuple4 =
-    Native.Json.decodeTuple4
-
-
-{-|-}
-tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
-tuple5 =
-    Native.Json.decodeTuple5
-
-
-{-|-}
-tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
-tuple6 =
-    Native.Json.decodeTuple6
-
-
-{-|-}
-tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
-tuple7 =
-    Native.Json.decodeTuple7
-
-
-{-|-}
-tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
-tuple8 =
-    Native.Json.decodeTuple8
