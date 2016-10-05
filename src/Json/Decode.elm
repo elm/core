@@ -220,11 +220,50 @@ index =
 -- WEIRD STRUCTURE
 
 
+{-| Helpful for dealing with optional fields. Here are a few slightly different
+examples:
+
+    json = """{ "name": "tom", "age": 42 }"""
+
+    decodeString (maybe (field "age"    int  )) json == Ok (Just 42)
+    decodeString (maybe (field "name"   int  )) json == Ok Nothing
+    decodeString (maybe (field "height" float)) json == Ok Nothing
+
+    decodeString (field "age"    (maybe int  )) json == Ok (Just 42)
+    decodeString (field "name"   (maybe int  )) json == Ok Nothing
+    decodeString (field "height" (maybe float)) json == Err ...
+
+Notice the last example! It is saying we *must* have a field named `height` and
+the content *may* be a float. There is no `height` field, so the decoder fails.
+
+Point is, `maybe` will make exactly what it contains conditional. For optional
+fields, this means you probably want it *outside* a use of `field` or `at`.
+-}
 maybe : Decoder a -> Decoder (Maybe a)
 maybe decoder =
   Native.Json.decodeContainer "maybe" decoder
 
 
+{-| Try a bunch of different decoders. This can be useful if the JSON may come
+in a couple different formats. For example, say you want to read an array of
+numbers, but some of them are `null`.
+
+    import String
+
+    badInt : Decoder Int
+    badInt =
+      oneOf [ int, null 0 ]
+
+    -- decodeString (list badInt) "[1,2,null,4]" == Ok [1,2,0,4]
+
+Why would someone generate JSON like this? Questions like this are not good
+for your health. The point is that you can use `oneOf` to handle situations
+like this!
+
+You could also use `oneOf` to help version your data. Try the latest format,
+then a few older ones that you still support. You could use `andThen` to be
+even more particular if you wanted.
+-}
 oneOf : List (Decoder a) -> Decoder a
 oneOf =
     Native.Json.oneOf
