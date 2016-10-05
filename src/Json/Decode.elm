@@ -40,7 +40,7 @@ import Array exposing (Array)
 import Dict exposing (Dict)
 import Json.Encode as JsEncode
 import List
-import Maybe exposing (Maybe)
+import Maybe exposing (Maybe(..))
 import Result exposing (Result(..))
 import Native.Json
 
