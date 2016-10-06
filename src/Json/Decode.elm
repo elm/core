@@ -493,16 +493,7 @@ structures [here][].
 -}
 lazy : (() -> Decoder a) -> Decoder a
 lazy thunk =
-  let
-    lazilyDecode jsValue =
-      case decodeValue (thunk ()) jsValue of
-        Ok value ->
-          succeed value
-
-        Err msg ->
-          fail msg
-  in
-    andThen lazilyDecode value
+  andThen thunk (succeed ())
 
 
 {-| Do not do anything with a JSON value, just bring it into Elm as a `Value`.
