@@ -338,10 +338,10 @@ reportRemBug msg c lgot rgot =
 
 -- Remove the top node from the tree, may leave behind BBlacks
 rem : NColor -> Dict k v -> Dict k v -> Dict k v
-rem c l r =
-  case (l, r) of
+rem color left right =
+  case (left, right) of
     (RBEmpty_elm_builtin _, RBEmpty_elm_builtin _) ->
-      case c of
+      case color of
         Red ->
           RBEmpty_elm_builtin LBlack
 
@@ -351,21 +351,21 @@ rem c l r =
         _ ->
           Native.Debug.crash "cannot have bblack or nblack nodes at this point"
 
-    (RBEmpty_elm_builtin cl, RBNode_elm_builtin cr k' v' l' r') ->
-      case (c, cl, cr) of
+    (RBEmpty_elm_builtin cl, RBNode_elm_builtin cr k v l r) ->
+      case (color, cl, cr) of
         (Black, LBlack, Red) ->
-          RBNode_elm_builtin Black k' v' l' r'
+          RBNode_elm_builtin Black k v l r
 
         _ ->
-          reportRemBug "Black/LBlack/Red" c (toString cl) (toString cr)
+          reportRemBug "Black/LBlack/Red" color (toString cl) (toString cr)
 
-    (RBNode_elm_builtin cl k' v' l' r', RBEmpty_elm_builtin cr) ->
-      case (c, cl, cr) of
+    (RBNode_elm_builtin cl k v l r, RBEmpty_elm_builtin cr) ->
+      case (color, cl, cr) of
         (Black, Red, LBlack) ->
-          RBNode_elm_builtin Black k' v' l' r'
+          RBNode_elm_builtin Black k v l r
 
         _ ->
-          reportRemBug "Black/Red/LBlack" c (toString cl) (toString cr)
+          reportRemBug "Black/Red/LBlack" color (toString cl) (toString cr)
 
     -- l and r are both RBNodes
     (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
@@ -373,10 +373,10 @@ rem c l r =
         (k, v) =
           maxWithDefault kl vl rl
 
-        l' =
+        newLeft =
           removeMax cl kl vl ll rl
       in
-        bubble c k v l' r
+        bubble color k v newLeft right
 
 
 -- Kills a BBlack or moves it upward, may leave behind NBlack

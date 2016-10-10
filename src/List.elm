@@ -189,12 +189,12 @@ scanl f b xs =
 filter : (a -> Bool) -> List a -> List a
 filter pred xs =
   let
-    conditionalCons x xs' =
-      if pred x then
-        x :: xs'
+    conditionalCons front back =
+      if pred front then
+        front :: back
 
       else
-        xs'
+        back
   in
     foldr conditionalCons [] xs
 

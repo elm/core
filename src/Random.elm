@@ -102,15 +102,15 @@ int a b =
           0 -> (acc, state)
           _ ->
             let
-              (x, state') = seed.next state
+              (x, nextState) = seed.next state
             in
-              f (n - 1) (x + acc * base) state'
+              f (n - 1) (x + acc * base) nextState
 
-      (v, state') =
+      (v, nextState) =
         f n 1 seed.state
     in
       ( lo + v % k
-      , Seed { seed | state = state' }
+      , Seed { seed | state = nextState }
       )
 
 
@@ -419,9 +419,9 @@ initialSeed n =
 to produce distinct generator states.
 -}
 initState : Int -> State
-initState s' =
+initState seed =
   let
-    s = max s' -s'
+    s = max seed -seed
     q  = s // (magicNum6-1)
     s1 = s %  (magicNum6-1)
     s2 = q %  (magicNum7-1)
@@ -441,23 +441,23 @@ magicNum8 = 2147483562
 
 
 next : State -> (Int, State)
-next (State s1 s2) =
+next (State state1 state2) =
   -- Div always rounds down and so random numbers are biased
   -- ideally we would use division that rounds towards zero so
   -- that in the negative case it rounds up and in the positive case
   -- it rounds down. Thus half the time it rounds up and half the time it
   -- rounds down
   let
-    k = s1 // magicNum1
-    s1' = magicNum0 * (s1 - k * magicNum1) - k * magicNum2
-    s1'' = if s1' < 0 then s1' + magicNum6 else s1'
-    k' = s2 // magicNum3
-    s2' = magicNum4 * (s2 - k' * magicNum3) - k' * magicNum5
-    s2'' = if s2' < 0 then s2' + magicNum7 else s2'
-    z = s1'' - s2''
-    z' = if z < 1 then z + magicNum8 else z
+    k1 = state1 // magicNum1
+    rawState1 = magicNum0 * (state1 - k1 * magicNum1) - k1 * magicNum2
+    newState1 = if rawState1 < 0 then rawState1 + magicNum6 else rawState1
+    k2 = state2 // magicNum3
+    rawState2 = magicNum4 * (state2 - k2 * magicNum3) - k2 * magicNum5
+    newState2 = if rawState2 < 0 then rawState2 + magicNum7 else rawState2
+    z = newState1 - newState2
+    newZ = if z < 1 then z + magicNum8 else z
   in
-    (z', State s1'' s2'')
+    (newZ, State newState1 newState2)
 
 
 split : State -> (State, State)

@@ -146,7 +146,7 @@ foldr f b (Set_elm_builtin d) =
 
 {-| Map a function onto a set, creating a new set with no duplicates.
 -}
-map : (comparable -> comparable') -> Set comparable -> Set comparable'
+map : (comparable -> comparable2) -> Set comparable -> Set comparable2
 map f s = fromList (List.map f (toList s))
 
 
