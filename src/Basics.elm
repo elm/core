@@ -605,7 +605,15 @@ snd (_,b) =
   b
 
 
-{-| Flip the order of the first two arguments to a function. -}
+{-| Flip the order of the first two arguments to a function.
+
+    divideBy a b = b / a
+    
+    divideBy4 = divideBy 4
+    
+    divide4By = flip divideBy 4
+
+-}
 flip : (a -> b -> c) -> (b -> a -> c)
 flip f b a =
   f a b
