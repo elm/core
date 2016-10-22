@@ -30,6 +30,9 @@ tests =
 
         , test "replace All" <| assertEqual           "Th qck brwn fx"
             (replace All (regex "[aeiou]") (\_ -> "") "The quick brown fox")
+
+        , test "replace using index" <| assertEqual                   "a1b3c"
+            (replace All (regex ",") (\match -> toString match.index) "a,b,c")
         ]
   in
       suite "Regex" [ simpleTests ]
