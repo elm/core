@@ -75,7 +75,7 @@ function replace(n, re, replacer, string)
 		return replacer({
 			match: match,
 			submatches: _elm_lang$core$Native_List.fromArray(submatches),
-			index: arguments[i - 1],
+			index: arguments[arguments.length - 2],
 			number: count
 		});
 	}
