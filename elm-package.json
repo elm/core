@@ -29,7 +29,8 @@
         "Set",
         "String",
         "Task",
-        "Time"
+        "Time",
+        "Tuple"
     ],
     "native-modules": true,
     "dependencies": {},

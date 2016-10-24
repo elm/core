@@ -9,7 +9,6 @@ module Basics exposing
   , toPolar, fromPolar
   , isNaN, isInfinite
   , toString, (++)
-  , fst, snd
   , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
   )
 
@@ -53,9 +52,6 @@ which happen to be radians.
 
 # Strings and Lists
 @docs toString, (++)
-
-# Tuples
-@docs fst, snd
 
 # Higher-Order Helpers
 @docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
@@ -592,18 +588,6 @@ of length ten would be:
 always : a -> b -> a
 always a _ =
   a
-
-
-{-| Given a 2-tuple, returns the first value. -}
-fst : (a,b) -> a
-fst (a,_) =
-  a
-
-
-{-| Given a 2-tuple, returns the second value. -}
-snd : (a,b) -> b
-snd (_,b) =
-  b
 
 
 {-| Flip the order of the first two arguments to a function. -}
