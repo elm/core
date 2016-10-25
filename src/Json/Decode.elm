@@ -446,7 +446,7 @@ customDecoder =
 you are dealing with. For example, imagine we are getting JSON representing
 different shapes. Data like this:
 
-    { "tag": "rectangle", "width": 2, "height": 3 }
+    { "height": 3, "tag": "rectangle", "width": 2 }
     { "tag": "circle", "radius": 2 }
 
 The following `shape` decoder looks at the `tag` to know what other fields to
