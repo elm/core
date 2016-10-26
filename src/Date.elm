@@ -153,7 +153,6 @@ millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
 
-{-----------------------------------------------------------------------------}
 {-| Extract the year of a given date when localized to UTC. Given the date 23
 June 1990 at 11:45AM UTC this returns the integer `1990`.
 -}
