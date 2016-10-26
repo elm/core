@@ -188,18 +188,22 @@ rgbToHsl red green blue =
 
     hue =
       degrees 60 *
-        if cMax == r then
+        if c == 0 then
+          0
+        else if cMax == r then
           ((g - b) / c) `fmod` 6
         else if cMax == g then
           ((b - r) / c) + 2
-        else {- cMax == b -}
+        else if cMax == b then
           ((r - g) / c) + 4
+        else
+          0
 
     lightness =
       (cMax + cMin) / 2
 
     saturation =
-      if lightness == 0 then
+      if c == 0 then
         0
       else
         c / (1 - abs (2 * lightness - 1))
