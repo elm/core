@@ -3,8 +3,8 @@ module Date exposing
   , year, month, Month(..)
   , day, dayOfWeek, Day(..)
   , hour, minute, second, millisecond
-  , utcYear, utcMonth,
-  , utcDay, utcDayOfWeek,
+  , utcYear, utcMonth
+  , utcDay, utcDayOfWeek
   , utcHour, utcMinute, utcSecond, utcMillisecond
   , timezoneOffset
   , now
