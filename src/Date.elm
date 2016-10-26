@@ -3,6 +3,10 @@ module Date exposing
   , year, month, Month(..)
   , day, dayOfWeek, Day(..)
   , hour, minute, second, millisecond
+  , utcYear, utcMonth,
+  , utcDay, utcDayOfWeek,
+  , utcHour, utcMinute, utcSecond, utcMillisecond
+  , timezoneOffset
   , now
   )
 
@@ -16,7 +20,7 @@ issues with internationalization or locale formatting.
 @docs fromString, toTime, fromTime
 
 # Extractions
-@docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond
+@docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond, utcYear, utcMonth, utcDay, utcDayOfWeek, utcHour, utcMinute, utcSecond, utcMillisecond, timezoneOffset
 
 -}
 
@@ -142,9 +146,82 @@ second =
   Native.Date.second
 
 
-{-| Extract the millisecond of a given date. Given the date 23 June 1990 at 11:45:30.123AM
-this returns the integer `123`.
+{-| Extract the millisecond of a given date. Given the date 23 June 1990 at
+11:45:30.123AM this returns the integer `123`.
 -}
 millisecond : Date -> Int
 millisecond =
   Native.Date.millisecond
+
+{-----------------------------------------------------------------------------}
+{-| Extract the year of a given date when localized to UTC. Given the date 23
+June 1990 at 11:45AM UTC this returns the integer `1990`.
+-}
+utcYear : Date -> Int
+utcYear =
+  Native.Date.utcYear
+
+
+{-| Extract the month of a given date when localized to UTC. Given the date 23
+June 1990 at 11:45AM UTC this returns the month `Jun` as defined below.
+-}
+utcMonth : Date -> Month
+utcMonth =
+  Native.Date.utcMonth
+
+
+{-| Extract the day of a given date when localized to UTC. Given the date 23
+June 1990 at 11:45AM UTC this returns the integer `23`.
+-}
+day : Date -> Int
+day =
+  Native.Date.day
+
+
+{-| Extract the day of the week for a given date when localized to UTC. Given
+the date 23 June 1990 at 11:45AM UTC this returns the day `Sat` as defined
+below.
+-}
+utcDayOfWeek : Date -> Day
+utcDayOfWeek =
+  Native.Date.utcDayOfWeek
+
+
+{-| Extract the hour of a given date when localized to UTC. Given the date 23
+June 1990 at 11:45AM UTC this returns the integer `11`.
+-}
+utcHour : Date -> Int
+utcHour =
+  Native.Date.utcHour
+
+
+{-| Extract the minute of a given date when localized to UTC. Given the date 23
+June 1990 at 11:45AM UTC this returns the integer `45`.
+-}
+utcMinute : Date -> Int
+utcMinute =
+  Native.Date.utcMinute
+
+
+{-| Extract the second of a given date when localized to UTC. Given the date 23
+June 1990 at 11:45AM UTC this returns the integer `0`.
+-}
+utcSecond : Date -> Int
+utcSecond =
+  Native.Date.utcSecond
+
+
+{-| Extract the millisecond of a given date when localized to UTC. Given the
+date 23 June 1990 at 11:45:30.123AM UTC this returns the integer `123`.
+-}
+utcMillisecond : Date -> Int
+utcMillisecond =
+  Native.Date.utcMillisecond
+
+
+{-| Extract the number of minutes between the timezone in the date and UTC.
+Given the date 23 June 1990 at 11:45AM EDT this returns the integer `240`.
+-}
+timezoneOffset : Date -> Int
+timezoneOffset =
+  Native.Date.timezoneOffset
