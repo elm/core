@@ -172,9 +172,9 @@ utcMonth =
 {-| Extract the day of a given date when localized to UTC. Given the date 23
 June 1990 at 11:45AM UTC this returns the integer `23`.
 -}
-day : Date -> Int
-day =
-  Native.Date.day
+utcDay : Date -> Int
+utcDay =
+  Native.Date.utcDay
 
 
 {-| Extract the day of the week for a given date when localized to UTC. Given
