@@ -55,6 +55,7 @@ import Platform
 import Platform.Cmd exposing (Cmd)
 import Task exposing (Task)
 import Time
+import Tuple
 
 
 
@@ -470,7 +471,7 @@ split (State s1 s2 as std) =
       if s2 == 1 then magicNum7-1 else s2 - 1
 
     (State t1 t2) =
-      snd (next std)
+      Tuple.second (next std)
   in
     (State new_s1 t2, State t1 new_s2)
 
