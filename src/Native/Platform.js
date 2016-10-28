@@ -16,7 +16,14 @@ function addPublicModule(object, name, main)
 
 	object['embed'] = function embed(domNode, flags)
 	{
-		return init(domNode, flags, true);
+		if (!domNode)
+		{
+			domNodeIsUndefined();
+		}
+		else
+		{
+			return init(domNode, flags, true);
+		}
 	}
 
 	object['fullscreen'] = function fullscreen(flags)
@@ -37,6 +44,14 @@ function mainIsUndefined(name)
 		domNode.innerHTML = errorHtml(message);
 		throw new Error(message);
 	};
+}
+
+function domNodeIsUndefined()
+{
+	var message = "It looks like you passed an undefined mount node to `embed`!\n" +
+		"Make sure you didn't misspell the id of the node you meant to target.";
+	document.body.innerHTML = errorHtml(message);
+	throw new Error(message);
 }
 
 function errorHtml(message)
