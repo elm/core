@@ -14,7 +14,7 @@ import Native.Platform
 
 
 {-| A subscription is a way of telling Elm, “Hey, let me know if anything
-interesting happens over there!” So if you want listen for messages on a web
+interesting happens over there!” So if you want to listen for messages on a web
 socket, you would tell Elm to create a subscription. If you want to get clock
 ticks, you would tell Elm to subscribe to that. The cool thing here is that
 this means *Elm* manages all the details of subscriptions instead of *you*.
