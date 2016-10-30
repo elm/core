@@ -29,7 +29,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs keys, values, toList, fromList
 
 # Transform
-@docs map, foldl, foldr, filter, partition
+@docs map, foldl, foldr, filter, partition, filterMap
 
 # Combine
 @docs union, intersect, diff, merge
@@ -625,6 +625,23 @@ partition predicate dict =
         (t1, insert key value t2)
   in
     foldl add (empty, empty) dict
+
+
+{-| Apply a function that may succeed to all values in the dictionary,
+but only keep the successes.
+-}
+filterMap : (comparable -> a -> Maybe b) -> Dict comparable a -> Dict comparable b
+filterMap f dictionary =
+  let
+    add key value dict =
+      case f key value of
+        Just result ->
+          insert key result dict
+
+        Nothing ->
+          dict
+  in
+    foldl add empty dictionary
 
 
 
