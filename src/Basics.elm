@@ -635,7 +635,7 @@ type Never = JustOneMore Never
 
 {-| A function that can never be called. Seems extremely pointless, but it
 *can* come in handy. Imagine you have some HTML that should never produce any
-messages. And say you want to use it is some other HTML that *does* produce
+messages. And say you want to use it in some other HTML that *does* produce
 messages. You could say:
 
     import Html exposing (..)
