@@ -633,20 +633,22 @@ do not want `Never` in your return types though.
 type Never = JustOneMore Never
 
 
-{-| A function that can never be called. Seems extremely pointless, but this
-can be useful with if you want to use `Time.now` or some other task that
-always succeeds:
+{-| A function that can never be called. Seems extremely pointless, but it
+*can* come in handy. Imagine you have some HTML that should never produce any
+messages. And say you want to use it is some other HTML that *does* produce
+messages. You could say:
 
-    type Msg = CurrentTime Time | ...
+    import Html exposing (..)
 
-    getTime : Cmd Msg
-    getTime =
-      Task.perform never CurrentTime Time.now
+    embedHtml : Html Never -> Html msg
+    embedHtml staticStuff =
+      div []
+        [ text "hello"
+        , Html.map never staticStuff
+        ]
 
-We know that the `Time.now` task can never fail from the type `Task x Time`,
-but `Task.perform` still wants us to handle the error case. So the `never`
-function is basically telling the type system, make sure no one ever calls
-me!
+So the `never` function is basically telling the type system, make sure no one
+ever calls me!
 -}
 never : Never -> a
 never (JustOneMore nvr) =
