@@ -10,14 +10,18 @@ Every Elm project needs the core libraries. They provide basic functionality inc
 
 ## Default Imports
 
-In all Elm files there is a small set of default imports:
+All Elm files have some default imports:
 
 ```elm
 import Basics exposing (..)
-import Debug
 import List exposing ( List, (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )
 import Result exposing ( Result( Ok, Err ) )
+import String
+import Tuple
+
+import Debug
+
 import Platform exposing ( Program )
 import Platform.Cmd exposing ( Cmd, (!) )
 import Platform.Sub exposing ( Sub )
