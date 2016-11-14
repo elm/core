@@ -40,10 +40,10 @@ import Platform.Sub exposing (Sub)
 
 You can create [headless][] programs with the [`program`](#program) and
 [`programWithFlags`](#programWithFlags) functions. Similar functions exist in
-[`Html.App`][app] that let you specify a view.
+[`Html`][html] that let you specify a view.
 
 [headless]: https://en.wikipedia.org/wiki/Headless_software
-[app]: http://package.elm-lang.org/packages/elm-lang/html/latest/Html-App
+[html]: http://package.elm-lang.org/packages/elm-lang/html/latest/Html
 
 Honestly, it is totally normal if this seems crazy at first. The best way to
 understand is to work through [guide.elm-lang.org](http://guide.elm-lang.org/).
