@@ -74,36 +74,19 @@ The second value is an initial command. Often that command is [Cmd.none](Platfor
 
 The second argument, `update` is a function that takes these two arguments:
 
-1. A message from the outside world, that has the information your code will act upon.
-Usually this is a `Msg` type that you specify, (a constructor), which takes a record type
-matching the data coming from an incoming port. Unpack that data with `case` ... `of`.
+1. A message from the outside world that has the information your code will act upon.
+Usually this is a [Msg type](https://www.elm-tutorial.org/en/02-elm-arch/03-messages.html)
+that you specify, which takes a record type matching the data coming from an incoming port.
+Unpack that data with `case` ... `of`.
 
-2. The current state of your program's model, as maintained by the Elm runtime.
+2. The current state of your program's model.
 
-The `update` function must return a [Tuple](Tuple)
-containing the modified form of your program's model, and a command.
-Generate that command by passing data to an outbound port. The data type
-held by this command is a determined by Elm. It probably will __not__ match any type
-you have defined in your code. Here's an example where we output a [String](String).
+The `update` function must return a [Tuple](Tuple) containing the modified form
+of your program's model, and a command.
 
-```elm
-port greet : String -> Cmd a
-
-type Msg = Name String
-
-type alias Model = { greetings : Int }
-
-update : Msg -> Model -> ( Model, Cmd a )
-update msg model =
-    let newModel =
-            model.greetings + 1 |> Model
-
-        greeting = case msg of
-            Name name ->
-                "Whaddup " ++ name ++ "?"
-    in
-        ( newModel, greet greeting )
-```
+It is common to generate that command by passing data to an outbound port.
+Then the data type this command holds is determined by Elm, and probably
+will __not__ match any type you have defined in your code.
 
 ### subscriptions
 
@@ -116,32 +99,52 @@ Instead you will probably only call an input port function and pass it a message
 which accepts a certain data structure from outside of Elm.
 
 It's possible that the `subscriptions` function _could_ return differing [Sub](Platform-Sub)s based on
-the state of your model.
+the state of your model. To specify multiple subscriptions, use [Sub.batch](Platform-Sub#batch).
 
-A code example may help. Here we have a subscription that shuts itself down if more
-than one hundred thousand password changes have been processed:
+A code example may help. Here we have program that greets visitors by name, keeps a head count,
+and shuts down its subscription after greeting more than three visitors:
 
 ```elm
-type alias PasswordData =
-    { userId : Int, newPassword : String }
+port module Greet exposing (..)
 
-port changePwPort : (PasswordData -> msg) -> Sub msg
+import Json.Decode
 
-type Msg = ChangePassword PasswordData
+port greet : String -> Cmd a
 
-type alias Model =
-    { numChanges : Int}
--- Assume the update function increments `numChanges`.
+port inputName : ( String -> msg ) -> Sub msg
+
+type Msg = Name String
+
+type alias Model = { visitors : Int }
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
+    Name name ->
+      let
+        newModel =
+          model.visitors + 1 |> Model
+        greeting =
+          "Hi " ++ name ++ ", you're visitor " ++ toString newModel.visitors
+      in
+        ( newModel, greet greeting )
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  if model.numChanges > 100000 then
+  if model.visitors > 3 then
     Sub.none
   else
-    changePwPort ChangePassword
+    inputName Name
+
+main : Program Never Model Msg
+main =
+  Platform.program {
+    init = ( Model 0, Cmd.none ),
+    update = update,
+    subscriptions = subscriptions
+  }
 ```
 
-To specify multiple subscriptions, use [Sub.batch](Platform-Sub#batch).
 -}
 program
   : { init : (model, Cmd msg)
