@@ -90,16 +90,12 @@ will __not__ match any type you have defined in your code.
 
 ### subscriptions
 
-The third argument, `subscriptions` is a function that accepts your program's model, and returns a
-[Sub](Platform-Sub).
+The third argument, `subscriptions` is called when your program initializes, and after each call to `update`.
 As explained in [the effects section of the Elm language guide](https://guide.elm-lang.org/architecture/effects/),
 it _"declares any event sources you need to subscribe to given the current model."_
-Your model might not be used in your definition of the `subscriptions` function.
-Instead you will probably only call an input port function and pass it a message type you have defined
-which accepts a certain data structure from outside of Elm.
 
-It's possible that the `subscriptions` function _could_ return differing [Sub](Platform-Sub)s based on
-the state of your model. To specify multiple subscriptions, use [Sub.batch](Platform-Sub#batch).
+A common use is to call an input port function and pass it a message type you have defined
+which accepts a certain data structure from outside of Elm. To specify multiple subscriptions, use [Sub.batch](Platform-Sub#batch).
 
 A code example may help. Here we have program that greets visitors by name, keeps a head count,
 and shuts down its subscription after greeting more than three visitors:
