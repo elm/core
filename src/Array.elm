@@ -135,7 +135,7 @@ foldr =
 
 {-| Keep only elements that satisfy the predicate:
 
-    filter isEven (fromList [1..6]) == (fromList [2,4,6])
+    filter isEven (fromList [1,2,3,4,5,6]) == (fromList [2,4,6])
 -}
 filter : (a -> Bool) -> Array a -> Array a
 filter isOkay arr =

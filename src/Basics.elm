@@ -583,7 +583,7 @@ returns 42. When you are dealing with higher-order functions, this comes in
 handy more often than you might expect. For example, creating a zeroed out list
 of length ten would be:
 
-    map (always 0) [0..9]
+    map (always 0) [0,1,2,3,4,5,6,7,8,9]
 -}
 always : a -> b -> a
 always a _ =
