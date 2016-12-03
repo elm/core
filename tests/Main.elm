@@ -9,7 +9,7 @@ import Test.Runner.Node exposing (run, TestProgram)
 
 import Test.Array as Array
 import Test.Basics as Basics
--- import Test.Bitwise as Bitwise
+import Test.Bitwise as Bitwise
 -- import Test.Char as Char
 -- import Test.CodeGen as CodeGen
 -- import Test.Dict as Dict
@@ -26,7 +26,7 @@ tests =
     describe "Elm Standard Library Tests"
         [ Array.tests
         , Basics.tests
-        -- , Bitwise.tests
+        , Bitwise.tests
         -- , Char.tests
         -- , CodeGen.tests
         -- , Dict.tests
