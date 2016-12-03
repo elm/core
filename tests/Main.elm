@@ -15,7 +15,7 @@ import Test.CodeGen as CodeGen
 import Test.Dict as Dict
 import Test.Equality as Equality
 import Test.Json as Json
--- import Test.List as List
+import Test.List as List
 -- import Test.Result as Result
 -- import Test.Set as Set
 -- import Test.String as String
@@ -32,7 +32,7 @@ tests =
         , Dict.tests
         , Equality.tests
         , Json.tests
-        -- , List.tests
+        , List.tests
         -- , Result.tests
         -- , Set.tests
         -- , String.tests
