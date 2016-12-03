@@ -13,7 +13,7 @@ import Test.Bitwise as Bitwise
 import Test.Char as Char
 import Test.CodeGen as CodeGen
 import Test.Dict as Dict
--- import Test.Equality as Equality
+import Test.Equality as Equality
 -- import Test.Json as Json
 -- import Test.List as List
 -- import Test.Result as Result
@@ -30,7 +30,7 @@ tests =
         , Char.tests
         , CodeGen.tests
         , Dict.tests
-        -- , Equality.tests
+        , Equality.tests
         -- , Json.tests
         -- , List.tests
         -- , Result.tests
