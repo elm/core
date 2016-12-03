@@ -513,12 +513,6 @@ function setupIncomingPort(name, callback)
 
 	function postInitSend(incomingValue)
 	{
-		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
-		if (result.ctor === 'Err')
-		{
-			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
-		}
-
 		var value = result._0;
 		var temp = subs;
 		while (temp.ctor !== '[]')
@@ -530,6 +524,12 @@ function setupIncomingPort(name, callback)
 
 	function send(incomingValue)
 	{
+		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
+		if (result.ctor === 'Err')
+		{
+			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
+		}
+
 		currentSend(incomingValue);
 	}
 
