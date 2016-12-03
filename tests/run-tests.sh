@@ -16,4 +16,4 @@ ln -s $CORE_GIT_DIR $CORE_PACKAGE_DIR
 
 elm-make --yes --output test.js Main.elm
 
-npm test
+elm-test Main.elm
