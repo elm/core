@@ -4,7 +4,8 @@ import Basics exposing (..)
 import Char exposing (..)
 import List
 
-import ElmTest exposing (..)
+import Test exposing (..)
+import Expect
 
 
 lower = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ]
@@ -15,79 +16,79 @@ hexLower = List.take 6 lower
 hexUpper = List.take 6 upper
 hex = List.append hexLower hexUpper |> List.append dec
 
-lowerCodes = [97..(97 + List.length lower - 1)]
-upperCodes = [65..(65 + List.length upper - 1)]
-decCodes = [48..(48 + List.length dec - 1)]
+lowerCodes = List.range 97 (97 + List.length lower - 1)
+upperCodes = List.range 65 (65 + List.length upper - 1)
+decCodes = List.range 48 (48 + List.length dec - 1)
 
 oneOf : List a -> a -> Bool
 oneOf = flip List.member
 
 
 tests : Test
-tests = suite "Char"
-  [ suite "toCode"
-      [ test "a-z" <| assertEqual (lowerCodes) (List.map toCode lower)
-      , test "A-Z" <| assertEqual (upperCodes) (List.map toCode upper)
-      , test "0-9" <| assertEqual (decCodes) (List.map toCode dec)
+tests = describe "Char"
+  [ describe "toCode"
+      [ test "a-z" <| \() -> Expect.equal (lowerCodes) (List.map toCode lower)
+      , test "A-Z" <| \() -> Expect.equal (upperCodes) (List.map toCode upper)
+      , test "0-9" <| \() -> Expect.equal (decCodes) (List.map toCode dec)
       ]
 
-  , suite "fromCode"
-      [ test "a-z" <| assertEqual (lower) (List.map fromCode lowerCodes)
-      , test "A-Z" <| assertEqual (upper) (List.map fromCode upperCodes)
-      , test "0-9" <| assertEqual (dec) (List.map fromCode decCodes)
+  , describe "fromCode"
+      [ test "a-z" <| \() -> Expect.equal (lower) (List.map fromCode lowerCodes)
+      , test "A-Z" <| \() -> Expect.equal (upper) (List.map fromCode upperCodes)
+      , test "0-9" <| \() -> Expect.equal (dec) (List.map fromCode decCodes)
       ]
 
-  , suite "toLocaleLower"
-      [ test "a-z" <| assertEqual (lower) (List.map toLocaleLower lower)
-      , test "A-Z" <| assertEqual (lower) (List.map toLocaleLower upper)
-      , test "0-9" <| assertEqual (dec) (List.map toLocaleLower dec)
+  , describe "toLocaleLower"
+      [ test "a-z" <| \() -> Expect.equal (lower) (List.map toLocaleLower lower)
+      , test "A-Z" <| \() -> Expect.equal (lower) (List.map toLocaleLower upper)
+      , test "0-9" <| \() -> Expect.equal (dec) (List.map toLocaleLower dec)
       ]
 
-  , suite "toLocaleUpper"
-      [ test "a-z" <| assertEqual (upper) (List.map toLocaleUpper lower)
-      , test "A-Z" <| assertEqual (upper) (List.map toLocaleUpper upper)
-      , test "0-9" <| assertEqual (dec) (List.map toLocaleUpper dec)
+  , describe "toLocaleUpper"
+      [ test "a-z" <| \() -> Expect.equal (upper) (List.map toLocaleUpper lower)
+      , test "A-Z" <| \() -> Expect.equal (upper) (List.map toLocaleUpper upper)
+      , test "0-9" <| \() -> Expect.equal (dec) (List.map toLocaleUpper dec)
       ]
 
-  , suite "toLower"
-      [ test "a-z" <| assertEqual (lower) (List.map toLower lower)
-      , test "A-Z" <| assertEqual (lower) (List.map toLower upper)
-      , test "0-9" <| assertEqual (dec) (List.map toLower dec)
+  , describe "toLower"
+      [ test "a-z" <| \() -> Expect.equal (lower) (List.map toLower lower)
+      , test "A-Z" <| \() -> Expect.equal (lower) (List.map toLower upper)
+      , test "0-9" <| \() -> Expect.equal (dec) (List.map toLower dec)
       ]
 
-  , suite "toUpper"
-      [ test "a-z" <| assertEqual (upper) (List.map toUpper lower)
-      , test "A-Z" <| assertEqual (upper) (List.map toUpper upper)
-      , test "0-9" <| assertEqual (dec) (List.map toUpper dec)
+  , describe "toUpper"
+      [ test "a-z" <| \() -> Expect.equal (upper) (List.map toUpper lower)
+      , test "A-Z" <| \() -> Expect.equal (upper) (List.map toUpper upper)
+      , test "0-9" <| \() -> Expect.equal (dec) (List.map toUpper dec)
       ]
 
-  , suite "isLower"
-      [ test "a-z" <| assertEqual (True) (List.all isLower lower)
-      , test "A-Z" <| assertEqual (False) (List.any isLower upper)
-      , test "0-9" <| assertEqual (False) (List.any isLower dec)
+  , describe "isLower"
+      [ test "a-z" <| \() -> Expect.equal (True) (List.all isLower lower)
+      , test "A-Z" <| \() -> Expect.equal (False) (List.any isLower upper)
+      , test "0-9" <| \() -> Expect.equal (False) (List.any isLower dec)
       ]
 
-  , suite "isUpper"
-      [ test "a-z" <| assertEqual (False) (List.any isUpper lower)
-      , test "A-Z" <| assertEqual (True) (List.all isUpper upper)
-      , test "0-9" <| assertEqual (False) (List.any isUpper dec)
+  , describe "isUpper"
+      [ test "a-z" <| \() -> Expect.equal (False) (List.any isUpper lower)
+      , test "A-Z" <| \() -> Expect.equal (True) (List.all isUpper upper)
+      , test "0-9" <| \() -> Expect.equal (False) (List.any isUpper dec)
       ]
 
-  , suite "isDigit"
-      [ test "a-z" <| assertEqual (False) (List.any isDigit lower)
-      , test "A-Z" <| assertEqual (False) (List.any isDigit upper)
-      , test "0-9" <| assertEqual (True) (List.all isDigit dec)
+  , describe "isDigit"
+      [ test "a-z" <| \() -> Expect.equal (False) (List.any isDigit lower)
+      , test "A-Z" <| \() -> Expect.equal (False) (List.any isDigit upper)
+      , test "0-9" <| \() -> Expect.equal (True) (List.all isDigit dec)
       ]
 
-  , suite "isHexDigit"
-      [ test "a-z" <| assertEqual (List.map (oneOf hex) lower) (List.map isHexDigit lower)
-      , test "A-Z" <| assertEqual (List.map (oneOf hex) upper) (List.map isHexDigit upper)
-      , test "0-9" <| assertEqual (True) (List.all isHexDigit dec)
+  , describe "isHexDigit"
+      [ test "a-z" <| \() -> Expect.equal (List.map (oneOf hex) lower) (List.map isHexDigit lower)
+      , test "A-Z" <| \() -> Expect.equal (List.map (oneOf hex) upper) (List.map isHexDigit upper)
+      , test "0-9" <| \() -> Expect.equal (True) (List.all isHexDigit dec)
       ]
 
-  , suite "isOctDigit"
-      [ test "a-z" <| assertEqual (False) (List.any isOctDigit lower)
-      , test "A-Z" <| assertEqual (False) (List.any isOctDigit upper)
-      , test "0-9" <| assertEqual (List.map (oneOf oct) dec) (List.map isOctDigit dec)
+  , describe "isOctDigit"
+      [ test "a-z" <| \() -> Expect.equal (False) (List.any isOctDigit lower)
+      , test "A-Z" <| \() -> Expect.equal (False) (List.any isOctDigit upper)
+      , test "0-9" <| \() -> Expect.equal (List.map (oneOf oct) dec) (List.map isOctDigit dec)
       ]
   ]
