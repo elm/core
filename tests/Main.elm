@@ -11,7 +11,7 @@ import Test.Array as Array
 import Test.Basics as Basics
 import Test.Bitwise as Bitwise
 import Test.Char as Char
--- import Test.CodeGen as CodeGen
+import Test.CodeGen as CodeGen
 -- import Test.Dict as Dict
 -- import Test.Equality as Equality
 -- import Test.Json as Json
@@ -28,7 +28,7 @@ tests =
         , Basics.tests
         , Bitwise.tests
         , Char.tests
-        -- , CodeGen.tests
+        , CodeGen.tests
         -- , Dict.tests
         -- , Equality.tests
         -- , Json.tests
