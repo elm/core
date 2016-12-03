@@ -18,7 +18,7 @@ import Test.Json as Json
 import Test.List as List
 import Test.Result as Result
 import Test.Set as Set
--- import Test.String as String
+import Test.String as String
 -- import Test.Regex as Regex
 
 tests : Test
@@ -35,7 +35,7 @@ tests =
         , List.tests
         , Result.tests
         , Set.tests
-        -- , String.tests
+        , String.tests
         -- , Regex.tests
         ]
 
