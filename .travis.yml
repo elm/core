@@ -3,6 +3,7 @@ language: node_js
 node_js:
   - "4.3"
 install:
-  - npm install -g elm@0.17
+  - npm install -g elm@0.18
+  - npm install
 script:
   - bash tests/run-tests.sh
