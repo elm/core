@@ -419,6 +419,11 @@ function slice(from, to, a)
 
 function sliceRight(to, a)
 {
+	if (!a) 
+	{
+		a = empty;
+	}
+
 	if (to === length(a))
 	{
 		return a;
@@ -459,6 +464,11 @@ function sliceRight(to, a)
 
 function sliceLeft(from, a)
 {
+	if (!a) 
+	{
+		a = empty;
+	}
+
 	if (from === 0)
 	{
 		return a;
@@ -815,6 +825,11 @@ function nodeCopy(a)
 // Returns how many items are in the tree.
 function length(array)
 {
+	if (!array)
+	{
+		return 0;
+	}
+	
 	if (array.height === 0)
 	{
 		return array.table.length;
