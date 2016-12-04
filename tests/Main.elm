@@ -6,7 +6,6 @@ import Test exposing (..)
 import Platform.Cmd exposing (Cmd)
 import Json.Decode exposing (Value)
 import Test.Runner.Node exposing (run, TestProgram)
-
 import Test.Array as Array
 import Test.Basics as Basics
 import Test.Bitwise as Bitwise
@@ -20,6 +19,7 @@ import Test.Result as Result
 import Test.Set as Set
 import Test.String as String
 import Test.Regex as Regex
+
 
 tests : Test
 tests =
