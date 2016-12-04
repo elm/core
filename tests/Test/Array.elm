@@ -6,7 +6,6 @@ import List
 import List exposing ((::))
 import Maybe exposing (..)
 import Native.Array
-
 import Test exposing (..)
 import Expect
 
