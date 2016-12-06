@@ -380,13 +380,16 @@ function runHelp(decoder, value)
 			var keyValuePairs = _elm_lang$core$Native_List.Nil;
 			for (var key in value)
 			{
-				var result = runHelp(decoder.decoder, value[key]);
-				if (result.tag !== 'ok')
+				if (value.hasOwnProperty(key))
 				{
-					return badField(key, result);
+					var result = runHelp(decoder.decoder, value[key]);
+					if (result.tag !== 'ok')
+					{
+						return badField(key, result);
+					}
+					var pair = _elm_lang$core$Native_Utils.Tuple2(key, result.value);
+					keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
 				}
-				var pair = _elm_lang$core$Native_Utils.Tuple2(key, result.value);
-				keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
 			}
 			return ok(keyValuePairs);
 
