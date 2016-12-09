@@ -83,18 +83,14 @@ toList =
   Native.Array.toList
 
 
--- TODO: make this a native function.
 {-| Create an indexed list from an array. Each element of the array will be
 paired with its index.
 
     toIndexedList (fromList ["cat","dog"]) == [(0,"cat"), (1,"dog")]
 -}
 toIndexedList : Array a -> List (Int, a)
-toIndexedList array =
-  List.map2
-    (,)
-    (List.range 0 (Native.Array.length array - 1))
-    (Native.Array.toList array)
+toIndexedList =
+  Native.Array.toIndexedList
 
 
 {-| Apply a function on every element in an array.

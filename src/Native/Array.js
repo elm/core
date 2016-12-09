@@ -315,6 +315,26 @@ function toList_(list, a)
 	return list;
 }
 
+function toIndexedList(a)
+{
+	return toIndexedList_(_elm_lang$core$Native_List.Nil, a);
+}
+
+function toIndexedList_(list, a)
+{
+	for (var i = a.table.length - 1; i >= 0; i--)
+	{
+		list =
+			a.height === 0
+				? _elm_lang$core$Native_List.Cons(
+					_elm_lang$core$Native_Utils.Tuple2(i, a.table[i]),
+					list
+					)
+				: toIndexedList_(list, a.table[i]);
+	}
+	return list;
+}
+
 // Maps a function over the elements of an array.
 function map(f, a)
 {
@@ -948,6 +968,7 @@ return {
 	empty: empty,
 	fromList: fromList,
 	toList: toList,
+	toIndexedList: toIndexedList,
 	initialize: F2(initialize),
 	append: F2(append),
 	push: F2(push),
