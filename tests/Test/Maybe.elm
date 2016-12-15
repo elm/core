@@ -145,4 +145,25 @@ tests =
 
       ]
 
+    , describe "Chaining Maybes Tests"
+
+      [ describe "andThen Tests"
+        [ test "succeeding chain" <|
+            \() ->
+              Expect.equal
+                (Just 1)
+                (Maybe.andThen (\a -> Just a) (Just 1))
+        , test "failing chain (original Maybe failed)" <|
+            \() ->
+              Expect.equal
+                Nothing
+                (Maybe.andThen (\a -> Just a) Nothing)
+        , test "failing chain (chained function failed)" <|
+            \() ->
+              Expect.equal
+                Nothing
+                (Maybe.andThen (\a -> Nothing) (Just 1))
+        ]
+      ]
+
     ]
