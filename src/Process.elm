@@ -72,7 +72,8 @@ type alias Id =
 or is just taking a long time, we can hop over to `task2` and do some work
 there.
 
-    spawn task1 `Task.andThen` \_ -> spawn task2
+    spawn task1
+      |> Task.andThen (\_ -> spawn task2)
 
 **Note:** This creates a relatively restricted kind of `Process` because it
 cannot receive any messages. More flexibility for user-defined processes will

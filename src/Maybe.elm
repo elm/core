@@ -3,7 +3,6 @@ module Maybe exposing
   , andThen
   , map, map2, map3, map4, map5
   , withDefault
-  , oneOf
   )
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
@@ -13,11 +12,10 @@ you with optional arguments, error handling, and records with optional fields.
 @docs Maybe
 
 # Common Helpers
-@docs withDefault, oneOf, map, map2, map3, map4, map5
+@docs withDefault, map, map2, map3, map4, map5
 
 # Chaining Maybes
 @docs andThen
-
 -}
 
 {-| Represent values that may or may not exist. It can be useful if you have a
@@ -53,25 +51,6 @@ withDefault default maybe =
     case maybe of
       Just value -> value
       Nothing -> default
-
-
-{-| Pick the first `Maybe` that actually has a value. Useful when you want to
-try a couple different things, but there is no default value.
-
-    oneOf [ Nothing, Just 42, Just 71 ] == Just 42
-    oneOf [ Nothing, Nothing, Just 71 ] == Just 71
-    oneOf [ Nothing, Nothing, Nothing ] == Nothing
--}
-oneOf : List (Maybe a) -> Maybe a
-oneOf maybes =
-  case maybes of
-    [] ->
-        Nothing
-
-    maybe :: rest ->
-        case maybe of
-          Nothing -> oneOf rest
-          Just _ -> maybe
 
 
 {-| Transform a `Maybe` value with a given function:
@@ -138,8 +117,8 @@ map5 func ma mb mc md me =
 {-| Chain together many computations that may fail. It is helpful to see its
 definition:
 
-    andThen : Maybe a -> (a -> Maybe b) -> Maybe b
-    andThen maybe callback =
+    andThen : (a -> Maybe b) -> Maybe a -> Maybe b
+    andThen callback maybe =
         case maybe of
             Just value ->
                 callback value
@@ -160,15 +139,19 @@ first month from a `List` and then make sure it is between 1 and 12:
 
     getFirstMonth : List Int -> Maybe Int
     getFirstMonth months =
-        head months `andThen` toValidMonth
+        head months
+          |> andThen toValidMonth
 
 If `head` fails and results in `Nothing` (because the `List` was `empty`),
 this entire chain of operations will short-circuit and result in `Nothing`.
 If `toValidMonth` results in `Nothing`, again the chain of computations
 will result in `Nothing`.
 -}
-andThen : Maybe a -> (a -> Maybe b) -> Maybe b
-andThen maybeValue callback =
+andThen : (a -> Maybe b) -> Maybe a -> Maybe b
+andThen callback maybeValue =
     case maybeValue of
-        Just value -> callback value
-        Nothing -> Nothing
+        Just value ->
+            callback value
+
+        Nothing ->
+            Nothing

@@ -1,12 +1,11 @@
 effect module Task where { command = MyCmd } exposing
   ( Task
   , succeed, fail
-  , map, map2, map3, map4, map5, andMap
+  , map, map2, map3, map4, map5
   , sequence
   , andThen
   , onError, mapError
-  , toMaybe, fromMaybe, toResult, fromResult
-  , perform
+  , perform, attempt
   )
 
 {-| Tasks make it easy to describe asynchronous operations that may fail, like
@@ -17,20 +16,20 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 @docs Task, succeed, fail
 
 # Mapping
-@docs map, map2, map3, map4, map5, andMap
+@docs map, map2, map3, map4, map5
 
 # Chaining
 @docs andThen, sequence
 
 # Errors
-@docs onError, mapError, toMaybe, fromMaybe, toResult, fromResult
+@docs onError, mapError
 
 # Commands
-@docs perform
+@docs perform, attempt
 
 -}
 
-import Basics exposing (Never)
+import Basics exposing (Never, (|>), (<<))
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
@@ -85,7 +84,7 @@ fail =
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
   taskA
-    `andThen` \a -> succeed (func a)
+    |> andThen (\a -> succeed (func a))
 
 
 {-| Put the results of two tasks together. If either task fails, the whole
@@ -97,54 +96,38 @@ finished before the second task starts.
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
   taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> succeed (func a b)
+    |> andThen (\a -> taskB
+    |> andThen (\b -> succeed (func a b)))
 
 
 {-|-}
 map3 : (a -> b -> c -> result) -> Task x a -> Task x b -> Task x c -> Task x result
 map3 func taskA taskB taskC =
   taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> taskC
-    `andThen` \c -> succeed (func a b c)
+    |> andThen (\a -> taskB
+    |> andThen (\b -> taskC
+    |> andThen (\c -> succeed (func a b c))))
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x result
 map4 func taskA taskB taskC taskD =
   taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> taskC
-    `andThen` \c -> taskD
-    `andThen` \d -> succeed (func a b c d)
+    |> andThen (\a -> taskB
+    |> andThen (\b -> taskC
+    |> andThen (\c -> taskD
+    |> andThen (\d -> succeed (func a b c d)))))
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x e -> Task x result
 map5 func taskA taskB taskC taskD taskE =
   taskA
-    `andThen` \a -> taskB
-    `andThen` \b -> taskC
-    `andThen` \c -> taskD
-    `andThen` \d -> taskE
-    `andThen` \e -> succeed (func a b c d e)
-
-
-{-| Put the results of two tasks together. If either task fails, the whole
-thing fails. It also runs in order so the first task will be completely
-finished before the second task starts.
-
-This function makes it possible to chain tons of tasks together and pipe them
-all into a single function.
-
-    (f `map` task1 `andMap` task2 `andMap` task3) -- map3 f task1 task2 task3
--}
-andMap : Task x (a -> b) -> Task x a -> Task x b
-andMap taskFunc taskValue =
-  taskFunc
-    `andThen` \func -> taskValue
-    `andThen` \value -> succeed (func value)
+    |> andThen (\a -> taskB
+    |> andThen (\b -> taskC
+    |> andThen (\c -> taskD
+    |> andThen (\d -> taskE
+    |> andThen (\e -> succeed (func a b c d e))))))
 
 
 {-| Start with a list of tasks, and turn them into a single task that returns a
@@ -173,12 +156,14 @@ sequence tasks =
 successful, you give the result to the callback resulting in another task. This
 task then gets run.
 
-    succeed 2 `andThen` (\n -> succeed (n + 2)) -- succeed 4
+    succeed 2
+      |> andThen (\n -> succeed (n + 2))
+      -- succeed 4
 
 This is useful for chaining tasks together. Maybe you need to get a user from
 your servers *and then* lookup their picture once you know their name.
 -}
-andThen : Task x a -> (a -> Task x b) -> Task x b
+andThen : (a -> Task x b) -> Task x a -> Task x b
 andThen =
   Native.Scheduler.andThen
 
@@ -188,10 +173,15 @@ andThen =
 {-| Recover from a failure in a task. If the given task fails, we use the
 callback to recover.
 
-    fail "file not found" `onError` (\msg -> succeed 42) -- succeed 42
-    succeed 9 `onError` (\msg -> succeed 42)             -- succeed 9
+    fail "file not found"
+      |> onError (\msg -> succeed 42)
+      -- succeed 42
+
+    succeed 9
+      |> onError (\msg -> succeed 42)
+      -- succeed 9
 -}
-onError : Task x a -> (x -> Task y a) -> Task y a
+onError : (x -> Task y a) -> Task x a -> Task y a
 onError =
   Native.Scheduler.onError
 
@@ -206,66 +196,9 @@ types to match up.
       sequence [ mapError Http serverTask, mapError WebGL textureTask ]
 -}
 mapError : (x -> y) -> Task x a -> Task y a
-mapError f task =
-  task `onError` \err -> fail (f err)
-
-
-{-| Translate a task that can fail into a task that can never fail, by
-converting any failure into `Nothing` and any success into `Just` something.
-
-    toMaybe (fail "file not found") -- succeed Nothing
-    toMaybe (succeed 42)            -- succeed (Just 42)
-
-This means you can handle the error with the `Maybe` module instead.
--}
-toMaybe : Task x a -> Task never (Maybe a)
-toMaybe task =
-  map Just task `onError` (\_ -> succeed Nothing)
-
-
-{-| If you are chaining together a bunch of tasks, it may be useful to treat
-a maybe value like a task.
-
-    fromMaybe "file not found" Nothing   -- fail "file not found"
-    fromMaybe "file not found" (Just 42) -- succeed 42
--}
-fromMaybe : x -> Maybe a -> Task x a
-fromMaybe default maybe =
-  case maybe of
-    Just value ->
-      succeed value
-
-    Nothing ->
-      fail default
-
-
-{-| Translate a task that can fail into a task that can never fail, by
-converting any failure into `Err` something and any success into `Ok` something.
-
-    toResult (fail "file not found") -- succeed (Err "file not found")
-    toResult (succeed 42)            -- succeed (Ok 42)
-
-This means you can handle the error with the `Result` module instead.
--}
-toResult : Task x a -> Task never (Result x a)
-toResult task =
-  map Ok task `onError` (\msg -> succeed (Err msg))
-
-
-{-| If you are chaining together a bunch of tasks, it may be useful to treat
-a result like a task.
-
-    fromResult (Err "file not found") -- fail "file not found"
-    fromResult (Ok 42)                -- succeed 42
--}
-fromResult : Result x a -> Task x a
-fromResult result =
-  case result of
-    Ok value ->
-      succeed value
-
-    Err msg ->
-      fail msg
+mapError convert task =
+  task
+    |> onError (fail << convert)
 
 
 
@@ -273,23 +206,46 @@ fromResult result =
 
 
 type MyCmd msg =
-  T (Task Never msg)
+  Perform (Task Never msg)
 
 
-{-| Command the runtime system to perform a task. The most important argument
-is the `Task` which describes what you want to happen. But you also need to
-provide functions to tag the two possible outcomes of the task. It can fail or
-succeed, but either way, you need to have a message to feed back into your
-application.
+{-| The only way to *do* things in Elm is to give commands to the Elm runtime.
+So we describe some complex behavior with a `Task` and then command the runtime
+to `perform` that task. For example, getting the current time looks like this:
+
+    import Task
+    import Time exposing (Time)
+
+    type Msg = Click | NewTime Time
+
+    update : Msg -> Model -> Model
+    update msg model =
+      case msg of
+        Click ->
+          ( model, Task.perform NewTime Time.now )
+
+        NewTime time ->
+          ...
 -}
-perform : (x -> msg) -> (a -> msg) -> Task x a -> Cmd msg
-perform onFail onSuccess task =
-  command (T (map onSuccess task `onError` \x -> succeed (onFail x)))
+perform : (a -> msg) -> Task Never a -> Cmd msg
+perform toMessage task =
+  command (Perform (map toMessage task))
+
+
+{-| Command the Elm runtime to attempt a task that might fail!
+-}
+attempt : (Result x a -> msg) -> Task x a -> Cmd msg
+attempt resultToMessage task =
+  command (Perform (
+    task
+      |> andThen (succeed << resultToMessage << Ok)
+      |> onError (succeed << resultToMessage << Err)
+  ))
 
 
 cmdMap : (a -> b) -> MyCmd a -> MyCmd b
-cmdMap tagger (T task) =
-  T (map tagger task)
+cmdMap tagger (Perform task) =
+  Perform (map tagger task)
 
 
 
@@ -314,6 +270,9 @@ onSelfMsg _ _ _ =
 
 
 spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
-spawnCmd router (T task) =
-  Native.Scheduler.spawn (task `andThen` Platform.sendToApp router)
+spawnCmd router (Perform task) =
+  Native.Scheduler.spawn (
+    task
+      |> andThen (Platform.sendToApp router)
+  )
 

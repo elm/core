@@ -6,7 +6,7 @@ function fromString(str)
 {
 	var date = new Date(str);
 	return isNaN(date.getTime())
-		? _elm_lang$core$Result$Err('unable to parse \'' + str + '\' as a date')
+		? _elm_lang$core$Result$Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
 		: _elm_lang$core$Result$Ok(date);
 }
 

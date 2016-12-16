@@ -1,17 +1,15 @@
 module Bitwise exposing
   ( and, or, xor, complement
-  , shiftLeft, shiftRight, shiftRightLogical
+  , shiftLeftBy, shiftRightBy, shiftRightZfBy
   )
 
 {-| Library for [bitwise operations](http://en.wikipedia.org/wiki/Bitwise_operation).
 
 # Basic Operations
-
 @docs and, or, xor, complement
 
 # Bit Shifts
-
-@docs shiftLeft, shiftRight, shiftRightLogical
+@docs shiftLeftBy, shiftRightBy, shiftRightZfBy
 -}
 
 import Native.Bitwise
@@ -48,44 +46,45 @@ complement =
 {-| Shift bits to the left by a given offset, filling new bits with zeros.
 This can be used to multiply numbers by powers of two.
 
-    8 `shiftLeft` 1 == 16
-    8 `shiftLeft` 2 == 32
+    shiftLeftBy 1 5 == 10
+    shiftLeftBy 5 1 == 32
 -}
-shiftLeft : Int -> Int -> Int
-shiftLeft =
-  Native.Bitwise.shiftLeft
+shiftLeftBy : Int -> Int -> Int
+shiftLeftBy =
+  Native.Bitwise.shiftLeftBy
 
 
 {-| Shift bits to the right by a given offset, filling new bits with
 whatever is the topmost bit. This can be used to divide numbers by powers of two.
 
-     32 `shiftRight` 1 == 16
-     32 `shiftRight` 2 == 8
-    -32 `shiftRight` 1 == -16
+    shiftRightBy 1  32 == 16
+    shiftRightBy 2  32 == 8
+    shiftRightBy 1 -32 == -16
 
-This is called an [arithmetic right
-shift](http://en.wikipedia.org/wiki/Bitwise_operation#Arithmetic_shift),
-often written (>>), and sometimes called a sign-propagating
-right shift because it fills empty spots with copies of the highest bit.
+This is called an [arithmetic right shift][ars], often written (>>), and
+sometimes called a sign-propagating right shift because it fills empty spots
+with copies of the highest bit.
+
+[ars]: http://en.wikipedia.org/wiki/Bitwise_operation#Arithmetic_shift
 -}
-shiftRight : Int -> Int -> Int
-shiftRight =
-  Native.Bitwise.shiftRightArithmatic
+shiftRightBy : Int -> Int -> Int
+shiftRightBy =
+  Native.Bitwise.shiftRightBy
 
 
-{-| Shift bits to the right by a given offset, filling new bits with
+{-| Shift bits to the right by a given offset, filling new bits with zeros.
+
+    shiftRightZfBy 1  32 == 16
+    shiftRightZfBy 2  32 == 8
+    shiftRightZfBy 1 -32 == 2147483632
+
+This is called an [logical right shift][lrs], often written (>>>), and
+sometimes called a zero-fill right shift because it fills empty spots with
 zeros.
 
-     32 `shiftRightLogical` 1 == 16
-     32 `shiftRightLogical` 2 == 8
-    -32 `shiftRightLogical` 1 == 2147483632
-
-This is called an [logical right
-shift](http://en.wikipedia.org/wiki/Bitwise_operation#Logical_shift), often written (>>>),
-and sometimes called a zero-fill right shift because it fills empty spots
-with zeros.
+[lrs]: http://en.wikipedia.org/wiki/Bitwise_operation#Logical_shift
 -}
-shiftRightLogical : Int -> Int -> Int
-shiftRightLogical =
-  Native.Bitwise.shiftRightLogical
+shiftRightZfBy : Int -> Int -> Int
+shiftRightZfBy =
+  Native.Bitwise.shiftRightZfBy
 

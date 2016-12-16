@@ -10,7 +10,8 @@
     "exposed-modules": [ ],
     "native-modules": true,
     "dependencies": {
-        "elm-community/elm-test": "1.0.0 <= v < 2.0.0"
+        "elm-community/elm-test": "3.1.0 <= v < 4.0.0",
+        "rtfeldman/node-test-runner": "3.0.0 <= v < 4.0.0"
     },
-    "elm-version": "0.17.0 <= v < 0.18.0"
+    "elm-version": "0.18.0 <= v < 0.19.0"
 }

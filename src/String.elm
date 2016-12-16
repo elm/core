@@ -328,7 +328,7 @@ toUpper =
 
 {-| Convert a string to all lower case. Useful for case-insensitive comparisons.
 
-   toLower "X-FILES" == "x-files"
+    toLower "X-FILES" == "x-files"
 -}
 toLower : String -> String
 toLower =

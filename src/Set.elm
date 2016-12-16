@@ -12,8 +12,7 @@ module Set exposing
 includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or lists
 of comparable types.
 
-Insert, remove, and query operations all take *O(log n)* time. Set equality with
-`(==)` is unreliable and should not be used.
+Insert, remove, and query operations all take *O(log n)* time.
 
 # Sets
 @docs Set
@@ -147,7 +146,7 @@ foldr f b (Set_elm_builtin d) =
 
 {-| Map a function onto a set, creating a new set with no duplicates.
 -}
-map : (comparable -> comparable') -> Set comparable -> Set comparable'
+map : (comparable -> comparable2) -> Set comparable -> Set comparable2
 map f s = fromList (List.map f (toList s))
 
 

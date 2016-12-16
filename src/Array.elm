@@ -91,7 +91,10 @@ paired with its index.
 -}
 toIndexedList : Array a -> List (Int, a)
 toIndexedList array =
-  List.map2 (,) [ 0 .. Native.Array.length array - 1 ] (Native.Array.toList array)
+  List.map2
+    (,)
+    (List.range 0 (Native.Array.length array - 1))
+    (Native.Array.toList array)
 
 
 {-| Apply a function on every element in an array.
@@ -165,10 +168,10 @@ push =
 
 {-| Return Just the element at the index or Nothing if the index is out of range.
 
-    get  0 (fromList [0,1,2]) == Just 0
-    get  2 (fromList [0,1,2]) == Just 2
-    get  5 (fromList [0,1,2]) == Nothing
-    get -1 (fromList [0,1,2]) == Nothing
+    get  0 (fromList [0,5,3]) == Just 0
+    get  2 (fromList [0,5,3]) == Just 3
+    get  5 (fromList [0,5,3]) == Nothing
+    get -1 (fromList [0,5,3]) == Nothing
 
 -}
 get : Int -> Array a -> Maybe a
