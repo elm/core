@@ -19,7 +19,7 @@ tests =
                 , test "length" <| \() -> Expect.equal 11 (String.length "innumerable")
                 , test "endsWith" <| \() -> Expect.equal True <| String.endsWith "ship" "spaceship"
                 , test "reverse" <| \() -> Expect.equal "desserts" (String.reverse "stressed")
-                , test "reverse unicode" <| assertEqual "ma͒n𝌆" (String.reverse "𝌆na͒m")
+                , test "reverse unicode" <| Expect.equal "ma͒n𝌆" (String.reverse "𝌆na͒m")
                 , test "repeat" <| \() -> Expect.equal "hahaha" (String.repeat 3 "ha")
                 , test "indexes" <| \() -> Expect.equal [ 0, 2 ] (String.indexes "a" "aha")
                 , test "empty indexes" <| \() -> Expect.equal [] (String.indexes "" "aha")
