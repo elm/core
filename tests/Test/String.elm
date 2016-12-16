@@ -16,6 +16,7 @@ tests =
         , test "length" <| assertEqual 11 (String.length "innumerable")
         , test "endsWith" (assert <| String.endsWith "ship" "spaceship")
         , test "reverse" <| assertEqual "desserts" (String.reverse "stressed")
+        , test "reverse unicode" <| assertEqual "ma͒n𝌆" (String.reverse "𝌆na͒m")
         , test "repeat" <| assertEqual "hahaha" (String.repeat 3 "ha")
         ]
 
