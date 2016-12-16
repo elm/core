@@ -29,7 +29,7 @@ function concat(strs)
 }
 function length(str)
 {
-	return [...str].length;
+	return Array.from(str).length;
 }
 function map(f, str)
 {
