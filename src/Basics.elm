@@ -9,8 +9,7 @@ module Basics exposing
   , toPolar, fromPolar
   , isNaN, isInfinite
   , toString, (++)
-  , fst, snd
-  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
   )
 
 {-| Tons of useful functions that get imported by default.
@@ -54,11 +53,8 @@ which happen to be radians.
 # Strings and Lists
 @docs toString, (++)
 
-# Tuples
-@docs fst, snd
-
 # Higher-Order Helpers
-@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never
+@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
 
 -}
 
@@ -130,7 +126,6 @@ infixr 8 ^
 
 infixl 7 //
 infixl 7 %
-infixl 7 `rem`
 
 
 {-| Integer division. The remainder is discarded. -}
@@ -141,8 +136,10 @@ infixl 7 `rem`
 
 {-| Find the remainder after dividing one number by another.
 
-     7 `rem` 2 == 1
-    -1 `rem` 4 == -1
+    rem 11 4 == 3
+    rem 12 4 == 0
+    rem 13 4 == 1
+    rem -1 4 == -1
 -}
 rem : Int -> Int -> Int
 rem =
@@ -276,13 +273,34 @@ e =
   Native.Basics.e
 
 
-{-|-}
+{-| Check if values are &ldquo;the same&rdquo;.
+
+**Note:** Elm uses structural equality on tuples, records, and user-defined
+union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
+This is not true in languages like JavaScript that use reference equality on
+objects.
+
+**Note:** Equality (in the Elm sense) is not possible for certain types. For
+example, the functions `(\n -> n + 1)` and `(\n -> 1 + n)` are &ldquo;the
+same&rdquo; but detecting this in general is [undecidable][]. In a future
+release, the compiler will detect when `(==)` is used with problematic
+types and provide a helpful error message. This will require quite serious
+infrastructure work that makes sense to batch with another big project, so the
+stopgap is to crash as quickly as possible. Problematic types include functions
+and JavaScript values like `Json.Encode.Value` which could contain functions
+if passed through a port.
+
+[undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
+-}
 (==) : a -> a -> Bool
 (==) =
   Native.Basics.eq
 
 
-{-|-}
+{-| Check if values are not &ldquo;the same&rdquo;.
+
+So `(a /= b)` is the same as `(not (a == b))`.
+-}
 (/=) : a -> a -> Bool
 (/=) =
   Native.Basics.neq
@@ -572,18 +590,6 @@ always a _ =
   a
 
 
-{-| Given a 2-tuple, returns the first value. -}
-fst : (a,b) -> a
-fst (a,_) =
-  a
-
-
-{-| Given a 2-tuple, returns the second value. -}
-snd : (a,b) -> b
-snd (_,b) =
-  b
-
-
 {-| Flip the order of the first two arguments to a function. -}
 flip : (a -> b -> c) -> (b -> a -> c)
 flip f b a =
@@ -606,13 +612,44 @@ uncurry f (a,b) =
   f a b
 
 
-{-| A type that is "uninhabited". There are no values of type `Never`, and its
-primary use is demanding that certain tasks cannot possibly fail.
+{-| A value that can never happen! For context:
 
-For example, a task with type `(Task Never Int)` must *always* succeed with an
-integer. For the task to fail, someone would need to say `(Task.fail ???)` but
-since there is no value with type `Never` they could not fill in the question
-marks!
+  - The boolean type `Bool` has two values: `True` and `False`
+  - The unit type `()` has one value: `()`
+  - The never type `Never` has no values!
+
+You may see it in the wild in `Html Never` which means this HTML will never
+produce any messages. You would need to write an event handler like
+`onClick ??? : Attribute Never` but how can we fill in the question marks?!
+So there cannot be any event handlers on that HTML.
+
+You may also see this used with tasks that never fail, like `Task Never ()`.
+
+The `Never` type is useful for restricting *arguments* to a function. Maybe my
+API can only accept HTML without event handlers, so I require `Html Never` and
+users can give `Html msg` and everything will go fine. Generally speaking, you
+do not want `Never` in your return types though.
 -}
-type Never = Never Never
+type Never = JustOneMore Never
 
+
+{-| A function that can never be called. Seems extremely pointless, but it
+*can* come in handy. Imagine you have some HTML that should never produce any
+messages. And say you want to use it in some other HTML that *does* produce
+messages. You could say:
+
+    import Html exposing (..)
+
+    embedHtml : Html Never -> Html msg
+    embedHtml staticStuff =
+      div []
+        [ text "hello"
+        , Html.map never staticStuff
+        ]
+
+So the `never` function is basically telling the type system, make sure no one
+ever calls me!
+-}
+never : Never -> a
+never (JustOneMore nvr) =
+  never nvr

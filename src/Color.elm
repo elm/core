@@ -189,7 +189,7 @@ rgbToHsl red green blue =
     hue =
       degrees 60 *
         if cMax == r then
-          ((g - b) / c) `fmod` 6
+          fmod ((g - b) / c) 6
         else if cMax == g then
           ((b - r) / c) + 2
         else {- cMax == b -}
@@ -211,18 +211,18 @@ hslToRgb : Float -> Float -> Float -> (Float,Float,Float)
 hslToRgb hue saturation lightness =
   let
     chroma = (1 - abs (2 * lightness - 1)) * saturation
-    hue' = hue / degrees 60
+    normHue = hue / degrees 60
 
-    x = chroma * (1 - abs (fmod hue' 2 - 1))
+    x = chroma * (1 - abs (fmod normHue 2 - 1))
 
     (r,g,b) =
-      if hue' < 0 then (0, 0, 0)
-      else if hue' < 1 then (chroma, x, 0)
-      else if hue' < 2 then (x, chroma, 0)
-      else if hue' < 3 then (0, chroma, x)
-      else if hue' < 4 then (0, x, chroma)
-      else if hue' < 5 then (x, 0, chroma)
-      else if hue' < 6 then (chroma, 0, x)
+      if normHue < 0 then (0, 0, 0)
+      else if normHue < 1 then (chroma, x, 0)
+      else if normHue < 2 then (x, chroma, 0)
+      else if normHue < 3 then (0, chroma, x)
+      else if normHue < 4 then (0, x, chroma)
+      else if normHue < 5 then (x, 0, chroma)
+      else if normHue < 6 then (chroma, 0, x)
       else (0, 0, 0)
 
     m = lightness - chroma / 2

@@ -1,42 +1,45 @@
-module Json.Decode exposing  -- where
-  ( Decoder, Value
-  , decodeString, decodeValue
-  , string, int, float, bool, null
-  , list, array
-  , tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
-  , (:=), at
-  , object1, object2, object3, object4, object5, object6, object7, object8
-  , keyValuePairs, dict
-  , maybe, oneOf, map, fail, succeed, andThen
-  , value, customDecoder
+module Json.Decode exposing
+  ( Decoder, string, bool, int, float
+  , nullable, list, array, dict, keyValuePairs
+  , field, at, index
+  , maybe, oneOf
+  , decodeString, decodeValue, Value
+  , map, map2, map3, map4, map5, map6, map7, map8
+  , lazy, value, null, succeed, fail, andThen
   )
 
-{-| A way to turn Json values into Elm values. A `Decoder a` represents a
-decoding operation that will either produce a value of type `a`, or fail.
+{-| Turn JSON values into Elm values. Definitely check out this [intro to
+JSON decoders][guide] to get a feel for how this library works!
 
-# Decoders
-@docs Decoder, Value
-
-# Run a Decoder
-@docs decodeString, decodeValue
+[guide]: https://guide.elm-lang.org/interop/json.html
 
 # Primitives
-@docs string, int, float, bool, null
+@docs Decoder, string, bool, int, float
 
-# Arrays
-@docs list, array,
-  tuple1, tuple2, tuple3, tuple4, tuple5, tuple6, tuple7, tuple8
+# Data Structures
+@docs nullable, list, array, dict, keyValuePairs
 
-# Objects
-@docs (:=), at,
-  object1, object2, object3, object4, object5, object6, object7, object8,
-  keyValuePairs, dict
+# Object Primitives
+@docs field, at, index
 
-# Oddly Shaped Values
-@docs maybe, oneOf, map, fail, succeed, andThen
+# Inconsistent Structure
+@docs maybe, oneOf
 
-# "Creative" Values
-@docs value, customDecoder
+# Run Decoders
+@docs decodeString, decodeValue, Value
+
+# Mapping
+
+**Note:** If you run out of map functions, take a look at [elm-decode-pipeline][pipe]
+which makes it easier to handle large objects, but produces lower quality type
+errors.
+
+[pipe]: http://package.elm-lang.org/packages/NoRedInk/elm-decode-pipeline/latest
+
+@docs map, map2, map3, map4, map5, map6, map7, map8
+
+# Fancy Decoding
+@docs lazy, value, null, succeed, fail, andThen
 -}
 
 
@@ -44,554 +47,474 @@ import Array exposing (Array)
 import Dict exposing (Dict)
 import Json.Encode as JsEncode
 import List
-import Maybe exposing (Maybe)
-import Result exposing (Result)
+import Maybe exposing (Maybe(..))
+import Result exposing (Result(..))
 import Native.Json
 
-{-| Represents a way of decoding JSON values. If you have a `(Decoder (List String))`
-it will attempt to take some JSON value and turn it into a list of strings.
-These decoders are easy to put together so you can create more and more complex
-decoders.
+
+
+-- PRIMITIVES
+
+
+{-| A value that knows how to decode JSON values.
 -}
 type Decoder a = Decoder
 
 
-{-| Represents a JavaScript value.
--}
-type alias Value = JsEncode.Value
+{-| Decode a JSON string into an Elm `String`.
 
-
-{-| Transform the value returned by a decoder. Most useful when paired with
-the `oneOf` function.
-
-    nullOr : Decoder a -> Decoder (Maybe a)
-    nullOr decoder =
-        oneOf
-          [ null Nothing
-          , map Just decoder
-          ]
-
-    type UserID = OldID Int | NewID String
-
-    -- 1234 or "1234abc"
-    userID : Decoder UserID
-    userID =
-        oneOf
-          [ map OldID int
-          , map NewID string
-          ]
--}
-map : (a -> b) -> Decoder a -> Decoder b
-map =
-  Native.Json.decodeObject1
-
-
-{-| Using a certain decoder, attempt to parse a JSON string. If the decoder
-fails, you will get a string message telling you why.
-
-    decodeString (tuple2 (,) float float) "[3,4]"                  -- Ok (3,4)
-    decodeString (tuple2 (,) float float) "{ \"x\": 3, \"y\": 4 }" -- Err ""
--}
-decodeString : Decoder a -> String -> Result String a
-decodeString =
-  Native.Json.runOnString
-
-
--- OBJECTS
-
-{-| Access a nested field, making it easy to dive into big structures. This is
-really a helper function so you do not need to write `(:=)` so many times.
-
-    -- object.target.value = 'hello'
-    value : Decoder String
-    value =
-        at ["target", "value"] string
-
-It is defined as
-
-    at fields decoder =
-        List.foldr (:=) decoder fields
--}
-at : List String -> Decoder a -> Decoder a
-at fields decoder =
-    List.foldr (:=) decoder fields
-
-
-{-| Applies the decoder to the field with the given name.
-Fails if the JSON object has no such field.
-
-    nameAndAge : Decoder (String,Int)
-    nameAndAge =
-        object2 (,)
-          ("name" := string)
-          ("age" := int)
-
-    optionalProfession : Decoder (Maybe String)
-    optionalProfession =
-        maybe ("profession" := string)
--}
-(:=) : String -> Decoder a -> Decoder a
-(:=) =
-    Native.Json.decodeField
-
-
-{-| Apply a function to a decoder. You can use this function as `map` if you
-must (which can be done with any `objectN` function actually).
-
-    object1 sqrt ("x" := float)
--}
-object1 : (a -> value) -> Decoder a -> Decoder value
-object1 =
-    Native.Json.decodeObject1
-
-
-{-| Use two different decoders on a JS value. This is nice for extracting
-multiple fields from an object.
-
-    point : Decoder (Float,Float)
-    point =
-        object2 (,)
-          ("x" := float)
-          ("y" := float)
--}
-object2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
-object2 =
-    Native.Json.decodeObject2
-
-
-{-| Use three different decoders on a JS value. This is nice for extracting
-multiple fields from an object.
-
-    type alias Job = { name : String, id : Int, completed : Bool }
-
-    job : Decoder Job
-    job =
-        object3 Job
-          ("name" := string)
-          ("id" := int)
-          ("completed" := bool)
--}
-object3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
-object3 =
-    Native.Json.decodeObject3
-
-
-{-|-}
-object4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
-object4 =
-    Native.Json.decodeObject4
-
-
-{-|-}
-object5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
-object5 =
-    Native.Json.decodeObject5
-
-
-{-|-}
-object6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
-object6 =
-    Native.Json.decodeObject6
-
-
-{-|-}
-object7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
-object7 =
-    Native.Json.decodeObject7
-
-
-{-|-}
-object8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
-object8 =
-    Native.Json.decodeObject8
-
-
-{-| Turn any object into a list of key-value pairs, including inherited enumerable properties. Fails if _any_ value can't be
-decoded with the given decoder.
-
-    -- { "tom": 89, "sue": 92, "bill": 97, ... }
-    grades : Decoder (List (String, Int))
-    grades =
-        keyValuePairs int
--}
-keyValuePairs : Decoder a -> Decoder (List (String, a))
-keyValuePairs =
-    Native.Json.decodeKeyValuePairs
-
-
-{-| Turn any object into a dictionary of key-value pairs, including inherited enumerable properties. Fails if _any_ value can't be
-decoded with the given decoder.
-
-    -- { "mercury": 0.33, "venus": 4.87, "earth": 5.97, ... }
-    planetMasses : Decoder (Dict String Float)
-    planetMasses =
-        dict float
--}
-dict : Decoder a -> Decoder (Dict String a)
-dict decoder =
-    map Dict.fromList (keyValuePairs decoder)
-
-
-
-{-| Try out multiple different decoders. This is helpful when you are dealing
-with something with a very strange shape and when `andThen` does not help
-narrow things down so you can be more targeted.
-
-    -- [ [3,4], { "x":0, "y":0 }, [5,12] ]
-
-    points : Decoder (List (Float,Float))
-    points =
-        list point
-
-    point : Decoder (Float,Float)
-    point =
-        oneOf
-        [ tuple2 (,) float float
-        , object2 (,) ("x" := float) ("y" := float)
-        ]
--}
-oneOf : List (Decoder a) -> Decoder a
-oneOf =
-    Native.Json.oneOf
-
-
-{-| Extract a string.
-
-    -- ["John","Doe"]
-
-    name : Decoder (String, String)
-    name =
-        tuple2 (,) string string
+    decodeString string "true"              == Err ...
+    decodeString string "42"                == Err ...
+    decodeString string "3.14"              == Err ...
+    decodeString string "\"hello\""         == Ok "hello"
+    decodeString string "{ \"hello\": 42 }" == Err ...
 -}
 string : Decoder String
 string =
   Native.Json.decodePrimitive "string"
 
 
-{-| Extract a float.
+{-| Decode a JSON boolean into an Elm `Bool`.
 
-    -- [ 6.022, 3.1415, 1.618 ]
-
-    numbers : Decoder (List Float)
-    numbers =
-        list float
--}
-float : Decoder Float
-float =
-  Native.Json.decodePrimitive "float"
-
-
-{-| Extract an integer.
-
-    -- { ... "age": 42 ... }
-
-    age : Decoder Int
-    age =
-        "age" := int
--}
-int : Decoder Int
-int =
-  Native.Json.decodePrimitive "int"
-
-
-{-| Extract a boolean.
-
-    -- { ... "checked": true ... }
-
-    checked : Decoder Bool
-    checked =
-        "checked" := bool
+    decodeString bool "true"              == Ok True
+    decodeString bool "42"                == Err ...
+    decodeString bool "3.14"              == Err ...
+    decodeString bool "\"hello\""         == Err ...
+    decodeString bool "{ \"hello\": 42 }" == Err ...
 -}
 bool : Decoder Bool
 bool =
   Native.Json.decodePrimitive "bool"
 
 
-{-| Extract a List from a JS array.
+{-| Decode a JSON number into an Elm `Int`.
 
-    -- [1,2,3,4]
+    decodeString int "true"              == Err ...
+    decodeString int "42"                == Ok 42
+    decodeString int "3.14"              == Err ...
+    decodeString int "\"hello\""         == Err ...
+    decodeString int "{ \"hello\": 42 }" == Err ...
+-}
+int : Decoder Int
+int =
+  Native.Json.decodePrimitive "int"
 
-    numbers : Decoder (List Int)
-    numbers =
-        list int
+
+{-| Decode a JSON number into an Elm `Float`.
+
+    decodeString float "true"              == Err ..
+    decodeString float "42"                == Ok 42
+    decodeString float "3.14"              == Ok 3.14
+    decodeString float "\"hello\""         == Err ...
+    decodeString float "{ \"hello\": 42 }" == Err ...
+-}
+float : Decoder Float
+float =
+  Native.Json.decodePrimitive "float"
+
+
+
+-- DATA STRUCTURES
+
+
+{-| Decode a nullable JSON value into an Elm value.
+
+    decodeString (nullable int) "13"    == Ok (Just 13)
+    decodeString (nullable int) "42"    == Ok (Just 42)
+    decodeString (nullable int) "null"  == Ok Nothing
+    decodeString (nullable int) "true"  == Err ..
+-}
+nullable : Decoder a -> Decoder (Maybe a)
+nullable decoder =
+  oneOf
+    [ null Nothing
+    , map Just decoder
+    ]
+
+
+{-| Decode a JSON array into an Elm `List`.
+
+    decodeString (list int) "[1,2,3]"       == Ok [1,2,3]
+    decodeString (list bool) "[true,false]" == Ok [True,False]
 -}
 list : Decoder a -> Decoder (List a)
 list decoder =
   Native.Json.decodeContainer "list" decoder
 
 
-{-| Extract an Array from a JS array.
+{-| Decode a JSON array into an Elm `Array`.
 
-    -- [1,2,3,4]
-
-    numbers : Decoder (Array Int)
-    numbers =
-        array int
+    decodeString (array int) "[1,2,3]"       == Ok (Array.fromList [1,2,3])
+    decodeString (array bool) "[true,false]" == Ok (Array.fromList [True,False])
 -}
 array : Decoder a -> Decoder (Array a)
 array decoder =
   Native.Json.decodeContainer "array" decoder
 
 
-{-| Decode null as the value given, and fail otherwise. Primarily useful for
-creating *other* decoders.
+{-| Decode a JSON object into an Elm `Dict`.
 
-    numbers : Decoder [Int]
-    numbers =
-        list (oneOf [ int, null 0 ])
-
-This decoder treats `null` as `Nothing`, and otherwise tries to produce a
-`Just`.
-
-    nullOr : Decoder a -> Decoder (Maybe a)
-    nullOr decoder =
-        oneOf
-        [ null Nothing
-        , map Just decoder
-        ]
+    decodeString (dict int) "{ \"alice\": 42, \"bob\": 99 }"
+      == Dict.fromList [("alice", 42), ("bob", 99)]
 -}
-null : a -> Decoder a
-null =
-  Native.Json.decodeNull
+dict : Decoder a -> Decoder (Dict String a)
+dict decoder =
+  map Dict.fromList (keyValuePairs decoder)
 
 
-{-| Extract a Maybe value, wrapping successes with `Just` and turning any
-failure in `Nothing`. If you are expecting that a field can sometimes be `null`,
-it's better to check for it [explicitly](#null), as this function will swallow
-errors from ill-formed JSON.
+{-| Decode a JSON object into an Elm `List` of pairs.
 
-The following code decodes JSON objects that may not have a profession field.
+    decodeString (keyValuePairs int) "{ \"alice\": 42, \"bob\": 99 }"
+      == [("alice", 42), ("bob", 99)]
+-}
+keyValuePairs : Decoder a -> Decoder (List (String, a))
+keyValuePairs =
+  Native.Json.decodeKeyValuePairs
 
-    -- profession: Just "plumber"
-    -- { name: "Tom", age: 31, profession: "plumber" }
-    -- profession: Nothing
-    -- { name: "Sue", age: 42 }
-    -- { name: "Amy", age: 27, profession: null }
-    -- { name: "Joe", age: 36, profession: ["something", "unexpected"] }
 
-    type alias Person =
-        { name : String
-        , age : Int
-        , profession : Maybe String
-        }
 
-    person : Decoder Person
-    person =
-        object3 Person
-          ("name" := string)
-          ("age" := int)
-          (maybe ("profession" := string))
+-- OBJECT PRIMITIVES
+
+
+{-| Decode a JSON object, requiring a particular field.
+
+    decodeString (field "x" int) "{ \"x\": 3 }"            == Ok 3
+    decodeString (field "x" int) "{ \"x\": 3, \"y\": 4 }"  == Ok 3
+    decodeString (field "x" int) "{ \"x\": true }"         == Err ...
+    decodeString (field "x" int) "{ \"y\": 4 }"            == Err ...
+
+    decodeString (field "name" string) "{ \"name\": \"tom\" }" == Ok "tom"
+
+The object *can* have other fields. Lots of them! The only thing this decoder
+cares about is if `x` is present and that the value there is an `Int`.
+
+Check out [`map2`](#map2) to see how to decode multiple fields!
+-}
+field : String -> Decoder a -> Decoder a
+field =
+    Native.Json.decodeField
+
+
+{-| Decode a nested JSON object, requiring certain fields.
+
+    json = """{ "person": { "name": "tom", "age": 42 } }"""
+
+    decodeString (at ["person", "name"] string) json  == Ok "tom"
+    decodeString (at ["person", "age" ] int   ) json  == Ok "42
+
+This is really just a shorthand for saying things like:
+
+    field "person" (field "name" string) == at ["person","name"] string
+-}
+at : List String -> Decoder a -> Decoder a
+at fields decoder =
+    List.foldr field decoder fields
+
+
+{-| Decode a JSON array, requiring a particular index.
+
+    json = """[ "alice", "bob", "chuck" ]"""
+
+    decodeString (index 0 string) json  == Ok "alice"
+    decodeString (index 1 string) json  == Ok "bob"
+    decodeString (index 2 string) json  == Ok "chuck"
+    decodeString (index 3 string) json  == Err ...
+-}
+index : Int -> Decoder a -> Decoder a
+index =
+    Native.Json.decodeIndex
+
+
+
+-- WEIRD STRUCTURE
+
+
+{-| Helpful for dealing with optional fields. Here are a few slightly different
+examples:
+
+    json = """{ "name": "tom", "age": 42 }"""
+
+    decodeString (maybe (field "age"    int  )) json == Ok (Just 42)
+    decodeString (maybe (field "name"   int  )) json == Ok Nothing
+    decodeString (maybe (field "height" float)) json == Ok Nothing
+
+    decodeString (field "age"    (maybe int  )) json == Ok (Just 42)
+    decodeString (field "name"   (maybe int  )) json == Ok Nothing
+    decodeString (field "height" (maybe float)) json == Err ...
+
+Notice the last example! It is saying we *must* have a field named `height` and
+the content *may* be a float. There is no `height` field, so the decoder fails.
+
+Point is, `maybe` will make exactly what it contains conditional. For optional
+fields, this means you probably want it *outside* a use of `field` or `at`.
 -}
 maybe : Decoder a -> Decoder (Maybe a)
 maybe decoder =
   Native.Json.decodeContainer "maybe" decoder
 
 
-{-| Bring in an arbitrary JSON value. Useful if you need to work with crazily
-formatted data. For example, this lets you create a parser for "variadic" lists
-where the first few types are different, followed by 0 or more of the same
-type.
+{-| Try a bunch of different decoders. This can be useful if the JSON may come
+in a couple different formats. For example, say you want to read an array of
+numbers, but some of them are `null`.
 
-    variadic2 : (a -> b -> List c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
-    variadic2 f a b c =
-        let
-            combineResults = List.foldr (Result.map2 (::)) (Ok [])
-        in
-            customDecoder (list value) (\jsonList ->
-                case jsonList of
-                  one :: two :: rest ->
-                      Result.map3 f
-                        (decodeValue a one)
-                        (decodeValue b two)
-                        (combineResults (List.map (decodeValue c) rest))
+    import String
 
-                  _ -> Result.Err "expecting at least two elements in the array")
+    badInt : Decoder Int
+    badInt =
+      oneOf [ int, null 0 ]
+
+    -- decodeString (list badInt) "[1,2,null,4]" == Ok [1,2,0,4]
+
+Why would someone generate JSON like this? Questions like this are not good
+for your health. The point is that you can use `oneOf` to handle situations
+like this!
+
+You could also use `oneOf` to help version your data. Try the latest format,
+then a few older ones that you still support. You could use `andThen` to be
+even more particular if you wanted.
 -}
-value : Decoder Value
-value =
-  Native.Json.decodePrimitive "value"
+oneOf : List (Decoder a) -> Decoder a
+oneOf =
+    Native.Json.oneOf
 
 
-{-| Using a certain decoder, attempt to parse a raw `Json.Value`. You can pass
-a `Json.Value` into Elm through a port, so this can let you handle data with
-extra weird shapes or stuff that currently is not allowed through ports
-automatically.
 
-    port jsonValues : Signal Json.Value
+-- MAPPING
 
-    shapes : Signal (Result String Shape)
-    shapes =
-      Signal.map (decodeValue shape) jsonValues
 
-    type Shape
-        = Rectangle Float Float
-        | Circle Float
+{-| Transform a decoder. Maybe you just want to know the length of a string:
 
-    shape : Decoder Shape  -- see definition in `andThen` docs
+    import String
+
+    stringLength : Decoder Int
+    stringLength =
+      map String.length string
+
+It is often helpful to use `map` with `oneOf`, like when defining `nullable`:
+
+    nullable : Decoder a -> Decoder (Maybe a)
+    nullable decoder =
+      oneOf
+        [ null Nothing
+        , map Just decoder
+        ]
+-}
+map : (a -> value) -> Decoder a -> Decoder value
+map =
+    Native.Json.map1
+
+
+{-| Try two decoders and then combine the result. We can use this to decode
+objects with many fields:
+
+    type alias Point = { x : Float, y : Float }
+
+    point : Decoder Point
+    point =
+      map2 Point
+        (field "x" float)
+        (field "y" float)
+
+    -- decodeString point """{ "x": 3, "y": 4 }""" == Ok { x = 3, y = 4 }
+
+It tries each individual decoder and puts the result together with the `Point`
+constructor.
+-}
+map2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
+map2 =
+    Native.Json.map2
+
+
+{-| Try three decoders and then combine the result. We can use this to decode
+objects with many fields:
+
+    type alias Person = { name : String, age : Int, height : Float }
+
+    person : Decoder Person
+    person =
+      map3 Person
+        (at ["name"] string)
+        (at ["info","age"] int)
+        (at ["info","height"] float)
+
+    -- json = """{ "name": "tom", "info": { "age": 42, "height": 1.8 } }"""
+    -- decodeString point json == Ok { name = "tom", age = 42, height = 1.8 }
+
+Like `map2` it tries each decoder in order and then give the results to the
+`Person` constructor. That can be any function though!
+-}
+map3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
+map3 =
+    Native.Json.map3
+
+
+{-|-}
+map4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
+map4 =
+    Native.Json.map4
+
+
+{-|-}
+map5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
+map5 =
+    Native.Json.map5
+
+
+{-|-}
+map6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
+map6 =
+    Native.Json.map6
+
+
+{-|-}
+map7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
+map7 =
+    Native.Json.map7
+
+
+{-|-}
+map8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
+map8 =
+    Native.Json.map8
+
+
+
+-- RUN DECODERS
+
+
+{-| Parse the given string into a JSON value and then run the `Decoder` on it.
+This will fail if the string is not well-formed JSON or if the `Decoder`
+fails for some reason.
+
+    decodeString int "4"     == Ok 4
+    decodeString int "1 + 2" == Err ...
+-}
+decodeString : Decoder a -> String -> Result String a
+decodeString =
+  Native.Json.runOnString
+
+
+{-| Run a `Decoder` on some JSON `Value`. You can send these JSON values
+through ports, so that is probably the main time you would use this function.
 -}
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
   Native.Json.run
 
 
-{-| Create a custom decoder that may do some fancy computation. See the `value`
-documentation for an example usage.
+{-| A JSON value.
 -}
-customDecoder : Decoder a -> (a -> Result String b) -> Decoder b
-customDecoder =
-  Native.Json.customAndThen
+type alias Value = JsEncode.Value
 
 
-{-| Helpful when a field tells you about the overall structure of the JSON
-you are dealing with. For example, imagine we are getting JSON representing
-different shapes. Data like this:
 
-    { "tag": "rectangle", "width": 2, "height": 3 }
-    { "tag": "circle", "radius": 2 }
-
-The following `shape` decoder looks at the `tag` to know what other fields to
-expect **and then** it extracts the relevant information.
-
-    type Shape
-      = Rectangle Float Float
-      | Circle Float
-
-    shape : Decoder Shape
-    shape =
-      ("tag" := string) `andThen` shapeInfo
-
-    shapeInfo : String -> Decoder Shape
-    shapeInfo tag =
-      case tag of
-        "rectangle" ->
-          object2 Rectangle ("width" := float) ("height" := float)
-
-        "circle" ->
-          object1 Circle ("radius" := float)
-
-        _ ->
-          fail (tag ++ " is not a recognized tag for shapes")
--}
-andThen : Decoder a -> (a -> Decoder b) -> Decoder b
-andThen =
-  Native.Json.andThen
+-- FANCY PRIMITIVES
 
 
-{-| A decoder that always fails. Useful when paired with `andThen` or `oneOf`
-to improve error messages when things go wrong. For example, the following
-decoder is able to provide a much more specific error message when `fail` is
-the last option.
+{-| Ignore the JSON and produce a certain Elm value.
 
-    point : Decoder (Float,Float)
-    point =
-        oneOf
-        [ tuple2 (,) float float
-        , object2 (,) ("x" := float) ("y" := float)
-        , fail "expecting some kind of point"
-        ]
--}
-fail : String -> Decoder a
-fail =
-  Native.Json.fail
+    decodeString (succeed 42) "true"    == Ok 42
+    decodeString (succeed 42) "[1,2,3]" == Ok 42
+    decodeString (succeed 42) "hello"   == Err ... -- this is not a valid JSON string
 
-
-{-| A decoder that always succeeds. Useful when paired with `andThen` or
-`oneOf` but everything is supposed to work out at the end. For example,
-maybe you have an optional field that can have a default value when it is
-missing.
-
-    -- { x:3, y:4 } or { x:3, y:4, z:5 }
-
-    point3D : Decoder (Float,Float,Float)
-    point3D =
-        object3 (,,)
-          ("x" := float)
-          ("y" := float)
-          (oneOf [ "z" := float, succeed 0 ])
+This is handy when used with `oneOf` or `andThen`.
 -}
 succeed : a -> Decoder a
 succeed =
   Native.Json.succeed
 
 
--- TUPLES
+{-| Ignore the JSON and make the decoder fail. This is handy when used with
+`oneOf` or `andThen` where you want to give a custom error message in some
+case.
 
-{-| Handle an array with exactly one element.
-
-    extractString : Decoder String
-    extractString =
-        tuple1 identity string
-
-    authorship : Decoder String
-    authorship =
-        oneOf
-          [ tuple1 (\author -> "Author: " ++ author) string
-          , list string |> map (\authors -> "Co-authors: " ++ String.join ", " authors)
-          ]
+See the [`andThen`](#andThen) docs for an example.
 -}
-tuple1 : (a -> value) -> Decoder a -> Decoder value
-tuple1 =
-    Native.Json.decodeTuple1
+fail : String -> Decoder a
+fail =
+  Native.Json.fail
 
 
-{-| Handle an array with exactly two elements. Useful for points and simple
-pairs.
+{-| Create decoders that depend on previous results. If you are creating
+versioned data, you might do something like this:
 
-    -- [3,4] or [0,0]
-    point : Decoder (Float,Float)
-    point =
-        tuple2 (,) float float
+    info : Decoder Info
+    info =
+      field "version" int
+        |> andThen infoHelp
 
-    -- ["John","Doe"] or ["Hermann","Hesse"]
-    name : Decoder Name
-    name =
-        tuple2 Name string string
+    infoHelp : Int -> Decoder Info
+    infoHelp version =
+      case version of
+        4 ->
+          infoDecoder4
 
-    type alias Name = { first : String, last : String }
+        3 ->
+          infoDecoder3
+
+        _ ->
+          fail <|
+            "Trying to decode info, but version "
+            ++ toString version ++ " is not supported."
+
+    -- infoDecoder4 : Decoder Info
+    -- infoDecoder3 : Decoder Info
 -}
-tuple2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
-tuple2 =
-    Native.Json.decodeTuple2
+andThen : (a -> Decoder b) -> Decoder a -> Decoder b
+andThen =
+  Native.Json.andThen
 
 
-{-| Handle an array with exactly three elements.
+{-| Sometimes you have JSON with recursive structure, like nested comments.
+You can use `lazy` to make sure your decoder unrolls lazily.
 
-    -- [3,4,5] or [0,0,0]
-    point3D : Decoder (Float,Float,Float)
-    point3D =
-        tuple3 (,,) float float float
+    type alias Comment =
+      { message : String
+      , responses : Responses
+      }
 
+    type Responses = Responses (List Comment)
+
+    comment : Decoder Comment
+    comment =
+      object Comment
+        |> required "message" string
+        |> required "responses" (map Responses (list (lazy (\_ -> comment))))
+
+If we had said `list comment` instead, we would start expanding the value
+infinitely. What is a `comment`? It is a decoder for objects where the
+`responses` field contains comments. What is a `comment` though? Etc.
+
+By using `list (lazy (\_ -> comment))` we make sure the decoder only expands
+to be as deep as the JSON we are given. You can read more about recursive data
+structures [here][].
+
+[here]: https://github.com/elm-lang/elm-compiler/blob/master/hints/recursive-alias.md
 -}
-tuple3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
-tuple3 =
-    Native.Json.decodeTuple3
+lazy : (() -> Decoder a) -> Decoder a
+lazy thunk =
+  andThen thunk (succeed ())
 
 
-{-|-}
-tuple4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
-tuple4 =
-    Native.Json.decodeTuple4
+{-| Do not do anything with a JSON value, just bring it into Elm as a `Value`.
+This can be useful if you have particularly crazy data that you would like to
+deal with later. Or if you are going to send it out a port and do not care
+about its structure.
+-}
+value : Decoder Value
+value =
+  Native.Json.decodePrimitive "value"
 
 
-{-|-}
-tuple5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
-tuple5 =
-    Native.Json.decodeTuple5
+{-| Decode a `null` value into some Elm value.
 
+    decodeString (null False) "null" == Ok False
+    decodeString (null 42) "null"    == Ok 42
+    decodeString (null 42) "42"      == Err ..
+    decodeString (null 42) "false"   == Err ..
 
-{-|-}
-tuple6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
-tuple6 =
-    Native.Json.decodeTuple6
-
-
-{-|-}
-tuple7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
-tuple7 =
-    Native.Json.decodeTuple7
-
-
-{-|-}
-tuple8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
-tuple8 =
-    Native.Json.decodeTuple8
+So if you ever see a `null`, this will return whatever value you specified.
+-}
+null : a -> Decoder a
+null =
+  Native.Json.decodeNull

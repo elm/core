@@ -75,7 +75,7 @@ function replace(n, re, replacer, string)
 		return replacer({
 			match: match,
 			submatches: _elm_lang$core$Native_List.fromArray(submatches),
-			index: arguments[i - 1],
+			index: arguments[arguments.length - 2],
 			number: count
 		});
 	}
@@ -93,6 +93,7 @@ function split(n, re, str)
 	var result;
 	var out = [];
 	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
 	while (n--)
 	{
 		if (!(result = re.exec(string))) break;
@@ -100,6 +101,7 @@ function split(n, re, str)
 		start = re.lastIndex;
 	}
 	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
 	return _elm_lang$core$Native_List.fromArray(out);
 }
 

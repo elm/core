@@ -4,49 +4,123 @@ var _elm_lang$core$Native_Utils = function() {
 
 // COMPARISONS
 
-function eq(rootX, rootY)
+function eq(x, y)
 {
-	var stack = [{ x: rootX, y: rootY }];
-	while (stack.length > 0)
+	var stack = [];
+	var isEqual = eqHelp(x, y, 0, stack);
+	var pair;
+	while (isEqual && (pair = stack.pop()))
 	{
-		var front = stack.pop();
-		var x = front.x;
-		var y = front.y;
-		if (x === y)
+		isEqual = eqHelp(pair.x, pair.y, 0, stack);
+	}
+	return isEqual;
+}
+
+
+function eqHelp(x, y, depth, stack)
+{
+	if (depth > 100)
+	{
+		stack.push({ x: x, y: y });
+		return true;
+	}
+
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object')
+	{
+		if (typeof x === 'function')
 		{
-			continue;
+			throw new Error(
+				'Trying to use `(==)` on functions. There is no way to know if functions are "the same" in the Elm sense.'
+				+ ' Read more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#=='
+				+ ' which describes why it is this way and what the better version will look like.'
+			);
 		}
-		if (typeof x === 'object')
+		return false;
+	}
+
+	if (x === null || y === null)
+	{
+		return false
+	}
+
+	if (x instanceof Date)
+	{
+		return x.getTime() === y.getTime();
+	}
+
+	if (!('ctor' in x))
+	{
+		for (var key in x)
 		{
-			var c = 0;
-			for (var key in x)
-			{
-				++c;
-				if (!(key in y))
-				{
-					return false;
-				}
-				if (key === 'ctor')
-				{
-					continue;
-				}
-				stack.push({ x: x[key], y: y[key] });
-			}
-			if ('ctor' in x)
-			{
-				stack.push({ x: x.ctor, y: y.ctor});
-			}
-			if (c !== Object.keys(y).length)
+			if (!eqHelp(x[key], y[key], depth + 1, stack))
 			{
 				return false;
 			}
 		}
-		else if (typeof x === 'function')
+		return true;
+	}
+
+	// convert Dicts and Sets to lists
+	if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
+	{
+		x = _elm_lang$core$Dict$toList(x);
+		y = _elm_lang$core$Dict$toList(y);
+	}
+	if (x.ctor === 'Set_elm_builtin')
+	{
+		x = _elm_lang$core$Set$toList(x);
+		y = _elm_lang$core$Set$toList(y);
+	}
+
+	// check if lists are equal without recursion
+	if (x.ctor === '::')
+	{
+		var a = x;
+		var b = y;
+		while (a.ctor === '::' && b.ctor === '::')
 		{
-			throw new Error('Equality error: general function equality is ' +
-							'undecidable, and therefore, unsupported');
+			if (!eqHelp(a._0, b._0, depth + 1, stack))
+			{
+				return false;
+			}
+			a = a._1;
+			b = b._1;
 		}
-		else
+		return a.ctor === b.ctor;
+	}
+
+	// check if Arrays are equal
+	if (x.ctor === '_Array')
+	{
+		var xs = _elm_lang$core$Native_Array.toJSArray(x);
+		var ys = _elm_lang$core$Native_Array.toJSArray(y);
+		if (xs.length !== ys.length)
+		{
+			return false;
+		}
+		for (var i = 0; i < xs.length; i++)
+		{
+			if (!eqHelp(xs[i], ys[i], depth + 1, stack))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	if (!eqHelp(x.ctor, y.ctor, depth + 1, stack))
+	{
+		return false;
+	}
+
+	for (var key in x)
+	{
+		if (!eqHelp(x[key], y[key], depth + 1, stack))
 		{
 			return false;
 		}
@@ -61,34 +135,23 @@ var LT = -1, EQ = 0, GT = 1;
 
 function cmp(x, y)
 {
-	var ord;
 	if (typeof x !== 'object')
 	{
 		return x === y ? EQ : x < y ? LT : GT;
 	}
-	else if (x instanceof String)
+
+	if (x instanceof String)
 	{
 		var a = x.valueOf();
 		var b = y.valueOf();
-		return a === b
-			? EQ
-			: a < b
-				? LT
-				: GT;
+		return a === b ? EQ : a < b ? LT : GT;
 	}
-	else if (x.ctor === '::' || x.ctor === '[]')
+
+	if (x.ctor === '::' || x.ctor === '[]')
 	{
-		while (true)
+		while (x.ctor === '::' && y.ctor === '::')
 		{
-			if (x.ctor === '[]' && y.ctor === '[]')
-			{
-				return EQ;
-			}
-			if (x.ctor !== y.ctor)
-			{
-				return x.ctor === '[]' ? LT : GT;
-			}
-			ord = cmp(x._0, y._0);
+			var ord = cmp(x._0, y._0);
 			if (ord !== EQ)
 			{
 				return ord;
@@ -96,9 +159,12 @@ function cmp(x, y)
 			x = x._1;
 			y = y._1;
 		}
+		return x.ctor === y.ctor ? EQ : x.ctor === '[]' ? LT : GT;
 	}
-	else if (x.ctor.slice(0, 6) === '_Tuple')
+
+	if (x.ctor.slice(0, 6) === '_Tuple')
 	{
+		var ord;
 		var n = x.ctor.slice(6) - 0;
 		var err = 'cannot compare tuples with more than 6 elements.';
 		if (n === 0) return EQ;
@@ -111,12 +177,12 @@ function cmp(x, y)
 		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
 		return EQ;
 	}
-	else
-	{
-		throw new Error('Comparison error: comparison is only defined on ints, ' +
-						'floats, times, chars, strings, lists of comparable values, ' +
-						'and tuples of comparable values.');
-	}
+
+	throw new Error(
+		'Comparison error: comparison is only defined on ints, '
+		+ 'floats, times, chars, strings, lists of comparable values, '
+		+ 'and tuples of comparable values.'
+	);
 }
 
 
@@ -155,11 +221,17 @@ function guid(_)
 function update(oldRecord, updatedFields)
 {
 	var newRecord = {};
+
 	for (var key in oldRecord)
 	{
-		var value = (key in updatedFields) ? updatedFields[key] : oldRecord[key];
-		newRecord[key] = value;
+		newRecord[key] = oldRecord[key];
 	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
 	return newRecord;
 }
 
@@ -329,24 +401,14 @@ function toString(v)
 			return '[]';
 		}
 
-		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin' || v.ctor === 'Set_elm_builtin')
+		if (v.ctor === 'Set_elm_builtin')
 		{
-			var name, list;
-			if (v.ctor === 'Set_elm_builtin')
-			{
-				name = 'Set';
-				list = A2(
-					_elm_lang$core$List$map,
-					function(x) {return x._0; },
-					_elm_lang$core$Dict$toList(v._0)
-				);
-			}
-			else
-			{
-				name = 'Dict';
-				list = _elm_lang$core$Dict$toList(v);
-			}
-			return name + '.fromList ' + toString(list);
+			return 'Set.fromList ' + toString(_elm_lang$core$Set$toList(v));
+		}
+
+		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin')
+		{
+			return 'Dict.fromList ' + toString(_elm_lang$core$Dict$toList(v));
 		}
 
 		var output = '';
@@ -363,6 +425,16 @@ function toString(v)
 
 	if (type === 'object')
 	{
+		if (v instanceof Date)
+		{
+			return '<' + v.toString() + '>';
+		}
+
+		if (v.elm_web_socket)
+		{
+			return '<websocket>';
+		}
+
 		var output = [];
 		for (var k in v)
 		{

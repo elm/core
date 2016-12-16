@@ -32,21 +32,21 @@ function nativeBinding(callback)
 	};
 }
 
-function andThen(task, callback)
+function andThen(callback, task)
 {
 	return {
 		ctor: '_Task_andThen',
-		task: task,
-		callback: callback
+		callback: callback,
+		task: task
 	};
 }
 
-function onError(task, callback)
+function onError(callback, task)
 {
 	return {
 		ctor: '_Task_onError',
-		task: task,
-		callback: callback
+		callback: callback,
+		task: task
 	};
 }
 
@@ -247,7 +247,10 @@ function work()
 	var process;
 	while (numSteps < MAX_STEPS && (process = workQueue.shift()))
 	{
-		numSteps = step(numSteps, process);
+		if (process.root)
+		{
+			numSteps = step(numSteps, process);
+		}
 	}
 	if (!process)
 	{
