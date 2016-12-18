@@ -11,6 +11,7 @@ type Wrapper a
     = Wrapper a
 
 
+caseUnderscore : Maybe number -> number
 caseUnderscore m_ =
     case m_ of
         Just x ->
@@ -20,6 +21,7 @@ caseUnderscore m_ =
             0
 
 
+patternUnderscore : number
 patternUnderscore =
     case Just 42 of
         Just x_ ->
@@ -29,6 +31,7 @@ patternUnderscore =
             0
 
 
+letQualified : number
 letQualified =
     let
         (Wrapper x) =
@@ -37,6 +40,7 @@ letQualified =
         x
 
 
+caseQualified : number
 caseQualified =
     case Just 42 of
         Maybe.Just x ->
