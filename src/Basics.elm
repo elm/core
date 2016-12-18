@@ -584,6 +584,10 @@ handy more often than you might expect. For example, creating a zeroed out list
 of length ten would be:
 
     map (always 0) [0..9]
+
+rather than:
+
+    map (\_ -> 0) [0..9]
 -}
 always : a -> b -> a
 always a _ =
