@@ -11,7 +11,8 @@ type Wrapper a
     = Wrapper a
 
 
-casePrime m_ =
+caseUnderscore : Maybe number -> number
+caseUnderscore m_ =
     case m_ of
         Just x ->
             x
@@ -20,7 +21,8 @@ casePrime m_ =
             0
 
 
-patternPrime =
+patternUnderscore : number
+patternUnderscore =
     case Just 42 of
         Just x_ ->
             x_
@@ -29,6 +31,7 @@ patternPrime =
             0
 
 
+letQualified : number
 letQualified =
     let
         (Wrapper x) =
@@ -37,6 +40,7 @@ letQualified =
         x
 
 
+caseQualified : number
 caseQualified =
     case Just 42 of
         Maybe.Just x ->
@@ -58,24 +62,48 @@ caseScope =
 tests : Test
 tests =
     let
-        primes =
-            describe "Primes"
-                [ test "case" <| \() -> Expect.equal 42 (casePrime (Just 42))
-                , test "pattern" <| \() -> Expect.equal 42 patternPrime
+        -- We don't strictly speaking need annotations in this let-expression,
+        -- but having these here exercises the parser to avoid regressions like
+        -- https://github.com/elm-lang/elm-compiler/issues/1535
+        underscores : Test
+        underscores =
+            describe "Underscores"
+                [ test "case" <| \() -> Expect.equal 42 (caseUnderscore (Just 42))
+                , test "pattern" <| \() -> Expect.equal 42 patternUnderscore
                 ]
 
+        qualifiedPatterns : Test
         qualifiedPatterns =
             describe "Qualified Patterns"
                 [ test "let" <| \() -> Expect.equal 42 letQualified
                 , test "case" <| \() -> Expect.equal 42 caseQualified
                 ]
 
+        scope : Test
         scope =
             describe "Scoping"
                 [ test "case" <| \() -> Expect.equal "Hi" caseScope ]
+
+        hex : Test
+        hex =
+            describe "Hex"
+                [ test "0xFFFFFFFF" <|
+                    \() ->
+                        0xFFFFFFFF
+                            |> Expect.equal 4294967295
+                , test "0xD066F00D" <|
+                    \() ->
+                        0xD066F00D
+                            |> Expect.equal 3496407053
+                , test "0x00" <|
+                    \() ->
+                        0x00
+                            |> Expect.equal 0
+                ]
     in
         describe "CodeGen"
-            [ primes
+            [ underscores
             , qualifiedPatterns
             , scope
+            , hex
             ]
