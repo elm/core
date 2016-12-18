@@ -11,7 +11,7 @@ type Wrapper a
     = Wrapper a
 
 
-casePrime m_ =
+caseUnderscore m_ =
     case m_ of
         Just x ->
             x
@@ -20,7 +20,7 @@ casePrime m_ =
             0
 
 
-patternPrime =
+patternUnderscore =
     case Just 42 of
         Just x_ ->
             x_
@@ -58,10 +58,10 @@ caseScope =
 tests : Test
 tests =
     let
-        primes =
-            describe "Primes"
-                [ test "case" <| \() -> Expect.equal 42 (casePrime (Just 42))
-                , test "pattern" <| \() -> Expect.equal 42 patternPrime
+        underscores =
+            describe "Underscores"
+                [ test "case" <| \() -> Expect.equal 42 (caseUnderscore (Just 42))
+                , test "pattern" <| \() -> Expect.equal 42 patternUnderscore
                 ]
 
         qualifiedPatterns =
@@ -75,7 +75,7 @@ tests =
                 [ test "case" <| \() -> Expect.equal "Hi" caseScope ]
     in
         describe "CodeGen"
-            [ primes
+            [ underscores
             , qualifiedPatterns
             , scope
             ]
