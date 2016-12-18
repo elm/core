@@ -3,7 +3,7 @@ module Test.Basics.Arithmetic exposing (tests)
 import Basics exposing (..)
 import Test exposing (..)
 import Expect
-import Fuzz exposing (float)
+import Fuzz exposing (float, int)
 
 
 tests : Test
@@ -59,6 +59,20 @@ tests =
                         Expect.pass
                     else
                         ((numerator * denominator) / denominator)
+                            |> Expect.equal numerator
+            ]
+        , describe "//"
+            [ fuzz int "dividing by 1 does nothing" <|
+                \num ->
+                    (num // 1)
+                        |> Expect.equal num
+            , fuzz2 int int "it undoes multiplication" <|
+                \numerator denominator ->
+                    if denominator == 0 then
+                        -- Skip tests that would be division by 0
+                        Expect.pass
+                    else
+                        ((numerator * denominator) // denominator)
                             |> Expect.equal numerator
             ]
         ]
