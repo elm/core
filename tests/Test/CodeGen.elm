@@ -62,18 +62,24 @@ caseScope =
 tests : Test
 tests =
     let
+        -- We don't strictly speaking need annotations in this let-expression,
+        -- but having these here exercises the parser to avoid regressions like
+        -- https://github.com/elm-lang/elm-compiler/issues/1535
+        underscores : Test
         underscores =
             describe "Underscores"
                 [ test "case" <| \() -> Expect.equal 42 (caseUnderscore (Just 42))
                 , test "pattern" <| \() -> Expect.equal 42 patternUnderscore
                 ]
 
+        qualifiedPatterns : Test
         qualifiedPatterns =
             describe "Qualified Patterns"
                 [ test "let" <| \() -> Expect.equal 42 letQualified
                 , test "case" <| \() -> Expect.equal 42 caseQualified
                 ]
 
+        scope : Test
         scope =
             describe "Scoping"
                 [ test "case" <| \() -> Expect.equal "Hi" caseScope ]
