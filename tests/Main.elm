@@ -12,6 +12,7 @@ import Test.Bitwise as Bitwise
 import Test.Char as Char
 import Test.CodeGen as CodeGen
 import Test.Dict as Dict
+import Test.Maybe as Maybe
 import Test.Equality as Equality
 import Test.Json as Json
 import Test.List as List
@@ -37,6 +38,7 @@ tests =
         , Set.tests
         , String.tests
         , Regex.tests
+        , Maybe.tests
         ]
 
 
