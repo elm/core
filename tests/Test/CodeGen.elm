@@ -83,9 +83,27 @@ tests =
         scope =
             describe "Scoping"
                 [ test "case" <| \() -> Expect.equal "Hi" caseScope ]
+
+        hex : Test
+        hex =
+            describe "Hex"
+                [ test "0xFFFFFFFF" <|
+                    \() ->
+                        0xFFFFFFFF
+                            |> Expect.equal 4294967295
+                , test "0xD066F00D" <|
+                    \() ->
+                        0xD066F00D
+                            |> Expect.equal 3496407053
+                , test "0x00" <|
+                    \() ->
+                        0x00
+                            |> Expect.equal 0
+                ]
     in
         describe "CodeGen"
             [ underscores
             , qualifiedPatterns
             , scope
+            , hex
             ]
