@@ -8,6 +8,7 @@ import Json.Decode exposing (Value)
 import Test.Runner.Node exposing (run, TestProgram)
 import Test.Array as Array
 import Test.Basics as Basics
+import Test.Basics.Arithmetic as Arithmetic
 import Test.Bitwise as Bitwise
 import Test.Char as Char
 import Test.CodeGen as CodeGen
@@ -27,6 +28,7 @@ tests =
     describe "Elm Standard Library Tests"
         [ Array.tests
         , Basics.tests
+        , Arithmetic.tests
         , Bitwise.tests
         , Char.tests
         , CodeGen.tests
