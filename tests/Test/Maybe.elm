@@ -145,7 +145,21 @@ tests =
 
       ]
 
-    , describe "Chaining Maybes Tests"
+    , describe "Special Maps Tests"
+
+      [ describe "concatMap Tests"
+        ( let f = (\i -> Maybe.map ((+) 1) i) in
+          [ test "Just Just" <|
+              \() -> Expect.equal (Just 4) (Maybe.concatMap f (Just (Just 3)))
+          , test "Just Nothing" <|
+              \() -> Expect.equal Nothing (Maybe.concatMap f (Just Nothing))
+          , test "Nothing" <|
+              \() -> Expect.equal Nothing (Maybe.concatMap f Nothing)
+          ]
+        )
+      ]
+
+    , describe "Combining Maybes Tests"
 
       [ describe "andThen Tests"
         [ test "succeeding chain" <|
@@ -163,6 +177,15 @@ tests =
               Expect.equal
                 Nothing
                 (Maybe.andThen (\a -> Nothing) (Just 1))
+        ]
+
+      , describe "concat Tests"
+        [ test "Just Just" <|
+            \() -> Expect.equal (Just 3) (Maybe.concat (Just (Just 3)))
+        , test "Just Nothing" <|
+            \() -> Expect.equal Nothing (Maybe.concat (Just Nothing))
+        , test "Nothing" <|
+            \() -> Expect.equal Nothing (Maybe.concat Nothing)
         ]
       ]
 

@@ -3,6 +3,7 @@ module Maybe exposing
   , andThen
   , map, map2, map3, map4, map5
   , withDefault
+  , concat, concatMap
   )
 
 {-| This library fills a bunch of important niches in Elm. A `Maybe` can help
@@ -14,8 +15,11 @@ you with optional arguments, error handling, and records with optional fields.
 # Common Helpers
 @docs withDefault, map, map2, map3, map4, map5
 
-# Chaining Maybes
-@docs andThen
+# Special Maps
+@docs concatMap
+
+# Combining Maybes
+@docs andThen, concat
 -}
 
 {-| Represent values that may or may not exist. It can be useful if you have a
@@ -112,6 +116,30 @@ map5 func ma mb mc md me =
 
       _ ->
           Nothing
+
+
+{-| Concat (flatten) two nested `Maybe`s into one
+
+    concat Just Just 3 == Just 3
+    concat Just Nothing == Nothing
+    concat Nothing == Nothing
+-}
+concat : Maybe (Maybe a) -> Maybe a
+concat ma =
+  case ma of
+    Nothing -> Nothing
+    Just Nothing -> Nothing
+    Just (Just a) -> Just a
+
+
+{-| Transform a `Maybe` value with a given function that returns another `Maybe`
+and concat (flatten) the result:
+
+    concatMap f m == concat (map f m)
+-}
+concatMap : (a -> Maybe b) -> Maybe a -> Maybe b
+concatMap f ma =
+  concat (map f ma)
 
 
 {-| Chain together many computations that may fail. It is helpful to see its
