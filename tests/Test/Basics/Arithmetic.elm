@@ -18,28 +18,16 @@ tests =
                 \left right ->
                     (left + -right)
                         |> Expect.equal (left - right)
-            , fuzzArithmetic2 "it is commutative" <|
-                \left right ->
-                    (left + right)
-                        |> Expect.equal (right + left)
-            , fuzzArithmetic3 "it is associative" <|
-                \first second third ->
-                    (first + second + third)
-                        |> Expect.equal ((first + second) + third)
+            , expectCommutative (+)
+            , expectAssociative (+)
             ]
         , describe "*"
             [ fuzz float "multiplying by 1 does nothing" <|
                 \num ->
                     (num * 1)
                         |> Expect.equal num
-            , fuzzArithmetic2 "it is commutative" <|
-                \left right ->
-                    (left * right)
-                        |> Expect.equal (right * left)
-            , fuzzArithmetic3 "it is associative" <|
-                \first second third ->
-                    (first * second * third)
-                        |> Expect.equal ((first * second) * third)
+            , expectCommutative (*)
+            , expectAssociative (*)
             ]
         , describe "-"
             [ fuzz float "subtracting 0 does nothing" <|
@@ -76,6 +64,22 @@ tests =
                             |> Expect.equal numerator
             ]
         ]
+
+
+expectCommutative : (Float -> Float -> Float) -> Test
+expectCommutative op =
+    fuzzArithmetic2 "it is commutative" <|
+        \left right ->
+            op left right
+                |> Expect.equal (op left right)
+
+
+expectAssociative : (Float -> Float -> Float) -> Test
+expectAssociative op =
+    fuzzArithmetic3 "it is associative" <|
+        \first second third ->
+            op first (op second third)
+                |> Expect.equal (op (op first second) third)
 
 
 fuzzArithmetic2 : String -> (Float -> Float -> Expect.Expectation) -> Test
