@@ -1,7 +1,7 @@
 module List exposing
   ( isEmpty, length, reverse, member
   , head, tail, filter, take, drop
-  , repeat, range, (::), append, concat, intersperse
+  , singleton, repeat, range, (::), append, concat, intersperse
   , partition, unzip
   , map, map2, map3, map4, map5
   , filterMap, concatMap, indexedMap
@@ -20,7 +20,7 @@ list must have the same type.
 @docs head, tail, filter, take, drop
 
 # Putting Lists Together
-@docs repeat, range, (::), append, concat, intersperse
+@docs singleton, repeat, range, (::), append, concat, intersperse
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -519,6 +519,16 @@ drop n list =
 
       x :: xs ->
         drop (n-1) xs
+
+
+{-| Create a list with only one element:
+
+    singleton 1234 == [1234]
+    singleton "hi" == ["hi"]
+-}
+singleton : a -> List a
+singleton value =
+  [value]
 
 
 {-| Create a list with *n* copies of a value:
