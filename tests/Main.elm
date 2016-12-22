@@ -1,14 +1,18 @@
-module Main exposing (..)
+port module Main exposing (..)
 
 import Basics exposing (..)
-import ElmTest exposing (..)
-
+import Task exposing (..)
+import Test exposing (..)
+import Platform.Cmd exposing (Cmd)
+import Json.Decode exposing (Value)
+import Test.Runner.Node exposing (run, TestProgram)
 import Test.Array as Array
 import Test.Basics as Basics
 import Test.Bitwise as Bitwise
 import Test.Char as Char
 import Test.CodeGen as CodeGen
 import Test.Dict as Dict
+import Test.Maybe as Maybe
 import Test.Equality as Equality
 import Test.Json as Json
 import Test.List as List
@@ -17,9 +21,10 @@ import Test.Set as Set
 import Test.String as String
 import Test.Regex as Regex
 
+
 tests : Test
 tests =
-    suite "Elm Standard Library Tests"
+    describe "Elm Standard Library Tests"
         [ Array.tests
         , Basics.tests
         , Bitwise.tests
@@ -33,8 +38,13 @@ tests =
         , Set.tests
         , String.tests
         , Regex.tests
+        , Maybe.tests
         ]
 
 
+main : TestProgram
 main =
-    runSuite tests
+    run emit tests
+
+
+port emit : ( String, Value ) -> Cmd msg
