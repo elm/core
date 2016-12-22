@@ -477,9 +477,9 @@ You can use `lazy` to make sure your decoder unrolls lazily.
 
     comment : Decoder Comment
     comment =
-      object Comment
-        |> required "message" string
-        |> required "responses" (map Responses (list (lazy (\_ -> comment))))
+      map2 Comment
+        (field "message" string)
+        (field "responses" (map Responses (list (lazy (\_ -> comment)))))
 
 If we had said `list comment` instead, we would start expanding the value
 infinitely. What is a `comment`? It is a decoder for objects where the
