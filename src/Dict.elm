@@ -202,7 +202,7 @@ update k alter dict =
             Nothing ->
               (Same, empty)
 
-            Just v  ->
+            Just v ->
               (Insert, RBNode_elm_builtin Red k v empty empty)
 
         RBNode_elm_builtin clr key value left right ->
