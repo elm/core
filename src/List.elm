@@ -184,7 +184,7 @@ scanl f b xs =
 
 {-| Keep only elements that satisfy the predicate.
 
-    filter isEven [1..6] == [2,4,6]
+    filter isEven [1,2,3,4,5,6] == [2,4,6]
 -}
 filter : (a -> Bool) -> List a -> List a
 filter pred xs =
@@ -239,7 +239,7 @@ length xs =
 
 {-| Reverse a list.
 
-    reverse [1..4] == [4,3,2,1]
+    reverse [1,2,3,4] == [4,3,2,1]
 -}
 reverse : List a -> List a
 reverse list =
@@ -315,7 +315,7 @@ concatMap f list =
 
 {-| Get the sum of the list elements.
 
-    sum [1..4] == 10
+    sum [1,2,3,4] == 10
 -}
 sum : List number -> number
 sum numbers =
@@ -324,7 +324,7 @@ sum numbers =
 
 {-| Get the product of the list elements.
 
-    product [1..4] == 24
+    product [1,2,3,4] == 24
 -}
 product : List number -> number
 product numbers =
@@ -365,8 +365,8 @@ minimum list =
 that satisfy the predicate, and the second list contains all the value that do
 not.
 
-    partition (\x -> x < 3) [0..5] == ([0,1,2], [3,4,5])
-    partition isEven        [0..5] == ([0,2,4], [1,3,5])
+    partition (\x -> x < 3) [0,1,2,3,4,5] == ([0,1,2], [3,4,5])
+    partition isEven        [0,1,2,3,4,5] == ([0,2,4], [1,3,5])
 -}
 partition : (a -> Bool) -> List a -> (List a, List a)
 partition pred list =
@@ -587,7 +587,7 @@ sortBy =
 
 {-| Sort values with a custom comparison function.
 
-    sortWith flippedComparison [1..5] == [5,4,3,2,1]
+    sortWith flippedComparison [1,2,3,4,5] == [5,4,3,2,1]
 
     flippedComparison a b =
         case compare a b of
