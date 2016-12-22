@@ -572,18 +572,13 @@ identity x =
   x
 
 
-{-| Create a [constant function](http://en.wikipedia.org/wiki/Constant_function),
-a function that *always* returns the same value regardless of what input you give.
-It is defined as:
+{-| Create a function that *always* returns the same value. Useful with
+functions like `map`:
 
-    always a b = a
+    List.map (always 0) [1,2,3,4,5] == [0,0,0,0,0]
 
-It totally ignores the second argument, so `always 42` is a function that always
-returns 42. When you are dealing with higher-order functions, this comes in
-handy more often than you might expect. For example, creating a zeroed out list
-of length ten would be:
-
-    map (always 0) [0..9]
+    -- List.map (\_ -> 0) [1,2,3,4,5] == [0,0,0,0,0]
+    -- always = (\x _ -> x)
 -}
 always : a -> b -> a
 always a _ =
