@@ -218,7 +218,7 @@ to `perform` that task. For example, getting the current time looks like this:
 
     type Msg = Click | NewTime Time
 
-    update : Msg -> Model -> Model
+    update : Msg -> Model -> ( Model, Cmd Msg )
     update msg model =
       case msg of
         Click ->
@@ -275,4 +275,3 @@ spawnCmd router (Perform task) =
     task
       |> andThen (Platform.sendToApp router)
   )
-
