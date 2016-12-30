@@ -31,7 +31,6 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 
 import Basics exposing (Never, (|>), (<<))
 import List exposing ((::))
-import Maybe exposing (Maybe(Just,Nothing))
 import Native.Scheduler
 import Platform
 import Platform.Cmd exposing (Cmd)
@@ -275,4 +274,3 @@ spawnCmd router (Perform task) =
     task
       |> andThen (Platform.sendToApp router)
   )
-

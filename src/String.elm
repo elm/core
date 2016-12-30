@@ -38,7 +38,6 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 -}
 
 import Native.String
-import Char
 import Maybe exposing (Maybe)
 import Result exposing (Result)
 
@@ -461,4 +460,3 @@ something.
 fromList : List Char -> String
 fromList =
   Native.String.fromList
-
