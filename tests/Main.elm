@@ -20,6 +20,7 @@ import Test.Result as Result
 import Test.Set as Set
 import Test.String as String
 import Test.Regex as Regex
+import Test.Tuple as Tuple
 
 
 tests : Test
@@ -39,6 +40,7 @@ tests =
         , String.tests
         , Regex.tests
         , Maybe.tests
+        , Tuple.tests
         ]
 
 
