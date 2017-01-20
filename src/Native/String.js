@@ -243,11 +243,7 @@ function toFloat(s)
 		return floatErr(s);
 	}
 	var n = +s;
-	if (isNaN(n))
-	{
-		return floatErr(s);
-	}
-	return _elm_lang$core$Result$Ok(n);
+	return n === n ? n : floatErr(s);
 }
 
 function floatErr(s)
