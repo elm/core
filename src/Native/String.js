@@ -225,7 +225,7 @@ function toInt(s)
 
 function intErr(s)
 {
-	return _elm_lang$core$Result$Err('could not convert string "' + s + '" to an Int');
+	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to an Int");
 }
 
 
@@ -245,7 +245,7 @@ function toFloat(s)
 
 function floatErr(s)
 {
-	return _elm_lang$core$Result$Err('could not convert string "' + s + '" to a Float');
+	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float");
 }
 
 
