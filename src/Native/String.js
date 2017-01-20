@@ -238,7 +238,7 @@ function toInt(s)
 			}
 			return intErr(s);
 		}
-		return _elm_lang$core$Result$Ok(parseInt(s, 10));
+		return _elm_lang$core$Result$Ok(parseInt(s, 16));
 	}
 
 	// is decimal
