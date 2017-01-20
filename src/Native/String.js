@@ -271,7 +271,7 @@ function toFloat(s)
 		return floatErr(s);
 	}
 	var n = +s;
-	return n === n ? n : floatErr(s);
+	return n === n ? _elm_lang$core$Result$Ok(n) : floatErr(s);
 }
 
 function floatErr(s)
