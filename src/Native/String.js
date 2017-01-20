@@ -211,23 +211,51 @@ function indexes(sub, str)
 
 function toInt(s)
 {
-	if (s.length === 0)
+	var len = s.length;
+
+	// if empty
+	if (len === 0)
 	{
 		return intErr(s);
 	}
 
-	var hexStart = s[0] === '0' && s[1] === 'x';
-	if (hexStart ? /[\s.]/.test(s) : /[\s.eE]/.test(s))
+	// if hex
+	var c = s[0];
+	if (c === '0')
 	{
-		return intErr(s);
+		// must be hex
+		if (s[1] !== 'x')
+		{
+			return intErr(s);
+		}
+
+		for (var i = 2; i < len; ++i)
+		{
+			var c = s[i];
+			if (('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'))
+			{
+				continue;
+			}
+			return intErr(s);
+		}
+		return _elm_lang$core$Result$Ok(parseInt(s, 10));
 	}
 
-	var n = +s;
-	if (isNaN(n))
+	// is decimal
+	if (c < '0' || '9' < c)
 	{
 		return intErr(s);
 	}
-	return _elm_lang$core$Result$Ok(n);
+	for (var i = 1; i < len; ++i)
+	{
+		var c = s[i];
+		if (c < '0' || '9' < c)
+		{
+			return intErr(s);
+		}
+	}
+
+	return _elm_lang$core$Result$Ok(parseInt(s, 10));
 }
 
 function intErr(s)
