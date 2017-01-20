@@ -211,10 +211,17 @@ function indexes(sub, str)
 
 function toInt(s)
 {
-	if (s.length === 0 || /[\s.eE]/.test(s))
+	if (s.length === 0)
 	{
 		return intErr(s);
 	}
+
+	var hexStart = s[0] === '0' && s[1] === 'x';
+	if (hexStart ? /[\s.]/.test(s) : /[\s.eE]/.test(s))
+	{
+		return intErr(s);
+	}
+
 	var n = +s;
 	if (isNaN(n))
 	{
