@@ -338,7 +338,7 @@ objects with many fields:
         (at ["info","height"] float)
 
     -- json = """{ "name": "tom", "info": { "age": 42, "height": 1.8 } }"""
-    -- decodeString point json == Ok { name = "tom", age = 42, height = 1.8 }
+    -- decodeString person json == Ok { name = "tom", age = 42, height = 1.8 }
 
 Like `map2` it tries each decoder in order and then give the results to the
 `Person` constructor. That can be any function though!
