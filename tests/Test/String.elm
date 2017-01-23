@@ -3,6 +3,7 @@ module Test.String exposing (tests)
 import Basics exposing (..)
 import List
 import Maybe exposing (..)
+import Result exposing (Result(..))
 import String
 import Test exposing (..)
 import Expect
@@ -40,5 +41,70 @@ tests =
                 , test "slice 3" <| \() -> Expect.equal "abc" (String.slice 0 -1 "abcd")
                 , test "slice 4" <| \() -> Expect.equal "cd" (String.slice -2 4 "abcd")
                 ]
+
+        intTests =
+            describe "String.toInt"
+                [ goodInt "1234" 1234
+                , goodInt "+1234" 1234
+                , goodInt "-1234" -1234
+                , badInt "1.34"
+                , badInt "1e31"
+                , badInt "123a"
+                , goodInt "0123" 123
+                , goodInt "0x001A" 26
+                , goodInt "0x001a" 26
+                , goodInt "0xBEEF" 48879
+                , badInt "0x12.0"
+                , badInt "0x12an"
+                ]
+
+        floatTests =
+            describe "String.toFloat"
+                [ goodFloat "123" 123
+                , goodFloat "3.14" 3.14
+                , goodFloat "+3.14" 3.14
+                , goodFloat "-3.14" -3.14
+                , goodFloat "0.12" 0.12
+                , goodFloat ".12" 0.12
+                , goodFloat "1e-42" 1e-42
+                , goodFloat "6.022e23" 6.022e23
+                , goodFloat "6.022E23" 6.022e23
+                , goodFloat "6.022e+23" 6.022e23
+                , badFloat "6.022e"
+                , badFloat "6.022n"
+                , badFloat "6.022.31"
+                ]
     in
-        describe "String" [ simpleTests, combiningTests ]
+        describe "String" [ simpleTests, combiningTests, intTests, floatTests ]
+
+
+
+-- NUMBER HELPERS
+
+
+goodInt : String -> Int -> Test
+goodInt str int =
+    test str <| \_ ->
+        Expect.equal (Ok int) (String.toInt str)
+
+
+badInt : String -> Test
+badInt str =
+    test str <| \_ ->
+        Expect.equal
+            (Err ("could not convert string '" ++ str ++ "' to an Int"))
+            (String.toInt str)
+
+
+goodFloat : String -> Float -> Test
+goodFloat str float =
+    test str <| \_ ->
+        Expect.equal (Ok float) (String.toFloat str)
+
+
+badFloat : String -> Test
+badFloat str =
+    test str <| \_ ->
+        Expect.equal
+            (Err ("could not convert string '" ++ str ++ "' to a Float"))
+            (String.toFloat str)
