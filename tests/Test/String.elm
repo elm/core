@@ -50,7 +50,7 @@ tests =
                 , badInt "1.34"
                 , badInt "1e31"
                 , badInt "123a"
-                , badInt "0123"
+                , goodInt "0123" 123
                 , goodInt "0x001A" 26
                 , goodInt "0x001a" 26
                 , goodInt "0xBEEF" 48879

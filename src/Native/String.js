@@ -221,14 +221,8 @@ function toInt(s)
 
 	// if hex
 	var c = s[0];
-	if (c === '0')
+	if (c === '0' && s[1] === 'x')
 	{
-		// must be hex
-		if (s[1] !== 'x')
-		{
-			return intErr(s);
-		}
-
 		for (var i = 2; i < len; ++i)
 		{
 			var c = s[i];
