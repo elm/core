@@ -511,9 +511,8 @@ function setupIncomingPort(name, callback)
 		sentBeforeInit.push(value);
 	}
 
-	function postInitSend(incomingValue)
+	function postInitSend(value)
 	{
-		var value = result._0;
 		var temp = subs;
 		while (temp.ctor !== '[]')
 		{
@@ -530,7 +529,7 @@ function setupIncomingPort(name, callback)
 			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
 		}
 
-		currentSend(incomingValue);
+		currentSend(result._0);
 	}
 
 	return { send: send };
