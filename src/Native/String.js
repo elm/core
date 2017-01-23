@@ -260,11 +260,13 @@ function intErr(s)
 
 function toFloat(s)
 {
+	// check if it is a hex, octal, or binary number
 	if (s.length === 0 || /[\sxbo]/.test(s))
 	{
 		return floatErr(s);
 	}
 	var n = +s;
+	// faster isNaN check
 	return n === n ? _elm_lang$core$Result$Ok(n) : floatErr(s);
 }
 
