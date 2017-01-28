@@ -3,16 +3,21 @@ module Test.Json exposing (tests)
 import Basics exposing (..)
 import Result exposing (..)
 import Json.Decode as Json
+import Json.Encode as Encode
 import String
 import Test exposing (..)
 import Expect
+import List
 
 
 tests : Test
 tests =
-    describe "Json decode"
-        [ intTests
-        , customTests
+    describe "Json"
+        [ describe "decode"
+            [ intTests
+            , customTests
+            , equality
+            ]
         ]
 
 
@@ -82,3 +87,43 @@ customTests =
                                 ++ message
     in
         test "customDecoder preserves user error messages" <| \() -> assertion
+
+
+equality : Test
+equality =
+    describe "equality of Values"
+        [ describe "commutativity"
+            (let
+                values =
+                    [ Encode.int 5
+                    , Encode.string "foo"
+                    , Encode.float 42.23
+                    , Encode.bool True
+                    , Encode.null
+                    , Encode.list [ Encode.null, Encode.int 3 ]
+                    , Encode.object [ ( "foo", Encode.int 42 ) ]
+                    , Encode.object
+                        [ ( "foo", Encode.int 42 )
+                        , ( "bar", Encode.int 23 )
+                        ]
+                    , Encode.object
+                        [ ( "foo", Encode.int 42 )
+                        , ( "bar", Encode.null )
+                        ]
+                    ]
+             in
+                List.concat <|
+                    List.map
+                        (\a ->
+                            List.map
+                                (\b ->
+                                    test ("(" ++ toString a ++ " == " ++ toString b ++ ") is commutative")
+                                        (\() ->
+                                            (a == b) |> Expect.equal (b == a)
+                                        )
+                                )
+                                values
+                        )
+                        values
+            )
+        ]
