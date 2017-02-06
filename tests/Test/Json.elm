@@ -3,6 +3,7 @@ module Test.Json exposing (tests)
 import Basics exposing (..)
 import Result exposing (..)
 import Json.Decode as Json
+import Json.Encode exposing (object, null)
 import String
 import Test exposing (..)
 import Expect
@@ -13,6 +14,7 @@ tests =
     describe "Json decode"
         [ intTests
         , customTests
+        , equalityTests
         ]
 
 
@@ -82,3 +84,20 @@ customTests =
                                 ++ message
     in
         test "customDecoder preserves user error messages" <| \() -> assertion
+
+
+equalityTests : Test
+equalityTests =
+    let
+        a =
+            object [ ( "foo", object [ ( "bar", null ) ] ) ]
+
+        b =
+            object []
+    in
+        describe "equality of values"
+            [ test "allows to test deeply nested objects for equality"
+                (\() ->
+                    a |> Expect.notEqual b
+                )
+            ]
