@@ -59,7 +59,8 @@ type Month
     | Sep | Oct | Nov | Dec
 
 
-{-| Attempt to read a date from a string.
+{-| Attempt to read a date from a string. This accepts [the same date strings
+supported by JavaScript's `Date.parse()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
 -}
 fromString : String -> Result String Date
 fromString =
