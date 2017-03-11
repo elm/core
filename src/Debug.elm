@@ -28,7 +28,7 @@ log =
 
 {-| Crash the program with an error message. This is an uncatchable error,
 intended for code that is soon-to-be-implemented. For example, if you are
-working with a large ADT and have partially completed a case expression, it may
+working with a large union type and have partially completed a case expression, it may
 make sense to do this:
 
     type Entity = Ship | Fish | Captain | Seagull
