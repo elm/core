@@ -1,7 +1,7 @@
 module Set exposing
   ( Set
   , empty, singleton, insert, remove
-  , isEmpty, member, size
+  , isEmpty, member, size, first, last
   , foldl, foldr, map
   , filter, partition
   , union, intersect, diff
@@ -21,7 +21,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs empty, singleton, insert, remove
 
 # Query
-@docs isEmpty, member, size
+@docs isEmpty, member, size, first, last
 
 # Combine
 @docs union, intersect, diff
@@ -35,6 +35,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 -}
 
 import Basics exposing ((<|))
+import Maybe exposing (..)
 import Dict as Dict
 import List as List
 
@@ -93,6 +94,30 @@ member k (Set_elm_builtin d) =
 size : Set a -> Int
 size (Set_elm_builtin d) =
   Dict.size d
+
+
+{-| Return the lowest element of the set, or Nothing, if it is empty.
+-}
+first : Set comparable -> Maybe comparable
+first (Set_elm_builtin d) =
+    case Dict.first d of
+        Nothing ->
+            Nothing
+
+        Just (k, _) ->
+            Just k
+
+
+{-| Return the highest element of the set, or Nothing, if it is empty.
+-}
+last : Set comparable -> Maybe comparable
+last (Set_elm_builtin d) =
+    case Dict.last d of
+        Nothing ->
+            Nothing
+
+        Just (k, _) ->
+            Just k
 
 
 {-| Get the union of two sets. Keep all values.

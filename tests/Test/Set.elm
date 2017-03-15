@@ -4,6 +4,7 @@ import Basics exposing (..)
 import Set
 import Set exposing (Set)
 import List
+import Maybe exposing (..)
 import Test exposing (..)
 import Expect
 
@@ -35,6 +36,14 @@ tests =
             describe "query Tests"
                 [ test "size of set of 100 elements" <|
                     \() -> Expect.equal 100 (Set.size set)
+                , test "first 1" <|
+                    \() -> Expect.equal Nothing (Set.first Set.empty)
+                , test "first 2" <|
+                    \() -> Expect.equal (Just 1) (Set.first set)
+                , test "last 1" <|
+                    \() -> Expect.equal Nothing (Set.first Set.empty)
+                , test "last 2" <|
+                    \() -> Expect.equal (Just 100) (Set.last set)
                 ]
 
         filterTests =
