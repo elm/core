@@ -7,7 +7,7 @@ function toCode(char)
 	var code = char.charCodeAt(0);
 	if (0xD800 <= code && code <= 0xDBFF)
 	{
-		code = (code - 0xD800) * 0x400 + char.charCodeAt(1) - 0xDC00 + 0x10000
+		return (code - 0xD800) * 0x400 + char.charCodeAt(1) - 0xDC00 + 0x10000
 	}
 	return code;
 }
