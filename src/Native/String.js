@@ -42,7 +42,26 @@ function map(f, str)
 }
 function filter(pred, str)
 {
-	return str.split('').map(_elm_lang$core$Native_Utils.chr).filter(pred).join('');
+	var arr = [];
+	var len = str.length;
+	var i = 0;
+	while (i < len)
+	{
+		var char = str[i];
+		var word = str.charCodeAt(i);
+		i++;
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			c += str[i];
+			i++;
+		}
+
+		if (pred(_elm_lang$core$Native_Utils.chr(c)))
+		{
+			arr.push(c);
+		}
+	}
+	return arr.join('');
 }
 function reverse(str)
 {
