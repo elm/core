@@ -21,41 +21,105 @@ import Native.Char
 import Basics exposing ((&&), (||), (>=), (<=))
 
 
-isBetween : Char -> Char -> Char -> Bool
-isBetween low high char =
-  let code = toCode char
-  in
-      (code >= toCode low) && (code <= toCode high)
+
+-- CLASSIFICATION
 
 
-{-| True for upper case ASCII letters. -}
+{-| Detect upper case ASCII characters.
+
+    isUpper 'A' == True
+    isUpper 'B' == True
+    ...
+    isUpper 'Z' == True
+
+    isUpper '0' == False
+    isUpper 'a' == False
+    isUpper 'Σ' == False
+-}
 isUpper : Char -> Bool
-isUpper =
-  isBetween 'A' 'Z'
+isUpper char =
+  let
+    code =
+      toCode char
+  in
+    code <= 0x5A && 0x41 <= code
 
 
-{-| True for lower case ASCII letters. -}
+{-| Detect lower case ASCII characters.
+
+    isLower 'a' == True
+    isLower 'b' == True
+    ...
+    isLower 'z' == True
+
+    isLower '0' == False
+    isLower 'A' == False
+    isLower 'π' == False
+-}
 isLower : Char -> Bool
-isLower =
-  isBetween 'a' 'z'
+isLower char =
+  let
+    code =
+      toCode char
+  in
+    0x61 <= code && code <= 0x7A
 
 
-{-| True for ASCII digits `[0-9]`. -}
+{-| Detect digits `0123456789`
+
+    isDigit '0' == True
+    isDigit '1' == True
+    ...
+    isDigit '9' == True
+
+    isDigit 'a' == False
+    isDigit 'b' == False
+    isDigit 'A' == False
+-}
 isDigit : Char -> Bool
-isDigit =
-  isBetween '0' '9'
+isDigit char =
+  let
+    code =
+      toCode char
+  in
+    code <= 0x39 && 0x30 <= code
 
 
-{-| True for ASCII octal digits `[0-7]`. -}
+{-| Detect octal digits `01234567`
+
+    isOctDigit '0' == True
+    isOctDigit '1' == True
+    ...
+    isOctDigit '7' == True
+
+    isOctDigit '8' == False
+    isOctDigit 'a' == False
+    isOctDigit 'A' == False
+-}
 isOctDigit : Char -> Bool
-isOctDigit =
-  isBetween '0' '7'
+isOctDigit char =
+  let
+    code =
+      toCode char
+  in
+    code <= 0x37 && 0x30 <= code
 
 
-{-| True for ASCII hexadecimal digits `[0-9a-fA-F]`. -}
+{-| Detect hexidecimal digits `0123456789abcdefABCDEF`
+-}
 isHexDigit : Char -> Bool
 isHexDigit char =
-  isDigit char || isBetween 'a' 'f' char || isBetween 'A' 'F' char
+  let
+    code =
+      toCode char
+  in
+    (0x30 <= code && code <= 0x39)
+    || (0x41 <= code && code <= 0x46)
+    || (0x61 <= code && code <= 0x66)
+
+
+
+-- CONVERSIONS
 
 
 {-| Convert to upper case. -}
@@ -85,6 +149,12 @@ toLocaleLower =
 {-| Convert to the corresponding Unicode [code point][cp].
 
 [cp]: https://en.wikipedia.org/wiki/Code_point
+
+    toCode 'A' == 65
+    toCode 'B' == 66
+    toCode '木' == 0x6728
+    toCode '𝌆' == 0x1D306
+    toCode '😃' == 0x1F603
 -}
 toCode : Char -> Int
 toCode =
@@ -94,6 +164,12 @@ toCode =
 {-| Convert a Unicode [code point][cp] to a character.
 
 [cp]: https://en.wikipedia.org/wiki/Code_point
+
+    fromCode 65      == 'A'
+    fromCode 66      == 'B'
+    fromCode 0x6728  == '木'
+    fromCode 0x1D306 == '𝌆'
+    fromCode 0x1F603 == '😃'
 -}
 fromCode : Int -> Char
 fromCode =
