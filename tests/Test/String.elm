@@ -81,6 +81,7 @@ tests =
                 , test "reverse 2" <| \() -> Expect.equal "nàm" (String.reverse "màn")
                 , test "reverse 3" <| \() -> Expect.equal "😣ba" (String.reverse "ab😣")
                 , test "filter" <| \() -> Expect.equal "mànabc" (String.filter (\c -> c /= '😣') "màn😣abc")
+                , test "toList" <| \() -> Expect.equal ['𝌆', 'a', '𝌆', 'b', '𝌆'] (String.toList "𝌆a𝌆b𝌆")
                 ]
     in
         describe "String" [ simpleTests, combiningTests, intTests, floatTests, encodingTests ]

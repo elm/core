@@ -316,8 +316,22 @@ function floatErr(s)
 
 function toList(str)
 {
-	return _elm_lang$core$Native_List.fromArray(str.split('').map(_elm_lang$core$Native_Utils.chr));
+	var i = str.length;
+	var list = _elm_lang$core$Native_List.Nil;
+	while (i--)
+	{
+		var char = str[i];
+		var word = str.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = str[i] + char;
+		}
+		list = _elm_lang$core$Native_List.Cons(char, list);
+	}
+	return list;
 }
+
 function fromList(chars)
 {
 	return _elm_lang$core$Native_List.toArray(chars).join('');
