@@ -37,7 +37,7 @@ The current sentiment is that it is already quite error prone once you get to
 @docs filterMap, concatMap, indexedMap
 
 # Folding
-@docs foldr, foldl
+@docs foldl, foldr
 
 # Special Folds
 @docs sum, product, maximum, minimum, all, any, scanl
@@ -144,6 +144,7 @@ indexedMap f xs =
 {-| Reduce a list from the left.
 
     foldl (::) [] [1,2,3] == [3,2,1]
+    foldl (+) 0 [1,2,3] == 6
 -}
 foldl : (a -> b -> b) -> b -> List a -> b
 foldl func acc list =
@@ -157,6 +158,7 @@ foldl func acc list =
 
 {-| Reduce a list from the right.
 
+    foldr (::) [] [1,2,3] == [1,2,3]
     foldr (+) 0 [1,2,3] == 6
 -}
 foldr : (a -> b -> b) -> b -> List a -> b
