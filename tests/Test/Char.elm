@@ -59,11 +59,13 @@ tests =
             [ test "a-z" <| \() -> Expect.equal (lowerCodes) (List.map toCode lower)
             , test "A-Z" <| \() -> Expect.equal (upperCodes) (List.map toCode upper)
             , test "0-9" <| \() -> Expect.equal (decCodes) (List.map toCode dec)
+            , test "UTF-16" <| \() -> Expect.equal 0x1D306 (Char.toCode '𝌆')
             ]
         , describe "fromCode"
             [ test "a-z" <| \() -> Expect.equal (lower) (List.map fromCode lowerCodes)
             , test "A-Z" <| \() -> Expect.equal (upper) (List.map fromCode upperCodes)
             , test "0-9" <| \() -> Expect.equal (dec) (List.map fromCode decCodes)
+            , test "UTF-16" <| \() -> Expect.equal '𝌆' (Char.fromCode 0x1D306)
             ]
         , describe "toLocaleLower"
             [ test "a-z" <| \() -> Expect.equal (lower) (List.map toLocaleLower lower)
