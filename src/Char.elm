@@ -1,7 +1,7 @@
 module Char exposing
   ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
   , toUpper, toLower, toLocaleUpper, toLocaleLower
-  , KeyCode, toCode, fromCode
+  , toCode, fromCode
   )
 
 {-| Functions for working with characters. Character literals are enclosed in
@@ -13,9 +13,8 @@ module Char exposing
 # Conversion
 @docs toUpper, toLower, toLocaleUpper, toLocaleLower
 
-# Key Codes
-@docs KeyCode, toCode, fromCode
-
+# Unicode Code Points
+@docs toCode, fromCode
 -}
 
 import Native.Char
@@ -83,21 +82,19 @@ toLocaleLower =
   Native.Char.toLocaleLower
 
 
-{-| Keyboard keys can be represented as integers. These are called *key codes*.
-You can use [`toCode`](#toCode) and [`fromCode`](#fromCode) to convert between
-key codes and characters.
--}
-type alias KeyCode = Int
+{-| Convert to the corresponding Unicode [code point][cp].
 
-
-{-| Convert to key code.
+[cp]: https://en.wikipedia.org/wiki/Code_point
 -}
-toCode : Char -> KeyCode
+toCode : Char -> Int
 toCode =
   Native.Char.toCode
 
 
-{-| Convert from key code. -}
-fromCode : KeyCode -> Char
+{-| Convert a Unicode [code point][cp] to a character.
+
+[cp]: https://en.wikipedia.org/wiki/Code_point
+-}
+fromCode : Int -> Char
 fromCode =
   Native.Char.fromCode
