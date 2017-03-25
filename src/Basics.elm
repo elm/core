@@ -468,12 +468,17 @@ isInfinite =
   Native.Basics.isInfinite
 
 
-{-| Turn any kind of value into a string. When you view the resulting string
-with `Text.fromString` it should look just like the value it came from.
+{-| Turn any kind of value into a string, mostly for debugging.
 
-    toString 42 == "42"
-    toString [1,2] == "[1,2]"
+    toString 42                == "42"
+    toString [1,2]             == "[1,2]"
+    toString ('a', "cat", 13)  == "('a', \"cat\", 13)"
     toString "he said, \"hi\"" == "\"he said, \\\"hi\\\"\""
+
+Notice that with strings, this is not the `identity` function. It escapes
+characters so if you say `Html.text (toString "he said, \"hi\"")` it will
+show `"he said, \"hi\""` rather than `he said, "hi"`. This makes it nice
+for viewing Elm data structures.
 -}
 toString : a -> String
 toString =
