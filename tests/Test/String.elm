@@ -74,8 +74,16 @@ tests =
                 , badFloat "6.022n"
                 , badFloat "6.022.31"
                 ]
+
+        encodingTests =
+            describe "UTF-16 Encoding"
+                [ test "reverse 1" <| \() -> Expect.equal "𝌆c𝌆b𝌆a𝌆" (String.reverse "𝌆a𝌆b𝌆c𝌆")
+                , test "reverse 2" <| \() -> Expect.equal "nàm" (String.reverse "màn")
+                , test "reverse 3" <| \() -> Expect.equal "😣ba" (String.reverse "ab😣")
+                , test "filter" <| \() -> Expect.equal "mànabc" (String.filter (\c -> c /= '😣') "màn😣abc")
+                ]
     in
-        describe "String" [ simpleTests, combiningTests, intTests, floatTests ]
+        describe "String" [ simpleTests, combiningTests, intTests, floatTests, encodingTests ]
 
 
 
