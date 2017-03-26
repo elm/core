@@ -346,25 +346,6 @@ function floatErr(s)
 	return _elm_lang$core$Result$Err("could not convert string '" + s + "' to a Float");
 }
 
-
-function toList(str)
-{
-	var i = str.length;
-	var list = _elm_lang$core$Native_List.Nil;
-	while (i--)
-	{
-		var char = str[i];
-		var word = str.charCodeAt(i);
-		if (0xDC00 <= word && word <= 0xDFFF)
-		{
-			i--;
-			char = str[i] + char;
-		}
-		list = _elm_lang$core$Native_List.Cons(char, list);
-	}
-	return list;
-}
-
 function fromList(chars)
 {
 	return _elm_lang$core$Native_List.toArray(chars).join('');
@@ -417,7 +398,6 @@ return {
 
 	toInt: toInt,
 	toFloat: toFloat,
-	toList: toList,
 	fromList: fromList
 };
 

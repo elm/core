@@ -446,10 +446,11 @@ toFloat =
 {-| Convert a string to a list of characters.
 
     toList "abc" == ['a','b','c']
+    toList "🙈🙉🙊" == ['🙈','🙉','🙊']
 -}
 toList : String -> List Char
-toList =
-  Native.String.toList
+toList string =
+  foldr (::) [] string
 
 
 {-| Convert a list of characters into a String. Can be useful if you
@@ -457,6 +458,7 @@ want to create a string primarily by consing, perhaps for decoding
 something.
 
     fromList ['a','b','c'] == "abc"
+    fromList ['🙈','🙉','🙊'] == "🙈🙉🙊"
 -}
 fromList : List Char -> String
 fromList =
