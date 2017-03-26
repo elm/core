@@ -63,6 +63,7 @@ function filter(pred, str)
 	}
 	return arr.join('');
 }
+
 function reverse(str)
 {
 	var len = str.length;
@@ -86,31 +87,53 @@ function reverse(str)
 	}
 	return arr.join('');
 }
-function foldl(f, b, str)
+
+function foldl(func, state, string)
 {
-	var len = str.length;
-	for (var i = 0; i < len; ++i)
+	var len = string.length;
+	var i = 0;
+	while (i < len)
 	{
-		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		i++;
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			char += string[i];
+			i++;
+		}
+		state = A2(func, _elm_lang$core$Native_Utils.chr(char), state);
 	}
-	return b;
+	return state;
 }
-function foldr(f, b, str)
+
+function foldr(func, state, string)
 {
-	for (var i = str.length; i--; )
+	var i = string.length;
+	while (i--)
 	{
-		b = A2(f, _elm_lang$core$Native_Utils.chr(str[i]), b);
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = string[i] + char;
+		}
+		state = A2(func, _elm_lang$core$Native_Utils.chr(char), state);
 	}
-	return b;
+	return state;
 }
+
 function split(sep, str)
 {
 	return _elm_lang$core$Native_List.fromArray(str.split(sep));
 }
+
 function join(sep, strs)
 {
 	return _elm_lang$core$Native_List.toArray(strs).join(sep);
 }
+
 function repeat(n, str)
 {
 	var result = '';
@@ -124,35 +147,43 @@ function repeat(n, str)
 	}
 	return result;
 }
+
 function slice(start, end, str)
 {
 	return str.slice(start, end);
 }
+
 function left(n, str)
 {
 	return n < 1 ? '' : str.slice(0, n);
 }
+
 function right(n, str)
 {
 	return n < 1 ? '' : str.slice(-n);
 }
+
 function dropLeft(n, str)
 {
 	return n < 1 ? str : str.slice(n);
 }
+
 function dropRight(n, str)
 {
 	return n < 1 ? str : str.slice(0, -n);
 }
+
 function pad(n, chr, str)
 {
 	var half = (n - str.length) / 2;
 	return repeat(Math.ceil(half), chr) + str + repeat(half | 0, chr);
 }
+
 function padRight(n, chr, str)
 {
 	return str + repeat(n - str.length, chr);
 }
+
 function padLeft(n, chr, str)
 {
 	return repeat(n - str.length, chr) + str;
@@ -162,10 +193,12 @@ function trim(str)
 {
 	return str.trim();
 }
+
 function trimLeft(str)
 {
 	return str.replace(/^\s+/, '');
 }
+
 function trimRight(str)
 {
 	return str.replace(/\s+$/, '');
