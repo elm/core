@@ -222,22 +222,39 @@ function toLower(str)
 	return str.toLowerCase();
 }
 
-function any(pred, str)
+function any(isGood, string)
 {
-	for (var i = str.length; i--; )
+	var i = string.length;
+	while (i--)
 	{
-		if (pred(_elm_lang$core$Native_Utils.chr(str[i])))
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = string[i] + char;
+		}
+		if (isGood(_elm_lang$core$Native_Utils.chr(char)))
 		{
 			return true;
 		}
 	}
 	return false;
 }
-function all(pred, str)
+
+function all(isGood, string)
 {
-	for (var i = str.length; i--; )
+	var i = string.length;
+	while (i--)
 	{
-		if (!pred(_elm_lang$core$Native_Utils.chr(str[i])))
+		var char = string[i];
+		var word = string.charCodeAt(i);
+		if (0xDC00 <= word && word <= 0xDFFF)
+		{
+			i--;
+			char = string[i] + char;
+		}
+		if (!isGood(_elm_lang$core$Native_Utils.chr(char)))
 		{
 			return false;
 		}
