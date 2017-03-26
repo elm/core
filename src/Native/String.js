@@ -6,10 +6,12 @@ function isEmpty(str)
 {
 	return str.length === 0;
 }
+
 function cons(chr, str)
 {
 	return chr + str;
 }
+
 function uncons(str)
 {
 	var hd = str[0];
@@ -19,18 +21,22 @@ function uncons(str)
 	}
 	return _elm_lang$core$Maybe$Nothing;
 }
+
 function append(a, b)
 {
 	return a + b;
 }
+
 function concat(strs)
 {
 	return _elm_lang$core$Native_List.toArray(strs).join('');
 }
+
 function length(str)
 {
 	return str.length;
 }
+
 function map(f, str)
 {
 	var out = str.split('');
@@ -40,6 +46,7 @@ function map(f, str)
 	}
 	return out.join('');
 }
+
 function filter(pred, str)
 {
 	var arr = [];
@@ -208,6 +215,7 @@ function words(str)
 {
 	return _elm_lang$core$Native_List.fromArray(str.trim().split(/\s+/g));
 }
+
 function lines(str)
 {
 	return _elm_lang$core$Native_List.fromArray(str.split(/\r\n|\r|\n/g));
