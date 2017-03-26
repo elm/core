@@ -36,6 +36,10 @@ tests =
                 , test "get 2" <| \() -> Expect.equal Nothing (Dict.get "Spike" animals)
                 , test "size of empty dictionary" <| \() -> Expect.equal 0 (Dict.size Dict.empty)
                 , test "size of example dictionary" <| \() -> Expect.equal 2 (Dict.size animals)
+                , test "first 1" <| \() -> Expect.equal Nothing (Dict.first Dict.empty)
+                , test "first 2" <| \() -> Expect.equal (Just ("Jerry", "mouse")) (Dict.first animals)
+                , test "last 1" <| \() -> Expect.equal Nothing (Dict.first Dict.empty)
+                , test "last 2" <| \() -> Expect.equal (Just ("Tom", "cat")) (Dict.last animals)
                 ]
 
         combineTests =

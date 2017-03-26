@@ -1,7 +1,7 @@
 module Dict exposing
   ( Dict
   , empty, singleton, insert, update
-  , isEmpty, get, remove, member, size
+  , isEmpty, get, remove, member, size, first, last
   , filter
   , partition
   , foldl, foldr, map
@@ -23,7 +23,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs empty, singleton, insert, update, remove
 
 # Query
-@docs isEmpty, member, get, size
+@docs isEmpty, member, get, size, first, last
 
 # Lists
 @docs keys, values, toList, fromList
@@ -583,6 +583,29 @@ foldl f acc dict =
       foldl f (f key value (foldl f acc left)) right
 
 
+{-| Return the element of the dictionary with the lowest key,
+or Nothing, if it is empty.
+-}
+first : Dict comparable v -> Maybe (comparable, v)
+first dict =
+  case dict of
+    RBEmpty_elm_builtin _ ->
+      Nothing
+
+    RBNode_elm_builtin _ key value left _ ->
+      Just <| firstHelper key value left
+
+
+-- Could call this firstWithDefault and expose it...
+firstHelper : comparable -> v -> Dict comparable v -> (comparable, v)
+firstHelper k v dict =
+    case dict of
+        RBEmpty_elm_builtin _ ->
+            (k, v)
+
+        RBNode_elm_builtin _ key value left _ ->
+            firstHelper key value left
+
 {-| Fold over the key-value pairs in a dictionary, in order from highest
 key to lowest key.
 -}
@@ -594,6 +617,30 @@ foldr f acc t =
 
     RBNode_elm_builtin _ key value left right ->
       foldr f (f key value (foldr f acc right)) left
+
+
+{-| Return the element of the dictionary with the highest key,
+or Nothing, if it is empty.
+-}
+last : Dict comparable v -> Maybe (comparable, v)
+last dict =
+  case dict of
+    RBEmpty_elm_builtin _ ->
+      Nothing
+
+    RBNode_elm_builtin _ key value _ right ->
+      Just <| lastHelper key value right
+
+
+-- Could call this lastWithDefault and expose it...
+lastHelper : comparable -> v -> Dict comparable v -> (comparable, v)
+lastHelper k v dict =
+    case dict of
+        RBEmpty_elm_builtin _ ->
+            (k, v)
+
+        RBNode_elm_builtin _ key value _ right ->
+            lastHelper key value right
 
 
 {-| Keep a key-value pair when it satisfies a predicate. -}
