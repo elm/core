@@ -236,7 +236,7 @@ function toInt(s)
 	}
 
 	// is decimal
-	if (c > '9' || (c < '0' && c !== '-' && c !== '+'))
+	if (c > '9' || (c < '0' && ((c !== '-' && c !== '+') || len === 1)))
 	{
 		return intErr(s);
 	}
