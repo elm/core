@@ -49,14 +49,24 @@ function length(str)
 	return str.length;
 }
 
-function map(f, str)
+function map(func, string)
 {
-	var out = str.split('');
-	for (var i = out.length; i--; )
+	var len = string.length;
+	var array = new Array(len);
+	var i = 0;
+	while (i < len)
 	{
-		out[i] = f(_elm_lang$core$Native_Utils.chr(out[i]));
+		var word = str.charCodeAt(i);
+		if (0xD800 <= word && word <= 0xDBFF)
+		{
+			array[i] = func(_elm_lang$core$Native_Utils.chr(string[i] + string[i+1]));
+			i += 2;
+			continue;
+		}
+		array[i] = func(_elm_lang$core$Native_Utils.chr(string[i]));
+		i++;
 	}
-	return out.join('');
+	return array.join('');
 }
 
 function filter(pred, str)
