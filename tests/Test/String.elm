@@ -82,6 +82,10 @@ tests =
                 , test "reverse 3" <| \() -> Expect.equal "😣ba" (String.reverse "ab😣")
                 , test "filter" <| \() -> Expect.equal "mànabc" (String.filter (\c -> c /= '😣') "màn😣abc")
                 , test "toList" <| \() -> Expect.equal ['𝌆', 'a', '𝌆', 'b', '𝌆'] (String.toList "𝌆a𝌆b𝌆")
+                , test "uncons" <| \() -> Expect.equal (Just ( '😃', "bc" )) (String.uncons "😃bc")
+                , test "map" <| \() -> Expect.equal "aaa" (String.map (\_ -> 'a') "😃😃😃")
+                , test "foldl" <| \() -> Expect.equal 3 (String.foldl (\_ c -> c + 1) 0 "😃😃😃")
+                , test "foldr" <| \() -> Expect.equal 3 (String.foldr (\_ c -> c + 1) 0 "😃😃😃")
                 ]
     in
         describe "String" [ simpleTests, combiningTests, intTests, floatTests, encodingTests ]
