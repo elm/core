@@ -12,14 +12,26 @@ function cons(chr, str)
 	return chr + str;
 }
 
-function uncons(str)
+function uncons(string)
 {
-	var hd = str[0];
-	if (hd)
+	if (string.length === 0)
 	{
-		return _elm_lang$core$Maybe$Just(_elm_lang$core$Native_Utils.Tuple2(_elm_lang$core$Native_Utils.chr(hd), str.slice(1)));
+		return _elm_lang$core$Maybe$Nothing;
 	}
-	return _elm_lang$core$Maybe$Nothing;
+	var char = string[i];
+	var offset = 1;
+	var word = string.charCodeAt(0);
+	if (0xD800 <= word && word <= 0xDBFF)
+	{
+		char += string[i+1];
+		offset = 2;
+	}
+	return _elm_lang$core$Maybe$Just(
+		_elm_lang$core$Native_Utils.Tuple2(
+			_elm_lang$core$Native_Utils.chr(char),
+			string.slice(offset)
+		)
+	);
 }
 
 function append(a, b)
