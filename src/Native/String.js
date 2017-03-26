@@ -81,13 +81,13 @@ function filter(pred, str)
 		i++;
 		if (0xD800 <= word && word <= 0xDBFF)
 		{
-			c += str[i];
+			char += str[i];
 			i++;
 		}
 
-		if (pred(_elm_lang$core$Native_Utils.chr(c)))
+		if (pred(_elm_lang$core$Native_Utils.chr(char)))
 		{
-			arr.push(c);
+			arr.push(char);
 		}
 	}
 	return arr.join('');
