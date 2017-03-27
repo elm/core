@@ -40,7 +40,7 @@ The current sentiment is that it is already quite error prone once you get to
 @docs foldl, foldr
 
 # Special Folds
-@docs sum, product, maximum, minimum, all, any, scanl
+@docs sum, product, maximum, minimum, all, any, find, scanl
 
 # Sorting
 @docs sort, sortBy, sortWith
@@ -140,6 +140,24 @@ indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
   map2 f (range 0 (length xs - 1)) xs
 
+
+
+{-| Find the first element that satisfies a predicate and return
+Just that element. If none match, return Nothing.
+
+    find (\num -> num > 5) [2, 4, 6, 8] == Just 6
+-}
+find : (a -> Bool) -> List a -> Maybe a
+find predicate list =
+    case list of
+        [] ->
+            Nothing
+
+        first::rest ->
+            if predicate first then
+                Just first
+            else
+                find predicate rest
 
 {-| Reduce a list from the left.
 
