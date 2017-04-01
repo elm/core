@@ -1,23 +1,19 @@
-//import //
-
-var _elm_lang$core$Native_Utils = function() {
 
 // COMPARISONS
 
-function eq(x, y)
+function _Utils_eq(x, y)
 {
 	var stack = [];
-	var isEqual = eqHelp(x, y, 0, stack);
+	var isEqual = _Utils_eqHelp(x, y, 0, stack);
 	var pair;
 	while (isEqual && (pair = stack.pop()))
 	{
-		isEqual = eqHelp(pair.x, pair.y, 0, stack);
+		isEqual = _Utils_eqHelp(pair.x, pair.y, 0, stack);
 	}
 	return isEqual;
 }
 
-
-function eqHelp(x, y, depth, stack)
+function _Utils_eqHelp(x, y, depth, stack)
 {
 	if (depth > 100)
 	{
@@ -57,7 +53,7 @@ function eqHelp(x, y, depth, stack)
 	{
 		for (var key in x)
 		{
-			if (!eqHelp(x[key], y[key], depth + 1, stack))
+			if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
 			{
 				return false;
 			}
@@ -68,13 +64,13 @@ function eqHelp(x, y, depth, stack)
 	// convert Dicts and Sets to lists
 	if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
 	{
-		x = _elm_lang$core$Dict$toList(x);
-		y = _elm_lang$core$Dict$toList(y);
+		x = elm_lang$core$Dict$toList(x);
+		y = elm_lang$core$Dict$toList(y);
 	}
 	if (x.ctor === 'Set_elm_builtin')
 	{
-		x = _elm_lang$core$Set$toList(x);
-		y = _elm_lang$core$Set$toList(y);
+		x = elm_lang$core$Set$toList(x);
+		y = elm_lang$core$Set$toList(y);
 	}
 
 	// check if lists are equal without recursion
@@ -84,7 +80,7 @@ function eqHelp(x, y, depth, stack)
 		var b = y;
 		while (a.ctor === '::' && b.ctor === '::')
 		{
-			if (!eqHelp(a._0, b._0, depth + 1, stack))
+			if (!_Utils_eqHelp(a._0, b._0, depth + 1, stack))
 			{
 				return false;
 			}
@@ -97,15 +93,15 @@ function eqHelp(x, y, depth, stack)
 	// check if Arrays are equal
 	if (x.ctor === '_Array')
 	{
-		var xs = _elm_lang$core$Native_Array.toJSArray(x);
-		var ys = _elm_lang$core$Native_Array.toJSArray(y);
+		var xs = _Array_toJSArray(x);
+		var ys = _Array_toJSArray(y);
 		if (xs.length !== ys.length)
 		{
 			return false;
 		}
 		for (var i = 0; i < xs.length; i++)
 		{
-			if (!eqHelp(xs[i], ys[i], depth + 1, stack))
+			if (!_Utils_eqHelp(xs[i], ys[i], depth + 1, stack))
 			{
 				return false;
 			}
@@ -113,14 +109,14 @@ function eqHelp(x, y, depth, stack)
 		return true;
 	}
 
-	if (!eqHelp(x.ctor, y.ctor, depth + 1, stack))
+	if (!_Utils_eqHelp(x.ctor, y.ctor, depth + 1, stack))
 	{
 		return false;
 	}
 
 	for (var key in x)
 	{
-		if (!eqHelp(x[key], y[key], depth + 1, stack))
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
 		{
 			return false;
 		}
@@ -131,35 +127,35 @@ function eqHelp(x, y, depth, stack)
 // Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
 // the particular integer values assigned to LT, EQ, and GT.
 
-var LT = -1, EQ = 0, GT = 1;
+var _Utils_LT = -1, _Utils_EQ = 0, _Utils_GT = 1;
 
-function cmp(x, y)
+function _Utils_cmp(x, y)
 {
 	if (typeof x !== 'object')
 	{
-		return x === y ? EQ : x < y ? LT : GT;
+		return x === y ? _Utils_EQ : x < y ? _Utils_LT : _Utils_GT;
 	}
 
 	if (x instanceof String)
 	{
 		var a = x.valueOf();
 		var b = y.valueOf();
-		return a === b ? EQ : a < b ? LT : GT;
+		return a === b ? _Utils_EQ : a < b ? _Utils_LT : _Utils_GT;
 	}
 
 	if (x.ctor === '::' || x.ctor === '[]')
 	{
 		while (x.ctor === '::' && y.ctor === '::')
 		{
-			var ord = cmp(x._0, y._0);
-			if (ord !== EQ)
+			var ord = _Utils_cmp(x._0, y._0);
+			if (ord !== _Utils_EQ)
 			{
 				return ord;
 			}
 			x = x._1;
 			y = y._1;
 		}
-		return x.ctor === y.ctor ? EQ : x.ctor === '[]' ? LT : GT;
+		return x.ctor === y.ctor ? _Utils_EQ : x.ctor === '[]' ? _Utils_LT : _Utils_GT;
 	}
 
 	if (x.ctor.slice(0, 6) === '_Tuple')
@@ -167,15 +163,15 @@ function cmp(x, y)
 		var ord;
 		var n = x.ctor.slice(6) - 0;
 		var err = 'cannot compare tuples with more than 6 elements.';
-		if (n === 0) return EQ;
-		if (n >= 1) { ord = cmp(x._0, y._0); if (ord !== EQ) return ord;
-		if (n >= 2) { ord = cmp(x._1, y._1); if (ord !== EQ) return ord;
-		if (n >= 3) { ord = cmp(x._2, y._2); if (ord !== EQ) return ord;
-		if (n >= 4) { ord = cmp(x._3, y._3); if (ord !== EQ) return ord;
-		if (n >= 5) { ord = cmp(x._4, y._4); if (ord !== EQ) return ord;
-		if (n >= 6) { ord = cmp(x._5, y._5); if (ord !== EQ) return ord;
+		if (n === 0) return _Utils_EQ;
+		if (n >= 1) { ord = _Utils_cmp(x._0, y._0); if (ord !== _Utils_EQ) return ord;
+		if (n >= 2) { ord = _Utils_cmp(x._1, y._1); if (ord !== _Utils_EQ) return ord;
+		if (n >= 3) { ord = _Utils_cmp(x._2, y._2); if (ord !== _Utils_EQ) return ord;
+		if (n >= 4) { ord = _Utils_cmp(x._3, y._3); if (ord !== _Utils_EQ) return ord;
+		if (n >= 5) { ord = _Utils_cmp(x._4, y._4); if (ord !== _Utils_EQ) return ord;
+		if (n >= 6) { ord = _Utils_cmp(x._5, y._5); if (ord !== _Utils_EQ) return ord;
 		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
-		return EQ;
+		return _Utils_EQ;
 	}
 
 	throw new Error(
@@ -188,11 +184,11 @@ function cmp(x, y)
 
 // COMMON VALUES
 
-var Tuple0 = {
+var _Utils_Tuple0 = {
 	ctor: '_Tuple0'
 };
 
-function Tuple2(x, y)
+function _Utils_Tuple2(x, y)
 {
 	return {
 		ctor: '_Tuple2',
@@ -201,24 +197,15 @@ function Tuple2(x, y)
 	};
 }
 
-function chr(c)
+function _Utils_chr(c)
 {
 	return new String(c);
 }
 
 
-// GUID
-
-var count = 0;
-function guid(_)
-{
-	return count++;
-}
-
-
 // RECORDS
 
-function update(oldRecord, updatedFields)
+function _Utils_update(oldRecord, updatedFields)
 {
 	var newRecord = {};
 
@@ -236,20 +223,9 @@ function update(oldRecord, updatedFields)
 }
 
 
-//// LIST STUFF ////
+// APPEND
 
-var Nil = { ctor: '[]' };
-
-function Cons(hd, tl)
-{
-	return {
-		ctor: '::',
-		_0: hd,
-		_1: tl
-	};
-}
-
-function append(xs, ys)
+function _Utils_append(xs, ys)
 {
 	// append Strings
 	if (typeof xs === 'string')
@@ -262,12 +238,12 @@ function append(xs, ys)
 	{
 		return ys;
 	}
-	var root = Cons(xs._0, Nil);
+	var root = _List_Cons(xs._0, _List_Nil);
 	var curr = root;
 	xs = xs._1;
 	while (xs.ctor !== '[]')
 	{
-		curr._1 = Cons(xs._0, Nil);
+		curr._1 = _List_Cons(xs._0, _List_Nil);
 		xs = xs._1;
 		curr = curr._1;
 	}
@@ -278,31 +254,31 @@ function append(xs, ys)
 
 // CRASHES
 
-function crash(moduleName, region)
+function _Utils_crash(moduleName, region)
 {
 	return function(message) {
 		throw new Error(
-			'Ran into a `Debug.crash` in module `' + moduleName + '` ' + regionToString(region) + '\n'
+			'Ran into a `Debug.crash` in module `' + moduleName + '` ' + _Utils_regionToString(region) + '\n'
 			+ 'The message provided by the code author is:\n\n    '
 			+ message
 		);
 	};
 }
 
-function crashCase(moduleName, region, value)
+function _Utils_crashCase(moduleName, region, value)
 {
 	return function(message) {
 		throw new Error(
 			'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
-			+ 'This was caused by the `case` expression ' + regionToString(region) + '.\n'
-			+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + toString(value) + '\n\n'
+			+ 'This was caused by the `case` expression ' + _Utils_regionToString(region) + '.\n'
+			+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + _Utils_toString(value) + '\n\n'
 			+ 'The message provided by the code author is:\n\n    '
 			+ message
 		);
 	};
 }
 
-function regionToString(region)
+function _Utils_regionToString(region)
 {
 	if (region.start.line == region.end.line)
 	{
@@ -314,7 +290,7 @@ function regionToString(region)
 
 // TO STRING
 
-function toString(v)
+function _Utils_toString(v)
 {
 	var type = typeof v;
 	if (type === 'function')
@@ -334,12 +310,12 @@ function toString(v)
 
 	if (v instanceof String)
 	{
-		return '\'' + addSlashes(v, true) + '\'';
+		return '\'' + _Utils_addSlashes(v, true) + '\'';
 	}
 
 	if (type === 'string')
 	{
-		return '"' + addSlashes(v, false) + '"';
+		return '"' + _Utils_addSlashes(v, false) + '"';
 	}
 
 	if (v === null)
@@ -357,7 +333,7 @@ function toString(v)
 			for (var k in v)
 			{
 				if (k === 'ctor') continue;
-				output.push(toString(v[k]));
+				output.push(_Utils_toString(v[k]));
 			}
 			return '(' + output.join(',') + ')';
 		}
@@ -369,8 +345,8 @@ function toString(v)
 
 		if (v.ctor === '_Array')
 		{
-			var list = _elm_lang$core$Array$toList(v);
-			return 'Array.fromList ' + toString(list);
+			var list = elm_lang$core$Array$toList(v);
+			return 'Array.fromList ' + _Utils_toString(list);
 		}
 
 		if (v.ctor === '<decoder>')
@@ -385,11 +361,11 @@ function toString(v)
 
 		if (v.ctor === '::')
 		{
-			var output = '[' + toString(v._0);
+			var output = '[' + _Utils_toString(v._0);
 			v = v._1;
 			while (v.ctor === '::')
 			{
-				output += ',' + toString(v._0);
+				output += ',' + _Utils_toString(v._0);
 				v = v._1;
 			}
 			return output + ']';
@@ -402,19 +378,19 @@ function toString(v)
 
 		if (v.ctor === 'Set_elm_builtin')
 		{
-			return 'Set.fromList ' + toString(_elm_lang$core$Set$toList(v));
+			return 'Set.fromList ' + _Utils_toString(elm_lang$core$Set$toList(v));
 		}
 
 		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin')
 		{
-			return 'Dict.fromList ' + toString(_elm_lang$core$Dict$toList(v));
+			return 'Dict.fromList ' + _Utils_toString(elm_lang$core$Dict$toList(v));
 		}
 
 		var output = '';
 		for (var i in v)
 		{
 			if (i === 'ctor') continue;
-			var str = toString(v[i]);
+			var str = _Utils_toString(v[i]);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
@@ -437,7 +413,7 @@ function toString(v)
 		var output = [];
 		for (var k in v)
 		{
-			output.push(k + ' = ' + toString(v[k]));
+			output.push(k + ' = ' + _Utils_toString(v[k]));
 		}
 		if (output.length === 0)
 		{
@@ -449,14 +425,16 @@ function toString(v)
 	return '<internal structure>';
 }
 
-function addSlashes(str, isChar)
+function _Utils_addSlashes(str, isChar)
 {
-	var s = str.replace(/\\/g, '\\\\')
-			  .replace(/\n/g, '\\n')
-			  .replace(/\t/g, '\\t')
-			  .replace(/\r/g, '\\r')
-			  .replace(/\v/g, '\\v')
-			  .replace(/\0/g, '\\0');
+	var s = str
+		.replace(/\\/g, '\\\\')
+		.replace(/\n/g, '\\n')
+		.replace(/\t/g, '\\t')
+		.replace(/\r/g, '\\r')
+		.replace(/\v/g, '\\v')
+		.replace(/\0/g, '\\0');
+
 	if (isChar)
 	{
 		return s.replace(/\'/g, '\\\'');
@@ -466,23 +444,3 @@ function addSlashes(str, isChar)
 		return s.replace(/\"/g, '\\"');
 	}
 }
-
-
-return {
-	eq: eq,
-	cmp: cmp,
-	Tuple0: Tuple0,
-	Tuple2: Tuple2,
-	chr: chr,
-	update: update,
-	guid: guid,
-
-	append: F2(append),
-
-	crash: crash,
-	crashCase: crashCase,
-
-	toString: toString
-};
-
-}();

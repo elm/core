@@ -22,7 +22,9 @@ module Json.Encode exposing
 -}
 
 import Array exposing (Array)
+import Native.Array
 import Native.Json
+import Native.List
 
 
 {-| Represents a JavaScript value.
@@ -93,10 +95,10 @@ object =
 {-|-}
 array : Array Value -> Value
 array =
-    Native.Json.encodeArray
+    Native.Array.toJSArray
 
 
 {-|-}
 list : List Value -> Value
 list =
-    Native.Json.encodeList
+    Native.List.toArray

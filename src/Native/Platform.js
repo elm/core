@@ -1,11 +1,8 @@
-//import //
-
-var _elm_lang$core$Native_Platform = function() {
 
 
 // PROGRAMS
 
-function program(impl)
+function _Platform_program(impl)
 {
 	return function(flagDecoder)
 	{
@@ -21,18 +18,18 @@ function program(impl)
 					);
 				}
 
-				return initialize(
+				return _Platform_initialize(
 					impl.init,
 					impl.update,
 					impl.subscriptions,
-					renderer
+					_Platform_renderer
 				);
 			};
 		};
 	};
 }
 
-function programWithFlags(impl)
+function _Platform_programWithFlags(impl)
 {
 	return function(flagDecoder)
 	{
@@ -49,7 +46,7 @@ function programWithFlags(impl)
 					);
 				}
 
-				var result = A2(_elm_lang$core$Native_Json.run, flagDecoder, flags);
+				var result = A2(_Json_run, flagDecoder, flags);
 				if (result.ctor === 'Err')
 				{
 					throw new Error(
@@ -59,18 +56,18 @@ function programWithFlags(impl)
 					);
 				}
 
-				return initialize(
+				return _Platform_initialize(
 					impl.init(result._0),
 					impl.update,
 					impl.subscriptions,
-					renderer
+					_Platform_renderer
 				);
 			};
 		};
 	};
 }
 
-function renderer(enqueue, _)
+function _Platform_renderer(enqueue, _)
 {
 	return function(_) {};
 }
@@ -78,15 +75,12 @@ function renderer(enqueue, _)
 
 // HTML TO PROGRAM
 
-function htmlToProgram(vnode)
+function _Platform_htmlToProgram(vnode)
 {
-	var emptyBag = batch(_elm_lang$core$Native_List.Nil);
-	var noChange = _elm_lang$core$Native_Utils.Tuple2(
-		_elm_lang$core$Native_Utils.Tuple0,
-		emptyBag
-	);
+	var emptyBag = _Platform_batch(_List_Nil);
+	var noChange = _Utils_Tuple2(_Utils_Tuple0, emptyBag);
 
-	return _elm_lang$virtual_dom$VirtualDom$program({
+	return elm_lang$virtual_dom$VirtualDom$program({
 		init: noChange,
 		view: function(model) { return main; },
 		update: F2(function(msg, model) { return noChange; }),
@@ -97,43 +91,43 @@ function htmlToProgram(vnode)
 
 // INITIALIZE A PROGRAM
 
-function initialize(init, update, subscriptions, renderer)
+function _Platform_initialize(init, update, subscriptions, renderer)
 {
 	// ambient state
 	var managers = {};
 	var updateView;
 
 	// init and update state in main process
-	var initApp = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+	var initApp = _Scheduler_nativeBinding(function(callback) {
 		var model = init._0;
 		updateView = renderer(enqueue, model);
 		var cmds = init._1;
 		var subs = subscriptions(model);
-		dispatchEffects(managers, cmds, subs);
-		callback(_elm_lang$core$Native_Scheduler.succeed(model));
+		_Platform_dispatchEffects(managers, cmds, subs);
+		callback(_Scheduler_succeed(model));
 	});
 
 	function onMessage(msg, model)
 	{
-		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+		return _Scheduler_nativeBinding(function(callback) {
 			var results = A2(update, msg, model);
 			model = results._0;
 			updateView(model);
 			var cmds = results._1;
 			var subs = subscriptions(model);
-			dispatchEffects(managers, cmds, subs);
-			callback(_elm_lang$core$Native_Scheduler.succeed(model));
+			_Platform_dispatchEffects(managers, cmds, subs);
+			callback(_Scheduler_succeed(model));
 		});
 	}
 
-	var mainProcess = spawnLoop(initApp, onMessage);
+	var mainProcess = _Platform_spawnLoop(initApp, onMessage);
 
 	function enqueue(msg)
 	{
-		_elm_lang$core$Native_Scheduler.rawSend(mainProcess, msg);
+		_Scheduler_rawSend(mainProcess, msg);
 	}
 
-	var ports = setupEffects(managers, enqueue);
+	var ports = _Platform_setupEffects(managers, enqueue);
 
 	return ports ? { ports: ports } : {};
 }
@@ -141,32 +135,32 @@ function initialize(init, update, subscriptions, renderer)
 
 // EFFECT MANAGERS
 
-var effectManagers = {};
+var _Platform_effectManagers = {};
 
-function setupEffects(managers, callback)
+function _Platform_setupEffects(managers, callback)
 {
 	var ports;
 
 	// setup all necessary effect managers
-	for (var key in effectManagers)
+	for (var key in _Platform_effectManagers)
 	{
-		var manager = effectManagers[key];
+		var manager = _Platform_effectManagers[key];
 
 		if (manager.isForeign)
 		{
 			ports = ports || {};
 			ports[key] = manager.tag === 'cmd'
-				? setupOutgoingPort(key)
-				: setupIncomingPort(key, callback);
+				? _Platform_setupOutgoingPort(key)
+				: _Platform_setupIncomingPort(key, callback);
 		}
 
-		managers[key] = makeManager(manager, callback);
+		managers[key] = _Platform_makeManager(manager, callback);
 	}
 
 	return ports;
 }
 
-function makeManager(info, callback)
+function _Platform_makeManager(info, callback)
 {
 	var router = {
 		main: callback,
@@ -198,52 +192,50 @@ function makeManager(info, callback)
 		}
 	}
 
-	var process = spawnLoop(info.init, onMessage);
+	var process = _Platform_spawnLoop(info.init, onMessage);
 	router.self = process;
 	return process;
 }
 
-function sendToApp(router, msg)
+var _Platform_sendToApp = F2(function(router, msg)
 {
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	return _Scheduler_nativeBinding(function(callback)
 	{
 		router.main(msg);
-		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+		callback(_Scheduler_succeed(_Utils_Tuple0));
 	});
-}
+});
 
-function sendToSelf(router, msg)
+var _Platform_sendToSelf = F2(function(router, msg)
 {
-	return A2(_elm_lang$core$Native_Scheduler.send, router.self, {
+	return A2(_Scheduler_send, router.self, {
 		ctor: 'self',
 		_0: msg
 	});
-}
+});
 
 
 // HELPER for STATEFUL LOOPS
 
-function spawnLoop(init, onMessage)
+function _Platform_spawnLoop(init, onMessage)
 {
-	var andThen = _elm_lang$core$Native_Scheduler.andThen;
-
 	function loop(state)
 	{
-		var handleMsg = _elm_lang$core$Native_Scheduler.receive(function(msg) {
+		var handleMsg = _Scheduler_receive(function(msg) {
 			return onMessage(msg, state);
 		});
-		return A2(andThen, loop, handleMsg);
+		return A2(_Scheduler_andThen, loop, handleMsg);
 	}
 
-	var task = A2(andThen, loop, init);
+	var task = A2(_Scheduler_andThen, loop, init);
 
-	return _elm_lang$core$Native_Scheduler.rawSpawn(task);
+	return _Scheduler_rawSpawn(task);
 }
 
 
 // BAGS
 
-function leaf(home)
+function _Platform_leaf(home)
 {
 	return function(value)
 	{
@@ -255,7 +247,7 @@ function leaf(home)
 	};
 }
 
-function batch(list)
+function _Platform_batch(list)
 {
 	return {
 		type: 'node',
@@ -263,58 +255,55 @@ function batch(list)
 	};
 }
 
-function map(tagger, bag)
+var _Platform_map = F2(function(tagger, bag)
 {
 	return {
 		type: 'map',
 		tagger: tagger,
 		tree: bag
 	}
-}
+});
 
 
 // PIPE BAGS INTO EFFECT MANAGERS
 
-function dispatchEffects(managers, cmdBag, subBag)
+function _Platform_dispatchEffects(managers, cmdBag, subBag)
 {
 	var effectsDict = {};
-	gatherEffects(true, cmdBag, effectsDict, null);
-	gatherEffects(false, subBag, effectsDict, null);
+	_Platform_gatherEffects(true, cmdBag, effectsDict, null);
+	_Platform_gatherEffects(false, subBag, effectsDict, null);
 
 	for (var home in managers)
 	{
 		var fx = home in effectsDict
 			? effectsDict[home]
-			: {
-				cmds: _elm_lang$core$Native_List.Nil,
-				subs: _elm_lang$core$Native_List.Nil
-			};
+			: { cmds: _List_Nil, subs: _List_Nil };
 
-		_elm_lang$core$Native_Scheduler.rawSend(managers[home], { ctor: 'fx', _0: fx });
+		_Scheduler_rawSend(managers[home], { ctor: 'fx', _0: fx });
 	}
 }
 
-function gatherEffects(isCmd, bag, effectsDict, taggers)
+function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
 	switch (bag.type)
 	{
 		case 'leaf':
 			var home = bag.home;
-			var effect = toEffect(isCmd, home, taggers, bag.value);
-			effectsDict[home] = insert(isCmd, effect, effectsDict[home]);
+			var effect = _Platform_toEffect(isCmd, home, taggers, bag.value);
+			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
 			return;
 
 		case 'node':
 			var list = bag.branches;
 			while (list.ctor !== '[]')
 			{
-				gatherEffects(isCmd, list._0, effectsDict, taggers);
+				_Platform_gatherEffects(isCmd, list._0, effectsDict, taggers);
 				list = list._1;
 			}
 			return;
 
 		case 'map':
-			gatherEffects(isCmd, bag.tree, effectsDict, {
+			_Platform_gatherEffects(isCmd, bag.tree, effectsDict, {
 				tagger: bag.tagger,
 				rest: taggers
 			});
@@ -322,7 +311,7 @@ function gatherEffects(isCmd, bag, effectsDict, taggers)
 	}
 }
 
-function toEffect(isCmd, home, taggers, value)
+function _Platform_toEffect(isCmd, home, taggers, value)
 {
 	function applyTaggers(x)
 	{
@@ -336,33 +325,31 @@ function toEffect(isCmd, home, taggers, value)
 	}
 
 	var map = isCmd
-		? effectManagers[home].cmdMap
-		: effectManagers[home].subMap;
+		? _Platform_effectManagers[home].cmdMap
+		: _Platform_effectManagers[home].subMap;
 
 	return A2(map, applyTaggers, value)
 }
 
-function insert(isCmd, newEffect, effects)
+function _Platform_insert(isCmd, newEffect, effects)
 {
-	effects = effects || {
-		cmds: _elm_lang$core$Native_List.Nil,
-		subs: _elm_lang$core$Native_List.Nil
-	};
+	effects = effects || { cmds: _List_Nil, subs: _List_Nil };
+
 	if (isCmd)
 	{
-		effects.cmds = _elm_lang$core$Native_List.Cons(newEffect, effects.cmds);
+		effects.cmds = _List_Cons(newEffect, effects.cmds);
 		return effects;
 	}
-	effects.subs = _elm_lang$core$Native_List.Cons(newEffect, effects.subs);
+	effects.subs = _List_Cons(newEffect, effects.subs);
 	return effects;
 }
 
 
 // PORTS
 
-function checkPortName(name)
+function _Platform_checkPortName(name)
 {
-	if (name in effectManagers)
+	if (name in _Platform_effectManagers)
 	{
 		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
 	}
@@ -371,30 +358,28 @@ function checkPortName(name)
 
 // OUTGOING PORTS
 
-function outgoingPort(name, converter)
+function _Platform_outgoingPort(name, converter)
 {
-	checkPortName(name);
-	effectManagers[name] = {
+	_Platform_checkPortName(name);
+	_Platform_effectManagers[name] = {
 		tag: 'cmd',
-		cmdMap: outgoingPortMap,
+		cmdMap: _Platform_outgoingPortMap,
 		converter: converter,
 		isForeign: true
 	};
-	return leaf(name);
+	return _Platform_leaf(name);
 }
 
-var outgoingPortMap = F2(function cmdMap(tagger, value) {
-	return value;
-});
+var _Platform_outgoingPortMap = F2(function(tagger, value) { return value; });
 
-function setupOutgoingPort(name)
+function _Platform_setupOutgoingPort(name)
 {
 	var subs = [];
-	var converter = effectManagers[name].converter;
+	var converter = _Platform_effectManagers[name].converter;
 
 	// CREATE MANAGER
 
-	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+	var init = _Scheduler_succeed(null);
 
 	function onEffects(router, cmdList, state)
 	{
@@ -412,8 +397,8 @@ function setupOutgoingPort(name)
 		return init;
 	}
 
-	effectManagers[name].init = init;
-	effectManagers[name].onEffects = F3(onEffects);
+	_Platform_effectManagers[name].init = init;
+	_Platform_effectManagers[name].onEffects = F3(onEffects);
 
 	// PUBLIC API
 
@@ -443,19 +428,19 @@ function setupOutgoingPort(name)
 
 // INCOMING PORTS
 
-function incomingPort(name, converter)
+function _Platform_incomingPort(name, converter)
 {
-	checkPortName(name);
-	effectManagers[name] = {
+	_Platform_checkPortName(name);
+	_Platform_effectManagers[name] = {
 		tag: 'sub',
-		subMap: incomingPortMap,
+		subMap: _Platform_incomingPortMap,
 		converter: converter,
 		isForeign: true
 	};
-	return leaf(name);
+	return _Platform_leaf(name);
 }
 
-var incomingPortMap = F2(function subMap(tagger, finalTagger)
+var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
 {
 	return function(value)
 	{
@@ -463,17 +448,17 @@ var incomingPortMap = F2(function subMap(tagger, finalTagger)
 	};
 });
 
-function setupIncomingPort(name, callback)
+function _Platform_setupIncomingPort(name, callback)
 {
 	var sentBeforeInit = [];
-	var subs = _elm_lang$core$Native_List.Nil;
-	var converter = effectManagers[name].converter;
+	var subs = _List_Nil;
+	var converter = _Platform_effectManagers[name].converter;
 	var currentOnEffects = preInitOnEffects;
 	var currentSend = preInitSend;
 
 	// CREATE MANAGER
 
-	var init = _elm_lang$core$Native_Scheduler.succeed(null);
+	var init = _Scheduler_succeed(null);
 
 	function preInitOnEffects(router, subList, state)
 	{
@@ -501,8 +486,8 @@ function setupIncomingPort(name, callback)
 		return currentOnEffects(router, subList, state);
 	}
 
-	effectManagers[name].init = init;
-	effectManagers[name].onEffects = F3(onEffects);
+	_Platform_effectManagers[name].init = init;
+	_Platform_effectManagers[name].onEffects = F3(onEffects);
 
 	// PUBLIC API
 
@@ -523,7 +508,7 @@ function setupIncomingPort(name, callback)
 
 	function send(incomingValue)
 	{
-		var result = A2(_elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
+		var result = A2(elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
 		if (result.ctor === 'Err')
 		{
 			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
@@ -534,26 +519,3 @@ function setupIncomingPort(name, callback)
 
 	return { send: send };
 }
-
-return {
-	// routers
-	sendToApp: F2(sendToApp),
-	sendToSelf: F2(sendToSelf),
-
-	// global setup
-	effectManagers: effectManagers,
-	outgoingPort: outgoingPort,
-	incomingPort: incomingPort,
-
-	htmlToProgram: htmlToProgram,
-	program: program,
-	programWithFlags: programWithFlags,
-	initialize: initialize,
-
-	// effect bags
-	leaf: leaf,
-	batch: batch,
-	map: F2(map)
-};
-
-}();

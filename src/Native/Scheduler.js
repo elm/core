@@ -1,13 +1,10 @@
-//import Native.Utils //
 
-var _elm_lang$core$Native_Scheduler = function() {
-
-var MAX_STEPS = 10000;
+var _Scheduler_MAX_STEPS = 10000;
 
 
 // TASKS
 
-function succeed(value)
+function _Scheduler_succeed(value)
 {
 	return {
 		ctor: '_Task_succeed',
@@ -15,7 +12,7 @@ function succeed(value)
 	};
 }
 
-function fail(error)
+function _Scheduler_fail(error)
 {
 	return {
 		ctor: '_Task_fail',
@@ -23,7 +20,7 @@ function fail(error)
 	};
 }
 
-function nativeBinding(callback)
+function _Scheduler_nativeBinding(callback)
 {
 	return {
 		ctor: '_Task_nativeBinding',
@@ -32,25 +29,25 @@ function nativeBinding(callback)
 	};
 }
 
-function andThen(callback, task)
+var _Scheduler_andThen = F2(function(callback, task)
 {
 	return {
 		ctor: '_Task_andThen',
 		callback: callback,
 		task: task
 	};
-}
+});
 
-function onError(callback, task)
+var _Scheduler_onError = F2(function(callback, task)
 {
 	return {
 		ctor: '_Task_onError',
 		callback: callback,
 		task: task
 	};
-}
+});
 
-function receive(callback)
+function _Scheduler_receive(callback)
 {
 	return {
 		ctor: '_Task_receive',
@@ -61,46 +58,48 @@ function receive(callback)
 
 // PROCESSES
 
-function rawSpawn(task)
+var _Scheduler_guid = 0;
+
+function _Scheduler_rawSpawn(task)
 {
 	var process = {
 		ctor: '_Process',
-		id: _elm_lang$core$Native_Utils.guid(),
+		id: _Scheduler_guid++,
 		root: task,
 		stack: null,
 		mailbox: []
 	};
 
-	enqueue(process);
+	_Scheduler_enqueue(process);
 
 	return process;
 }
 
-function spawn(task)
+function _Scheduler_spawn(task)
 {
-	return nativeBinding(function(callback) {
-		var process = rawSpawn(task);
-		callback(succeed(process));
+	return _Scheduler_nativeBinding(function(callback) {
+		var process = _Scheduler_rawSpawn(task);
+		callback(_Scheduler_succeed(process));
 	});
 }
 
-function rawSend(process, msg)
+function _Scheduler_rawSend(process, msg)
 {
 	process.mailbox.push(msg);
-	enqueue(process);
+	_Scheduler_enqueue(process);
 }
 
-function send(process, msg)
+var _Scheduler_send = F2(function(process, msg)
 {
-	return nativeBinding(function(callback) {
-		rawSend(process, msg);
-		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+	return _Scheduler_nativeBinding(function(callback) {
+		_Scheduler_rawSend(process, msg);
+		callback(_Scheduler_succeed(_Utils_Tuple0));
 	});
-}
+});
 
-function kill(process)
+function _Scheduler_kill(process)
 {
-	return nativeBinding(function(callback) {
+	return _Scheduler_nativeBinding(function(callback) {
 		var root = process.root;
 		if (root.ctor === '_Task_nativeBinding' && root.cancel)
 		{
@@ -109,15 +108,15 @@ function kill(process)
 
 		process.root = null;
 
-		callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+		callback(_Scheduler_succeed(_Utils_Tuple0));
 	});
 }
 
-function sleep(time)
+function _Scheduler_sleep(time)
 {
-	return nativeBinding(function(callback) {
+	return _Scheduler_nativeBinding(function(callback) {
 		var id = setTimeout(function() {
-			callback(succeed(_elm_lang$core$Native_Utils.Tuple0));
+			callback(_Scheduler_succeed(_Utils_Tuple0));
 		}, time);
 
 		return function() { clearTimeout(id); };
@@ -127,9 +126,9 @@ function sleep(time)
 
 // STEP PROCESSES
 
-function step(numSteps, process)
+function _Scheduler_step(numSteps, process)
 {
-	while (numSteps < MAX_STEPS)
+	while (numSteps < _Scheduler_MAX_STEPS)
 	{
 		var ctor = process.root.ctor;
 
@@ -193,7 +192,7 @@ function step(numSteps, process)
 		{
 			process.root.cancel = process.root.callback(function(newRoot) {
 				process.root = newRoot;
-				enqueue(process);
+				_Scheduler_enqueue(process);
 			});
 
 			break;
@@ -215,11 +214,11 @@ function step(numSteps, process)
 		throw new Error(ctor);
 	}
 
-	if (numSteps < MAX_STEPS)
+	if (numSteps < _Scheduler_MAX_STEPS)
 	{
 		return numSteps + 1;
 	}
-	enqueue(process);
+	_Scheduler_enqueue(process);
 
 	return numSteps;
 }
@@ -227,55 +226,35 @@ function step(numSteps, process)
 
 // WORK QUEUE
 
-var working = false;
-var workQueue = [];
+var _Scheduler_working = false;
+var _Scheduler_workQueue = [];
 
-function enqueue(process)
+function _Scheduler_enqueue(process)
 {
-	workQueue.push(process);
+	_Scheduler_workQueue.push(process);
 
-	if (!working)
+	if (!_Scheduler_working)
 	{
-		setTimeout(work, 0);
-		working = true;
+		setTimeout(_Scheduler_work, 0);
+		_Scheduler_working = true;
 	}
 }
 
-function work()
+function _Scheduler_work()
 {
 	var numSteps = 0;
 	var process;
-	while (numSteps < MAX_STEPS && (process = workQueue.shift()))
+	while (numSteps < _Scheduler_MAX_STEPS && (process = _Scheduler_workQueue.shift()))
 	{
 		if (process.root)
 		{
-			numSteps = step(numSteps, process);
+			numSteps = _Scheduler_step(numSteps, process);
 		}
 	}
 	if (!process)
 	{
-		working = false;
+		_Scheduler_working = false;
 		return;
 	}
-	setTimeout(work, 0);
+	setTimeout(_Scheduler_work, 0);
 }
-
-
-return {
-	succeed: succeed,
-	fail: fail,
-	nativeBinding: nativeBinding,
-	andThen: F2(andThen),
-	onError: F2(onError),
-	receive: receive,
-
-	spawn: spawn,
-	kill: kill,
-	sleep: sleep,
-	send: F2(send),
-
-	rawSpawn: rawSpawn,
-	rawSend: rawSend
-};
-
-}();

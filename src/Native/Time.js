@@ -1,27 +1,17 @@
-//import Native.Scheduler //
 
-var _elm_lang$core$Native_Time = function() {
-
-var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+function _Time_now()
 {
-	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
-});
-
-function setInterval_(interval, task)
-{
-	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	return _Scheduler_nativeBinding(function(callback)
 	{
-		var id = setInterval(function() {
-			_elm_lang$core$Native_Scheduler.rawSpawn(task);
-		}, interval);
-
-		return function() { clearInterval(id); };
+		callback(_Scheduler_succeed(Date.now()));
 	});
 }
 
-return {
-	now: now,
-	setInterval_: F2(setInterval_)
-};
-
-}();
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_nativeBinding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
+});

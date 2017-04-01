@@ -43,7 +43,7 @@ type alias Time = Float
 -}
 now : Task x Time
 now =
-  Native.Time.now
+  Native.Time.now ()
 
 
 {-| Subscribe to the current time. First you provide an interval describing how
@@ -240,4 +240,4 @@ onSelfMsg router interval state =
 
 setInterval : Time -> Task Never () -> Task x Never
 setInterval =
-  Native.Time.setInterval_
+  Native.Time.setInterval

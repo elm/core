@@ -1,16 +1,18 @@
-//import Native.Utils //
 
-var _elm_lang$core$Native_Basics = function() {
 
-function div(a, b)
+// DIVISION
+
+var _Basics_div = F2(function(a, b)
 {
 	return (a / b) | 0;
-}
-function rem(a, b)
+});
+
+var _Basics_rem = F2(function(a, b)
 {
 	return a % b;
-}
-function mod(a, b)
+});
+
+var _Basics_mod = F2(function(a, b)
 {
 	if (b === 0)
 	{
@@ -20,122 +22,130 @@ function mod(a, b)
 	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -mod(-a, -b));
 
 	return m === b ? 0 : m;
-}
-function logBase(base, n)
+});
+
+
+// TRIGONOMETRY
+
+var _Basics_pi = Math.PI;
+var _Basics_e = Math.E;
+var _Basics_cos = Math.cos;
+var _Basics_sin = Math.sin;
+var _Basics_tan = Math.tan;
+var _Basics_acos = Math.acos;
+var _Basics_asin = Math.asin;
+var _Basics_atan = Math.atan;
+var _Basics_atan2 = F2(Math.atan2);
+
+
+// MATH STUFF
+
+var _Basics_sqrt = Math.sqrt;
+
+var _Basics_logBase = F2(function(base, n)
 {
 	return Math.log(n) / Math.log(base);
-}
-function negate(n)
+});
+
+function _Basics_negate(n)
 {
 	return -n;
 }
-function abs(n)
+
+function _Basics_abs(n)
 {
 	return n < 0 ? -n : n;
 }
 
-function min(a, b)
+
+// COMPARISON
+
+var _Basics_min = F2(function(a, b)
 {
-	return _elm_lang$core$Native_Utils.cmp(a, b) < 0 ? a : b;
-}
-function max(a, b)
+	return _Utils_cmp(a, b) < 0 ? a : b;
+});
+
+var _Basics_max = F2(function(a, b)
 {
-	return _elm_lang$core$Native_Utils.cmp(a, b) > 0 ? a : b;
-}
-function clamp(lo, hi, n)
+	return _Utils_cmp(a, b) > 0 ? a : b;
+});
+
+var _Basics_clamp = F3(function(lo, hi, n)
 {
-	return _elm_lang$core$Native_Utils.cmp(n, lo) < 0
+	return _Utils_cmp(n, lo) < 0
 		? lo
-		: _elm_lang$core$Native_Utils.cmp(n, hi) > 0
+		: _Utils_cmp(n, hi) > 0
 			? hi
 			: n;
-}
+});
 
-var ord = ['LT', 'EQ', 'GT'];
+var _Basics_ordTable = ['LT', 'EQ', 'GT'];
 
-function compare(x, y)
+var _Basics_compare = F2(function(x, y)
 {
-	return { ctor: ord[_elm_lang$core$Native_Utils.cmp(x, y) + 1] };
-}
+	return { ctor: _Basics_ordTable[_Utils_cmp(x, y) + 1] };
+});
 
-function xor(a, b)
+
+// BOOLEANS
+
+var _Basics_xor = F2(function(a, b)
 {
 	return a !== b;
-}
-function not(b)
+});
+
+function _Basics_not(b)
 {
 	return !b;
 }
-function isInfinite(n)
+
+
+// MORE MATH STUFF
+
+function _Basics_toFloat(x)
+{
+	return x;
+};
+
+var _Basics_isNaN = isNaN;
+
+function _Basics_isInfinite(n)
 {
 	return n === Infinity || n === -Infinity;
 }
 
-function truncate(n)
+var _Basics_ceiling = Math.ceil;
+var _Basics_floor = Math.floor;
+var _Basics_round = Math.round;
+
+function _Basics_truncate(n)
 {
 	return n | 0;
 }
 
-function degrees(d)
+
+// ANGLES
+
+function _Basics_degrees(d)
 {
 	return d * Math.PI / 180;
 }
-function turns(t)
+
+function _Basics_turns(t)
 {
 	return 2 * Math.PI * t;
 }
-function fromPolar(point)
+
+function _Basics_fromPolar(point)
 {
 	var r = point._0;
 	var t = point._1;
-	return _elm_lang$core$Native_Utils.Tuple2(r * Math.cos(t), r * Math.sin(t));
+	return _Utils_Tuple2(r * Math.cos(t), r * Math.sin(t));
 }
-function toPolar(point)
+
+function _Basics_toPolar(point)
 {
 	var x = point._0;
 	var y = point._1;
-	return _elm_lang$core$Native_Utils.Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
+	return _Utils_Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 }
-
-return {
-	div: F2(div),
-	rem: F2(rem),
-	mod: F2(mod),
-
-	pi: Math.PI,
-	e: Math.E,
-	cos: Math.cos,
-	sin: Math.sin,
-	tan: Math.tan,
-	acos: Math.acos,
-	asin: Math.asin,
-	atan: Math.atan,
-	atan2: F2(Math.atan2),
-
-	degrees: degrees,
-	turns: turns,
-	fromPolar: fromPolar,
-	toPolar: toPolar,
-
-	sqrt: Math.sqrt,
-	logBase: F2(logBase),
-	negate: negate,
-	abs: abs,
-	min: F2(min),
-	max: F2(max),
-	clamp: F3(clamp),
-	compare: F2(compare),
-
-	xor: F2(xor),
-	not: not,
-
-	truncate: truncate,
-	ceiling: Math.ceil,
-	floor: Math.floor,
-	round: Math.round,
-	toFloat: function(x) { return x; },
-	isNaN: isNaN,
-	isInfinite: isInfinite
-};
-
-}();

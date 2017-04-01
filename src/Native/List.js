@@ -1,25 +1,24 @@
-//import Native.Utils //
 
-var _elm_lang$core$Native_List = function() {
+var _List_Nil = { ctor: '[]' };
 
-var Nil = { ctor: '[]' };
-
-function Cons(hd, tl)
+function _List_Cons(hd, tl)
 {
 	return { ctor: '::', _0: hd, _1: tl };
 }
 
-function fromArray(arr)
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
 {
-	var out = Nil;
+	var out = _List_Nil;
 	for (var i = arr.length; i--; )
 	{
-		out = Cons(arr[i], out);
+		out = _List_Cons(arr[i], out);
 	}
 	return out;
 }
 
-function toArray(xs)
+function _List_toArray(xs)
 {
 	var out = [];
 	while (xs.ctor !== '[]')
@@ -30,18 +29,18 @@ function toArray(xs)
 	return out;
 }
 
-function foldr(f, b, xs)
+var _List_foldr = F3(function(f, b, xs)
 {
-	var arr = toArray(xs);
+	var arr = _List_toArray(xs);
 	var acc = b;
 	for (var i = arr.length; i--; )
 	{
 		acc = A2(f, arr[i], acc);
 	}
 	return acc;
-}
+});
 
-function map2(f, xs, ys)
+var _List_map2 = F3(function(f, xs, ys)
 {
 	var arr = [];
 	while (xs.ctor !== '[]' && ys.ctor !== '[]')
@@ -50,10 +49,10 @@ function map2(f, xs, ys)
 		xs = xs._1;
 		ys = ys._1;
 	}
-	return fromArray(arr);
-}
+	return _List_fromArray(arr);
+});
 
-function map3(f, xs, ys, zs)
+var _List_map3 = F4(function(f, xs, ys, zs)
 {
 	var arr = [];
 	while (xs.ctor !== '[]' && ys.ctor !== '[]' && zs.ctor !== '[]')
@@ -63,10 +62,10 @@ function map3(f, xs, ys, zs)
 		ys = ys._1;
 		zs = zs._1;
 	}
-	return fromArray(arr);
-}
+	return _List_fromArray(arr);
+});
 
-function map4(f, ws, xs, ys, zs)
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
 {
 	var arr = [];
 	while (   ws.ctor !== '[]'
@@ -80,10 +79,10 @@ function map4(f, ws, xs, ys, zs)
 		ys = ys._1;
 		zs = zs._1;
 	}
-	return fromArray(arr);
-}
+	return _List_fromArray(arr);
+});
 
-function map5(f, vs, ws, xs, ys, zs)
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
 {
 	var arr = [];
 	while (   vs.ctor !== '[]'
@@ -99,39 +98,20 @@ function map5(f, vs, ws, xs, ys, zs)
 		ys = ys._1;
 		zs = zs._1;
 	}
-	return fromArray(arr);
-}
+	return _List_fromArray(arr);
+});
 
-function sortBy(f, xs)
+var _List_sortBy = F2(function(f, xs)
 {
-	return fromArray(toArray(xs).sort(function(a, b) {
-		return _elm_lang$core$Native_Utils.cmp(f(a), f(b));
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
 	}));
-}
+});
 
-function sortWith(f, xs)
+var _List_sortWith = F2(function(f, xs)
 {
-	return fromArray(toArray(xs).sort(function(a, b) {
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
 		var ord = f(a)(b).ctor;
 		return ord === 'EQ' ? 0 : ord === 'LT' ? -1 : 1;
 	}));
-}
-
-return {
-	Nil: Nil,
-	Cons: Cons,
-	cons: F2(Cons),
-	toArray: toArray,
-	fromArray: fromArray,
-
-	foldr: F3(foldr),
-
-	map2: F3(map2),
-	map3: F4(map3),
-	map4: F5(map4),
-	map5: F6(map5),
-	sortBy: F2(sortBy),
-	sortWith: F2(sortWith)
-};
-
-}();
+});
