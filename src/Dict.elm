@@ -38,9 +38,9 @@ Insert, remove, and query operations all take *O(log n)* time.
 
 
 import Basics exposing (..)
+import Debug
 import Maybe exposing (..)
 import List exposing (..)
-import Native.Debug
 import String
 
 
@@ -289,7 +289,7 @@ moreBlack color =
       Red
 
     BBlack ->
-      Native.Debug.crash "Can't make a double black node more black!"
+      Debug.crash "Can't make a double black node more black!"
 
 
 lessBlack : NColor -> NColor
@@ -305,7 +305,7 @@ lessBlack color =
       NBlack
 
     NBlack ->
-      Native.Debug.crash "Can't make a negative black node less black!"
+      Debug.crash "Can't make a negative black node less black!"
 
 
 {- The actual pattern match here is somewhat lax. If it is given invalid input,
@@ -328,7 +328,7 @@ lessBlackTree dict =
 
 reportRemBug : String -> NColor -> String -> String -> a
 reportRemBug msg c lgot rgot =
-  Native.Debug.crash <|
+  Debug.crash <|
     String.concat
     [ "Internal red-black tree invariant violated, expected "
     , msg, " and got ", toString c, "/", lgot, "/", rgot
@@ -349,7 +349,7 @@ rem color left right =
           RBEmpty_elm_builtin LBBlack
 
         _ ->
-          Native.Debug.crash "cannot have bblack or nblack nodes at this point"
+          Debug.crash "cannot have bblack or nblack nodes at this point"
 
     (RBEmpty_elm_builtin cl, RBNode_elm_builtin cr k v l r) ->
       case (color, cl, cr) of
@@ -480,7 +480,7 @@ redden : Dict k v -> Dict k v
 redden t =
   case t of
     RBEmpty_elm_builtin _ ->
-      Native.Debug.crash "can't make a Leaf red"
+      Debug.crash "can't make a Leaf red"
 
     RBNode_elm_builtin _ k v l r ->
       RBNode_elm_builtin Red k v l r

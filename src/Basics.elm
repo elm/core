@@ -58,8 +58,8 @@ which happen to be radians.
 
 -}
 
-import Native.Basics
-import Native.Utils
+import Elm.Kernel.Basics
+import Elm.Kernel.Utils
 
 
 {-| Convert radians to standard Elm angles (radians). -}
@@ -71,7 +71,7 @@ radians t =
 {-| Convert degrees to standard Elm angles (radians). -}
 degrees : Float -> Float
 degrees =
-  Native.Basics.degrees
+  Elm.Kernel.Basics.degrees
 
 
 {-| Convert turns to standard Elm angles (radians).
@@ -79,43 +79,43 @@ One turn is equal to 360&deg;.
 -}
 turns : Float -> Float
 turns =
-  Native.Basics.turns
+  Elm.Kernel.Basics.turns
 
 
 {-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
 fromPolar : (Float,Float) -> (Float,Float)
 fromPolar =
-  Native.Basics.fromPolar
+  Elm.Kernel.Basics.fromPolar
 
 
 {-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
 toPolar : (Float,Float) -> (Float,Float)
 toPolar =
-  Native.Basics.toPolar
+  Elm.Kernel.Basics.toPolar
 
 
 {-|-}
 (+) : number -> number -> number
 (+) =
-  Native.Basics.add
+  Elm.Kernel.Basics.add
 
 
 {-|-}
 (-) : number -> number -> number
 (-) =
-  Native.Basics.sub
+  Elm.Kernel.Basics.sub
 
 
 {-|-}
 (*) : number -> number -> number
 (*) =
-  Native.Basics.mul
+  Elm.Kernel.Basics.mul
 
 
 {-| Floating point division. -}
 (/) : Float -> Float -> Float
 (/) =
-  Native.Basics.floatDiv
+  Elm.Kernel.Basics.floatDiv
 
 
 infixl 6 +
@@ -131,7 +131,7 @@ infixl 7 %
 {-| Integer division. The remainder is discarded. -}
 (//) : Int -> Int -> Int
 (//) =
-  Native.Basics.div
+  Elm.Kernel.Basics.div
 
 
 {-| Find the remainder after dividing one number by another.
@@ -143,7 +143,7 @@ infixl 7 %
 -}
 rem : Int -> Int -> Int
 rem =
-  Native.Basics.rem
+  Elm.Kernel.Basics.rem
 
 
 {-| Perform [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic).
@@ -153,7 +153,7 @@ rem =
 -}
 (%) : Int -> Int -> Int
 (%) =
-  Native.Basics.mod
+  Elm.Kernel.Basics.mod
 
 
 {-| Exponentiation
@@ -162,37 +162,37 @@ rem =
 -}
 (^) : number -> number -> number
 (^) =
-  Native.Basics.exp
+  Elm.Kernel.Basics.exp
 
 
 {-|-}
 cos : Float -> Float
 cos =
-  Native.Basics.cos
+  Elm.Kernel.Basics.cos
 
 
 {-|-}
 sin : Float -> Float
 sin =
-  Native.Basics.sin
+  Elm.Kernel.Basics.sin
 
 
 {-|-}
 tan : Float -> Float
 tan =
-  Native.Basics.tan
+  Elm.Kernel.Basics.tan
 
 
 {-|-}
 acos : Float -> Float
 acos =
-  Native.Basics.acos
+  Elm.Kernel.Basics.acos
 
 
 {-|-}
 asin : Float -> Float
 asin =
-  Native.Basics.asin
+  Elm.Kernel.Basics.asin
 
 
 {-| You probably do not want to use this. It takes `(y/x)` as the
@@ -202,7 +202,7 @@ the `y` or `x`. Thus, the resulting angle is always between &pi;/2 and -&pi;/2
 -}
 atan : Float -> Float
 atan =
-  Native.Basics.atan
+  Elm.Kernel.Basics.atan
 
 
 {-| This helps you find the angle of a Cartesian coordinate.
@@ -213,13 +213,13 @@ quadrant the angle should really be in. The result will be between
 -}
 atan2 : Float -> Float -> Float
 atan2 =
-  Native.Basics.atan2
+  Elm.Kernel.Basics.atan2
 
 
 {-| Take the square root of a number. -}
 sqrt : Float -> Float
 sqrt =
-  Native.Basics.sqrt
+  Elm.Kernel.Basics.sqrt
 
 
 {-| Negate a number.
@@ -230,13 +230,13 @@ sqrt =
 -}
 negate : number -> number
 negate =
-  Native.Basics.negate
+  Elm.Kernel.Basics.negate
 
 
 {-| Take the absolute value of a number. -}
 abs : number -> number
 abs =
-  Native.Basics.abs
+  Elm.Kernel.Basics.abs
 
 
 {-| Calculate the logarithm of a number with a given base.
@@ -246,7 +246,7 @@ abs =
 -}
 logBase : Float -> Float -> Float
 logBase =
-  Native.Basics.logBase
+  Elm.Kernel.Basics.logBase
 
 
 {-| Clamps a number within a given range. With the expression
@@ -258,19 +258,19 @@ logBase =
 -}
 clamp : number -> number -> number -> number
 clamp =
-  Native.Basics.clamp
+  Elm.Kernel.Basics.clamp
 
 
 {-| An approximation of pi. -}
 pi : Float
 pi =
-  Native.Basics.pi
+  Elm.Kernel.Basics.pi
 
 
 {-| An approximation of e. -}
 e : Float
 e =
-  Native.Basics.e
+  Elm.Kernel.Basics.e
 
 
 {-| Check if values are &ldquo;the same&rdquo;.
@@ -294,7 +294,7 @@ if passed through a port.
 -}
 (==) : a -> a -> Bool
 (==) =
-  Native.Basics.eq
+  Elm.Kernel.Basics.eq
 
 
 {-| Check if values are not &ldquo;the same&rdquo;.
@@ -303,31 +303,31 @@ So `(a /= b)` is the same as `(not (a == b))`.
 -}
 (/=) : a -> a -> Bool
 (/=) =
-  Native.Basics.neq
+  Elm.Kernel.Basics.neq
 
 
 {-|-}
 (<) : comparable -> comparable -> Bool
 (<) =
-  Native.Basics.lt
+  Elm.Kernel.Basics.lt
 
 
 {-|-}
 (>) : comparable -> comparable -> Bool
 (>) =
-  Native.Basics.gt
+  Elm.Kernel.Basics.gt
 
 
 {-|-}
 (<=) : comparable -> comparable -> Bool
 (<=) =
-  Native.Basics.le
+  Elm.Kernel.Basics.le
 
 
 {-|-}
 (>=) : comparable -> comparable -> Bool
 (>=) =
-  Native.Basics.ge
+  Elm.Kernel.Basics.ge
 
 
 infix 4 ==
@@ -344,7 +344,7 @@ These are also the only values that work as `Dict` keys or `Set` members.
 -}
 compare : comparable -> comparable -> Order
 compare =
-  Native.Basics.compare
+  Elm.Kernel.Basics.compare
 
 
 {-| Represents the relative ordering of two things.
@@ -356,13 +356,13 @@ type Order = LT | EQ | GT
 {-| Find the smaller of two comparables. -}
 min : comparable -> comparable -> comparable
 min =
-  Native.Basics.min
+  Elm.Kernel.Basics.min
 
 
 {-| Find the larger of two comparables. -}
 max : comparable -> comparable -> comparable
 max =
-  Native.Basics.max
+  Elm.Kernel.Basics.max
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
@@ -373,7 +373,7 @@ and just return `False` overall.
 -}
 (&&) : Bool -> Bool -> Bool
 (&&) =
-  Native.Basics.and
+  Elm.Kernel.Basics.and
 
 
 {-| The logical OR operator. `True` if one or both inputs are `True`.
@@ -384,7 +384,7 @@ and just return `True` overall.
 -}
 (||) : Bool -> Bool -> Bool
 (||) =
-  Native.Basics.or
+  Elm.Kernel.Basics.or
 
 
 infixr 3 &&
@@ -394,7 +394,7 @@ infixr 2 ||
 {-| The exclusive-or operator. `True` if exactly one input is `True`. -}
 xor : Bool -> Bool -> Bool
 xor =
-  Native.Basics.xor
+  Elm.Kernel.Basics.xor
 
 
 {-| Negate a boolean value.
@@ -404,7 +404,7 @@ xor =
 -}
 not : Bool -> Bool
 not =
-  Native.Basics.not
+  Elm.Kernel.Basics.not
 
 
 -- Conversions
@@ -412,31 +412,31 @@ not =
 {-| Round a number to the nearest integer. -}
 round : Float -> Int
 round =
-  Native.Basics.round
+  Elm.Kernel.Basics.round
 
 
 {-| Truncate a number, rounding towards zero. -}
 truncate : Float -> Int
 truncate =
-  Native.Basics.truncate
+  Elm.Kernel.Basics.truncate
 
 
 {-| Floor function, rounding down. -}
 floor : Float -> Int
 floor =
-  Native.Basics.floor
+  Elm.Kernel.Basics.floor
 
 
 {-| Ceiling function, rounding up. -}
 ceiling : Float -> Int
 ceiling =
-  Native.Basics.ceiling
+  Elm.Kernel.Basics.ceiling
 
 
 {-| Convert an integer into a float. -}
 toFloat : Int -> Float
 toFloat =
-  Native.Basics.toFloat
+  Elm.Kernel.Basics.toFloat
 
 
 {-| Determine whether a float is an undefined or unrepresentable number.
@@ -450,7 +450,7 @@ numbers](http://en.wikipedia.org/wiki/NaN).
 -}
 isNaN : Float -> Bool
 isNaN =
-  Native.Basics.isNaN
+  Elm.Kernel.Basics.isNaN
 
 
 {-| Determine whether a float is positive or negative infinity.
@@ -465,7 +465,7 @@ Notice that NaN is not infinite! For float `n` to be finite implies that
 -}
 isInfinite : Float -> Bool
 isInfinite =
-  Native.Basics.isInfinite
+  Elm.Kernel.Basics.isInfinite
 
 
 {-| Turn any kind of value into a string, mostly for debugging.
@@ -482,7 +482,7 @@ for viewing Elm data structures.
 -}
 toString : a -> String
 toString =
-  Native.Utils.toString
+  Elm.Kernel.Utils.toString
 
 
 {-| Put two appendable things together. This includes strings, lists, and text.
@@ -492,7 +492,7 @@ toString =
 -}
 (++) : appendable -> appendable -> appendable
 (++) =
-  Native.Utils.append
+  Elm.Kernel.Utils.append
 
 
 infixr 5 ++

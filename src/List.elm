@@ -50,7 +50,7 @@ The current sentiment is that it is already quite error prone once you get to
 import Basics exposing (..)
 import Maybe
 import Maybe exposing ( Maybe(Just,Nothing) )
-import Native.List
+import Elm.Kernel.List
 
 
 {-| Add an element to the front of a list. Pronounced *cons*.
@@ -60,7 +60,7 @@ import Native.List
 -}
 (::) : a -> List a -> List a
 (::) =
-  Native.List.cons
+  Elm.Kernel.List.cons
 
 
 infixr 5 ::
@@ -161,7 +161,7 @@ foldl func acc list =
 -}
 foldr : (a -> b -> b) -> b -> List a -> b
 foldr =
-  Native.List.foldr
+  Elm.Kernel.List.foldr
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
@@ -394,25 +394,25 @@ If one list is longer, the extra elements are dropped.
 -}
 map2 : (a -> b -> result) -> List a -> List b -> List result
 map2 =
-  Native.List.map2
+  Elm.Kernel.List.map2
 
 
 {-|-}
 map3 : (a -> b -> c -> result) -> List a -> List b -> List c -> List result
 map3 =
-  Native.List.map3
+  Elm.Kernel.List.map3
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> result) -> List a -> List b -> List c -> List d -> List result
 map4 =
-  Native.List.map4
+  Elm.Kernel.List.map4
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> List a -> List b -> List c -> List d -> List e -> List result
 map5 =
-  Native.List.map5
+  Elm.Kernel.List.map5
 
 
 {-| Decompose a list of tuples into a tuple of lists.
@@ -592,7 +592,7 @@ sort xs =
 -}
 sortBy : (a -> comparable) ->  List a -> List a
 sortBy =
-  Native.List.sortBy
+  Elm.Kernel.List.sortBy
 
 
 {-| Sort values with a custom comparison function.
@@ -610,4 +610,4 @@ to define any other: `sort == sortWith compare`
 -}
 sortWith : (a -> a -> Order) ->  List a -> List a
 sortWith =
-  Native.List.sortWith
+  Elm.Kernel.List.sortWith

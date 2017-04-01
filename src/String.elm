@@ -37,8 +37,8 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 @docs map, filter, foldl, foldr, any, all
 -}
 
-import Native.String
 import Char
+import Elm.Kernel.String
 import Maybe exposing (Maybe)
 import Result exposing (Result)
 
@@ -50,7 +50,7 @@ import Result exposing (Result)
 -}
 isEmpty : String -> Bool
 isEmpty =
-  Native.String.isEmpty
+  Elm.Kernel.String.isEmpty
 
 
 {-| Add a character to the beginning of a string.
@@ -59,7 +59,7 @@ isEmpty =
 -}
 cons : Char -> String -> String
 cons =
-  Native.String.cons
+  Elm.Kernel.String.cons
 
 
 {-| Create a string from a given character.
@@ -79,7 +79,7 @@ pattern match on strings exactly as you would with lists.
 -}
 uncons : String -> Maybe (Char, String)
 uncons =
-  Native.String.uncons
+  Elm.Kernel.String.uncons
 
 
 {-| Append two strings. You can also use [the `(++)` operator](Basics#++)
@@ -89,7 +89,7 @@ to do this.
 -}
 append : String -> String -> String
 append =
-  Native.String.append
+  Elm.Kernel.String.append
 
 
 {-| Concatenate many strings into one.
@@ -98,7 +98,7 @@ append =
 -}
 concat : List String -> String
 concat =
-  Native.String.concat
+  Elm.Kernel.String.concat
 
 
 {-| Get the length of a string.
@@ -109,7 +109,7 @@ concat =
 -}
 length : String -> Int
 length =
-  Native.String.length
+  Elm.Kernel.String.length
 
 
 {-| Transform every character in a string
@@ -118,7 +118,7 @@ length =
 -}
 map : (Char -> Char) -> String -> String
 map =
-  Native.String.map
+  Elm.Kernel.String.map
 
 
 {-| Keep only the characters that satisfy the predicate.
@@ -127,7 +127,7 @@ map =
 -}
 filter : (Char -> Bool) -> String -> String
 filter =
-  Native.String.filter
+  Elm.Kernel.String.filter
 
 
 {-| Reverse a string.
@@ -136,7 +136,7 @@ filter =
 -}
 reverse : String -> String
 reverse =
-  Native.String.reverse
+  Elm.Kernel.String.reverse
 
 
 {-| Reduce a string from the left.
@@ -145,7 +145,7 @@ reverse =
 -}
 foldl : (Char -> b -> b) -> b -> String -> b
 foldl =
-  Native.String.foldl
+  Elm.Kernel.String.foldl
 
 
 {-| Reduce a string from the right.
@@ -154,7 +154,7 @@ foldl =
 -}
 foldr : (Char -> b -> b) -> b -> String -> b
 foldr =
-  Native.String.foldr
+  Elm.Kernel.String.foldr
 
 
 {-| Split a string using a given separator.
@@ -166,7 +166,7 @@ Use [`Regex.split`](Regex#split) if you need something more flexible.
 -}
 split : String -> String -> List String
 split =
-  Native.String.split
+  Elm.Kernel.String.split
 
 
 {-| Put many strings together with a given separator.
@@ -177,7 +177,7 @@ split =
 -}
 join : String -> List String -> String
 join =
-  Native.String.join
+  Elm.Kernel.String.join
 
 
 {-| Repeat a string *n* times.
@@ -186,7 +186,7 @@ join =
 -}
 repeat : Int -> String -> String
 repeat =
-  Native.String.repeat
+  Elm.Kernel.String.repeat
 
 
 {-| Take a substring given a start and end index. Negative indexes
@@ -199,7 +199,7 @@ are taken starting from the *end* of the list.
 -}
 slice : Int -> Int -> String -> String
 slice =
-  Native.String.slice
+  Elm.Kernel.String.slice
 
 
 {-| Take *n* characters from the left side of a string.
@@ -208,7 +208,7 @@ slice =
 -}
 left : Int -> String -> String
 left =
-  Native.String.left
+  Elm.Kernel.String.left
 
 
 {-| Take *n* characters from the right side of a string.
@@ -217,7 +217,7 @@ left =
 -}
 right : Int -> String -> String
 right =
-  Native.String.right
+  Elm.Kernel.String.right
 
 
 {-| Drop *n* characters from the left side of a string.
@@ -226,7 +226,7 @@ right =
 -}
 dropLeft : Int -> String -> String
 dropLeft =
-  Native.String.dropLeft
+  Elm.Kernel.String.dropLeft
 
 
 {-| Drop *n* characters from the right side of a string.
@@ -235,7 +235,7 @@ dropLeft =
 -}
 dropRight : Int -> String -> String
 dropRight =
-  Native.String.dropRight
+  Elm.Kernel.String.dropRight
 
 
 {-| Pad a string on both sides until it has a given length.
@@ -246,7 +246,7 @@ dropRight =
 -}
 pad : Int -> Char -> String -> String
 pad =
-  Native.String.pad
+  Elm.Kernel.String.pad
 
 
 {-| Pad a string on the left until it has a given length.
@@ -257,7 +257,7 @@ pad =
 -}
 padLeft : Int -> Char -> String -> String
 padLeft =
-  Native.String.padLeft
+  Elm.Kernel.String.padLeft
 
 
 {-| Pad a string on the right until it has a given length.
@@ -268,7 +268,7 @@ padLeft =
 -}
 padRight : Int -> Char -> String -> String
 padRight =
-  Native.String.padRight
+  Elm.Kernel.String.padRight
 
 
 {-| Get rid of whitespace on both sides of a string.
@@ -277,7 +277,7 @@ padRight =
 -}
 trim : String -> String
 trim =
-  Native.String.trim
+  Elm.Kernel.String.trim
 
 
 {-| Get rid of whitespace on the left of a string.
@@ -286,7 +286,7 @@ trim =
 -}
 trimLeft : String -> String
 trimLeft =
-  Native.String.trimLeft
+  Elm.Kernel.String.trimLeft
 
 
 {-| Get rid of whitespace on the right of a string.
@@ -295,7 +295,7 @@ trimLeft =
 -}
 trimRight : String -> String
 trimRight =
-  Native.String.trimRight
+  Elm.Kernel.String.trimRight
 
 
 {-| Break a string into words, splitting on chunks of whitespace.
@@ -304,7 +304,7 @@ trimRight =
 -}
 words : String -> List String
 words =
-  Native.String.words
+  Elm.Kernel.String.words
 
 
 {-| Break a string into lines, splitting on newlines.
@@ -313,7 +313,7 @@ words =
 -}
 lines : String -> List String
 lines =
-  Native.String.lines
+  Elm.Kernel.String.lines
 
 
 {-| Convert a string to all upper case. Useful for case-insensitive comparisons
@@ -323,7 +323,7 @@ and VIRTUAL YELLING.
 -}
 toUpper : String -> String
 toUpper =
-  Native.String.toUpper
+  Elm.Kernel.String.toUpper
 
 
 {-| Convert a string to all lower case. Useful for case-insensitive comparisons.
@@ -332,7 +332,7 @@ toUpper =
 -}
 toLower : String -> String
 toLower =
-  Native.String.toLower
+  Elm.Kernel.String.toLower
 
 
 {-| Determine whether *any* characters satisfy a predicate.
@@ -343,7 +343,7 @@ toLower =
 -}
 any : (Char -> Bool) -> String -> Bool
 any =
-  Native.String.any
+  Elm.Kernel.String.any
 
 
 {-| Determine whether *all* characters satisfy a predicate.
@@ -354,7 +354,7 @@ any =
 -}
 all : (Char -> Bool) -> String -> Bool
 all =
-  Native.String.all
+  Elm.Kernel.String.all
 
 
 {-| See if the second string contains the first one.
@@ -367,7 +367,7 @@ Use [`Regex.contains`](Regex#contains) if you need something more flexible.
 -}
 contains : String -> String -> Bool
 contains =
-  Native.String.contains
+  Elm.Kernel.String.contains
 
 
 {-| See if the second string starts with the first one.
@@ -377,7 +377,7 @@ contains =
 -}
 startsWith : String -> String -> Bool
 startsWith =
-  Native.String.startsWith
+  Elm.Kernel.String.startsWith
 
 
 {-| See if the second string ends with the first one.
@@ -387,7 +387,7 @@ startsWith =
 -}
 endsWith : String -> String -> Bool
 endsWith =
-  Native.String.endsWith
+  Elm.Kernel.String.endsWith
 
 
 {-| Get all of the indexes for a substring in another string.
@@ -398,13 +398,13 @@ endsWith =
 -}
 indexes : String -> String -> List Int
 indexes =
-  Native.String.indexes
+  Elm.Kernel.String.indexes
 
 
 {-| Alias for `indexes`. -}
 indices : String -> String -> List Int
 indices =
-  Native.String.indexes
+  Elm.Kernel.String.indexes
 
 
 {-| Try to convert a string into an int, failing on improperly formatted strings.
@@ -422,7 +422,7 @@ want to use [`Result.withDefault`](Result#withDefault) to handle bad data:
 -}
 toInt : String -> Result String Int
 toInt =
-  Native.String.toInt
+  Elm.Kernel.String.toInt
 
 
 {-| Try to convert a string into a float, failing on improperly formatted strings.
@@ -440,7 +440,7 @@ want to use [`Result.withDefault`](Result#withDefault) to handle bad data:
 -}
 toFloat : String -> Result String Float
 toFloat =
-  Native.String.toFloat
+  Elm.Kernel.String.toFloat
 
 
 {-| Convert a string to a list of characters.
@@ -462,5 +462,5 @@ something.
 -}
 fromList : List Char -> String
 fromList =
-  Native.String.fromList
+  Elm.Kernel.String.fromList
 

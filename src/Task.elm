@@ -30,9 +30,9 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 -}
 
 import Basics exposing (Never, (|>), (<<))
+import Elm.Kernel.Scheduler
 import List exposing ((::))
 import Maybe exposing (Maybe(Just,Nothing))
-import Native.Scheduler
 import Platform
 import Platform.Cmd exposing (Cmd)
 import Result exposing (Result(Ok,Err))
@@ -61,7 +61,7 @@ type alias Task err ok =
 -}
 succeed : a -> Task x a
 succeed =
-  Native.Scheduler.succeed
+  Elm.Kernel.Scheduler.succeed
 
 
 {-| A task that fails immediately when run.
@@ -70,7 +70,7 @@ succeed =
 -}
 fail : x -> Task x a
 fail =
-  Native.Scheduler.fail
+  Elm.Kernel.Scheduler.fail
 
 
 
@@ -165,7 +165,7 @@ your servers *and then* lookup their picture once you know their name.
 -}
 andThen : (a -> Task x b) -> Task x a -> Task x b
 andThen =
-  Native.Scheduler.andThen
+  Elm.Kernel.Scheduler.andThen
 
 
 -- ERRORS
@@ -183,7 +183,7 @@ callback to recover.
 -}
 onError : (x -> Task y a) -> Task x a -> Task y a
 onError =
-  Native.Scheduler.onError
+  Elm.Kernel.Scheduler.onError
 
 
 {-| Transform the error value. This can be useful if you need a bunch of error
@@ -271,7 +271,7 @@ onSelfMsg _ _ _ =
 
 spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
 spawnCmd router (Perform task) =
-  Native.Scheduler.spawn (
+  Elm.Kernel.Scheduler.spawn (
     task
       |> andThen (Platform.sendToApp router)
   )

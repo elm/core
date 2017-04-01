@@ -10,7 +10,7 @@ module Platform.Sub exposing
 @docs Sub, map, batch, none
 -}
 
-import Native.Platform
+import Elm.Kernel.Platform
 
 
 {-| A subscription is a way of telling Elm, “Hey, let me know if anything
@@ -35,13 +35,13 @@ type Sub msg = Sub
 {-|-}
 map : (a -> msg) -> Sub a -> Sub msg
 map =
-  Native.Platform.map
+  Elm.Kernel.Platform.map
 
 
 {-|-}
 batch : List (Sub msg) -> Sub msg
 batch =
-  Native.Platform.batch
+  Elm.Kernel.Platform.batch
 
 
 {-|-}

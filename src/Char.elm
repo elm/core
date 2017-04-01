@@ -17,8 +17,8 @@ module Char exposing
 @docs toCode, fromCode
 -}
 
-import Native.Char
 import Basics exposing ((&&), (||), (>=), (<=))
+import Elm.Kernel.Char
 
 
 
@@ -125,25 +125,25 @@ isHexDigit char =
 {-| Convert to upper case. -}
 toUpper : Char -> Char
 toUpper =
-  Native.Char.toUpper
+  Elm.Kernel.Char.toUpper
 
 
 {-| Convert to lower case. -}
 toLower : Char -> Char
 toLower =
-  Native.Char.toLower
+  Elm.Kernel.Char.toLower
 
 
 {-| Convert to upper case, according to any locale-specific case mappings. -}
 toLocaleUpper : Char -> Char
 toLocaleUpper =
-  Native.Char.toLocaleUpper
+  Elm.Kernel.Char.toLocaleUpper
 
 
 {-| Convert to lower case, according to any locale-specific case mappings. -}
 toLocaleLower : Char -> Char
 toLocaleLower =
-  Native.Char.toLocaleLower
+  Elm.Kernel.Char.toLocaleLower
 
 
 {-| Convert to the corresponding Unicode [code point][cp].
@@ -158,7 +158,7 @@ toLocaleLower =
 -}
 toCode : Char -> Int
 toCode =
-  Native.Char.toCode
+  Elm.Kernel.Char.toCode
 
 
 {-| Convert a Unicode [code point][cp] to a character.
@@ -173,4 +173,4 @@ toCode =
 -}
 fromCode : Int -> Char
 fromCode =
-  Native.Char.fromCode
+  Elm.Kernel.Char.fromCode

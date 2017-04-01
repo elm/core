@@ -45,7 +45,7 @@ longer. That’s kind of what Elm is all about.
 -}
 
 import Basics exposing (Never)
-import Native.Scheduler
+import Elm.Kernel.Scheduler
 import Platform
 import Task exposing (Task)
 import Time exposing (Time)
@@ -81,7 +81,7 @@ come in a later release!
 -}
 spawn : Task x a -> Task y Id
 spawn =
-  Native.Scheduler.spawn
+  Elm.Kernel.Scheduler.spawn
 
 
 {-| Block progress on the current process for a given amount of time. The
@@ -92,7 +92,7 @@ delay work until later.
 -}
 sleep : Time -> Task x ()
 sleep =
-  Native.Scheduler.sleep
+  Elm.Kernel.Scheduler.sleep
 
 
 {-| Sometimes you `spawn` a process, but later decide it would be a waste to
@@ -102,5 +102,5 @@ flight, it will also abort the request.
 -}
 kill : Id -> Task x ()
 kill =
-  Native.Scheduler.kill
+  Elm.Kernel.Scheduler.kill
 

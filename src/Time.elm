@@ -19,10 +19,10 @@ effect module Time where { subscription = MySub } exposing
 
 import Basics exposing (..)
 import Dict
+import Elm.Kernel.Scheduler
+import Elm.Kernel.Time
 import List exposing ((::))
 import Maybe exposing (Maybe(..))
-import Native.Scheduler
-import Native.Time
 import Platform
 import Platform.Sub exposing (Sub)
 import Task exposing (Task)
@@ -43,7 +43,7 @@ type alias Time = Float
 -}
 now : Task x Time
 now =
-  Native.Time.now ()
+  Elm.Kernel.Time.now ()
 
 
 {-| Subscribe to the current time. First you provide an interval describing how
@@ -176,7 +176,7 @@ onEffects router subs {processes} =
     rightStep _ id (spawnList, existingDict, killTask) =
       ( spawnList
       , existingDict
-      , Native.Scheduler.kill id
+      , Elm.Kernel.Scheduler.kill id
           |> Task.andThen (\_ -> killTask)
       )
 
@@ -213,7 +213,7 @@ spawnHelp router intervals processes =
     interval :: rest ->
       let
         spawnTimer =
-          Native.Scheduler.spawn (setInterval interval (Platform.sendToSelf router interval))
+          Elm.Kernel.Scheduler.spawn (setInterval interval (Platform.sendToSelf router interval))
 
         spawnRest id =
           spawnHelp router rest (Dict.insert interval id processes)
@@ -240,4 +240,4 @@ onSelfMsg router interval state =
 
 setInterval : Time -> Task Never () -> Task x Never
 setInterval =
-  Native.Time.setInterval
+  Elm.Kernel.Time.setInterval

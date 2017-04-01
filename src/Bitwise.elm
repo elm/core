@@ -12,35 +12,35 @@ module Bitwise exposing
 @docs shiftLeftBy, shiftRightBy, shiftRightZfBy
 -}
 
-import Native.Bitwise
+import Elm.Kernel.Bitwise
 
 
 {-| Bitwise AND
 -}
 and : Int -> Int -> Int
 and =
-  Native.Bitwise.and
+  Elm.Kernel.Bitwise.and
 
 
 {-| Bitwise OR
 -}
 or : Int -> Int -> Int
 or =
-  Native.Bitwise.or
+  Elm.Kernel.Bitwise.or
 
 
 {-| Bitwise XOR
 -}
 xor : Int -> Int -> Int
 xor =
-  Native.Bitwise.xor
+  Elm.Kernel.Bitwise.xor
 
 
 {-| Flip each bit individually, often called bitwise NOT
 -}
 complement : Int -> Int
 complement =
-  Native.Bitwise.complement
+  Elm.Kernel.Bitwise.complement
 
 
 {-| Shift bits to the left by a given offset, filling new bits with zeros.
@@ -51,7 +51,7 @@ This can be used to multiply numbers by powers of two.
 -}
 shiftLeftBy : Int -> Int -> Int
 shiftLeftBy =
-  Native.Bitwise.shiftLeftBy
+  Elm.Kernel.Bitwise.shiftLeftBy
 
 
 {-| Shift bits to the right by a given offset, filling new bits with
@@ -69,7 +69,7 @@ with copies of the highest bit.
 -}
 shiftRightBy : Int -> Int -> Int
 shiftRightBy =
-  Native.Bitwise.shiftRightBy
+  Elm.Kernel.Bitwise.shiftRightBy
 
 
 {-| Shift bits to the right by a given offset, filling new bits with zeros.
@@ -86,5 +86,5 @@ zeros.
 -}
 shiftRightZfBy : Int -> Int -> Int
 shiftRightZfBy =
-  Native.Bitwise.shiftRightZfBy
+  Elm.Kernel.Bitwise.shiftRightZfBy
 

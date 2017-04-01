@@ -26,8 +26,8 @@ curious? Public discussions of your explorations should be framed accordingly.
 -}
 
 import Basics exposing (Never)
-import Native.Platform
-import Native.Scheduler
+import Elm.Kernel.Platform
+import Elm.Kernel.Scheduler
 import Platform.Cmd exposing (Cmd)
 import Platform.Sub exposing (Sub)
 
@@ -71,7 +71,7 @@ program
     }
   -> Program Never model msg
 program =
-  Native.Platform.program
+  Elm.Kernel.Platform.program
 
 
 {-| Same as [`program`](#program), but you can provide flags. Initializing a
@@ -91,7 +91,7 @@ programWithFlags
     }
   -> Program flags model msg
 programWithFlags =
-  Native.Platform.programWithFlags
+  Elm.Kernel.Platform.programWithFlags
 
 
 
@@ -127,7 +127,7 @@ be handled by the overall `update` function, just like events from `Html`.
 -}
 sendToApp : Router msg a -> msg -> Task x ()
 sendToApp =
-  Native.Platform.sendToApp
+  Elm.Kernel.Platform.sendToApp
 
 
 {-| Send the router a message for your effect manager. This message will
@@ -138,8 +138,8 @@ As an example, the effect manager for web sockets
 -}
 sendToSelf : Router a msg -> msg -> Task x ()
 sendToSelf =
-  Native.Platform.sendToSelf
+  Elm.Kernel.Platform.sendToSelf
 
 
 hack =
-  Native.Scheduler.succeed
+  Elm.Kernel.Scheduler.succeed

@@ -23,7 +23,7 @@ and subscriptions.
 
 -}
 
-import Native.Platform
+import Elm.Kernel.Platform
 
 
 {-| A command is a way of telling Elm, “Hey, I want you to do this thing!”
@@ -45,13 +45,13 @@ type Cmd msg = Cmd
 {-|-}
 map : (a -> msg) -> Cmd a -> Cmd msg
 map =
-  Native.Platform.map
+  Elm.Kernel.Platform.map
 
 
 {-|-}
 batch : List (Cmd msg) -> Cmd msg
 batch =
-  Native.Platform.batch
+  Elm.Kernel.Platform.batch
 
 
 {-|-}

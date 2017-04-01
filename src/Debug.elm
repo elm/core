@@ -10,7 +10,7 @@ module Debug exposing
 @docs log, crash
 -}
 
-import Native.Debug
+import Elm.Kernel.Debug
 
 
 {-| Log a tagged value on the developer console, and then return the value.
@@ -23,7 +23,7 @@ investigating bugs or performance problems.
 -}
 log : String -> a -> a
 log =
-  Native.Debug.log
+  Elm.Kernel.Debug.log
 
 
 {-| Crash the program with an error message. This is an uncatchable error,
@@ -58,5 +58,5 @@ Use the [`Maybe`](Maybe) or [`Result`](Result) libraries instead.
 -}
 crash : String -> a
 crash =
-  Native.Debug.crash
+  Elm.Kernel.Debug.crash
 

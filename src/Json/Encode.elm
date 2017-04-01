@@ -22,9 +22,9 @@ module Json.Encode exposing
 -}
 
 import Array exposing (Array)
-import Native.Array
-import Native.Json
-import Native.List
+import Elm.Kernel.Array
+import Elm.Kernel.Json
+import Elm.Kernel.List
 
 
 {-| Represents a JavaScript value.
@@ -52,53 +52,53 @@ the amount of indentation in the resulting string.
 -}
 encode : Int -> Value -> String
 encode =
-    Native.Json.encode
+    Elm.Kernel.Json.encode
 
 
 {-|-}
 string : String -> Value
 string =
-    Native.Json.identity
+    Elm.Kernel.Json.identity
 
 
 {-|-}
 int : Int -> Value
 int =
-    Native.Json.identity
+    Elm.Kernel.Json.identity
 
 
 {-| Encode a Float. `Infinity` and `NaN` are encoded as `null`.
 -}
 float : Float -> Value
 float =
-    Native.Json.identity
+    Elm.Kernel.Json.identity
 
 
 {-|-}
 bool : Bool -> Value
 bool =
-    Native.Json.identity
+    Elm.Kernel.Json.identity
 
 
 {-|-}
 null : Value
 null =
-    Native.Json.encodeNull
+    Elm.Kernel.Json.encodeNull
 
 
 {-|-}
 object : List (String, Value) -> Value
 object =
-    Native.Json.encodeObject
+    Elm.Kernel.Json.encodeObject
 
 
 {-|-}
 array : Array Value -> Value
 array =
-    Native.Array.toJSArray
+    Elm.Kernel.Array.toJSArray
 
 
 {-|-}
 list : List Value -> Value
 list =
-    Native.List.toArray
+    Elm.Kernel.List.toArray

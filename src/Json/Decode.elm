@@ -49,7 +49,7 @@ import Json.Encode as JsEncode
 import List
 import Maybe exposing (Maybe(..))
 import Result exposing (Result(..))
-import Native.Json
+import Elm.Kernel.Json
 
 
 
@@ -71,7 +71,7 @@ type Decoder a = Decoder
 -}
 string : Decoder String
 string =
-  Native.Json.decodePrimitive "string"
+  Elm.Kernel.Json.decodePrimitive "string"
 
 
 {-| Decode a JSON boolean into an Elm `Bool`.
@@ -84,7 +84,7 @@ string =
 -}
 bool : Decoder Bool
 bool =
-  Native.Json.decodePrimitive "bool"
+  Elm.Kernel.Json.decodePrimitive "bool"
 
 
 {-| Decode a JSON number into an Elm `Int`.
@@ -97,7 +97,7 @@ bool =
 -}
 int : Decoder Int
 int =
-  Native.Json.decodePrimitive "int"
+  Elm.Kernel.Json.decodePrimitive "int"
 
 
 {-| Decode a JSON number into an Elm `Float`.
@@ -110,7 +110,7 @@ int =
 -}
 float : Decoder Float
 float =
-  Native.Json.decodePrimitive "float"
+  Elm.Kernel.Json.decodePrimitive "float"
 
 
 
@@ -139,7 +139,7 @@ nullable decoder =
 -}
 list : Decoder a -> Decoder (List a)
 list decoder =
-  Native.Json.decodeContainer "list" decoder
+  Elm.Kernel.Json.decodeContainer "list" decoder
 
 
 {-| Decode a JSON array into an Elm `Array`.
@@ -149,7 +149,7 @@ list decoder =
 -}
 array : Decoder a -> Decoder (Array a)
 array decoder =
-  Native.Json.decodeContainer "array" decoder
+  Elm.Kernel.Json.decodeContainer "array" decoder
 
 
 {-| Decode a JSON object into an Elm `Dict`.
@@ -169,7 +169,7 @@ dict decoder =
 -}
 keyValuePairs : Decoder a -> Decoder (List (String, a))
 keyValuePairs =
-  Native.Json.decodeKeyValuePairs
+  Elm.Kernel.Json.decodeKeyValuePairs
 
 
 
@@ -192,7 +192,7 @@ Check out [`map2`](#map2) to see how to decode multiple fields!
 -}
 field : String -> Decoder a -> Decoder a
 field =
-    Native.Json.decodeField
+    Elm.Kernel.Json.decodeField
 
 
 {-| Decode a nested JSON object, requiring certain fields.
@@ -222,7 +222,7 @@ at fields decoder =
 -}
 index : Int -> Decoder a -> Decoder a
 index =
-    Native.Json.decodeIndex
+    Elm.Kernel.Json.decodeIndex
 
 
 
@@ -250,7 +250,7 @@ fields, this means you probably want it *outside* a use of `field` or `at`.
 -}
 maybe : Decoder a -> Decoder (Maybe a)
 maybe decoder =
-  Native.Json.decodeContainer "maybe" decoder
+  Elm.Kernel.Json.decodeContainer "maybe" decoder
 
 
 {-| Try a bunch of different decoders. This can be useful if the JSON may come
@@ -275,7 +275,7 @@ even more particular if you wanted.
 -}
 oneOf : List (Decoder a) -> Decoder a
 oneOf =
-    Native.Json.oneOf
+    Elm.Kernel.Json.oneOf
 
 
 
@@ -301,7 +301,7 @@ It is often helpful to use `map` with `oneOf`, like when defining `nullable`:
 -}
 map : (a -> value) -> Decoder a -> Decoder value
 map =
-    Native.Json.map1
+    Elm.Kernel.Json.map1
 
 
 {-| Try two decoders and then combine the result. We can use this to decode
@@ -322,7 +322,7 @@ constructor.
 -}
 map2 : (a -> b -> value) -> Decoder a -> Decoder b -> Decoder value
 map2 =
-    Native.Json.map2
+    Elm.Kernel.Json.map2
 
 
 {-| Try three decoders and then combine the result. We can use this to decode
@@ -345,37 +345,37 @@ Like `map2` it tries each decoder in order and then give the results to the
 -}
 map3 : (a -> b -> c -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder value
 map3 =
-    Native.Json.map3
+    Elm.Kernel.Json.map3
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder value
 map4 =
-    Native.Json.map4
+    Elm.Kernel.Json.map4
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder value
 map5 =
-    Native.Json.map5
+    Elm.Kernel.Json.map5
 
 
 {-|-}
 map6 : (a -> b -> c -> d -> e -> f -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder value
 map6 =
-    Native.Json.map6
+    Elm.Kernel.Json.map6
 
 
 {-|-}
 map7 : (a -> b -> c -> d -> e -> f -> g -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder value
 map7 =
-    Native.Json.map7
+    Elm.Kernel.Json.map7
 
 
 {-|-}
 map8 : (a -> b -> c -> d -> e -> f -> g -> h -> value) -> Decoder a -> Decoder b -> Decoder c -> Decoder d -> Decoder e -> Decoder f -> Decoder g -> Decoder h -> Decoder value
 map8 =
-    Native.Json.map8
+    Elm.Kernel.Json.map8
 
 
 
@@ -391,7 +391,7 @@ fails for some reason.
 -}
 decodeString : Decoder a -> String -> Result String a
 decodeString =
-  Native.Json.runOnString
+  Elm.Kernel.Json.runOnString
 
 
 {-| Run a `Decoder` on some JSON `Value`. You can send these JSON values
@@ -399,7 +399,7 @@ through ports, so that is probably the main time you would use this function.
 -}
 decodeValue : Decoder a -> Value -> Result String a
 decodeValue =
-  Native.Json.run
+  Elm.Kernel.Json.run
 
 
 {-| A JSON value.
@@ -421,7 +421,7 @@ This is handy when used with `oneOf` or `andThen`.
 -}
 succeed : a -> Decoder a
 succeed =
-  Native.Json.succeed
+  Elm.Kernel.Json.succeed
 
 
 {-| Ignore the JSON and make the decoder fail. This is handy when used with
@@ -432,7 +432,7 @@ See the [`andThen`](#andThen) docs for an example.
 -}
 fail : String -> Decoder a
 fail =
-  Native.Json.fail
+  Elm.Kernel.Json.fail
 
 
 {-| Create decoders that depend on previous results. If you are creating
@@ -462,7 +462,7 @@ versioned data, you might do something like this:
 -}
 andThen : (a -> Decoder b) -> Decoder a -> Decoder b
 andThen =
-  Native.Json.andThen
+  Elm.Kernel.Json.andThen
 
 
 {-| Sometimes you have JSON with recursive structure, like nested comments.
@@ -503,7 +503,7 @@ about its structure.
 -}
 value : Decoder Value
 value =
-  Native.Json.decodePrimitive "value"
+  Elm.Kernel.Json.decodePrimitive "value"
 
 
 {-| Decode a `null` value into some Elm value.
@@ -517,4 +517,4 @@ So if you ever see a `null`, this will return whatever value you specified.
 -}
 null : a -> Decoder a
 null =
-  Native.Json.decodeNull
+  Elm.Kernel.Json.decodeNull
