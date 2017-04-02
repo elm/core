@@ -93,7 +93,7 @@ object =
 
 {-|-}
 array : Array Value -> Value
-array arr =
+array =
     Array.toList >> Elm.Kernel.List.toArray
 
 
