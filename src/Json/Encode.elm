@@ -22,7 +22,6 @@ module Json.Encode exposing
 -}
 
 import Array exposing (Array)
-import Elm.Kernel.Array
 import Elm.Kernel.Json
 import Elm.Kernel.List
 
@@ -95,7 +94,7 @@ object =
 {-|-}
 array : Array Value -> Value
 array =
-    Elm.Kernel.Array.toJSArray
+    Array.toList >> Elm.Kernel.List.toArray
 
 
 {-|-}

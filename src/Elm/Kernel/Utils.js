@@ -90,25 +90,6 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return a.ctor === b.ctor;
 	}
 
-	// check if Arrays are equal
-	if (x.ctor === '_Array')
-	{
-		var xs = _Array_toJSArray(x);
-		var ys = _Array_toJSArray(y);
-		if (xs.length !== ys.length)
-		{
-			return false;
-		}
-		for (var i = 0; i < xs.length; i++)
-		{
-			if (!_Utils_eqHelp(xs[i], ys[i], depth + 1, stack))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
 	if (!_Utils_eqHelp(x.ctor, y.ctor, depth + 1, stack))
 	{
 		return false;
@@ -343,7 +324,7 @@ function _Utils_toString(v)
 			return '<task>'
 		}
 
-		if (v.ctor === '_Array')
+		if (v.ctor === 'Array')
 		{
 			var list = elm_lang$core$Array$toList(v);
 			return 'Array.fromList ' + _Utils_toString(list);

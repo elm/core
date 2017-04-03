@@ -335,7 +335,10 @@ function _Json_runHelp(decoder, value)
 				}
 				array[i] = result.value;
 			}
-			return _Json_ok(_Array_fromJSArray(array));
+			var elmArray = A2(elm_lang$core$Array$initialize, array.length, function (idx) {
+				return array[idx];
+			});
+			return _Json_ok(elmArray);
 
 		case 'maybe':
 			var result = _Json_runHelp(decoder.decoder, value);
