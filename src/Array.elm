@@ -42,9 +42,9 @@ module Array
 @docs foldl, foldr, filter, map, indexedMap
 -}
 
-import JsArray exposing (JsArray)
 import Basics exposing (..)
 import Bitwise
+import Elm.JsArray as JsArray exposing (JsArray)
 import List exposing ((::))
 import Maybe exposing (..)
 import Tuple

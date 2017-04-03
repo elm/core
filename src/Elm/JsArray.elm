@@ -1,4 +1,4 @@
-module JsArray
+module Elm.JsArray
     exposing
         ( JsArray
         , empty
