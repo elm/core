@@ -163,7 +163,6 @@ foldr =
     split "," "cat,dog,cow"        == ["cat","dog","cow"]
     split "/" "home/evan/Desktop/" == ["home","evan","Desktop", ""]
 
-Use [`Regex.split`](Regex#split) if you need something more flexible.
 -}
 split : String -> String -> List String
 split =
@@ -364,7 +363,6 @@ all =
     contains "hat" "theory" == False
     contains "THE" "theory" == False
 
-Use [`Regex.contains`](Regex#contains) if you need something more flexible.
 -}
 contains : String -> String -> Bool
 contains =
