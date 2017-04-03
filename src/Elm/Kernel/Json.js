@@ -109,42 +109,42 @@ function _Json_oneOf(decoders)
 var _Json_map1 = F2(function(f, d1)
 {
 	return _Json_mapMany(f, [d1]);
-}
+});
 
 var _Json_map2 = F3(function(f, d1, d2)
 {
 	return _Json_mapMany(f, [d1, d2]);
-}
+});
 
 var _Json_map3 = F4(function(f, d1, d2, d3)
 {
 	return _Json_mapMany(f, [d1, d2, d3]);
-}
+});
 
 var _Json_map4 = F5(function(f, d1, d2, d3, d4)
 {
 	return _Json_mapMany(f, [d1, d2, d3, d4]);
-}
+});
 
 var _Json_map5 = F6(function(f, d1, d2, d3, d4, d5)
 {
 	return _Json_mapMany(f, [d1, d2, d3, d4, d5]);
-}
+});
 
 var _Json_map6 = F7(function(f, d1, d2, d3, d4, d5, d6)
 {
 	return _Json_mapMany(f, [d1, d2, d3, d4, d5, d6]);
-}
+});
 
 var _Json_map7 = F8(function(f, d1, d2, d3, d4, d5, d6, d7)
 {
 	return _Json_mapMany(f, [d1, d2, d3, d4, d5, d6, d7]);
-}
+});
 
 var _Json_map8 = F9(function(f, d1, d2, d3, d4, d5, d6, d7, d8)
 {
 	return _Json_mapMany(f, [d1, d2, d3, d4, d5, d6, d7, d8]);
-}
+});
 
 
 // DECODE HELPERS

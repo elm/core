@@ -128,7 +128,7 @@ var _String_foldl = F3(function(func, state, string)
 		state = A2(func, _Utils_chr(char), state);
 	}
 	return state;
-}
+});
 
 var _String_foldr = F3(function(func, state, string)
 {
@@ -145,7 +145,7 @@ var _String_foldr = F3(function(func, state, string)
 		state = A2(func, _Utils_chr(char), state);
 	}
 	return state;
-}
+});
 
 var _String_split = F2(function(sep, str)
 {
