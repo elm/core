@@ -39,6 +39,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 
 import Char
 import Elm.Kernel.String
+import List exposing ((::))
 import Maybe exposing (Maybe)
 import Result exposing (Result)
 

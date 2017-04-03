@@ -1,4 +1,4 @@
-module Array.JsArray
+module JsArray
     exposing
         ( JsArray
         , empty

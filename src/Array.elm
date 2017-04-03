@@ -1,4 +1,4 @@
-module Array.Hamt
+module Array
     exposing
         ( Array
         , empty
@@ -45,8 +45,9 @@ module Array.Hamt
 import JsArray exposing (JsArray)
 import Basics exposing (..)
 import Bitwise
-import List
+import List exposing ((::))
 import Maybe exposing (..)
+import Tuple
 
 
 {-| The array in this module is implemented as a tree with a high branching
