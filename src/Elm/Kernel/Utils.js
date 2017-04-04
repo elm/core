@@ -206,7 +206,7 @@ function _Utils_update(oldRecord, updatedFields)
 
 // APPEND
 
-function _Utils_append(xs, ys)
+var _Utils_append = F2(function(xs, ys)
 {
 	// append Strings
 	if (typeof xs === 'string')
@@ -230,7 +230,7 @@ function _Utils_append(xs, ys)
 	}
 	curr._1 = ys;
 	return root;
-}
+});
 
 
 // CRASHES
