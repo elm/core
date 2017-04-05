@@ -78,6 +78,13 @@ function _Basics_truncate(n)
 
 // COMPARISON
 
+var _Basics_eq = F2(_Utils_eq);
+
+var _Basics_neq = F2(function(a, b)
+{
+	return !_Utils_eq(a,b);
+});
+
 var _Basics_min = F2(function(a, b)
 {
 	return _Utils_cmp(a, b) < 0 ? a : b;
