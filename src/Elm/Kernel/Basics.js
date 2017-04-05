@@ -1,16 +1,13 @@
 
 
-// DIVISION
+// ARITHMETIC
 
-var _Basics_div = F2(function(a, b)
-{
-	return (a / b) | 0;
-});
-
-var _Basics_rem = F2(function(a, b)
-{
-	return a % b;
-});
+var _Basics_add = F2(function(a, b) { return a + b; });
+var _Basics_sub = F2(function(a, b) { return a - b; });
+var _Basics_mul = F2(function(a, b) { return a * b; });
+var _Basics_rem = F2(function(a, b) { return a % b; });
+var _Basics_div = F2(function(a, b) { return (a / b) | 0; });
+var _Basics_floatDiv = F2(function(a, b) { return a / b; });
 
 var _Basics_mod = F2(function(a, b)
 {
