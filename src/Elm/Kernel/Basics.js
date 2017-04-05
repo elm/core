@@ -57,6 +57,27 @@ function _Basics_abs(n)
 	return n < 0 ? -n : n;
 }
 
+function _Basics_toFloat(x)
+{
+	return x;
+};
+
+var _Basics_isNaN = isNaN;
+
+function _Basics_isInfinite(n)
+{
+	return n === Infinity || n === -Infinity;
+}
+
+var _Basics_ceiling = Math.ceil;
+var _Basics_floor = Math.floor;
+var _Basics_round = Math.round;
+
+function _Basics_truncate(n)
+{
+	return n | 0;
+}
+
 
 // COMPARISON
 
@@ -97,30 +118,6 @@ var _Basics_xor = F2(function(a, b)
 function _Basics_not(b)
 {
 	return !b;
-}
-
-
-// MORE MATH STUFF
-
-function _Basics_toFloat(x)
-{
-	return x;
-};
-
-var _Basics_isNaN = isNaN;
-
-function _Basics_isInfinite(n)
-{
-	return n === Infinity || n === -Infinity;
-}
-
-var _Basics_ceiling = Math.ceil;
-var _Basics_floor = Math.floor;
-var _Basics_round = Math.round;
-
-function _Basics_truncate(n)
-{
-	return n | 0;
 }
 
 
