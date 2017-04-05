@@ -73,22 +73,6 @@ function _Platform_renderer(enqueue, _)
 }
 
 
-// HTML TO PROGRAM
-
-function _Platform_htmlToProgram(vnode)
-{
-	var emptyBag = _Platform_batch(_List_Nil);
-	var noChange = _Utils_Tuple2(_Utils_Tuple0, emptyBag);
-
-	return elm_lang$virtual_dom$VirtualDom$program({
-		init: noChange,
-		view: function(model) { return main; },
-		update: F2(function(msg, model) { return noChange; }),
-		subscriptions: function (model) { return emptyBag; }
-	});
-}
-
-
 // INITIALIZE A PROGRAM
 
 function _Platform_initialize(init, update, subscriptions, renderer)
