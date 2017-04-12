@@ -14,7 +14,7 @@ All Elm files have some default imports:
 
 ```elm
 import Basics exposing (..)
-import List exposing ( List, (::) )
+import List exposing ( (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )
 import Result exposing ( Result( Ok, Err ) )
 import String
@@ -23,8 +23,8 @@ import Tuple
 import Debug
 
 import Platform exposing ( Program )
-import Platform.Cmd exposing ( Cmd, (!) )
-import Platform.Sub exposing ( Sub )
+import Platform.Cmd as Cmd exposing ( Cmd, (!) )
+import Platform.Sub as Sub exposing ( Sub )
 ```
 
 The intention is to include things that are both extremely useful and very
