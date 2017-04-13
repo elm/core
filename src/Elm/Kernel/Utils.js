@@ -1,5 +1,6 @@
 
-// COMPARISONS
+
+// EQUALITY
 
 function _Utils_eq(x, y)
 {
@@ -105,6 +106,12 @@ function _Utils_eqHelp(x, y, depth, stack)
 	return true;
 }
 
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+// COMPARISONS
+
 // Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
 // the particular integer values assigned to LT, EQ, and GT.
 
@@ -162,6 +169,30 @@ function _Utils_cmp(x, y)
 	);
 }
 
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_LT; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_GT; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_GT; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_LT; });
+
+var _Utils_min = F2(function(a, b) { return _Utils_cmp(a, b) < 0 ? a : b; });
+var _Utils_max = F2(function(a, b) { return _Utils_cmp(a, b) > 0 ? a : b; });
+
+var _Utils_clamp = F3(function(lo, hi, n)
+{
+	return _Utils_cmp(n, lo) < 0
+		? lo
+		: _Utils_cmp(n, hi) > 0
+			? hi
+			: n;
+});
+
+var _Utils_ordTable = ['LT', 'EQ', 'GT'];
+
+var _Utils_compare = F2(function(x, y)
+{
+	return { ctor: _Utils_ordTable[_Utils_cmp(x, y) + 1] };
+});
+
 
 // COMMON VALUES
 
@@ -181,6 +212,20 @@ function _Utils_Tuple2(x, y)
 function _Utils_chr(c)
 {
 	return new String(c);
+}
+
+function _Basics_fromPolar(point)
+{
+	var r = point._0;
+	var t = point._1;
+	return _Utils_Tuple2(r * Math.cos(t), r * Math.sin(t));
+}
+
+function _Basics_toPolar(point)
+{
+	var x = point._0;
+	var y = point._1;
+	return _Utils_Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 }
 
 

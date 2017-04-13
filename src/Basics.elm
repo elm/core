@@ -85,13 +85,13 @@ turns =
 {-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
 fromPolar : (Float,Float) -> (Float,Float)
 fromPolar =
-  Elm.Kernel.Basics.fromPolar
+  Elm.Kernel.Utils.fromPolar
 
 
 {-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
 toPolar : (Float,Float) -> (Float,Float)
 toPolar =
-  Elm.Kernel.Basics.toPolar
+  Elm.Kernel.Utils.toPolar
 
 
 {-|-}
@@ -258,7 +258,7 @@ logBase =
 -}
 clamp : number -> number -> number -> number
 clamp =
-  Elm.Kernel.Basics.clamp
+  Elm.Kernel.Utils.clamp
 
 
 {-| An approximation of pi. -}
@@ -294,7 +294,7 @@ if passed through a port.
 -}
 (==) : a -> a -> Bool
 (==) =
-  Elm.Kernel.Basics.eq
+  Elm.Kernel.Utils.equal
 
 
 {-| Check if values are not &ldquo;the same&rdquo;.
@@ -303,31 +303,31 @@ So `(a /= b)` is the same as `(not (a == b))`.
 -}
 (/=) : a -> a -> Bool
 (/=) =
-  Elm.Kernel.Basics.neq
+  Elm.Kernel.Utils.notEqual
 
 
 {-|-}
 (<) : comparable -> comparable -> Bool
 (<) =
-  Elm.Kernel.Basics.lt
+  Elm.Kernel.Utils.lt
 
 
 {-|-}
 (>) : comparable -> comparable -> Bool
 (>) =
-  Elm.Kernel.Basics.gt
+  Elm.Kernel.Utils.gt
 
 
 {-|-}
 (<=) : comparable -> comparable -> Bool
 (<=) =
-  Elm.Kernel.Basics.le
+  Elm.Kernel.Utils.le
 
 
 {-|-}
 (>=) : comparable -> comparable -> Bool
 (>=) =
-  Elm.Kernel.Basics.ge
+  Elm.Kernel.Utils.ge
 
 
 infix 4 ==
@@ -344,7 +344,7 @@ These are also the only values that work as `Dict` keys or `Set` members.
 -}
 compare : comparable -> comparable -> Order
 compare =
-  Elm.Kernel.Basics.compare
+  Elm.Kernel.Utils.compare
 
 
 {-| Represents the relative ordering of two things.
@@ -356,13 +356,13 @@ type Order = LT | EQ | GT
 {-| Find the smaller of two comparables. -}
 min : comparable -> comparable -> comparable
 min =
-  Elm.Kernel.Basics.min
+  Elm.Kernel.Utils.min
 
 
 {-| Find the larger of two comparables. -}
 max : comparable -> comparable -> comparable
 max =
-  Elm.Kernel.Basics.max
+  Elm.Kernel.Utils.max
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.

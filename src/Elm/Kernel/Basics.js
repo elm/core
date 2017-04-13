@@ -76,42 +76,6 @@ function _Basics_truncate(n)
 }
 
 
-// COMPARISON
-
-var _Basics_eq = F2(_Utils_eq);
-
-var _Basics_neq = F2(function(a, b)
-{
-	return !_Utils_eq(a,b);
-});
-
-var _Basics_min = F2(function(a, b)
-{
-	return _Utils_cmp(a, b) < 0 ? a : b;
-});
-
-var _Basics_max = F2(function(a, b)
-{
-	return _Utils_cmp(a, b) > 0 ? a : b;
-});
-
-var _Basics_clamp = F3(function(lo, hi, n)
-{
-	return _Utils_cmp(n, lo) < 0
-		? lo
-		: _Utils_cmp(n, hi) > 0
-			? hi
-			: n;
-});
-
-var _Basics_ordTable = ['LT', 'EQ', 'GT'];
-
-var _Basics_compare = F2(function(x, y)
-{
-	return { ctor: _Basics_ordTable[_Utils_cmp(x, y) + 1] };
-});
-
-
 // BOOLEANS
 
 var _Basics_xor = F2(function(a, b)
@@ -135,18 +99,4 @@ function _Basics_degrees(d)
 function _Basics_turns(t)
 {
 	return 2 * Math.PI * t;
-}
-
-function _Basics_fromPolar(point)
-{
-	var r = point._0;
-	var t = point._1;
-	return _Utils_Tuple2(r * Math.cos(t), r * Math.sin(t));
-}
-
-function _Basics_toPolar(point)
-{
-	var x = point._0;
-	var y = point._1;
-	return _Utils_Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
 }
