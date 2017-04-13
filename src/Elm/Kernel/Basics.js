@@ -8,6 +8,7 @@ var _Basics_mul = F2(function(a, b) { return a * b; });
 var _Basics_rem = F2(function(a, b) { return a % b; });
 var _Basics_div = F2(function(a, b) { return (a / b) | 0; });
 var _Basics_floatDiv = F2(function(a, b) { return a / b; });
+var _Basics_exp = F2(Math.pow);
 
 var _Basics_mod = F2(function(a, b)
 {
@@ -78,10 +79,9 @@ function _Basics_truncate(n)
 
 // BOOLEANS
 
-var _Basics_xor = F2(function(a, b)
-{
-	return a !== b;
-});
+var _Basics_and = F2(function(a, b) { return a && b; });
+var _Basics_or  = F2(function(a, b) { return a || b; });
+var _Basics_xor = F2(function(a, b) { return a !== b; });
 
 function _Basics_not(b)
 {
