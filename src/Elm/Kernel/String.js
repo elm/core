@@ -33,11 +33,6 @@ var _String_append = F2(function(a, b)
 	return a + b;
 });
 
-function _String_concat(strs)
-{
-	return _List_toArray(strs).join('');
-}
-
 function _String_length(str)
 {
 	return str.length;
@@ -149,12 +144,12 @@ var _String_foldr = F3(function(func, state, string)
 
 var _String_split = F2(function(sep, str)
 {
-	return _List_fromArray(str.split(sep));
+	return str.split(sep);
 });
 
 var _String_join = F2(function(sep, strs)
 {
-	return _List_toArray(strs).join(sep);
+	return strs.join(sep);
 });
 
 var _String_repeat = F2(function(n, str)

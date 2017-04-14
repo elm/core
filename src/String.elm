@@ -38,6 +38,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 -}
 
 import Char
+import Elm.Kernel.List
 import Elm.Kernel.String
 import List exposing ((::))
 import Maybe exposing (Maybe)
@@ -98,8 +99,8 @@ append =
     concat ["never","the","less"] == "nevertheless"
 -}
 concat : List String -> String
-concat =
-  Elm.Kernel.String.concat
+concat strings =
+  join "" strings
 
 
 {-| Get the length of a string.
@@ -165,8 +166,8 @@ foldr =
 
 -}
 split : String -> String -> List String
-split =
-  Elm.Kernel.String.split
+split sep string =
+  Elm.Kernel.List.fromArray (Elm.Kernel.String.split sep string)
 
 
 {-| Put many strings together with a given separator.
@@ -176,8 +177,8 @@ split =
     join "/" ["home","evan","Desktop"] == "home/evan/Desktop"
 -}
 join : String -> List String -> String
-join =
-  Elm.Kernel.String.join
+join sep chunks =
+  Elm.Kernel.String.join sep (Elm.Kernel.List.toArray chunks)
 
 
 {-| Repeat a string *n* times.
