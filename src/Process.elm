@@ -44,7 +44,6 @@ the Elm community will be supportive of being more ambitious, even if it takes
 longer. That’s kind of what Elm is all about.
 -}
 
-import Basics exposing (Never)
 import Native.Scheduler
 import Platform
 import Task exposing (Task)
@@ -103,4 +102,3 @@ flight, it will also abort the request.
 kill : Id -> Task x ()
 kill =
   Native.Scheduler.kill
-
