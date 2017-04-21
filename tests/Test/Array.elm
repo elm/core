@@ -105,6 +105,12 @@ tests =
                 , test "filter" <| \() -> Expect.equal (Array.fromList [ 2, 4, 6 ]) (Array.filter (\x -> x % 2 == 0) (Array.fromList <| List.range 1 6))
                 ]
 
+        sliceTests =
+            describe "Slice Array"
+                [ test "array < 32" <| \() -> Expect.equal (Array.initialize 31 identity |> Array.slice 31 32) (Array.fromList [])
+                , test "array == 32" <| \() -> Expect.equal (Array.initialize 32 identity |> Array.slice 32 33) (Array.fromList [])
+                ]
+
         nativeTests =
             describe "Conversion to JS Arrays"
                 [ test "jsArrays" <| \() -> Expect.equal (Array.fromList <| List.range 1 1100) (Native.Array.fromJSArray (Native.Array.toJSArray (Array.fromList <| List.range 1 1100)))
@@ -116,5 +122,6 @@ tests =
             , getAndSetTests
             , takingArraysApartTests
             , mappingAndFoldingTests
+            , sliceTests
             , nativeTests
             ]
