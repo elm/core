@@ -377,7 +377,7 @@ function runHelp(decoder, value)
 				return badPrimitive('an object', value);
 			}
 
-			var keyValuePairs = _elm_lang$core$Native_List.Nil;
+			var array = [];
 			for (var key in value)
 			{
 				var result = runHelp(decoder.decoder, value[key]);
@@ -385,10 +385,9 @@ function runHelp(decoder, value)
 				{
 					return badField(key, result);
 				}
-				var pair = _elm_lang$core$Native_Utils.Tuple2(key, result.value);
-				keyValuePairs = _elm_lang$core$Native_List.Cons(pair, keyValuePairs);
+				array.push(_elm_lang$core$Native_Utils.Tuple2(key, result.value));
 			}
-			return ok(keyValuePairs);
+			return ok(_elm_lang$core$Native_List.fromArray(array));
 
 		case 'map-many':
 			var answer = decoder.func;
