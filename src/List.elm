@@ -6,7 +6,7 @@ module List exposing
   , map, map2, map3, map4, map5
   , filterMap, concatMap, indexedMap
   , foldr, foldl
-  , sum, product, maximum, minimum, all, any, scanl
+  , sum, product, compose, maximum, minimum, all, any, scanl
   , sort, sortBy, sortWith
   )
 
@@ -40,7 +40,7 @@ The current sentiment is that it is already quite error prone once you get to
 @docs foldl, foldr
 
 # Special Folds
-@docs sum, product, maximum, minimum, all, any, scanl
+@docs sum, product, compose, maximum, minimum, all, any, scanl
 
 # Sorting
 @docs sort, sortBy, sortWith
@@ -331,6 +331,17 @@ sum numbers =
 product : List number -> number
 product numbers =
   foldl (*) 1 numbers
+
+
+{-| Compose a list of functions.
+
+    compose [(\a -> a + 1), (\a -> a * 2)]   == (\a -> a * 2 + 1)
+    compose []                               == identity
+-}
+compose : List (a -> a) -> (a -> a)
+compose modifiers =
+    modifiers
+        |> foldr (<<) identity
 
 
 {-| Find the maximum element in a non-empty list.
