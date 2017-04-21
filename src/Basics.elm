@@ -469,7 +469,7 @@ isInfinite =
 
 
 {-| Turn any kind of value into a string. When you view the resulting string
-with `Text.fromString` it should look just like the value it came from.
+with `Text.toString` it should look just like the value it came from.
 
     toString 42 == "42"
     toString [1,2] == "[1,2]"
