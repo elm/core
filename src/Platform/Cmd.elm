@@ -60,7 +60,10 @@ none =
   batch []
 
 
-{-|-}
+{-| Instead of using the tuple form and writing `(model, Cmd.none)` a bunch of times in your update 
+function, `!` is a useful shorthand. `model ! []` is the same as `(model, Cmd.none)`,
+and `model ! [cmd1, cmd2]` is the same as `(model, Cmd.batch [cmd1, cmd2])`.
+-}
 (!) : model -> List (Cmd msg) -> (model, Cmd msg)
 (!) model commands =
   (model, batch commands)
