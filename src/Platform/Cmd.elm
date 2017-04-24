@@ -48,7 +48,26 @@ map =
   Native.Platform.map
 
 
-{-|-}
+{-| Fold many `Cmd` together. Useful for combining things like HTTP
+requests:
+
+    import Http
+
+    type Msg = Res (Result Http.Error String)
+
+    someCall : Http.Request String
+    someCall = ...
+
+    -- Make three HTTP requests at the "same time".
+    combined : Cmd Msg
+    combined =
+      Cmd.batch [ Http.send Res someCall
+                , Http.send Res someCall
+                , Http.send Res someCall ]
+
+**Note:** Even though the original `List` is ordered, the order of execution
+of its `Cmd` is not guaranteed.
+-}
 batch : List (Cmd msg) -> Cmd msg
 batch =
   Native.Platform.batch
@@ -64,4 +83,3 @@ none =
 (!) : model -> List (Cmd msg) -> (model, Cmd msg)
 (!) model commands =
   (model, batch commands)
-
