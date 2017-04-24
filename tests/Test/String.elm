@@ -11,14 +11,17 @@ import Expect
 
 tests : Test
 tests =
+
     let
         simpleTests =
             describe "Simple Stuff"
                 [ test "is empty" <| \() -> Expect.equal True (String.isEmpty "")
                 , test "is not empty" <| \() -> Expect.equal True (not (String.isEmpty ("the world")))
                 , test "length" <| \() -> Expect.equal 11 (String.length "innumerable")
+                , test "length astral" <| \() -> Expect.equal 1 (String.length "𝌆")
                 , test "endsWith" <| \() -> Expect.equal True <| String.endsWith "ship" "spaceship"
                 , test "reverse" <| \() -> Expect.equal "desserts" (String.reverse "stressed")
+                , test "reverse astral and combining" <| \() -> Expect.equal "ma͒n𝌆" (String.reverse "𝌆na͒m")
                 , test "repeat" <| \() -> Expect.equal "hahaha" (String.repeat 3 "ha")
                 , test "indexes" <| \() -> Expect.equal [ 0, 2 ] (String.indexes "a" "aha")
                 , test "empty indexes" <| \() -> Expect.equal [] (String.indexes "" "aha")
