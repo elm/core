@@ -23,7 +23,7 @@ import Tuple
 import Debug
 
 import Platform exposing ( Program )
-import Platform.Cmd exposing ( Cmd, (!) )
+import Platform.Cmd exposing ( Cmd )
 import Platform.Sub exposing ( Sub )
 ```
 

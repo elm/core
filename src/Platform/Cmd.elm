@@ -3,7 +3,6 @@ module Platform.Cmd exposing
   , map
   , batch
   , none
-  , (!)
   )
 
 {-|
@@ -19,7 +18,7 @@ Elm is so nice for testing, reuse, reproducibility, etc.
 There are two kinds of managed effects you will use in your programs: commands
 and subscriptions.
 
-@docs Cmd, map, batch, none, (!)
+@docs Cmd, map, batch, none
 
 -}
 
@@ -58,10 +57,4 @@ batch =
 none : Cmd msg
 none =
   batch []
-
-
-{-|-}
-(!) : model -> List (Cmd msg) -> (model, Cmd msg)
-(!) model commands =
-  (model, batch commands)
 
