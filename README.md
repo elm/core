@@ -18,7 +18,7 @@ import List exposing ( List, (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )
 import Result exposing ( Result( Ok, Err ) )
 import String
-import Tuple
+import Tuple exposing ( (=>) )
 
 import Debug
 
