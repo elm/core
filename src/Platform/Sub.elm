@@ -1,16 +1,33 @@
 module Platform.Sub exposing
   ( Sub
-  , map
-  , batch
   , none
+  , batch
+  , map
   )
 
 {-|
 
-@docs Sub, map, batch, none
+> **Note:** Elm has **managed effects**, meaning that things like HTTP
+> requests or writing to disk are all treated as *data* in Elm. When this
+> data is given to the Elm runtime system, it can do some “query optimization”
+> before actually performing the effect. Perhaps unexpectedly, this managed
+> effects idea is the heart of why Elm is so nice for testing, reuse,
+> reproducibility, etc.
+>
+> Elm has two kinds of managed effects: commands and subscriptions.
+
+# Subscriptions
+@docs Sub, none, batch
+
+# Fancy Stuff
+@docs map
 -}
 
 import Elm.Kernel.Platform
+
+
+
+-- SUBSCRIPTIONS
 
 
 {-| A subscription is a way of telling Elm, “Hey, let me know if anything
@@ -26,27 +43,43 @@ messages that will come back into your application.
 
 **Note:** Do not worry if this seems confusing at first! As with every Elm user
 ever, subscriptions will make more sense as you work through [the Elm Architecture
-Tutorial](http://guide.elm-lang.org/architecture/index.html) and see how they fit
+Tutorial](http://guide.elm-lang.org/architecture/) and see how they fit
 into a real application!
 -}
 type Sub msg = Sub
 
 
-{-|-}
-map : (a -> msg) -> Sub a -> Sub msg
-map =
-  Elm.Kernel.Platform.map
-
-
-{-|-}
-batch : List (Sub msg) -> Sub msg
-batch =
-  Elm.Kernel.Platform.batch
-
-
-{-|-}
+{-| Tell the runtime that there are no subscriptions.
+-}
 none : Sub msg
 none =
   batch []
 
 
+{-| When you need to subscribe to multiple things, you can create a `batch` of
+subscriptions.
+
+**Note:** `Sub.none` and `Sub.batch [ Sub.none, Sub.none ]` and
+`Sub.batch []` all do the same thing.
+-}
+batch : List (Sub msg) -> Sub msg
+batch =
+  Elm.Kernel.Platform.batch
+
+
+
+-- FANCY STUFF
+
+
+{-| Transform the messages produced by a subscription.
+Very similar to [`Html.map`](/packages/elm-lang/html/latest/Html#map).
+
+This is very rarely useful in well-structured Elm code, so definitely read the
+sections on [reuse][] and [modularity][] in the guide before reaching for this!
+
+[reuse]: https://guide.elm-lang.org/reuse/
+[modularity]: https://guide.elm-lang.org/modularity/
+-}
+map : (a -> msg) -> Sub a -> Sub msg
+map =
+  Elm.Kernel.Platform.map
