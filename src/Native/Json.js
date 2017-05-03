@@ -428,6 +428,21 @@ function runHelp(decoder, value)
 			}
 			return badOneOf(errors);
 
+		case 'file':
+			var errors = [];
+			if (value instanceof File)
+ 			{
+				return {
+					ctor: '_File',
+					lastModified: value.lastModified,
+					name: value.name,
+				};
+			}
+			else
+			{
+				return badPrimitive('the object has to be of type File', value);
+			}
+
 		case 'fail':
 			return bad(decoder.msg);
 
