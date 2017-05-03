@@ -53,7 +53,7 @@ function eqHelp(x, y, depth, stack)
 		return x.getTime() === y.getTime();
 	}
 
-	if (!('ctor' in x))
+	if (typeof x.ctor === 'undefined')
 	{
 		for (var key in x)
 		{
@@ -347,7 +347,7 @@ function toString(v)
 		return 'null';
 	}
 
-	if (type === 'object' && 'ctor' in v)
+	if (type === 'object' && typeof v.ctor !== 'undefined')
 	{
 		var ctorStarter = v.ctor.substring(0, 5);
 
@@ -356,8 +356,9 @@ function toString(v)
 			var output = [];
 			for (var k in v)
 			{
-				if (k === 'ctor') continue;
-				output.push(toString(v[k]));
+				var val = v[k];
+				if (val === v.ctor) continue;
+				output.push(toString(val));
 			}
 			return '(' + output.join(',') + ')';
 		}
@@ -413,8 +414,9 @@ function toString(v)
 		var output = '';
 		for (var i in v)
 		{
-			if (i === 'ctor') continue;
-			var str = toString(v[i]);
+			var val = v[i];
+			if (val === v.ctor) continue;
+			var str = toString(val);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
