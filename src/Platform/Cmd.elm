@@ -65,3 +65,8 @@ none =
 (!) model commands =
   (model, batch commands)
 
+
+{-| Alias for `!`. `{ ...model... } `withCmds` [cmdA, cmdB]` -}
+withCmds : model -> List (Cmd msg) -> (model, Cmd msg)
+withCmds : model commands =
+  model ! batch commands
