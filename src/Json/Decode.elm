@@ -166,6 +166,8 @@ dict decoder =
 
     decodeString (keyValuePairs int) "{ \"alice\": 42, \"bob\": 99 }"
       == [("alice", 42), ("bob", 99)]
+
+**Note:** The order of the elements in the returned `List` is not guaranteed.
 -}
 keyValuePairs : Decoder a -> Decoder (List (String, a))
 keyValuePairs =
