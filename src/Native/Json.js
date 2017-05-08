@@ -173,11 +173,6 @@ function badField(field, nestedProblems)
 	return { tag: 'field', field: field, rest: nestedProblems };
 }
 
-function badIndex(index, nestedProblems)
-{
-	return { tag: 'index', index: index, rest: nestedProblems };
-}
-
 function badOneOf(problems)
 {
 	return { tag: 'oneOf', problems: problems };
