@@ -214,20 +214,6 @@ function _Utils_chr(c)
 	return new String(c);
 }
 
-function _Basics_fromPolar(point)
-{
-	var r = point._0;
-	var t = point._1;
-	return _Utils_Tuple2(r * Math.cos(t), r * Math.sin(t));
-}
-
-function _Basics_toPolar(point)
-{
-	var x = point._0;
-	var y = point._1;
-	return _Utils_Tuple2(Math.sqrt(x * x + y * y), Math.atan2(y, x));
-}
-
 
 // RECORDS
 

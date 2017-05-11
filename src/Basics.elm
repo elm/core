@@ -84,14 +84,14 @@ turns =
 
 {-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
 fromPolar : (Float,Float) -> (Float,Float)
-fromPolar =
-  Elm.Kernel.Utils.fromPolar
+fromPolar ( radius, theta ) =
+  ( radius * cos theta, radius * sin theta )
 
 
 {-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
 toPolar : (Float,Float) -> (Float,Float)
-toPolar =
-  Elm.Kernel.Utils.toPolar
+toPolar ( x, y ) =
+  ( sqrt (x * x + y * y), atan2 y x )
 
 
 {-|-}
