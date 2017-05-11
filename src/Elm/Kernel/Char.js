@@ -1,3 +1,4 @@
+// import Elm.Kernel.Utils
 
 function _Char_toCode(char)
 {
