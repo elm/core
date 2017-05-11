@@ -174,15 +174,6 @@ var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_GT; });
 var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_GT; });
 var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_LT; });
 
-var _Utils_clamp = F3(function(lo, hi, n)
-{
-	return _Utils_cmp(n, lo) < 0
-		? lo
-		: _Utils_cmp(n, hi) > 0
-			? hi
-			: n;
-});
-
 var _Utils_ordTable = ['LT', 'EQ', 'GT'];
 
 var _Utils_compare = F2(function(x, y)

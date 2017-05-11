@@ -257,8 +257,13 @@ logBase =
     200     if 200 <= x
 -}
 clamp : number -> number -> number -> number
-clamp =
-  Elm.Kernel.Utils.clamp
+clamp low high number =
+  if number < low then
+    low
+  else if number > high then
+    high
+  else
+    number
 
 
 {-| An approximation of pi. -}
