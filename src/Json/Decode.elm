@@ -71,7 +71,7 @@ type Decoder a = Decoder
 -}
 string : Decoder String
 string =
-  Elm.Kernel.Json.decodePrimitive "string"
+  Elm.Kernel.Json.decodePrimitive "_d_string"
 
 
 {-| Decode a JSON boolean into an Elm `Bool`.
@@ -84,7 +84,7 @@ string =
 -}
 bool : Decoder Bool
 bool =
-  Elm.Kernel.Json.decodePrimitive "bool"
+  Elm.Kernel.Json.decodePrimitive "_d_bool"
 
 
 {-| Decode a JSON number into an Elm `Int`.
@@ -97,7 +97,7 @@ bool =
 -}
 int : Decoder Int
 int =
-  Elm.Kernel.Json.decodePrimitive "int"
+  Elm.Kernel.Json.decodePrimitive "_d_int"
 
 
 {-| Decode a JSON number into an Elm `Float`.
@@ -110,7 +110,7 @@ int =
 -}
 float : Decoder Float
 float =
-  Elm.Kernel.Json.decodePrimitive "float"
+  Elm.Kernel.Json.decodePrimitive "_d_float"
 
 
 
@@ -139,7 +139,7 @@ nullable decoder =
 -}
 list : Decoder a -> Decoder (List a)
 list decoder =
-  Elm.Kernel.Json.decodeContainer "list" decoder
+  Elm.Kernel.Json.decodeContainer "_d_list" decoder
 
 
 {-| Decode a JSON array into an Elm `Array`.
@@ -149,7 +149,7 @@ list decoder =
 -}
 array : Decoder a -> Decoder (Array a)
 array decoder =
-  Elm.Kernel.Json.decodeContainer "array" decoder
+  Elm.Kernel.Json.decodeContainer "_d_array" decoder
 
 
 {-| Decode a JSON object into an Elm `Dict`.
@@ -250,7 +250,7 @@ fields, this means you probably want it *outside* a use of `field` or `at`.
 -}
 maybe : Decoder a -> Decoder (Maybe a)
 maybe decoder =
-  Elm.Kernel.Json.decodeContainer "maybe" decoder
+  Elm.Kernel.Json.decodeContainer "_d_maybe" decoder
 
 
 {-| Try a bunch of different decoders. This can be useful if the JSON may come
@@ -503,7 +503,7 @@ about its structure.
 -}
 value : Decoder Value
 value =
-  Elm.Kernel.Json.decodePrimitive "value"
+  Elm.Kernel.Json.decodePrimitive "_d_value"
 
 
 {-| Decode a `null` value into some Elm value.

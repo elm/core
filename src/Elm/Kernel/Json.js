@@ -10,8 +10,7 @@
 function _Json_succeed(msg)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'succeed',
+		ctor: '_d_succeed',
 		msg: msg
 	};
 }
@@ -19,8 +18,7 @@ function _Json_succeed(msg)
 function _Json_fail(msg)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'fail',
+		ctor: '_d_fail',
 		msg: msg
 	};
 }
@@ -28,16 +26,14 @@ function _Json_fail(msg)
 function _Json_decodePrimitive(tag)
 {
 	return {
-		ctor: '<decoder>',
-		tag: tag
+		ctor: tag
 	};
 }
 
 var _Json_decodeContainer = F2(function(tag, decoder)
 {
 	return {
-		ctor: '<decoder>',
-		tag: tag,
+		ctor: tag,
 		decoder: decoder
 	};
 });
@@ -45,8 +41,7 @@ var _Json_decodeContainer = F2(function(tag, decoder)
 function _Json_decodeNull(value)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'null',
+		ctor: '_d_null',
 		value: value
 	};
 }
@@ -54,8 +49,7 @@ function _Json_decodeNull(value)
 var _Json_decodeField = F2(function(field, decoder)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'field',
+		ctor: '_d_field',
 		field: field,
 		decoder: decoder
 	};
@@ -64,8 +58,7 @@ var _Json_decodeField = F2(function(field, decoder)
 var _Json_decodeIndex = F2(function(index, decoder)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'index',
+		ctor: '_d_index',
 		index: index,
 		decoder: decoder
 	};
@@ -74,8 +67,7 @@ var _Json_decodeIndex = F2(function(index, decoder)
 function _Json_decodeKeyValuePairs(decoder)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'key-value',
+		ctor: '_d_key_value',
 		decoder: decoder
 	};
 }
@@ -83,8 +75,7 @@ function _Json_decodeKeyValuePairs(decoder)
 function _Json_mapMany(f, decoders)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'map-many',
+		ctor: '_d_map',
 		func: f,
 		decoders: decoders
 	};
@@ -93,8 +84,7 @@ function _Json_mapMany(f, decoders)
 var _Json_andThen = F2(function(callback, decoder)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'andThen',
+		ctor: '_d_andThen',
 		decoder: decoder,
 		callback: callback
 	};
@@ -103,8 +93,7 @@ var _Json_andThen = F2(function(callback, decoder)
 function _Json_oneOf(decoders)
 {
 	return {
-		ctor: '<decoder>',
-		tag: 'oneOf',
+		ctor: '_d_oneOf',
 		decoders: decoders
 	};
 }
@@ -163,11 +152,6 @@ function _Json_ok(value)
 function _Json_badPrimitive(type, value)
 {
 	return { tag: 'primitive', type: type, value: value };
-}
-
-function _Json_badIndex(index, nestedProblems)
-{
-	return { tag: 'index', index: index, rest: nestedProblems };
 }
 
 function _Json_badField(field, nestedProblems)
@@ -264,14 +248,14 @@ var _Json_run = F2(function(decoder, value)
 
 function _Json_runHelp(decoder, value)
 {
-	switch (decoder.tag)
+	switch (decoder.ctor)
 	{
-		case 'bool':
+		case '_d_bool':
 			return (typeof value === 'boolean')
 				? _Json_ok(value)
 				: _Json_badPrimitive('a Bool', value);
 
-		case 'int':
+		case '_d_int':
 			if (typeof value !== 'number') {
 				return _Json_badPrimitive('an Int', value);
 			}
@@ -286,27 +270,27 @@ function _Json_runHelp(decoder, value)
 
 			return _Json_badPrimitive('an Int', value);
 
-		case 'float':
+		case '_d_float':
 			return (typeof value === 'number')
 				? _Json_ok(value)
 				: _Json_badPrimitive('a Float', value);
 
-		case 'string':
+		case '_d_string':
 			return (typeof value === 'string')
 				? _Json_ok(value)
 				: (value instanceof String)
 					? _Json_ok(value + '')
 					: _Json_badPrimitive('a String', value);
 
-		case 'null':
+		case '_d_null':
 			return (value === null)
 				? _Json_ok(decoder.value)
 				: _Json_badPrimitive('null', value);
 
-		case 'value':
+		case '_d_value':
 			return _Json_ok(value);
 
-		case 'list':
+		case '_d_list':
 			if (!(value instanceof Array))
 			{
 				return _Json_badPrimitive('a List', value);
@@ -324,7 +308,7 @@ function _Json_runHelp(decoder, value)
 			}
 			return _Json_ok(list);
 
-		case 'array':
+		case '_d_array':
 			if (!(value instanceof Array))
 			{
 				return _Json_badPrimitive('an Array', value);
@@ -346,13 +330,13 @@ function _Json_runHelp(decoder, value)
 			});
 			return _Json_ok(elmArray);
 
-		case 'maybe':
+		case '_d_maybe':
 			var result = _Json_runHelp(decoder.decoder, value);
 			return (result.tag === 'ok')
 				? _Json_ok(__Maybe_Just(result.value))
 				: _Json_ok(__Maybe_Nothing);
 
-		case 'field':
+		case '_d_field':
 			var field = decoder.field;
 			if (typeof value !== 'object' || value === null || !(field in value))
 			{
@@ -362,7 +346,7 @@ function _Json_runHelp(decoder, value)
 			var result = _Json_runHelp(decoder.decoder, value[field]);
 			return (result.tag === 'ok') ? result : _Json_badField(field, result);
 
-		case 'index':
+		case '_d_index':
 			var index = decoder.index;
 			if (!(value instanceof Array))
 			{
@@ -376,7 +360,7 @@ function _Json_runHelp(decoder, value)
 			var result = _Json_runHelp(decoder.decoder, value[index]);
 			return (result.tag === 'ok') ? result : _Json_badIndex(index, result);
 
-		case 'key-value':
+		case '_d_key_value':
 			if (typeof value !== 'object' || value === null || value instanceof Array)
 			{
 				return _Json_badPrimitive('an object', value);
@@ -395,7 +379,7 @@ function _Json_runHelp(decoder, value)
 			}
 			return _Json_ok(keyValuePairs);
 
-		case 'map-many':
+		case '_d_map':
 			var answer = decoder.func;
 			var decoders = decoder.decoders;
 			for (var i = 0; i < decoders.length; i++)
@@ -409,13 +393,13 @@ function _Json_runHelp(decoder, value)
 			}
 			return _Json_ok(answer);
 
-		case 'andThen':
+		case '_d_andThen':
 			var result = _Json_runHelp(decoder.decoder, value);
 			return (result.tag !== 'ok')
 				? result
 				: _Json_runHelp(decoder.callback(result.value), value);
 
-		case 'oneOf':
+		case '_d_oneOf':
 			var errors = [];
 			var temp = decoder.decoders;
 			while (temp.ctor !== '[]')
@@ -433,10 +417,10 @@ function _Json_runHelp(decoder, value)
 			}
 			return _Json_badOneOf(errors);
 
-		case 'fail':
+		case '_d_fail':
 			return _Json_bad(decoder.msg);
 
-		case 'succeed':
+		case '_d_succeed':
 			return _Json_ok(decoder.msg);
 	}
 }
@@ -451,50 +435,50 @@ function _Json_equality(a, b)
 		return true;
 	}
 
-	if (a.tag !== b.tag)
+	if (a.ctor !== b.ctor)
 	{
 		return false;
 	}
 
-	switch (a.tag)
+	switch (a.ctor)
 	{
-		case 'succeed':
-		case 'fail':
+		case '_d_succeed':
+		case '_d_fail':
 			return a.msg === b.msg;
 
-		case 'bool':
-		case 'int':
-		case 'float':
-		case 'string':
-		case 'value':
+		case '_d_bool':
+		case '_d_int':
+		case '_d_float':
+		case '_d_string':
+		case '_d_value':
 			return true;
 
-		case 'null':
+		case '_d_null':
 			return a.value === b.value;
 
-		case 'list':
-		case 'array':
-		case 'maybe':
-		case 'key-value':
+		case '_d_list':
+		case '_d_array':
+		case '_d_maybe':
+		case '_d_key_value':
 			return _Json_equality(a.decoder, b.decoder);
 
-		case 'field':
+		case '_d_field':
 			return a.field === b.field && _Json_equality(a.decoder, b.decoder);
 
-		case 'index':
+		case '_d_index':
 			return a.index === b.index && _Json_equality(a.decoder, b.decoder);
 
-		case 'map-many':
+		case '_d_map':
 			if (a.func !== b.func)
 			{
 				return false;
 			}
 			return _Json_listEquality(a.decoders, b.decoders);
 
-		case 'andThen':
+		case '_d_andThen':
 			return a.callback === b.callback && _Json_equality(a.decoder, b.decoder);
 
-		case 'oneOf':
+		case '_d_oneOf':
 			return _Json_listEquality(a.decoders, b.decoders);
 	}
 }
