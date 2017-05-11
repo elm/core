@@ -70,16 +70,16 @@ radians t =
 
 {-| Convert degrees to standard Elm angles (radians). -}
 degrees : Float -> Float
-degrees =
-  Elm.Kernel.Basics.degrees
+degrees degs =
+  degs * pi / 180
 
 
 {-| Convert turns to standard Elm angles (radians).
 One turn is equal to 360&deg;.
 -}
 turns : Float -> Float
-turns =
-  Elm.Kernel.Basics.turns
+turns ts =
+  2 * pi * ts
 
 
 {-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}

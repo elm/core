@@ -82,16 +82,3 @@ function _Basics_not(b)
 {
 	return !b;
 }
-
-
-// ANGLES
-
-function _Basics_degrees(d)
-{
-	return d * Math.PI / 180;
-}
-
-function _Basics_turns(t)
-{
-	return 2 * Math.PI * t;
-}
