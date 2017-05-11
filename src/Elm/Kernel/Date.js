@@ -1,11 +1,12 @@
 // import Elm.Kernel.Utils
+// import Result exposing (Result(Ok,Err))
 
 function _Date_fromString(str)
 {
 	var date = new Date(str);
 	return isNaN(date.getTime())
-		? _elm_lang$core$Result$Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
-		: _elm_lang$core$Result$Ok(date);
+		? __Result_Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
+		: __Result_Ok(date);
 }
 
 function _Date_year(d)

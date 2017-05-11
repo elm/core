@@ -1,5 +1,8 @@
+// import Array exposing (initialize)
 // import Elm.Kernel.List
 // import Elm.Kernel.Utils
+// import Maybe exposing (Maybe(Just,Nothing))
+// import Result exposing (Result(Ok,Err))
 
 
 // CORE DECODERS
@@ -246,7 +249,7 @@ var _Json_runOnString = F2(function(decoder, string)
 	}
 	catch (e)
 	{
-		return elm_lang$core$Result$Err('Given an invalid JSON: ' + e.message);
+		return __Result_Err('Given an invalid JSON: ' + e.message);
 	}
 	return run(decoder, json);
 });
@@ -255,8 +258,8 @@ var _Json_run = F2(function(decoder, value)
 {
 	var result = _Json_runHelp(decoder, value);
 	return (result.tag === 'ok')
-		? elm_lang$core$Result$Ok(result.value)
-		: elm_lang$core$Result$Err(_Json_badToString(result));
+		? __Result_Ok(result.value)
+		: __Result_Err(_Json_badToString(result));
 });
 
 function _Json_runHelp(decoder, value)
@@ -338,7 +341,7 @@ function _Json_runHelp(decoder, value)
 				}
 				array[i] = result.value;
 			}
-			var elmArray = A2(elm_lang$core$Array$initialize, array.length, function (idx) {
+			var elmArray = A2(__Array_initialize, array.length, function (idx) {
 				return array[idx];
 			});
 			return _Json_ok(elmArray);
@@ -346,8 +349,8 @@ function _Json_runHelp(decoder, value)
 		case 'maybe':
 			var result = _Json_runHelp(decoder.decoder, value);
 			return (result.tag === 'ok')
-				? _Json_ok(elm_lang$core$Maybe$Just(result.value))
-				: _Json_ok(elm_lang$core$Maybe$Nothing);
+				? _Json_ok(__Maybe_Just(result.value))
+				: _Json_ok(__Maybe_Nothing);
 
 		case 'field':
 			var field = decoder.field;

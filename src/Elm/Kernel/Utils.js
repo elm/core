@@ -1,4 +1,7 @@
+// import Array exposing (toList)
+// import Dict exposing (toList)
 // import Elm.Kernel.List
+// import Set exposing (toList)
 
 
 // EQUALITY
@@ -66,13 +69,13 @@ function _Utils_eqHelp(x, y, depth, stack)
 	// convert Dicts and Sets to lists
 	if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
 	{
-		x = elm_lang$core$Dict$toList(x);
-		y = elm_lang$core$Dict$toList(y);
+		x = __Dict_toList(x);
+		y = __Dict_toList(y);
 	}
 	if (x.ctor === 'Set_elm_builtin')
 	{
-		x = elm_lang$core$Set$toList(x);
-		y = elm_lang$core$Set$toList(y);
+		x = __Set_toList(x);
+		y = __Set_toList(y);
 	}
 
 	// check if lists are equal without recursion
@@ -346,7 +349,7 @@ function _Utils_toString(v)
 
 		if (v.ctor === 'Array')
 		{
-			var list = elm_lang$core$Array$toList(v);
+			var list = __Array_toList(v);
 			return 'Array.fromList ' + _Utils_toString(list);
 		}
 
@@ -379,12 +382,12 @@ function _Utils_toString(v)
 
 		if (v.ctor === 'Set_elm_builtin')
 		{
-			return 'Set.fromList ' + _Utils_toString(elm_lang$core$Set$toList(v));
+			return 'Set.fromList ' + _Utils_toString(__Set_toList(v));
 		}
 
 		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin')
 		{
-			return 'Dict.fromList ' + _Utils_toString(elm_lang$core$Dict$toList(v));
+			return 'Dict.fromList ' + _Utils_toString(__Dict_toList(v));
 		}
 
 		var output = '';

@@ -1,5 +1,7 @@
 // import Elm.Kernel.List
 // import Elm.Kernel.Utils
+// import Maybe exposing (Maybe(Just,Nothing))
+// import Result exposing (Result(Ok,Err))
 
 
 function _String_isEmpty(str)
@@ -16,7 +18,7 @@ function _String_uncons(string)
 {
 	if (string.length === 0)
 	{
-		return elm_lang$core$Maybe$Nothing;
+		return __Maybe_Nothing;
 	}
 	var char = string[i];
 	var offset = 1;
@@ -26,7 +28,7 @@ function _String_uncons(string)
 		char += string[i+1];
 		offset = 2;
 	}
-	return elm_lang$core$Maybe$Just(
+	return __Maybe_Just(
 		_Utils_Tuple2(_Utils_chr(char), string.slice(offset))
 	);
 }
@@ -345,7 +347,7 @@ function _String_toInt(s)
 			}
 			return _String_intErr(s);
 		}
-		return elm_lang$core$Result$Ok(parseInt(s, 16));
+		return __Result_Ok(parseInt(s, 16));
 	}
 
 	// is decimal
@@ -362,12 +364,12 @@ function _String_toInt(s)
 		}
 	}
 
-	return elm_lang$core$Result$Ok(parseInt(s, 10));
+	return __Result_Ok(parseInt(s, 10));
 }
 
 function _String_intErr(s)
 {
-	return elm_lang$core$Result$Err('could not convert string "' + s + '" to an Int');
+	return __Result_Err('could not convert string "' + s + '" to an Int');
 }
 
 
@@ -380,12 +382,12 @@ function _String_toFloat(s)
 	}
 	var n = +s;
 	// faster isNaN check
-	return n === n ? elm_lang$core$Result$Ok(n) : _String_floatErr(s);
+	return n === n ? __Result_Ok(n) : _String_floatErr(s);
 }
 
 function _String_floatErr(s)
 {
-	return elm_lang$core$Result$Err('could not convert string "' + s + '" to a Float');
+	return __Result_Err('could not convert string "' + s + '" to a Float');
 }
 
 function _String_fromList(chars)
