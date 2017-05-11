@@ -358,13 +358,21 @@ The relations are less than, equal to, and greater than.
 type Order = LT | EQ | GT
 
 
-{-| Find the smaller of two comparables. -}
+{-| Find the smaller of two comparables.
+
+    min 42 12345678 == 42
+    min "abc" "xyz" == "abc"
+-}
 min : comparable -> comparable -> comparable
 min x y =
   if x < y then x else y
 
 
-{-| Find the larger of two comparables. -}
+{-| Find the larger of two comparables.
+
+    max 42 12345678 == 12345678
+    max "abc" "xyz" == "xyz"
+-}
 max : comparable -> comparable -> comparable
 max x y =
   if x > y then x else y
