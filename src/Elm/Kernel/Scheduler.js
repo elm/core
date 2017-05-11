@@ -65,7 +65,7 @@ var _Scheduler_guid = 0;
 function _Scheduler_rawSpawn(task)
 {
 	var process = {
-		ctor: '_Process',
+		ctor: '_p',
 		id: _Scheduler_guid++,
 		root: task,
 		stack: null,
