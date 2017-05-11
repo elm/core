@@ -1,4 +1,4 @@
-// import Elm.Kernel.Utils
+// import Elm.Kernel.Utils exposing (cmp)
 
 var _List_Nil = { ctor: '[]' };
 
@@ -105,7 +105,7 @@ var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
 var _List_sortBy = F2(function(f, xs)
 {
 	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
+		return __Utils_cmp(f(a), f(b));
 	}));
 });
 

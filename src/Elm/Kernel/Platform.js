@@ -1,7 +1,7 @@
-// import Elm.Kernel.Json
-// import Elm.Kernel.List
-// import Elm.Kernel.Scheduler
-// import Elm.Kernel.Utils
+// import Elm.Kernel.Json exposing (run)
+// import Elm.Kernel.List exposing (Cons, Nil)
+// import Elm.Kernel.Scheduler exposing (andThen, nativeBinding, rawSend, rawSpawn, receive, send, succeed)
+// import Elm.Kernel.Utils exposing (Tuple0)
 
 
 // PROGRAMS
@@ -50,7 +50,7 @@ function _Platform_programWithFlags(impl)
 					);
 				}
 
-				var result = A2(_Json_run, flagDecoder, flags);
+				var result = A2(__Json_run, flagDecoder, flags);
 				if (result.ctor === 'Err')
 				{
 					throw new Error(
@@ -86,25 +86,25 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 	var updateView;
 
 	// init and update state in main process
-	var initApp = _Scheduler_nativeBinding(function(callback) {
+	var initApp = __Scheduler_nativeBinding(function(callback) {
 		var model = init._0;
 		updateView = renderer(enqueue, model);
 		var cmds = init._1;
 		var subs = subscriptions(model);
 		_Platform_dispatchEffects(managers, cmds, subs);
-		callback(_Scheduler_succeed(model));
+		callback(__Scheduler_succeed(model));
 	});
 
 	function onMessage(msg, model)
 	{
-		return _Scheduler_nativeBinding(function(callback) {
+		return __Scheduler_nativeBinding(function(callback) {
 			var results = A2(update, msg, model);
 			model = results._0;
 			updateView(model);
 			var cmds = results._1;
 			var subs = subscriptions(model);
 			_Platform_dispatchEffects(managers, cmds, subs);
-			callback(_Scheduler_succeed(model));
+			callback(__Scheduler_succeed(model));
 		});
 	}
 
@@ -112,7 +112,7 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 
 	function enqueue(msg)
 	{
-		_Scheduler_rawSend(mainProcess, msg);
+		__Scheduler_rawSend(mainProcess, msg);
 	}
 
 	var ports = _Platform_setupEffects(managers, enqueue);
@@ -187,16 +187,16 @@ function _Platform_makeManager(info, callback)
 
 var _Platform_sendToApp = F2(function(router, msg)
 {
-	return _Scheduler_nativeBinding(function(callback)
+	return __Scheduler_nativeBinding(function(callback)
 	{
 		router.main(msg);
-		callback(_Scheduler_succeed(_Utils_Tuple0));
+		callback(__Scheduler_succeed(__Utils_Tuple0));
 	});
 });
 
 var _Platform_sendToSelf = F2(function(router, msg)
 {
-	return A2(_Scheduler_send, router.self, {
+	return A2(__Scheduler_send, router.self, {
 		ctor: 'self',
 		_0: msg
 	});
@@ -209,15 +209,15 @@ function _Platform_spawnLoop(init, onMessage)
 {
 	function loop(state)
 	{
-		var handleMsg = _Scheduler_receive(function(msg) {
+		var handleMsg = __Scheduler_receive(function(msg) {
 			return onMessage(msg, state);
 		});
-		return A2(_Scheduler_andThen, loop, handleMsg);
+		return A2(__Scheduler_andThen, loop, handleMsg);
 	}
 
-	var task = A2(_Scheduler_andThen, loop, init);
+	var task = A2(__Scheduler_andThen, loop, init);
 
-	return _Scheduler_rawSpawn(task);
+	return __Scheduler_rawSpawn(task);
 }
 
 
@@ -265,9 +265,9 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 	{
 		var fx = home in effectsDict
 			? effectsDict[home]
-			: { cmds: _List_Nil, subs: _List_Nil };
+			: { cmds: __List_Nil, subs: __List_Nil };
 
-		_Scheduler_rawSend(managers[home], { ctor: 'fx', _0: fx });
+		__Scheduler_rawSend(managers[home], { ctor: 'fx', _0: fx });
 	}
 }
 
@@ -321,14 +321,14 @@ function _Platform_toEffect(isCmd, home, taggers, value)
 
 function _Platform_insert(isCmd, newEffect, effects)
 {
-	effects = effects || { cmds: _List_Nil, subs: _List_Nil };
+	effects = effects || { cmds: __List_Nil, subs: __List_Nil };
 
 	if (isCmd)
 	{
-		effects.cmds = _List_Cons(newEffect, effects.cmds);
+		effects.cmds = __List_Cons(newEffect, effects.cmds);
 		return effects;
 	}
-	effects.subs = _List_Cons(newEffect, effects.subs);
+	effects.subs = __List_Cons(newEffect, effects.subs);
 	return effects;
 }
 
@@ -367,7 +367,7 @@ function _Platform_setupOutgoingPort(name)
 
 	// CREATE MANAGER
 
-	var init = _Scheduler_succeed(null);
+	var init = __Scheduler_succeed(null);
 
 	function onEffects(router, cmdList, state)
 	{
@@ -439,14 +439,14 @@ var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
 function _Platform_setupIncomingPort(name, callback)
 {
 	var sentBeforeInit = [];
-	var subs = _List_Nil;
+	var subs = __List_Nil;
 	var converter = _Platform_effectManagers[name].converter;
 	var currentOnEffects = preInitOnEffects;
 	var currentSend = preInitSend;
 
 	// CREATE MANAGER
 
-	var init = _Scheduler_succeed(null);
+	var init = __Scheduler_succeed(null);
 
 	function preInitOnEffects(router, subList, state)
 	{
@@ -496,7 +496,7 @@ function _Platform_setupIncomingPort(name, callback)
 
 	function send(incomingValue)
 	{
-		var result = A2(_Json_run, converter, incomingValue);
+		var result = A2(__Json_run, converter, incomingValue);
 		if (result.ctor === 'Err')
 		{
 			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);

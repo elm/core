@@ -1,6 +1,6 @@
 // import Array exposing (initialize)
-// import Elm.Kernel.List
-// import Elm.Kernel.Utils
+// import Elm.Kernel.List exposing (Cons, Nil)
+// import Elm.Kernel.Utils exposing (Tuple2)
 // import Maybe exposing (Maybe(Just,Nothing))
 // import Result exposing (Result(Ok,Err))
 
@@ -312,7 +312,7 @@ function _Json_runHelp(decoder, value)
 				return _Json_badPrimitive('a List', value);
 			}
 
-			var list = _List_Nil;
+			var list = __List_Nil;
 			for (var i = value.length; i--; )
 			{
 				var result = _Json_runHelp(decoder.decoder, value[i]);
@@ -320,7 +320,7 @@ function _Json_runHelp(decoder, value)
 				{
 					return _Json_badIndex(i, result)
 				}
-				list = _List_Cons(result.value, list);
+				list = __List_Cons(result.value, list);
 			}
 			return _Json_ok(list);
 
@@ -382,7 +382,7 @@ function _Json_runHelp(decoder, value)
 				return _Json_badPrimitive('an object', value);
 			}
 
-			var keyValuePairs = _List_Nil;
+			var keyValuePairs = __List_Nil;
 			for (var key in value)
 			{
 				var result = _Json_runHelp(decoder.decoder, value[key]);
@@ -390,8 +390,8 @@ function _Json_runHelp(decoder, value)
 				{
 					return _Json_badField(key, result);
 				}
-				var pair = _Utils_Tuple2(key, result.value);
-				keyValuePairs = _List_Cons(pair, keyValuePairs);
+				var pair = __Utils_Tuple2(key, result.value);
+				keyValuePairs = __List_Cons(pair, keyValuePairs);
 			}
 			return _Json_ok(keyValuePairs);
 

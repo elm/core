@@ -1,5 +1,5 @@
-// import Elm.Kernel.List
-// import Elm.Kernel.Utils
+// import Elm.Kernel.List exposing (fromArray, toArray, Nil)
+// import Elm.Kernel.Utils exposing (chr, Tuple2)
 // import Maybe exposing (Maybe(Just,Nothing))
 // import Result exposing (Result(Ok,Err))
 
@@ -29,7 +29,7 @@ function _String_uncons(string)
 		offset = 2;
 	}
 	return __Maybe_Just(
-		_Utils_Tuple2(_Utils_chr(char), string.slice(offset))
+		__Utils_Tuple2(__Utils_chr(char), string.slice(offset))
 	);
 }
 
@@ -53,11 +53,11 @@ var _String_map = F2(function(func, string)
 		var word = str.charCodeAt(i);
 		if (0xD800 <= word && word <= 0xDBFF)
 		{
-			array[i] = func(_Utils_chr(string[i] + string[i+1]));
+			array[i] = func(__Utils_chr(string[i] + string[i+1]));
 			i += 2;
 			continue;
 		}
-		array[i] = func(_Utils_chr(string[i]));
+		array[i] = func(__Utils_chr(string[i]));
 		i++;
 	}
 	return array.join('');
@@ -79,7 +79,7 @@ var _String_filter = F2(function(pred, str)
 			i++;
 		}
 
-		if (pred(_Utils_chr(char)))
+		if (pred(__Utils_chr(char)))
 		{
 			arr.push(char);
 		}
@@ -125,7 +125,7 @@ var _String_foldl = F3(function(func, state, string)
 			char += string[i];
 			i++;
 		}
-		state = A2(func, _Utils_chr(char), state);
+		state = A2(func, __Utils_chr(char), state);
 	}
 	return state;
 });
@@ -142,7 +142,7 @@ var _String_foldr = F3(function(func, state, string)
 			i--;
 			char = string[i] + char;
 		}
-		state = A2(func, _Utils_chr(char), state);
+		state = A2(func, __Utils_chr(char), state);
 	}
 	return state;
 });
@@ -228,12 +228,12 @@ function _String_trimRight(str)
 
 function _String_words(str)
 {
-	return _List_fromArray(str.trim().split(/\s+/g));
+	return __List_fromArray(str.trim().split(/\s+/g));
 }
 
 function _String_lines(str)
 {
-	return _List_fromArray(str.split(/\r\n|\r|\n/g));
+	return __List_fromArray(str.split(/\r\n|\r|\n/g));
 }
 
 function _String_toUpper(str)
@@ -258,7 +258,7 @@ var _String_any = F2(function(isGood, string)
 			i--;
 			char = string[i] + char;
 		}
-		if (isGood(_Utils_chr(char)))
+		if (isGood(__Utils_chr(char)))
 		{
 			return true;
 		}
@@ -278,7 +278,7 @@ var _String_all = F2(function(isGood, string)
 			i--;
 			char = string[i] + char;
 		}
-		if (!isGood(_Utils_chr(char)))
+		if (!isGood(__Utils_chr(char)))
 		{
 			return false;
 		}
@@ -308,7 +308,7 @@ var _String_indexes = F2(function(sub, str)
 
 	if (subLen < 1)
 	{
-		return _List_Nil;
+		return __List_Nil;
 	}
 
 	var i = 0;
@@ -320,7 +320,7 @@ var _String_indexes = F2(function(sub, str)
 		i = i + subLen;
 	}
 
-	return _List_fromArray(is);
+	return __List_fromArray(is);
 });
 
 
@@ -392,6 +392,6 @@ function _String_floatErr(s)
 
 function _String_fromList(chars)
 {
-	return _List_toArray(chars).join('');
+	return __List_toArray(chars).join('');
 }
 

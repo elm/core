@@ -1,4 +1,4 @@
-// import Elm.Kernel.Utils
+// import Elm.Kernel.Utils exposing (Tuple0)
 
 
 var _Scheduler_MAX_STEPS = 10000;
@@ -95,7 +95,7 @@ var _Scheduler_send = F2(function(process, msg)
 {
 	return _Scheduler_nativeBinding(function(callback) {
 		_Scheduler_rawSend(process, msg);
-		callback(_Scheduler_succeed(_Utils_Tuple0));
+		callback(_Scheduler_succeed(__Utils_Tuple0));
 	});
 });
 
@@ -110,7 +110,7 @@ function _Scheduler_kill(process)
 
 		process.root = null;
 
-		callback(_Scheduler_succeed(_Utils_Tuple0));
+		callback(_Scheduler_succeed(__Utils_Tuple0));
 	});
 }
 
@@ -118,7 +118,7 @@ function _Scheduler_sleep(time)
 {
 	return _Scheduler_nativeBinding(function(callback) {
 		var id = setTimeout(function() {
-			callback(_Scheduler_succeed(_Utils_Tuple0));
+			callback(_Scheduler_succeed(__Utils_Tuple0));
 		}, time);
 
 		return function() { clearTimeout(id); };

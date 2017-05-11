@@ -1,4 +1,3 @@
-// import Elm.Kernel.Utils
 // import Result exposing (Result(Ok,Err))
 
 function _Date_fromString(str)

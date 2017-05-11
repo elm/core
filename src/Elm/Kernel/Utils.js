@@ -1,6 +1,6 @@
 // import Array exposing (toList)
 // import Dict exposing (toList)
-// import Elm.Kernel.List
+// import Elm.Kernel.List exposing (Cons, Nil)
 // import Set exposing (toList)
 
 
@@ -242,12 +242,12 @@ var _Utils_append = F2(function(xs, ys)
 	{
 		return ys;
 	}
-	var root = _List_Cons(xs._0, _List_Nil);
+	var root = __List_Cons(xs._0, __List_Nil);
 	var curr = root;
 	xs = xs._1;
 	while (xs.ctor !== '[]')
 	{
-		curr._1 = _List_Cons(xs._0, _List_Nil);
+		curr._1 = __List_Cons(xs._0, __List_Nil);
 		xs = xs._1;
 		curr = curr._1;
 	}
