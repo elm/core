@@ -202,7 +202,7 @@ list n (Generator generate) =
 listHelp : List a -> Int -> (Seed -> (a,Seed)) -> Seed -> (List a, Seed)
 listHelp list n generate seed =
   if n < 1 then
-    (List.reverse list, seed)
+    (list, seed)
 
   else
     let
