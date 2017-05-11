@@ -404,7 +404,13 @@ infixr 3 &&
 infixr 2 ||
 
 
-{-| The exclusive-or operator. `True` if exactly one input is `True`. -}
+{-| The exclusive-or operator. `True` if exactly one input is `True`.
+
+    xor False False == False
+    xor True  False == True
+    xor False True  == True
+    xor True  True  == False
+-}
 xor : Bool -> Bool -> Bool
 xor =
   Elm.Kernel.Basics.xor
