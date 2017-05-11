@@ -229,8 +229,8 @@ sqrt =
     negate 0 == 0
 -}
 negate : number -> number
-negate =
-  Elm.Kernel.Basics.negate
+negate n =
+  -n
 
 
 {-| Take the absolute value of a number. -}

@@ -45,11 +45,6 @@ var _Basics_logBase = F2(function(base, n)
 	return Math.log(n) / Math.log(base);
 });
 
-function _Basics_negate(n)
-{
-	return -n;
-}
-
 function _Basics_abs(n)
 {
 	return n < 0 ? -n : n;
