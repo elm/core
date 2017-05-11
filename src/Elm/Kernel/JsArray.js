@@ -1,3 +1,5 @@
+// import Elm.Kernel.Utils exposing (Tuple2)
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(val)
@@ -58,11 +60,7 @@ var _JsArray_initializeFromList = F2(function (max, ls)
         ls = ls._1;
     }
 
-    return {
-        ctor: '_Tuple2',
-        _0: result,
-        _1: ls
-    };
+    return __Utils_Tuple2(result, ls);
 });
 
 var _JsArray_unsafeGet = F2(function(idx, arr)
