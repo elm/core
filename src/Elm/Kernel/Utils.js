@@ -189,13 +189,13 @@ var _Utils_compare = F2(function(x, y)
 // COMMON VALUES
 
 var _Utils_Tuple0 = {
-	ctor: '_Tuple0'
+	ctor: '#0'
 };
 
 function _Utils_Tuple2(x, y)
 {
 	return {
-		ctor: '_Tuple2',
+		ctor: '#2',
 		_0: x,
 		_1: y
 	};
@@ -329,9 +329,10 @@ function _Utils_toString(v)
 
 	if (type === 'object' && 'ctor' in v)
 	{
-		var ctorStarter = v.ctor.substring(0, 5);
+		var tag = v.ctor;
+		var first = tag[0];
 
-		if (ctorStarter === '_Tupl')
+		if (first === '#')
 		{
 			var output = [];
 			for (var k in v)
@@ -342,28 +343,23 @@ function _Utils_toString(v)
 			return '(' + output.join(',') + ')';
 		}
 
-		if (ctorStarter === '_Task')
+		if (first === '_')
 		{
-			return '<task>'
+			var second = tag[1];
+			return (
+				second === 't' ? '<task>' :
+				second === 'd' ? '<decoder>' :
+				second === 'p' ? '<process>' : '<internals>'
+			);
 		}
 
-		if (v.ctor === 'Array')
+		if (tag === 'Array')
 		{
 			var list = __Array_toList(v);
 			return 'Array.fromList ' + _Utils_toString(list);
 		}
 
-		if (v.ctor === '<decoder>')
-		{
-			return '<decoder>';
-		}
-
-		if (v.ctor === '_Process')
-		{
-			return '<process:' + v.id + '>';
-		}
-
-		if (v.ctor === '::')
+		if (tag === '::')
 		{
 			var output = '[' + _Utils_toString(v._0);
 			v = v._1;
@@ -375,17 +371,17 @@ function _Utils_toString(v)
 			return output + ']';
 		}
 
-		if (v.ctor === '[]')
+		if (tag === '[]')
 		{
 			return '[]';
 		}
 
-		if (v.ctor === 'Set_elm_builtin')
+		if (tag === 'Set_elm_builtin')
 		{
 			return 'Set.fromList ' + _Utils_toString(__Set_toList(v));
 		}
 
-		if (v.ctor === 'RBNode_elm_builtin' || v.ctor === 'RBEmpty_elm_builtin')
+		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
 			return 'Dict.fromList ' + _Utils_toString(__Dict_toList(v));
 		}
@@ -399,7 +395,7 @@ function _Utils_toString(v)
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
 		}
-		return v.ctor + output;
+		return tag + output;
 	}
 
 	if (type === 'object')
