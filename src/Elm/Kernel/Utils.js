@@ -174,9 +174,6 @@ var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_GT; });
 var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_GT; });
 var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_LT; });
 
-var _Utils_min = F2(function(a, b) { return _Utils_cmp(a, b) < 0 ? a : b; });
-var _Utils_max = F2(function(a, b) { return _Utils_cmp(a, b) > 0 ? a : b; });
-
 var _Utils_clamp = F3(function(lo, hi, n)
 {
 	return _Utils_cmp(n, lo) < 0

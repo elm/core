@@ -355,14 +355,14 @@ type Order = LT | EQ | GT
 
 {-| Find the smaller of two comparables. -}
 min : comparable -> comparable -> comparable
-min =
-  Elm.Kernel.Utils.min
+min x y =
+  if x < y then x else y
 
 
 {-| Find the larger of two comparables. -}
 max : comparable -> comparable -> comparable
-max =
-  Elm.Kernel.Utils.max
+max x y =
+  if x > y then x else y
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
