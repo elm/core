@@ -9,7 +9,7 @@ var _Scheduler_MAX_STEPS = 10000;
 function _Scheduler_succeed(value)
 {
 	return {
-		ctor: '_Task_succeed',
+		ctor: '_t_succeed',
 		value: value
 	};
 }
@@ -17,15 +17,15 @@ function _Scheduler_succeed(value)
 function _Scheduler_fail(error)
 {
 	return {
-		ctor: '_Task_fail',
+		ctor: '_t_fail',
 		value: error
 	};
 }
 
-function _Scheduler_nativeBinding(callback)
+function _Scheduler_binding(callback)
 {
 	return {
-		ctor: '_Task_nativeBinding',
+		ctor: '_t_binding',
 		callback: callback,
 		cancel: null
 	};
@@ -34,7 +34,7 @@ function _Scheduler_nativeBinding(callback)
 var _Scheduler_andThen = F2(function(callback, task)
 {
 	return {
-		ctor: '_Task_andThen',
+		ctor: '_t_andThen',
 		callback: callback,
 		task: task
 	};
@@ -43,7 +43,7 @@ var _Scheduler_andThen = F2(function(callback, task)
 var _Scheduler_onError = F2(function(callback, task)
 {
 	return {
-		ctor: '_Task_onError',
+		ctor: '_t_onError',
 		callback: callback,
 		task: task
 	};
@@ -52,7 +52,7 @@ var _Scheduler_onError = F2(function(callback, task)
 function _Scheduler_receive(callback)
 {
 	return {
-		ctor: '_Task_receive',
+		ctor: '_t_receive',
 		callback: callback
 	};
 }
@@ -79,7 +79,7 @@ function _Scheduler_rawSpawn(task)
 
 function _Scheduler_spawn(task)
 {
-	return _Scheduler_nativeBinding(function(callback) {
+	return _Scheduler_binding(function(callback) {
 		var process = _Scheduler_rawSpawn(task);
 		callback(_Scheduler_succeed(process));
 	});
@@ -93,7 +93,7 @@ function _Scheduler_rawSend(process, msg)
 
 var _Scheduler_send = F2(function(process, msg)
 {
-	return _Scheduler_nativeBinding(function(callback) {
+	return _Scheduler_binding(function(callback) {
 		_Scheduler_rawSend(process, msg);
 		callback(_Scheduler_succeed(__Utils_Tuple0));
 	});
@@ -101,9 +101,9 @@ var _Scheduler_send = F2(function(process, msg)
 
 function _Scheduler_kill(process)
 {
-	return _Scheduler_nativeBinding(function(callback) {
+	return _Scheduler_binding(function(callback) {
 		var root = process.root;
-		if (root.ctor === '_Task_nativeBinding' && root.cancel)
+		if (root.ctor === '_t_binding' && root.cancel)
 		{
 			root.cancel();
 		}
@@ -116,7 +116,7 @@ function _Scheduler_kill(process)
 
 function _Scheduler_sleep(time)
 {
-	return _Scheduler_nativeBinding(function(callback) {
+	return _Scheduler_binding(function(callback) {
 		var id = setTimeout(function() {
 			callback(_Scheduler_succeed(__Utils_Tuple0));
 		}, time);
@@ -134,9 +134,9 @@ function _Scheduler_step(numSteps, process)
 	{
 		var ctor = process.root.ctor;
 
-		if (ctor === '_Task_succeed')
+		if (ctor === '_t_succeed')
 		{
-			while (process.stack && process.stack.ctor === '_Task_onError')
+			while (process.stack && process.stack.ctor === '_t_onError')
 			{
 				process.stack = process.stack.rest;
 			}
@@ -150,9 +150,9 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === '_Task_fail')
+		if (ctor === '_t_fail')
 		{
-			while (process.stack && process.stack.ctor === '_Task_andThen')
+			while (process.stack && process.stack.ctor === '_t_andThen')
 			{
 				process.stack = process.stack.rest;
 			}
@@ -166,10 +166,10 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === '_Task_andThen')
+		if (ctor === '_t_andThen')
 		{
 			process.stack = {
-				ctor: '_Task_andThen',
+				ctor: '_t_andThen',
 				callback: process.root.callback,
 				rest: process.stack
 			};
@@ -178,10 +178,10 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === '_Task_onError')
+		if (ctor === '_t_onError')
 		{
 			process.stack = {
-				ctor: '_Task_onError',
+				ctor: '_t_onError',
 				callback: process.root.callback,
 				rest: process.stack
 			};
@@ -190,7 +190,7 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === '_Task_nativeBinding')
+		if (ctor === '_t_binding')
 		{
 			process.root.cancel = process.root.callback(function(newRoot) {
 				process.root = newRoot;
@@ -200,7 +200,7 @@ function _Scheduler_step(numSteps, process)
 			break;
 		}
 
-		if (ctor === '_Task_receive')
+		if (ctor === '_t_receive')
 		{
 			var mailbox = process.mailbox;
 			if (mailbox.length === 0)
