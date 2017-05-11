@@ -496,7 +496,7 @@ function _Platform_setupIncomingPort(name, callback)
 
 	function send(incomingValue)
 	{
-		var result = A2(elm_lang$core$Json_Decode$decodeValue, converter, incomingValue);
+		var result = A2(_Json_run, converter, incomingValue);
 		if (result.ctor === 'Err')
 		{
 			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
