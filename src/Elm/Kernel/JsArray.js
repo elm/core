@@ -77,8 +77,14 @@ var _JsArray_unsafeSet = F3(function(idx, val, arr)
 
 var _JsArray_push = F2(function(val, arr)
 {
-    var result = arr.slice();
-    result.push(val);
+    var len = arr.length;
+    var result = new Array(len + 1);
+
+    for (var i = 0; i < len; i++) {
+        result[i] = arr[i]
+    }
+
+    result[len] = val;
     return result;
 });
 
