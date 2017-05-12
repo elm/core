@@ -13,17 +13,19 @@ var _Basics_div = F2(function(a, b) { return (a / b) | 0; });
 var _Basics_floatDiv = F2(function(a, b) { return a / b; });
 var _Basics_exp = F2(Math.pow);
 
-var _Basics_mod = F2(function(a, b)
+var _Basics_mod = F2(_Basics_mod_help);
+
+function _Basics_mod_help(a, b)
 {
 	if (b === 0)
 	{
 		throw new Error('Cannot perform mod 0. Division by zero error.');
 	}
 	var r = a % b;
-	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -mod(-a, -b));
+	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -_Basics_mod_help(-a, -b));
 
 	return m === b ? 0 : m;
-});
+}
 
 
 // TRIGONOMETRY
