@@ -1,7 +1,11 @@
-// import Elm.Kernel.Json exposing (run)
-// import Elm.Kernel.List exposing (Cons, Nil)
-// import Elm.Kernel.Scheduler exposing (andThen, nativeBinding, rawSend, rawSpawn, receive, send, succeed)
-// import Elm.Kernel.Utils exposing (Tuple0)
+/*
+
+import Elm.Kernel.Json exposing (run)
+import Elm.Kernel.List exposing (Cons, Nil)
+import Elm.Kernel.Scheduler exposing (andThen, nativeBinding, rawSend, rawSpawn, receive, send, succeed)
+import Elm.Kernel.Utils exposing (Tuple0)
+
+*/
 
 
 // PROGRAMS

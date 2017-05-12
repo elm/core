@@ -1,4 +1,9 @@
-// import Elm.Kernel.Scheduler exposing (nativeBinding, succeed)
+/*
+
+import Elm.Kernel.Scheduler exposing (nativeBinding, succeed)
+
+*/
+
 
 function _Time_now()
 {

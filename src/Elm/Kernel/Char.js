@@ -1,4 +1,9 @@
-// import Elm.Kernel.Utils exposing (chr)
+/*
+
+import Elm.Kernel.Utils exposing (chr)
+
+*/
+
 
 function _Char_toCode(char)
 {

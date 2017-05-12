@@ -1,4 +1,9 @@
-// import Result exposing (Result(Ok,Err))
+/*
+
+import Result exposing (Result(Ok,Err))
+
+*/
+
 
 function _Date_fromString(str)
 {

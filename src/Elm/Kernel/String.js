@@ -1,7 +1,11 @@
-// import Elm.Kernel.List exposing (fromArray, toArray, Nil)
-// import Elm.Kernel.Utils exposing (chr, Tuple2)
-// import Maybe exposing (Maybe(Just,Nothing))
-// import Result exposing (Result(Ok,Err))
+/*
+
+import Elm.Kernel.List exposing (fromArray, toArray, Nil)
+import Elm.Kernel.Utils exposing (chr, Tuple2)
+import Maybe exposing (Maybe(Just,Nothing))
+import Result exposing (Result(Ok,Err))
+
+*/
 
 
 function _String_isEmpty(str)

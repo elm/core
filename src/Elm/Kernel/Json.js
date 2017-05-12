@@ -1,8 +1,12 @@
-// import Array exposing (initialize)
-// import Elm.Kernel.List exposing (Cons, Nil)
-// import Elm.Kernel.Utils exposing (Tuple2)
-// import Maybe exposing (Maybe(Just,Nothing))
-// import Result exposing (Result(Ok,Err))
+/*
+
+import Array exposing (initialize)
+import Elm.Kernel.List exposing (Cons, Nil)
+import Elm.Kernel.Utils exposing (Tuple2)
+import Maybe exposing (Maybe(Just,Nothing))
+import Result exposing (Result(Ok,Err))
+
+*/
 
 
 // CORE DECODERS

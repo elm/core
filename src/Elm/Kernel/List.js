@@ -1,4 +1,9 @@
-// import Elm.Kernel.Utils exposing (cmp)
+/*
+
+import Elm.Kernel.Utils exposing (cmp)
+
+*/
+
 
 var _List_Nil = { ctor: '[]' };
 
