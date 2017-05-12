@@ -271,6 +271,11 @@ sliceTests =
                 \() ->
                     toList (slice -1 -2 smallSample)
                         |> Expect.equal []
+            , test "crash" <|
+                \() ->
+                    Array.repeat (33 * 32) 1
+                        |> Array.slice 0 1
+                        |> Expect.equal (Array.repeat 1 1)
             ]
 
 

@@ -754,6 +754,7 @@ sliceRight end ((Array length startShift tree tail) as arr) =
 
             depth =
                 (endIdx - 1)
+                    |> max 1
                     |> toFloat
                     |> logBase (toFloat branchFactor)
                     |> floor
@@ -825,7 +826,7 @@ to do so.
 -}
 hoistTree : Int -> Int -> Tree a -> Tree a
 hoistTree oldShift newShift tree =
-    if oldShift <= newShift then
+    if oldShift <= newShift || JsArray.length tree == 0 then
         tree
     else
         case JsArray.unsafeGet 0 tree of
