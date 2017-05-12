@@ -2,7 +2,7 @@
 
 import Elm.Kernel.Json exposing (run)
 import Elm.Kernel.List exposing (Cons, Nil)
-import Elm.Kernel.Scheduler exposing (andThen, nativeBinding, rawSend, rawSpawn, receive, send, succeed)
+import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
 import Elm.Kernel.Utils exposing (Tuple0)
 
 */
@@ -90,7 +90,7 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 	var updateView;
 
 	// init and update state in main process
-	var initApp = __Scheduler_nativeBinding(function(callback) {
+	var initApp = __Scheduler_binding(function(callback) {
 		var model = init._0;
 		updateView = renderer(enqueue, model);
 		var cmds = init._1;
@@ -101,7 +101,7 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 
 	function onMessage(msg, model)
 	{
-		return __Scheduler_nativeBinding(function(callback) {
+		return __Scheduler_binding(function(callback) {
 			var results = A2(update, msg, model);
 			model = results._0;
 			updateView(model);
@@ -191,7 +191,7 @@ function _Platform_makeManager(info, callback)
 
 var _Platform_sendToApp = F2(function(router, msg)
 {
-	return __Scheduler_nativeBinding(function(callback)
+	return __Scheduler_binding(function(callback)
 	{
 		router.main(msg);
 		callback(__Scheduler_succeed(__Utils_Tuple0));
