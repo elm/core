@@ -206,7 +206,6 @@ the successes.
 
     filterMap head [[1,2,3],[],[4,5,6],[],[]] == [1,4]
 
-
 `filterMap` can be combined with `identity` to clean a list of `Maybe` values:
 
     filterMap identity [Just 1, Nothing, Nothing, Just 2, Just 3] == [1,2,3]
