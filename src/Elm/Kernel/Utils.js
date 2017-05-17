@@ -426,7 +426,7 @@ function _Utils_toString(v)
 		return '{ ' + output.join(', ') + ' }';
 	}
 
-	return '<internal structure>';
+	return '<internals>';
 }
 
 function _Utils_addSlashes(str, isChar)
