@@ -29,7 +29,6 @@
         "Time",
         "Tuple"
     ],
-    "kernel-modules": true,
     "effect-modules": true,
     "dependencies": {},
     "test-dependencies": {},
