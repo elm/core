@@ -163,11 +163,6 @@ function _Json_badField(field, nestedProblems)
 	return { tag: 'field', field: field, rest: nestedProblems };
 }
 
-function _Json_badIndex(index, nestedProblems)
-{
-	return { tag: 'index', index: index, rest: nestedProblems };
-}
-
 function _Json_badOneOf(problems)
 {
 	return { tag: 'oneOf', problems: problems };
