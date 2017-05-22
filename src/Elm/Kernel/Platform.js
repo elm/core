@@ -75,9 +75,9 @@ function _Platform_programWithFlags(impl)
 	};
 }
 
-function _Platform_renderer(enqueue, _)
+function _Platform_renderer()
 {
-	return function(_) {};
+	return function() {};
 }
 
 
