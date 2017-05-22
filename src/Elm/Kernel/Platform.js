@@ -92,7 +92,7 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 	// init and update state in main process
 	var initApp = __Scheduler_binding(function(callback) {
 		var model = init._0;
-		updateView = renderer(enqueue, model);
+		updateView = renderer(enqueue);
 		var cmds = init._1;
 		var subs = subscriptions(model);
 		_Platform_dispatchEffects(managers, cmds, subs);
