@@ -10,18 +10,14 @@ import Set exposing (toList)
 
 // LOG
 
-var _Debug_log = F2(function(tag, value)
+var _Debug_log_prod = F2(function(tag, value)
 {
-	var msg = tag + ': ' + _Debug_toString_dev(value);
-	var process = process || {};
-	if (process.stdout)
-	{
-		process.stdout.write(msg);
-	}
-	else
-	{
-		console.log(msg);
-	}
+	return value;
+});
+
+var _Debug_log_dev = F2(function(tag, value)
+{
+	console.log(tag + ': ' + _Debug_toString_dev(value));
 	return value;
 });
 
