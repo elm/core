@@ -19,7 +19,7 @@ function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
 	{
 		case 0:
 			var moduleName = fact1;
-			throw new Error('The `' + moduleName + '` module does not need flags.\nCall ' + moduleName + '.worker() with no arguments and you should be all set!');
+			throw new Error('The `' + moduleName + '` module does not need flags.\nInitialize it with no arguments and you should be all set!');
 
 		case 1:
 			var moduleName = fact1;
@@ -28,7 +28,7 @@ function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
 		case 2:
 			var moduleName = fact1;
 			var message = fact2;
-			throw new Error(moduleName + '.worker(...) was called with an unexpected argument.\nI tried to convert it to an Elm value, but ran into this problem:\n\n' + message);
+			throw new Error('Trying to initialize the `' + moduleName + '` module with an unexpected argument.\nI tried to convert it to an Elm value, but ran into this problem:\n\n' + message);
 
 		case 3:
 			var portName = fact1;
@@ -70,6 +70,9 @@ function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
 
 		case 12:
 			throw new Error('Internal red-black tree invariant violated');
+
+		case 13:
+			throw new Error('Bug in https://github.com/elm-lang/virtual-dom/issues');
 	}
 }
 
