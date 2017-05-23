@@ -14,7 +14,7 @@ import Result exposing (Result(Ok,Err))
 function _Json_succeed(msg)
 {
 	return {
-		ctor: __1_SUCCEED,
+		$: __1_SUCCEED,
 		msg: msg
 	};
 }
@@ -22,27 +22,27 @@ function _Json_succeed(msg)
 function _Json_fail(msg)
 {
 	return {
-		ctor: __1_FAIL,
+		$: __1_FAIL,
 		msg: msg
 	};
 }
 
-var _Json_decodeInt = { ctor: __1_INT };
-var _Json_decodeBool = { ctor: __1_BOOL };
-var _Json_decodeFloat = { ctor: __1_FLOAT };
-var _Json_decodeValue = { ctor: __1_VALUE };
-var _Json_decodeString = { ctor: __1_STRING };
+var _Json_decodeInt = { $: __1_INT };
+var _Json_decodeBool = { $: __1_BOOL };
+var _Json_decodeFloat = { $: __1_FLOAT };
+var _Json_decodeValue = { $: __1_VALUE };
+var _Json_decodeString = { $: __1_STRING };
 
-function _Json_decodeList(decoder) { return { ctor: __1_LIST, decoder: decoder }; }
-function _Json_decodeArray(decoder) { return { ctor: __1_ARRAY, decoder: decoder }; }
-function _Json_decodeMaybe(decoder) { return { ctor: __1_MAYBE, decoder: decoder }; }
+function _Json_decodeList(decoder) { return { $: __1_LIST, decoder: decoder }; }
+function _Json_decodeArray(decoder) { return { $: __1_ARRAY, decoder: decoder }; }
+function _Json_decodeMaybe(decoder) { return { $: __1_MAYBE, decoder: decoder }; }
 
-function _Json_decodeNull(value) { return { ctor: __1_NULL, value: value }; }
+function _Json_decodeNull(value) { return { $: __1_NULL, value: value }; }
 
 var _Json_decodeField = F2(function(field, decoder)
 {
 	return {
-		ctor: __1_FIELD,
+		$: __1_FIELD,
 		field: field,
 		decoder: decoder
 	};
@@ -51,7 +51,7 @@ var _Json_decodeField = F2(function(field, decoder)
 var _Json_decodeIndex = F2(function(index, decoder)
 {
 	return {
-		ctor: __1_INDEX,
+		$: __1_INDEX,
 		index: index,
 		decoder: decoder
 	};
@@ -60,7 +60,7 @@ var _Json_decodeIndex = F2(function(index, decoder)
 function _Json_decodeKeyValuePairs(decoder)
 {
 	return {
-		ctor: __1_KEY_VALUE,
+		$: __1_KEY_VALUE,
 		decoder: decoder
 	};
 }
@@ -68,7 +68,7 @@ function _Json_decodeKeyValuePairs(decoder)
 function _Json_mapMany(f, decoders)
 {
 	return {
-		ctor: __1_MAP,
+		$: __1_MAP,
 		func: f,
 		decoders: decoders
 	};
@@ -77,7 +77,7 @@ function _Json_mapMany(f, decoders)
 var _Json_andThen = F2(function(callback, decoder)
 {
 	return {
-		ctor: __1_AND_THEN,
+		$: __1_AND_THEN,
 		decoder: decoder,
 		callback: callback
 	};
@@ -86,7 +86,7 @@ var _Json_andThen = F2(function(callback, decoder)
 function _Json_oneOf(decoders)
 {
 	return {
-		ctor: __1_ONE_OF,
+		$: __1_ONE_OF,
 		decoders: decoders
 	};
 }
@@ -241,7 +241,7 @@ var _Json_run = F2(function(decoder, value)
 
 function _Json_runHelp(decoder, value)
 {
-	switch (decoder.ctor)
+	switch (decoder.$)
 	{
 		case __1_BOOL:
 			return (typeof value === 'boolean')
@@ -395,7 +395,7 @@ function _Json_runHelp(decoder, value)
 		case __1_ONE_OF:
 			var errors = [];
 			var temp = decoder.decoders;
-			while (temp.ctor !== '[]')
+			while (temp.$ !== '[]')
 			{
 				var result = _Json_runHelp(temp._0, value);
 
@@ -428,12 +428,12 @@ function _Json_equality(a, b)
 		return true;
 	}
 
-	if (a.ctor !== b.ctor)
+	if (a.$ !== b.$)
 	{
 		return false;
 	}
 
-	switch (a.ctor)
+	switch (a.$)
 	{
 		case __1_SUCCEED:
 		case __1_FAIL:
@@ -509,7 +509,7 @@ function _Json_identity(value)
 function _Json_encodeObject(keyValuePairs)
 {
 	var obj = {};
-	while (keyValuePairs.ctor !== '[]')
+	while (keyValuePairs.$ !== '[]')
 	{
 		var pair = keyValuePairs._0;
 		obj[pair._0] = pair._1;

@@ -5,11 +5,11 @@ import Elm.Kernel.Utils exposing (cmp)
 */
 
 
-var _List_Nil = { ctor: '[]' };
+var _List_Nil = { $: '[]' };
 
 function _List_Cons(hd, tl)
 {
-	return { ctor: '::', _0: hd, _1: tl };
+	return { $: '::', _0: hd, _1: tl };
 }
 
 var _List_cons = F2(_List_Cons);
@@ -27,7 +27,7 @@ function _List_fromArray(arr)
 function _List_toArray(xs)
 {
 	var out = [];
-	while (xs.ctor !== '[]')
+	while (xs.$ !== '[]')
 	{
 		out.push(xs._0);
 		xs = xs._1;
@@ -49,7 +49,7 @@ var _List_foldr = F3(function(f, b, xs)
 var _List_map2 = F3(function(f, xs, ys)
 {
 	var arr = [];
-	while (xs.ctor !== '[]' && ys.ctor !== '[]')
+	while (xs.$ !== '[]' && ys.$ !== '[]')
 	{
 		arr.push(A2(f, xs._0, ys._0));
 		xs = xs._1;
@@ -61,7 +61,7 @@ var _List_map2 = F3(function(f, xs, ys)
 var _List_map3 = F4(function(f, xs, ys, zs)
 {
 	var arr = [];
-	while (xs.ctor !== '[]' && ys.ctor !== '[]' && zs.ctor !== '[]')
+	while (xs.$ !== '[]' && ys.$ !== '[]' && zs.$ !== '[]')
 	{
 		arr.push(A3(f, xs._0, ys._0, zs._0));
 		xs = xs._1;
@@ -74,10 +74,10 @@ var _List_map3 = F4(function(f, xs, ys, zs)
 var _List_map4 = F5(function(f, ws, xs, ys, zs)
 {
 	var arr = [];
-	while (   ws.ctor !== '[]'
-		   && xs.ctor !== '[]'
-		   && ys.ctor !== '[]'
-		   && zs.ctor !== '[]')
+	while (   ws.$ !== '[]'
+		   && xs.$ !== '[]'
+		   && ys.$ !== '[]'
+		   && zs.$ !== '[]')
 	{
 		arr.push(A4(f, ws._0, xs._0, ys._0, zs._0));
 		ws = ws._1;
@@ -91,11 +91,11 @@ var _List_map4 = F5(function(f, ws, xs, ys, zs)
 var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
 {
 	var arr = [];
-	while (   vs.ctor !== '[]'
-		   && ws.ctor !== '[]'
-		   && xs.ctor !== '[]'
-		   && ys.ctor !== '[]'
-		   && zs.ctor !== '[]')
+	while (   vs.$ !== '[]'
+		   && ws.$ !== '[]'
+		   && xs.$ !== '[]'
+		   && ys.$ !== '[]'
+		   && zs.$ !== '[]')
 	{
 		arr.push(A5(f, vs._0, ws._0, xs._0, ys._0, zs._0));
 		vs = vs._1;
@@ -117,7 +117,7 @@ var _List_sortBy = F2(function(f, xs)
 var _List_sortWith = F2(function(f, xs)
 {
 	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = f(a)(b).ctor;
+		var ord = f(a)(b).$;
 		return ord === 'EQ' ? 0 : ord === 'LT' ? -1 : 1;
 	}));
 });

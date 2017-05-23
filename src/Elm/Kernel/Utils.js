@@ -55,7 +55,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return x.getTime() === y.getTime();
 	}
 
-	if (!('ctor' in x))
+	if (!('$' in x))
 	{
 		for (var key in x)
 		{
@@ -68,23 +68,23 @@ function _Utils_eqHelp(x, y, depth, stack)
 	}
 
 	// convert Dicts and Sets to lists
-	if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
 	{
 		x = __Dict_toList(x);
 		y = __Dict_toList(y);
 	}
-	if (x.ctor === 'Set_elm_builtin')
+	if (x.$ === 'Set_elm_builtin')
 	{
 		x = __Set_toList(x);
 		y = __Set_toList(y);
 	}
 
 	// check if lists are equal without recursion
-	if (x.ctor === '::')
+	if (x.$ === '::')
 	{
 		var a = x;
 		var b = y;
-		while (a.ctor === '::' && b.ctor === '::')
+		while (a.$ === '::' && b.$ === '::')
 		{
 			if (!_Utils_eqHelp(a._0, b._0, depth + 1, stack))
 			{
@@ -93,10 +93,10 @@ function _Utils_eqHelp(x, y, depth, stack)
 			a = a._1;
 			b = b._1;
 		}
-		return a.ctor === b.ctor;
+		return a.$ === b.$;
 	}
 
-	if (!_Utils_eqHelp(x.ctor, y.ctor, depth + 1, stack))
+	if (!_Utils_eqHelp(x.$, y.$, depth + 1, stack))
 	{
 		return false;
 	}
@@ -136,9 +136,9 @@ function _Utils_cmp(x, y)
 		return a === b ? _Utils_EQ : a < b ? _Utils_LT : _Utils_GT;
 	}
 
-	if (x.ctor === '::' || x.ctor === '[]')
+	if (x.$ === '::' || x.$ === '[]')
 	{
-		while (x.ctor === '::' && y.ctor === '::')
+		while (x.$ === '::' && y.$ === '::')
 		{
 			var ord = _Utils_cmp(x._0, y._0);
 			if (ord !== _Utils_EQ)
@@ -148,13 +148,13 @@ function _Utils_cmp(x, y)
 			x = x._1;
 			y = y._1;
 		}
-		return x.ctor === y.ctor ? _Utils_EQ : x.ctor === '[]' ? _Utils_LT : _Utils_GT;
+		return x.$ === y.$ ? _Utils_EQ : x.$ === '[]' ? _Utils_LT : _Utils_GT;
 	}
 
-	if (x.ctor[0] === '#')
+	if (x.$[0] === '#')
 	{
 		var ord;
-		var n = x.ctor.slice(6) - 0;
+		var n = x.$.slice(6) - 0;
 		if (n === 0) return _Utils_EQ;
 		if (n >= 1) { ord = _Utils_cmp(x._0, y._0); if (ord !== _Utils_EQ) return ord;
 		if (n >= 2) { ord = _Utils_cmp(x._1, y._1); if (ord !== _Utils_EQ) return ord;
@@ -178,20 +178,20 @@ var _Utils_ordTable = ['LT', 'EQ', 'GT'];
 
 var _Utils_compare = F2(function(x, y)
 {
-	return { ctor: _Utils_ordTable[_Utils_cmp(x, y) + 1] };
+	return { $: _Utils_ordTable[_Utils_cmp(x, y) + 1] };
 });
 
 
 // COMMON VALUES
 
 var _Utils_Tuple0 = {
-	ctor: '#0'
+	$: '#0'
 };
 
 function _Utils_Tuple2(x, y)
 {
 	return {
-		ctor: '#2',
+		$: '#2',
 		_0: x,
 		_1: y
 	};
@@ -234,14 +234,14 @@ var _Utils_append = F2(function(xs, ys)
 	}
 
 	// append Lists
-	if (xs.ctor === '[]')
+	if (xs.$ === '[]')
 	{
 		return ys;
 	}
 	var root = __List_Cons(xs._0, __List_Nil);
 	var curr = root;
 	xs = xs._1;
-	while (xs.ctor !== '[]')
+	while (xs.$ !== '[]')
 	{
 		curr._1 = __List_Cons(xs._0, __List_Nil);
 		xs = xs._1;

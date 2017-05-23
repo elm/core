@@ -20,7 +20,7 @@ function _Date_year(d)
 
 function _Date_month(d)
 {
-	return { ctor: _Date_monthTable[d.getMonth()] };
+	return { $: _Date_monthTable[d.getMonth()] };
 }
 
 var _Date_monthTable = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -62,7 +62,7 @@ function _Date_fromTime(t)
 
 function _Date_dayOfWeek(d)
 {
-	return { ctor: _Date_dayTable[d.getDay()] };
+	return { $: _Date_dayTable[d.getDay()] };
 }
 
 var _Date_dayTable = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];

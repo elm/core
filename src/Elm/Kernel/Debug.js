@@ -79,9 +79,9 @@ function _Debug_toString_dev(v)
 		return 'null';
 	}
 
-	if (type === 'object' && 'ctor' in v)
+	if (type === 'object' && '$' in v)
 	{
-		var tag = v.ctor;
+		var tag = v.$;
 
 		if (typeof tag === 'number')
 		{
@@ -93,7 +93,7 @@ function _Debug_toString_dev(v)
 			var output = [];
 			for (var k in v)
 			{
-				if (k === 'ctor') continue;
+				if (k === '$') continue;
 				output.push(_Debug_toString_dev(v[k]));
 			}
 			return '(' + output.join(',') + ')';
@@ -109,7 +109,7 @@ function _Debug_toString_dev(v)
 		{
 			var output = '[' + _Debug_toString_dev(v._0);
 			v = v._1;
-			while (v.ctor === '::')
+			while (v.$ === '::')
 			{
 				output += ',' + _Debug_toString_dev(v._0);
 				v = v._1;
@@ -135,7 +135,7 @@ function _Debug_toString_dev(v)
 		var output = '';
 		for (var i in v)
 		{
-			if (i === 'ctor') continue;
+			if (i === '$') continue;
 			var str = _Debug_toString_dev(v[i]);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;

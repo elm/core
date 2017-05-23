@@ -56,7 +56,7 @@ var _JsArray_initializeFromList = F2(function (max, ls)
     var result = _JsArray_newArray(max);
 
     for (var i = 0; i < max; i++) {
-        if (ls.ctor === '[]') {
+        if (ls.$ === '[]') {
             result.length = i;
             break;
         }

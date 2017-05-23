@@ -14,7 +14,7 @@ var _Scheduler_MAX_STEPS = 10000;
 function _Scheduler_succeed(value)
 {
 	return {
-		ctor: __1_SUCCEED,
+		$: __1_SUCCEED,
 		value: value
 	};
 }
@@ -22,7 +22,7 @@ function _Scheduler_succeed(value)
 function _Scheduler_fail(error)
 {
 	return {
-		ctor: __1_FAIL,
+		$: __1_FAIL,
 		value: error
 	};
 }
@@ -30,7 +30,7 @@ function _Scheduler_fail(error)
 function _Scheduler_binding(callback)
 {
 	return {
-		ctor: __1_BINDING,
+		$: __1_BINDING,
 		callback: callback,
 		cancel: null
 	};
@@ -39,7 +39,7 @@ function _Scheduler_binding(callback)
 var _Scheduler_andThen = F2(function(callback, task)
 {
 	return {
-		ctor: __1_AND_THEN,
+		$: __1_AND_THEN,
 		callback: callback,
 		task: task
 	};
@@ -48,7 +48,7 @@ var _Scheduler_andThen = F2(function(callback, task)
 var _Scheduler_onError = F2(function(callback, task)
 {
 	return {
-		ctor: __1_ON_ERROR,
+		$: __1_ON_ERROR,
 		callback: callback,
 		task: task
 	};
@@ -57,7 +57,7 @@ var _Scheduler_onError = F2(function(callback, task)
 function _Scheduler_receive(callback)
 {
 	return {
-		ctor: __1_RECEIVE,
+		$: __1_RECEIVE,
 		callback: callback
 	};
 }
@@ -70,7 +70,7 @@ var _Scheduler_guid = 0;
 function _Scheduler_rawSpawn(task)
 {
 	var process = {
-		ctor: __2_PROCESS,
+		$: __2_PROCESS,
 		id: _Scheduler_guid++,
 		root: task,
 		stack: null,
@@ -108,7 +108,7 @@ function _Scheduler_kill(process)
 {
 	return _Scheduler_binding(function(callback) {
 		var root = process.root;
-		if (root.ctor === __1_BINDING && root.cancel)
+		if (root.$ === __1_BINDING && root.cancel)
 		{
 			root.cancel();
 		}
@@ -137,11 +137,11 @@ function _Scheduler_step(numSteps, process)
 {
 	while (numSteps < _Scheduler_MAX_STEPS)
 	{
-		var ctor = process.root.ctor;
+		var tag = process.root.$;
 
-		if (ctor === __1_SUCCEED)
+		if (tag === __1_SUCCEED)
 		{
-			while (process.stack && process.stack.ctor === __1_ON_ERROR)
+			while (process.stack && process.stack.$ === __1_ON_ERROR)
 			{
 				process.stack = process.stack.rest;
 			}
@@ -155,9 +155,9 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === __1_FAIL)
+		if (tag === __1_FAIL)
 		{
-			while (process.stack && process.stack.ctor === __1_AND_THEN)
+			while (process.stack && process.stack.$ === __1_AND_THEN)
 			{
 				process.stack = process.stack.rest;
 			}
@@ -171,10 +171,10 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === __1_AND_THEN)
+		if (tag === __1_AND_THEN)
 		{
 			process.stack = {
-				ctor: __1_AND_THEN,
+				$: __1_AND_THEN,
 				callback: process.root.callback,
 				rest: process.stack
 			};
@@ -183,10 +183,10 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === __1_ON_ERROR)
+		if (tag === __1_ON_ERROR)
 		{
 			process.stack = {
-				ctor: __1_ON_ERROR,
+				$: __1_ON_ERROR,
 				callback: process.root.callback,
 				rest: process.stack
 			};
@@ -195,7 +195,7 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		if (ctor === __1_BINDING)
+		if (tag === __1_BINDING)
 		{
 			process.root.cancel = process.root.callback(function(newRoot) {
 				process.root = newRoot;
@@ -205,7 +205,7 @@ function _Scheduler_step(numSteps, process)
 			break;
 		}
 
-		if (ctor === __1_RECEIVE)
+		if (tag === __1_RECEIVE)
 		{
 			var mailbox = process.mailbox;
 			if (mailbox.length === 0)
@@ -218,7 +218,7 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		__Error_throw(10, ctor);
+		__Error_throw(10, tag);
 	}
 
 	if (numSteps < _Scheduler_MAX_STEPS)

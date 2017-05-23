@@ -61,8 +61,8 @@ function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
 			throw new Error('Ran into a `Debug.crash` in module `' + moduleName + '`\n\nThis was caused by the `case` expression ' + _Error_regionToString(region) + '.\nOne of the branches ended with a crash and the following value got through:\n\n    ' + __Debug_toString(value) + '\n\nThe message provided by the code author is:\n\n    ' + message);
 
 		case 10:
-			var ctor = fact1;
-			throw new Error('Task scheduler failed on constructor ' + ctor);
+			var tagName = fact1;
+			throw new Error('Scheduler failed on unknown task ' + tagName);
 
 		case 11:
 			throw new Error('Cannot perform mod 0. Division by zero error.');

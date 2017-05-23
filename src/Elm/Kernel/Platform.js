@@ -49,7 +49,7 @@ function _Platform_programWithFlags(impl)
 				}
 
 				var result = A2(__Json_run, flagDecoder, flags);
-				if (result.ctor === 'Err')
+				if (result.$ === 'Err')
 				{
 					__Error_throw(2, moduleName, result._0);
 				}
@@ -155,7 +155,7 @@ function _Platform_makeManager(info, callback)
 
 	function onMessage(msg, state)
 	{
-		if (msg.ctor === __2_SELF)
+		if (msg.$ === __2_SELF)
 		{
 			return A3(onSelfMsg, router, msg._0, state);
 		}
@@ -191,7 +191,7 @@ var _Platform_sendToApp = F2(function(router, msg)
 var _Platform_sendToSelf = F2(function(router, msg)
 {
 	return A2(__Scheduler_send, router.self, {
-		ctor: __2_SELF,
+		$: __2_SELF,
 		_0: msg
 	});
 });
@@ -222,7 +222,7 @@ function _Platform_leaf(home)
 	return function(value)
 	{
 		return {
-			ctor: __1_LEAF,
+			$: __1_LEAF,
 			home: home,
 			value: value
 		};
@@ -232,7 +232,7 @@ function _Platform_leaf(home)
 function _Platform_batch(list)
 {
 	return {
-		ctor: __1_NODE,
+		$: __1_NODE,
 		branches: list
 	};
 }
@@ -240,7 +240,7 @@ function _Platform_batch(list)
 var _Platform_map = F2(function(tagger, bag)
 {
 	return {
-		ctor: __1_MAP,
+		$: __1_MAP,
 		tagger: tagger,
 		tree: bag
 	}
@@ -261,13 +261,13 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 			? effectsDict[home]
 			: { cmds: __List_Nil, subs: __List_Nil };
 
-		__Scheduler_rawSend(managers[home], { ctor: 'fx', _0: fx });
+		__Scheduler_rawSend(managers[home], { $: 'fx', _0: fx });
 	}
 }
 
 function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
-	switch (bag.ctor)
+	switch (bag.$)
 	{
 		case __1_LEAF:
 			var home = bag.home;
@@ -277,7 +277,7 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 
 		case __1_NODE:
 			var list = bag.branches;
-			while (list.ctor !== '[]')
+			while (list.$ !== '[]')
 			{
 				_Platform_gatherEffects(isCmd, list._0, effectsDict, taggers);
 				list = list._1;
@@ -365,7 +365,7 @@ function _Platform_setupOutgoingPort(name)
 
 	function onEffects(router, cmdList, state)
 	{
-		while (cmdList.ctor !== '[]')
+		while (cmdList.$ !== '[]')
 		{
 			// grab a separate reference to subs in case unsubscribe is called
 			var currentSubs = subs;
@@ -481,7 +481,7 @@ function _Platform_setupIncomingPort(name, callback)
 	function postInitSend(value)
 	{
 		var temp = subs;
-		while (temp.ctor !== '[]')
+		while (temp.$ !== '[]')
 		{
 			callback(temp._0(value));
 			temp = temp._1;
@@ -491,7 +491,7 @@ function _Platform_setupIncomingPort(name, callback)
 	function send(incomingValue)
 	{
 		var result = A2(__Json_run, converter, incomingValue);
-		if (result.ctor === 'Err')
+		if (result.$ === 'Err')
 		{
 			__Error_throw(4, name, result._0);
 		}
