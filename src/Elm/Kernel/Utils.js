@@ -2,6 +2,7 @@
 
 import Array exposing (toList)
 import Dict exposing (toList)
+import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Set exposing (toList)
 
@@ -39,11 +40,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 	{
 		if (typeof x === 'function')
 		{
-			throw new Error(
-				'Trying to use `(==)` on functions. There is no way to know if functions are "the same" in the Elm sense.'
-				+ ' Read more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#=='
-				+ ' which describes why it is this way and what the better version will look like.'
-			);
+			__Error_throw(5);
 		}
 		return false;
 	}
@@ -158,7 +155,6 @@ function _Utils_cmp(x, y)
 	{
 		var ord;
 		var n = x.ctor.slice(6) - 0;
-		var err = 'cannot compare tuples with more than 6 elements.';
 		if (n === 0) return _Utils_EQ;
 		if (n >= 1) { ord = _Utils_cmp(x._0, y._0); if (ord !== _Utils_EQ) return ord;
 		if (n >= 2) { ord = _Utils_cmp(x._1, y._1); if (ord !== _Utils_EQ) return ord;
@@ -166,15 +162,11 @@ function _Utils_cmp(x, y)
 		if (n >= 4) { ord = _Utils_cmp(x._3, y._3); if (ord !== _Utils_EQ) return ord;
 		if (n >= 5) { ord = _Utils_cmp(x._4, y._4); if (ord !== _Utils_EQ) return ord;
 		if (n >= 6) { ord = _Utils_cmp(x._5, y._5); if (ord !== _Utils_EQ) return ord;
-		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
+		if (n >= 7) __Error_throw(6); } } } } } }
 		return _Utils_EQ;
 	}
 
-	throw new Error(
-		'Comparison error: comparison is only defined on ints, '
-		+ 'floats, times, chars, strings, lists of comparable values, '
-		+ 'and tuples of comparable values.'
-	);
+	__Error_throw(7);
 }
 
 var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_LT; });
@@ -265,34 +257,15 @@ var _Utils_append = F2(function(xs, ys)
 function _Utils_crash(moduleName, region)
 {
 	return function(message) {
-		throw new Error(
-			'Ran into a `Debug.crash` in module `' + moduleName + '` ' + _Utils_regionToString(region) + '\n'
-			+ 'The message provided by the code author is:\n\n    '
-			+ message
-		);
+		__Error_throw(8, moduleName, region, message);
 	};
 }
 
 function _Utils_crashCase(moduleName, region, value)
 {
 	return function(message) {
-		throw new Error(
-			'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
-			+ 'This was caused by the `case` expression ' + _Utils_regionToString(region) + '.\n'
-			+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + _Utils_toString(value) + '\n\n'
-			+ 'The message provided by the code author is:\n\n    '
-			+ message
-		);
+		__Error_throw(9, moduleName, region, value, message);
 	};
-}
-
-function _Utils_regionToString(region)
-{
-	if (region.start.line == region.end.line)
-	{
-		return 'on line ' + region.start.line;
-	}
-	return 'between lines ' + region.start.line + ' and ' + region.end.line;
 }
 
 

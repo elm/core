@@ -1,5 +1,6 @@
 /*
 
+import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.Json exposing (run)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
@@ -20,10 +21,7 @@ function _Platform_program(impl)
 			{
 				if (typeof flags !== 'undefined')
 				{
-					throw new Error(
-						'The `' + moduleName + '` module does not need flags.\n'
-						+ 'Call ' + moduleName + '.worker() with no arguments and you should be all set!'
-					);
+					__Error_throw(0, moduleName);
 				}
 
 				return _Platform_initialize(
@@ -47,21 +45,13 @@ function _Platform_programWithFlags(impl)
 			{
 				if (typeof flagDecoder === 'undefined')
 				{
-					throw new Error(
-						'Are you trying to sneak a Never value into Elm? Trickster!\n'
-						+ 'It looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\n'
-						+ 'Use `program` instead if you do not want flags.'
-					);
+					__Error_throw(1, moduleName);
 				}
 
 				var result = A2(__Json_run, flagDecoder, flags);
 				if (result.ctor === 'Err')
 				{
-					throw new Error(
-						moduleName + '.worker(...) was called with an unexpected argument.\n'
-						+ 'I tried to convert it to an Elm value, but ran into this problem:\n\n'
-						+ result._0
-					);
+					__Error_throw(2, moduleName, result._0);
 				}
 
 				return _Platform_initialize(
@@ -343,7 +333,7 @@ function _Platform_checkPortName(name)
 {
 	if (name in _Platform_effectManagers)
 	{
-		throw new Error('There can only be one port named `' + name + '`, but your program has multiple.');
+		__Error_throw(3, name)
 	}
 }
 
@@ -503,7 +493,7 @@ function _Platform_setupIncomingPort(name, callback)
 		var result = A2(__Json_run, converter, incomingValue);
 		if (result.ctor === 'Err')
 		{
-			throw new Error('Trying to send an unexpected type of value through port `' + name + '`:\n' + result._0);
+			__Error_throw(4, name, result._0);
 		}
 
 		currentSend(result._0);

@@ -1,5 +1,7 @@
 /*
 
+import Elm.Kernel.Error exposing (throw)
+
 */
 
 
@@ -19,7 +21,7 @@ function _Basics_mod_help(a, b)
 {
 	if (b === 0)
 	{
-		throw new Error('Cannot perform mod 0. Division by zero error.');
+		__Error_throw(11);
 	}
 	var r = a % b;
 	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -_Basics_mod_help(-a, -b));

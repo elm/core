@@ -1,5 +1,6 @@
 /*
 
+import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.Utils exposing (Tuple0)
 
 */
@@ -217,7 +218,7 @@ function _Scheduler_step(numSteps, process)
 			continue;
 		}
 
-		throw new Error(ctor);
+		__Error_throw(10, ctor);
 	}
 
 	if (numSteps < _Scheduler_MAX_STEPS)
