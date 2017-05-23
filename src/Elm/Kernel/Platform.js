@@ -131,7 +131,7 @@ function _Platform_setupEffects(managers, callback)
 		if (manager.isForeign)
 		{
 			ports = ports || {};
-			ports[key] = manager.tag === 'cmd'
+			ports[key] = manager.tag === __2_CMD
 				? _Platform_setupOutgoingPort(key)
 				: _Platform_setupIncomingPort(key, callback);
 		}
@@ -155,7 +155,7 @@ function _Platform_makeManager(info, callback)
 
 	function onMessage(msg, state)
 	{
-		if (msg.ctor === 'self')
+		if (msg.ctor === __3_SELF)
 		{
 			return A3(onSelfMsg, router, msg._0, state);
 		}
@@ -163,13 +163,13 @@ function _Platform_makeManager(info, callback)
 		var fx = msg._0;
 		switch (tag)
 		{
-			case 'cmd':
+			case __2_CMD:
 				return A3(onEffects, router, fx.cmds, state);
 
-			case 'sub':
+			case __2_SUB:
 				return A3(onEffects, router, fx.subs, state);
 
-			case 'fx':
+			case __2_FX:
 				return A4(onEffects, router, fx.cmds, fx.subs, state);
 		}
 	}
@@ -191,7 +191,7 @@ var _Platform_sendToApp = F2(function(router, msg)
 var _Platform_sendToSelf = F2(function(router, msg)
 {
 	return A2(__Scheduler_send, router.self, {
-		ctor: 'self',
+		ctor: __3_SELF,
 		_0: msg
 	});
 });
@@ -222,7 +222,7 @@ function _Platform_leaf(home)
 	return function(value)
 	{
 		return {
-			type: 'leaf',
+			ctor: __1_LEAF,
 			home: home,
 			value: value
 		};
@@ -232,7 +232,7 @@ function _Platform_leaf(home)
 function _Platform_batch(list)
 {
 	return {
-		type: 'node',
+		ctor: __1_NODE,
 		branches: list
 	};
 }
@@ -240,7 +240,7 @@ function _Platform_batch(list)
 var _Platform_map = F2(function(tagger, bag)
 {
 	return {
-		type: 'map',
+		ctor: __1_MAP,
 		tagger: tagger,
 		tree: bag
 	}
@@ -261,21 +261,21 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 			? effectsDict[home]
 			: { cmds: __List_Nil, subs: __List_Nil };
 
-		__Scheduler_rawSend(managers[home], { ctor: 'fx', _0: fx });
+		__Scheduler_rawSend(managers[home], { ctor: __2_FX, _0: fx });
 	}
 }
 
 function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
-	switch (bag.type)
+	switch (bag.ctor)
 	{
-		case 'leaf':
+		case __1_LEAF:
 			var home = bag.home;
 			var effect = _Platform_toEffect(isCmd, home, taggers, bag.value);
 			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
 			return;
 
-		case 'node':
+		case __1_NODE:
 			var list = bag.branches;
 			while (list.ctor !== '[]')
 			{
@@ -284,7 +284,7 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 			}
 			return;
 
-		case 'map':
+		case __1_MAP:
 			_Platform_gatherEffects(isCmd, bag.tree, effectsDict, {
 				tagger: bag.tagger,
 				rest: taggers
@@ -344,7 +344,7 @@ function _Platform_outgoingPort(name, converter)
 {
 	_Platform_checkPortName(name);
 	_Platform_effectManagers[name] = {
-		tag: 'cmd',
+		tag: __2_CMD,
 		cmdMap: _Platform_outgoingPortMap,
 		converter: converter,
 		isForeign: true
@@ -414,7 +414,7 @@ function _Platform_incomingPort(name, converter)
 {
 	_Platform_checkPortName(name);
 	_Platform_effectManagers[name] = {
-		tag: 'sub',
+		tag: __2_SUB,
 		subMap: _Platform_incomingPortMap,
 		converter: converter,
 		isForeign: true
