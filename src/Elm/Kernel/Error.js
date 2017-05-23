@@ -1,5 +1,6 @@
 /*
 
+import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.Debug exposing (toString)
 
 */
@@ -66,6 +67,9 @@ function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
 
 		case 11:
 			throw new Error('Cannot perform mod 0. Division by zero error.');
+
+		case 12:
+			throw new Error('Internal red-black tree invariant violated');
 	}
 }
 
@@ -76,4 +80,9 @@ function _Error_regionToString(region)
 		return 'on line ' + region.start.line;
 	}
 	return 'between lines ' + region.start.line + ' and ' + region.end.line;
+}
+
+function _Error_dictBug()
+{
+	__Error_throw(12);
 }

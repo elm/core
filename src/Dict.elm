@@ -39,6 +39,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 
 import Basics exposing (..)
 import Debug
+import Elm.Kernel.Error
 import Maybe exposing (..)
 import List exposing (..)
 import String
@@ -289,7 +290,7 @@ moreBlack color =
       Red
 
     BBlack ->
-      Debug.crash "Can't make a double black node more black!"
+      Elm.Kernel.Error.dictBug 0 -- "Can't make a double black node more black!"
 
 
 lessBlack : NColor -> NColor
@@ -305,7 +306,7 @@ lessBlack color =
       NBlack
 
     NBlack ->
-      Debug.crash "Can't make a negative black node less black!"
+      Elm.Kernel.Error.dictBug 0 -- "Can't make a negative black node less black!"
 
 
 {- The actual pattern match here is somewhat lax. If it is given invalid input,
@@ -326,16 +327,6 @@ lessBlackTree dict =
       RBEmpty_elm_builtin LBlack
 
 
-reportRemBug : String -> NColor -> String -> String -> a
-reportRemBug msg c lgot rgot =
-  Debug.crash <|
-    String.concat
-    [ "Internal red-black tree invariant violated, expected "
-    , msg, " and got ", toString c, "/", lgot, "/", rgot
-    , "\nPlease report this bug to <https://github.com/elm-lang/core/issues>"
-    ]
-
-
 -- Remove the top node from the tree, may leave behind BBlacks
 rem : NColor -> Dict k v -> Dict k v -> Dict k v
 rem color left right =
@@ -349,7 +340,7 @@ rem color left right =
           RBEmpty_elm_builtin LBBlack
 
         _ ->
-          Debug.crash "cannot have bblack or nblack nodes at this point"
+          Elm.Kernel.Error.dictBug 0 -- "cannot have bblack or nblack nodes at this point"
 
     (RBEmpty_elm_builtin cl, RBNode_elm_builtin cr k v l r) ->
       case (color, cl, cr) of
@@ -357,7 +348,7 @@ rem color left right =
           RBNode_elm_builtin Black k v l r
 
         _ ->
-          reportRemBug "Black/LBlack/Red" color (toString cl) (toString cr)
+          Elm.Kernel.Error.dictBug 0 -- "bad remove"
 
     (RBNode_elm_builtin cl k v l r, RBEmpty_elm_builtin cr) ->
       case (color, cl, cr) of
@@ -365,7 +356,7 @@ rem color left right =
           RBNode_elm_builtin Black k v l r
 
         _ ->
-          reportRemBug "Black/Red/LBlack" color (toString cl) (toString cr)
+          Elm.Kernel.Error.dictBug 0 -- "bad remove"
 
     -- l and r are both RBNodes
     (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
@@ -480,7 +471,7 @@ redden : Dict k v -> Dict k v
 redden t =
   case t of
     RBEmpty_elm_builtin _ ->
-      Debug.crash "can't make a Leaf red"
+      Elm.Kernel.Error.dictBug 0 -- "can't make a Leaf red"
 
     RBNode_elm_builtin _ k v l r ->
       RBNode_elm_builtin Red k v l r
