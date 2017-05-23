@@ -131,7 +131,7 @@ function _Platform_setupEffects(managers, callback)
 		if (manager.isForeign)
 		{
 			ports = ports || {};
-			ports[key] = manager.tag === __2_CMD
+			ports[key] = manager.tag === 'cmd'
 				? _Platform_setupOutgoingPort(key)
 				: _Platform_setupIncomingPort(key, callback);
 		}
@@ -155,7 +155,7 @@ function _Platform_makeManager(info, callback)
 
 	function onMessage(msg, state)
 	{
-		if (msg.ctor === __3_SELF)
+		if (msg.ctor === __2_SELF)
 		{
 			return A3(onSelfMsg, router, msg._0, state);
 		}
@@ -163,13 +163,13 @@ function _Platform_makeManager(info, callback)
 		var fx = msg._0;
 		switch (tag)
 		{
-			case __2_CMD:
+			case 'cmd':
 				return A3(onEffects, router, fx.cmds, state);
 
-			case __2_SUB:
+			case 'sub':
 				return A3(onEffects, router, fx.subs, state);
 
-			case __2_FX:
+			case 'fx':
 				return A4(onEffects, router, fx.cmds, fx.subs, state);
 		}
 	}
@@ -191,7 +191,7 @@ var _Platform_sendToApp = F2(function(router, msg)
 var _Platform_sendToSelf = F2(function(router, msg)
 {
 	return A2(__Scheduler_send, router.self, {
-		ctor: __3_SELF,
+		ctor: __2_SELF,
 		_0: msg
 	});
 });
@@ -261,7 +261,7 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 			? effectsDict[home]
 			: { cmds: __List_Nil, subs: __List_Nil };
 
-		__Scheduler_rawSend(managers[home], { ctor: __2_FX, _0: fx });
+		__Scheduler_rawSend(managers[home], { ctor: 'fx', _0: fx });
 	}
 }
 
@@ -344,7 +344,7 @@ function _Platform_outgoingPort(name, converter)
 {
 	_Platform_checkPortName(name);
 	_Platform_effectManagers[name] = {
-		tag: __2_CMD,
+		tag: 'cmd',
 		cmdMap: _Platform_outgoingPortMap,
 		converter: converter,
 		isForeign: true
@@ -414,7 +414,7 @@ function _Platform_incomingPort(name, converter)
 {
 	_Platform_checkPortName(name);
 	_Platform_effectManagers[name] = {
-		tag: __2_SUB,
+		tag: 'sub',
 		subMap: _Platform_incomingPortMap,
 		converter: converter,
 		isForeign: true
