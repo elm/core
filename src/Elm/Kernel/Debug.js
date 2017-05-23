@@ -1,11 +1,13 @@
 /*
 
+import Elm.Kernel.Utils exposing (toString)
+
 */
 
 
 var _Debug_log = F2(function(tag, value)
 {
-	var msg = tag + ': ' + _Utils_toString(value);
+	var msg = tag + ': ' + __Utils_toString(value);
 	var process = process || {};
 	if (process.stdout)
 	{
