@@ -307,9 +307,13 @@ function _Utils_toString(v)
 	if (type === 'object' && 'ctor' in v)
 	{
 		var tag = v.ctor;
-		var first = tag[0];
 
-		if (first === '#')
+		if (typeof tag === 'number')
+		{
+			return '<internals>';
+		}
+
+		if (tag[0] === '#')
 		{
 			var output = [];
 			for (var k in v)
@@ -318,16 +322,6 @@ function _Utils_toString(v)
 				output.push(_Utils_toString(v[k]));
 			}
 			return '(' + output.join(',') + ')';
-		}
-
-		if (first === '_')
-		{
-			var second = tag[1];
-			return (
-				second === 't' ? '<task>' :
-				second === 'd' ? '<decoder>' :
-				second === 'p' ? '<process>' : '<internals>'
-			);
 		}
 
 		if (tag === 'Array')
