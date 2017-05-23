@@ -12,7 +12,7 @@ import Set exposing (toList)
 
 var _Debug_log = F2(function(tag, value)
 {
-	var msg = tag + ': ' + _Debug_toString(value);
+	var msg = tag + ': ' + _Debug_toString_dev(value);
 	var process = process || {};
 	if (process.stdout)
 	{
@@ -98,7 +98,7 @@ function _Debug_toString_dev(v)
 			for (var k in v)
 			{
 				if (k === 'ctor') continue;
-				output.push(_Debug_toString(v[k]));
+				output.push(_Debug_toString_dev(v[k]));
 			}
 			return '(' + output.join(',') + ')';
 		}
@@ -106,16 +106,16 @@ function _Debug_toString_dev(v)
 		if (tag === 'Array')
 		{
 			var list = __Array_toList(v);
-			return 'Array.fromList ' + _Debug_toString(list);
+			return 'Array.fromList ' + _Debug_toString_dev(list);
 		}
 
 		if (tag === '::')
 		{
-			var output = '[' + _Debug_toString(v._0);
+			var output = '[' + _Debug_toString_dev(v._0);
 			v = v._1;
 			while (v.ctor === '::')
 			{
-				output += ',' + _Debug_toString(v._0);
+				output += ',' + _Debug_toString_dev(v._0);
 				v = v._1;
 			}
 			return output + ']';
@@ -128,19 +128,19 @@ function _Debug_toString_dev(v)
 
 		if (tag === 'Set_elm_builtin')
 		{
-			return 'Set.fromList ' + _Debug_toString(__Set_toList(v));
+			return 'Set.fromList ' + _Debug_toString_dev(__Set_toList(v));
 		}
 
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
-			return 'Dict.fromList ' + _Debug_toString(__Dict_toList(v));
+			return 'Dict.fromList ' + _Debug_toString_dev(__Dict_toList(v));
 		}
 
 		var output = '';
 		for (var i in v)
 		{
 			if (i === 'ctor') continue;
-			var str = _Debug_toString(v[i]);
+			var str = _Debug_toString_dev(v[i]);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
@@ -163,7 +163,7 @@ function _Debug_toString_dev(v)
 		var output = [];
 		for (var k in v)
 		{
-			output.push(k + ' = ' + _Debug_toString(v[k]));
+			output.push(k + ' = ' + _Debug_toString_dev(v[k]));
 		}
 		if (output.length === 0)
 		{
