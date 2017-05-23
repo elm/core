@@ -61,8 +61,8 @@ var _JsArray_initializeFromList = F2(function (max, ls)
             break;
         }
 
-        result[i] = ls._0;
-        ls = ls._1;
+        result[i] = ls.a;
+        ls = ls.b;
     }
 
     return __Utils_Tuple2(result, ls);

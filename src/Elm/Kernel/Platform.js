@@ -51,11 +51,11 @@ function _Platform_programWithFlags(impl)
 				var result = A2(__Json_run, flagDecoder, flags);
 				if (result.$ === 'Err')
 				{
-					__Error_throw(2, moduleName, result._0);
+					__Error_throw(2, moduleName, result.a);
 				}
 
 				return _Platform_initialize(
-					impl.init(result._0),
+					impl.init(result.a),
 					impl.update,
 					impl.subscriptions,
 					_Platform_renderer
@@ -81,9 +81,9 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 
 	// init and update state in main process
 	var initApp = __Scheduler_binding(function(callback) {
-		var model = init._0;
+		var model = init.a;
 		updateView = renderer(enqueue);
-		var cmds = init._1;
+		var cmds = init.b;
 		var subs = subscriptions(model);
 		_Platform_dispatchEffects(managers, cmds, subs);
 		callback(__Scheduler_succeed(model));
@@ -93,9 +93,9 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 	{
 		return __Scheduler_binding(function(callback) {
 			var results = A2(update, msg, model);
-			model = results._0;
+			model = results.a;
 			updateView(model);
-			var cmds = results._1;
+			var cmds = results.b;
 			var subs = subscriptions(model);
 			_Platform_dispatchEffects(managers, cmds, subs);
 			callback(__Scheduler_succeed(model));
@@ -157,10 +157,10 @@ function _Platform_makeManager(info, callback)
 	{
 		if (msg.$ === __2_SELF)
 		{
-			return A3(onSelfMsg, router, msg._0, state);
+			return A3(onSelfMsg, router, msg.a, state);
 		}
 
-		var fx = msg._0;
+		var fx = msg.a;
 		switch (tag)
 		{
 			case 'cmd':
@@ -192,7 +192,7 @@ var _Platform_sendToSelf = F2(function(router, msg)
 {
 	return A2(__Scheduler_send, router.self, {
 		$: __2_SELF,
-		_0: msg
+		a: msg
 	});
 });
 
@@ -222,7 +222,7 @@ function _Platform_leaf(home)
 	return function(value)
 	{
 		return {
-			$: __1_LEAF,
+			$: _b_LEAF,
 			home: home,
 			value: value
 		};
@@ -232,7 +232,7 @@ function _Platform_leaf(home)
 function _Platform_batch(list)
 {
 	return {
-		$: __1_NODE,
+		$: _b_NODE,
 		branches: list
 	};
 }
@@ -240,7 +240,7 @@ function _Platform_batch(list)
 var _Platform_map = F2(function(tagger, bag)
 {
 	return {
-		$: __1_MAP,
+		$: _b_MAP,
 		tagger: tagger,
 		tree: bag
 	}
@@ -261,7 +261,7 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 			? effectsDict[home]
 			: { cmds: __List_Nil, subs: __List_Nil };
 
-		__Scheduler_rawSend(managers[home], { $: 'fx', _0: fx });
+		__Scheduler_rawSend(managers[home], { $: 'fx', a: fx });
 	}
 }
 
@@ -269,22 +269,22 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
 	switch (bag.$)
 	{
-		case __1_LEAF:
+		case _b_LEAF:
 			var home = bag.home;
 			var effect = _Platform_toEffect(isCmd, home, taggers, bag.value);
 			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
 			return;
 
-		case __1_NODE:
+		case _b_NODE:
 			var list = bag.branches;
 			while (list.$ !== '[]')
 			{
-				_Platform_gatherEffects(isCmd, list._0, effectsDict, taggers);
-				list = list._1;
+				_Platform_gatherEffects(isCmd, list.a, effectsDict, taggers);
+				list = list.b;
 			}
 			return;
 
-		case __1_MAP:
+		case _b_MAP:
 			_Platform_gatherEffects(isCmd, bag.tree, effectsDict, {
 				tagger: bag.tagger,
 				rest: taggers
@@ -369,12 +369,12 @@ function _Platform_setupOutgoingPort(name)
 		{
 			// grab a separate reference to subs in case unsubscribe is called
 			var currentSubs = subs;
-			var value = converter(cmdList._0);
+			var value = converter(cmdList.a);
 			for (var i = 0; i < currentSubs.length; i++)
 			{
 				currentSubs[i](value);
 			}
-			cmdList = cmdList._1;
+			cmdList = cmdList.b;
 		}
 		return init;
 	}
@@ -483,8 +483,8 @@ function _Platform_setupIncomingPort(name, callback)
 		var temp = subs;
 		while (temp.$ !== '[]')
 		{
-			callback(temp._0(value));
-			temp = temp._1;
+			callback(temp.a(value));
+			temp = temp.b;
 		}
 	}
 
@@ -493,10 +493,10 @@ function _Platform_setupIncomingPort(name, callback)
 		var result = A2(__Json_run, converter, incomingValue);
 		if (result.$ === 'Err')
 		{
-			__Error_throw(4, name, result._0);
+			__Error_throw(4, name, result.a);
 		}
 
-		currentSend(result._0);
+		currentSend(result.a);
 	}
 
 	return { send: send };

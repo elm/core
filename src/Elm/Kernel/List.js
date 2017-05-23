@@ -9,7 +9,7 @@ var _List_Nil = { $: '[]' };
 
 function _List_Cons(hd, tl)
 {
-	return { $: '::', _0: hd, _1: tl };
+	return { $: '::', a: hd, b: tl };
 }
 
 var _List_cons = F2(_List_Cons);
@@ -29,21 +29,20 @@ function _List_toArray(xs)
 	var out = [];
 	while (xs.$ !== '[]')
 	{
-		out.push(xs._0);
-		xs = xs._1;
+		out.push(xs.a);
+		xs = xs.b;
 	}
 	return out;
 }
 
-var _List_foldr = F3(function(f, b, xs)
+var _List_foldr = F3(function(f, state, xs)
 {
 	var arr = _List_toArray(xs);
-	var acc = b;
 	for (var i = arr.length; i--; )
 	{
-		acc = A2(f, arr[i], acc);
+		state = A2(f, arr[i], state);
 	}
-	return acc;
+	return state;
 });
 
 var _List_map2 = F3(function(f, xs, ys)
@@ -51,9 +50,9 @@ var _List_map2 = F3(function(f, xs, ys)
 	var arr = [];
 	while (xs.$ !== '[]' && ys.$ !== '[]')
 	{
-		arr.push(A2(f, xs._0, ys._0));
-		xs = xs._1;
-		ys = ys._1;
+		arr.push(A2(f, xs.a, ys.a));
+		xs = xs.b;
+		ys = ys.b;
 	}
 	return _List_fromArray(arr);
 });
@@ -63,10 +62,10 @@ var _List_map3 = F4(function(f, xs, ys, zs)
 	var arr = [];
 	while (xs.$ !== '[]' && ys.$ !== '[]' && zs.$ !== '[]')
 	{
-		arr.push(A3(f, xs._0, ys._0, zs._0));
-		xs = xs._1;
-		ys = ys._1;
-		zs = zs._1;
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+		xs = xs.b;
+		ys = ys.b;
+		zs = zs.b;
 	}
 	return _List_fromArray(arr);
 });
@@ -79,11 +78,11 @@ var _List_map4 = F5(function(f, ws, xs, ys, zs)
 		   && ys.$ !== '[]'
 		   && zs.$ !== '[]')
 	{
-		arr.push(A4(f, ws._0, xs._0, ys._0, zs._0));
-		ws = ws._1;
-		xs = xs._1;
-		ys = ys._1;
-		zs = zs._1;
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+		ws = ws.b;
+		xs = xs.b;
+		ys = ys.b;
+		zs = zs.b;
 	}
 	return _List_fromArray(arr);
 });
@@ -97,12 +96,12 @@ var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
 		   && ys.$ !== '[]'
 		   && zs.$ !== '[]')
 	{
-		arr.push(A5(f, vs._0, ws._0, xs._0, ys._0, zs._0));
-		vs = vs._1;
-		ws = ws._1;
-		xs = xs._1;
-		ys = ys._1;
-		zs = zs._1;
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+		vs = vs.b;
+		ws = ws.b;
+		xs = xs.b;
+		ys = ys.b;
+		zs = zs.b;
 	}
 	return _List_fromArray(arr);
 });

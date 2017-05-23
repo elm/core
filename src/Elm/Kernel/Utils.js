@@ -86,12 +86,12 @@ function _Utils_eqHelp(x, y, depth, stack)
 		var b = y;
 		while (a.$ === '::' && b.$ === '::')
 		{
-			if (!_Utils_eqHelp(a._0, b._0, depth + 1, stack))
+			if (!_Utils_eqHelp(a.a, b.a, depth + 1, stack))
 			{
 				return false;
 			}
-			a = a._1;
-			b = b._1;
+			a = a.b;
+			b = b.b;
 		}
 		return a.$ === b.$;
 	}
@@ -140,13 +140,13 @@ function _Utils_cmp(x, y)
 	{
 		while (x.$ === '::' && y.$ === '::')
 		{
-			var ord = _Utils_cmp(x._0, y._0);
+			var ord = _Utils_cmp(x.a, y.a);
 			if (ord !== _Utils_EQ)
 			{
 				return ord;
 			}
-			x = x._1;
-			y = y._1;
+			x = x.b;
+			y = y.b;
 		}
 		return x.$ === y.$ ? _Utils_EQ : x.$ === '[]' ? _Utils_LT : _Utils_GT;
 	}
@@ -156,12 +156,12 @@ function _Utils_cmp(x, y)
 		var ord;
 		var n = x.$.slice(1) - 0;
 		if (n === 0) return _Utils_EQ;
-		if (n >= 1) { ord = _Utils_cmp(x._0, y._0); if (ord !== _Utils_EQ) return ord;
-		if (n >= 2) { ord = _Utils_cmp(x._1, y._1); if (ord !== _Utils_EQ) return ord;
-		if (n >= 3) { ord = _Utils_cmp(x._2, y._2); if (ord !== _Utils_EQ) return ord;
-		if (n >= 4) { ord = _Utils_cmp(x._3, y._3); if (ord !== _Utils_EQ) return ord;
-		if (n >= 5) { ord = _Utils_cmp(x._4, y._4); if (ord !== _Utils_EQ) return ord;
-		if (n >= 6) { ord = _Utils_cmp(x._5, y._5); if (ord !== _Utils_EQ) return ord;
+		if (n >= 1) { ord = _Utils_cmp(x.a, y.a); if (ord !== _Utils_EQ) return ord;
+		if (n >= 2) { ord = _Utils_cmp(x.b, y.b); if (ord !== _Utils_EQ) return ord;
+		if (n >= 3) { ord = _Utils_cmp(x.c, y.c); if (ord !== _Utils_EQ) return ord;
+		if (n >= 4) { ord = _Utils_cmp(x.d, y.d); if (ord !== _Utils_EQ) return ord;
+		if (n >= 5) { ord = _Utils_cmp(x.e, y.e); if (ord !== _Utils_EQ) return ord;
+		if (n >= 6) { ord = _Utils_cmp(x.f, y.f); if (ord !== _Utils_EQ) return ord;
 		if (n >= 7) __Error_throw(6); } } } } } }
 		return _Utils_EQ;
 	}
@@ -192,8 +192,8 @@ function _Utils_Tuple2(x, y)
 {
 	return {
 		$: '#2',
-		_0: x,
-		_1: y
+		a: x,
+		b: y
 	};
 }
 
@@ -238,15 +238,15 @@ var _Utils_append = F2(function(xs, ys)
 	{
 		return ys;
 	}
-	var root = __List_Cons(xs._0, __List_Nil);
+	var root = __List_Cons(xs.a, __List_Nil);
 	var curr = root;
-	xs = xs._1;
+	xs = xs.b;
 	while (xs.$ !== '[]')
 	{
-		curr._1 = __List_Cons(xs._0, __List_Nil);
-		xs = xs._1;
-		curr = curr._1;
+		curr.b = __List_Cons(xs.a, __List_Nil);
+		xs = xs.b;
+		curr = curr.b;
 	}
-	curr._1 = ys;
+	curr.b = ys;
 	return root;
 });

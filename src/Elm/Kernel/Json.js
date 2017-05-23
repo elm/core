@@ -397,7 +397,7 @@ function _Json_runHelp(decoder, value)
 			var temp = decoder.decoders;
 			while (temp.$ !== '[]')
 			{
-				var result = _Json_runHelp(temp._0, value);
+				var result = _Json_runHelp(temp.a, value);
 
 				if (result.tag === __2_OK)
 				{
@@ -406,7 +406,7 @@ function _Json_runHelp(decoder, value)
 
 				errors.push(result);
 
-				temp = temp._1;
+				temp = temp.b;
 			}
 			return _Json_badOneOf(errors);
 
@@ -511,9 +511,9 @@ function _Json_encodeObject(keyValuePairs)
 	var obj = {};
 	while (keyValuePairs.$ !== '[]')
 	{
-		var pair = keyValuePairs._0;
-		obj[pair._0] = pair._1;
-		keyValuePairs = keyValuePairs._1;
+		var pair = keyValuePairs.a;
+		obj[pair.a] = pair.b;
+		keyValuePairs = keyValuePairs.b;
 	}
 	return obj;
 }

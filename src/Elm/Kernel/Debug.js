@@ -107,12 +107,12 @@ function _Debug_toString_dev(v)
 
 		if (tag === '::')
 		{
-			var output = '[' + _Debug_toString_dev(v._0);
-			v = v._1;
+			var output = '[' + _Debug_toString_dev(v.a);
+			v = v.b;
 			while (v.$ === '::')
 			{
-				output += ',' + _Debug_toString_dev(v._0);
-				v = v._1;
+				output += ',' + _Debug_toString_dev(v.a);
+				v = v.b;
 			}
 			return output + ']';
 		}
