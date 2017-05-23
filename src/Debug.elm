@@ -1,5 +1,6 @@
 module Debug exposing
-  ( log
+  ( toString
+  , log
   , crash
   )
 
@@ -7,10 +8,27 @@ module Debug exposing
 *not* be used in production code.
 
 # Debugging
-@docs log, crash
+@docs toString, log, crash
 -}
 
 import Elm.Kernel.Debug
+
+
+{-| Turn any kind of value into a string.
+
+    toString 42                == "42"
+    toString [1,2]             == "[1,2]"
+    toString ('a', "cat", 13)  == "('a', \"cat\", 13)"
+    toString "he said, \"hi\"" == "\"he said, \\\"hi\\\"\""
+
+Notice that with strings, this is not the `identity` function. It escapes
+characters so if you say `Html.text (toString "he said, \"hi\"")` it will
+show `"he said, \"hi\""` rather than `he said, "hi"`. This makes it nice
+for viewing Elm data structures.
+-}
+toString : a -> String
+toString =
+  Elm.Kernel.Debug.toString
 
 
 {-| Log a tagged value on the developer console, and then return the value.

@@ -8,7 +8,7 @@ module Basics exposing
   , degrees, radians, turns
   , toPolar, fromPolar
   , isNaN, isInfinite
-  , toString, (++)
+  , (++)
   , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
   )
 
@@ -50,8 +50,8 @@ which happen to be radians.
 # Floating Point Checks
 @docs isNaN, isInfinite
 
-# Strings and Lists
-@docs toString, (++)
+# Append Strings and Lists
+@docs (++)
 
 # Higher-Order Helpers
 @docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
@@ -485,23 +485,6 @@ Notice that NaN is not infinite! For float `n` to be finite implies that
 isInfinite : Float -> Bool
 isInfinite =
   Elm.Kernel.Basics.isInfinite
-
-
-{-| Turn any kind of value into a string, mostly for debugging.
-
-    toString 42                == "42"
-    toString [1,2]             == "[1,2]"
-    toString ('a', "cat", 13)  == "('a', \"cat\", 13)"
-    toString "he said, \"hi\"" == "\"he said, \\\"hi\\\"\""
-
-Notice that with strings, this is not the `identity` function. It escapes
-characters so if you say `Html.text (toString "he said, \"hi\"")` it will
-show `"he said, \"hi\""` rather than `he said, "hi"`. This makes it nice
-for viewing Elm data structures.
--}
-toString : a -> String
-toString =
-  Elm.Kernel.Utils.toString
 
 
 {-| Put two appendable things together. This includes strings, lists, and text.
