@@ -151,7 +151,7 @@ function _Utils_cmp(x, y)
 		return x.ctor === y.ctor ? _Utils_EQ : x.ctor === '[]' ? _Utils_LT : _Utils_GT;
 	}
 
-	if (x.ctor.slice(0, 6) === '_Tuple')
+	if (x.ctor[0] === '#')
 	{
 		var ord;
 		var n = x.ctor.slice(6) - 0;
