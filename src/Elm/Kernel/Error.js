@@ -6,9 +6,8 @@ import Elm.Kernel.Debug exposing (toString)
 */
 
 
-function _Error_throw_prod(identifier, fact1, fact2, fact3, fact4)
+function _Error_throw_prod(identifier)
 {
-	console.error(fact1, fact2, fact3, fact4);
 	throw new Error('https://github.com/elm-lang/core/blob/master/help.md#' + identifier);
 }
 
