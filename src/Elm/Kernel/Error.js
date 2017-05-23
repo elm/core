@@ -1,6 +1,6 @@
 /*
 
-import Elm.Kernel.Utils exposing (toString)
+import Elm.Kernel.Debug exposing (toString)
 
 */
 
@@ -58,7 +58,7 @@ function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
 			var region = fact2;
 			var value = fact3;
 			var message = fact4;
-			throw new Error('Ran into a `Debug.crash` in module `' + moduleName + '`\n\nThis was caused by the `case` expression ' + _Error_regionToString(region) + '.\nOne of the branches ended with a crash and the following value got through:\n\n    ' + __Utils_toString(value) + '\n\nThe message provided by the code author is:\n\n    ' + message);
+			throw new Error('Ran into a `Debug.crash` in module `' + moduleName + '`\n\nThis was caused by the `case` expression ' + _Error_regionToString(region) + '.\nOne of the branches ended with a crash and the following value got through:\n\n    ' + __Debug_toString(value) + '\n\nThe message provided by the code author is:\n\n    ' + message);
 
 		case 10:
 			var ctor = fact1;
