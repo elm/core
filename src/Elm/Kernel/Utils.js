@@ -154,7 +154,7 @@ function _Utils_cmp(x, y)
 	if (x.$[0] === '#')
 	{
 		var ord;
-		var n = x.$.slice(6) - 0;
+		var n = x.$.slice(1) - 0;
 		if (n === 0) return _Utils_EQ;
 		if (n >= 1) { ord = _Utils_cmp(x._0, y._0); if (ord !== _Utils_EQ) return ord;
 		if (n >= 2) { ord = _Utils_cmp(x._1, y._1); if (ord !== _Utils_EQ) return ord;
