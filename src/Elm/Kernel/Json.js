@@ -421,23 +421,23 @@ function _Json_runHelp(decoder, value)
 
 // EQUALITY
 
-function _Json_equality(a, b)
+function _Json_equality(x, y)
 {
-	if (a === b)
+	if (x === y)
 	{
 		return true;
 	}
 
-	if (a.$ !== b.$)
+	if (x.$ !== y.$)
 	{
 		return false;
 	}
 
-	switch (a.$)
+	switch (x.$)
 	{
 		case __1_SUCCEED:
 		case __1_FAIL:
-			return a.msg === b.msg;
+			return x.msg === y.msg;
 
 		case __1_BOOL:
 		case __1_INT:
@@ -447,32 +447,32 @@ function _Json_equality(a, b)
 			return true;
 
 		case __1_NULL:
-			return a.value === b.value;
+			return x.value === y.value;
 
 		case __1_LIST:
 		case __1_ARRAY:
 		case __1_MAYBE:
 		case __1_KEY_VALUE:
-			return _Json_equality(a.decoder, b.decoder);
+			return _Json_equality(x.decoder, y.decoder);
 
 		case __1_FIELD:
-			return a.field === b.field && _Json_equality(a.decoder, b.decoder);
+			return x.field === y.field && _Json_equality(x.decoder, y.decoder);
 
 		case __1_INDEX:
-			return a.index === b.index && _Json_equality(a.decoder, b.decoder);
+			return x.index === y.index && _Json_equality(x.decoder, y.decoder);
 
 		case __1_MAP:
-			if (a.func !== b.func)
+			if (x.func !== y.func)
 			{
 				return false;
 			}
-			return _Json_listEquality(a.decoders, b.decoders);
+			return _Json_listEquality(x.decoders, y.decoders);
 
 		case __1_AND_THEN:
-			return a.callback === b.callback && _Json_equality(a.decoder, b.decoder);
+			return x.callback === y.callback && _Json_equality(x.decoder, y.decoder);
 
 		case __1_ONE_OF:
-			return _Json_listEquality(a.decoders, b.decoders);
+			return _Json_listEquality(x.decoders, y.decoders);
 	}
 }
 
