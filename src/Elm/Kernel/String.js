@@ -328,6 +328,16 @@ var _String_indexes = F2(function(sub, str)
 });
 
 
+// TO STRING
+
+function _String_fromNumber(number)
+{
+	return number + '';
+}
+
+
+// INT CONVERSIONS
+
 function _String_toInt(s)
 {
 	var len = s.length;
@@ -376,6 +386,8 @@ function _String_intErr(s)
 	return __Result_Err('could not convert string "' + s + '" to an Int');
 }
 
+
+// FLOAT CONVERSIONS
 
 function _String_toFloat(s)
 {

@@ -3,7 +3,9 @@ module String exposing
   , cons, uncons, fromChar, append, concat, split, join, words, lines
   , slice, left, right, dropLeft, dropRight
   , contains, startsWith, endsWith, indexes, indices
-  , toInt, toFloat, toList, fromList
+  , toInt, fromInt
+  , toFloat, fromFloat
+  , toList, fromList
   , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
   , map, filter, foldl, foldr, any, all
   )
@@ -23,8 +25,14 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 # Check for Substrings
 @docs contains, startsWith, endsWith, indexes, indices
 
-# Conversions
-@docs toInt, toFloat, toList, fromList
+# Int Conversions
+@docs toInt, fromInt
+
+# Float Conversions
+@docs toFloat, fromFloat
+
+# List Conversions
+@docs toList, fromList
 
 # Formatting
 Cosmetic operations such as padding with extra characters or trimming whitespace.
@@ -407,6 +415,10 @@ indices =
   Elm.Kernel.String.indexes
 
 
+
+-- INT CONVERSIONS
+
+
 {-| Try to convert a string into an int, failing on improperly formatted strings.
 
     String.toInt "123" == Ok 123
@@ -425,6 +437,23 @@ toInt =
   Elm.Kernel.String.toInt
 
 
+{-| Convert an `Int` to a `String`.
+
+    String.fromInt 123 == "123"
+    String.fromInt -42 == "-42"
+
+Check out [`Debug.toString`](Debug#toString) to convert *any* value to a string
+for debugging purposes.
+-}
+fromInt : Int -> String
+fromInt =
+  Elm.Kernel.String.fromNumber
+
+
+
+-- FLOAT CONVERSIONS
+
+
 {-| Try to convert a string into a float, failing on improperly formatted strings.
 
     String.toFloat "123" == Ok 123.0
@@ -441,6 +470,24 @@ want to use [`Result.withDefault`](Result#withDefault) to handle bad data:
 toFloat : String -> Result String Float
 toFloat =
   Elm.Kernel.String.toFloat
+
+
+{-| Convert a `Float` to a `String`.
+
+    String.fromFloat 123 == "123"
+    String.fromFloat -42 == "-42"
+    String.fromFloat 3.9 == "3.9"
+
+Check out [`Debug.toString`](Debug#toString) to convert *any* value to a string
+for debugging purposes.
+-}
+fromFloat : Float -> String
+fromFloat =
+  Elm.Kernel.String.fromNumber
+
+
+
+-- LIST CONVERSIONS
 
 
 {-| Convert a string to a list of characters.
