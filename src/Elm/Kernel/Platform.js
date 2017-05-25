@@ -222,7 +222,7 @@ function _Platform_leaf(home)
 	return function(value)
 	{
 		return {
-			$: _b_LEAF,
+			$: __2_LEAF,
 			home: home,
 			value: value
 		};
@@ -232,7 +232,7 @@ function _Platform_leaf(home)
 function _Platform_batch(list)
 {
 	return {
-		$: _b_NODE,
+		$: __2_NODE,
 		branches: list
 	};
 }
@@ -240,7 +240,7 @@ function _Platform_batch(list)
 var _Platform_map = F2(function(tagger, bag)
 {
 	return {
-		$: _b_MAP,
+		$: __2_MAP,
 		tagger: tagger,
 		tree: bag
 	}
@@ -269,13 +269,13 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
 	switch (bag.$)
 	{
-		case _b_LEAF:
+		case __2_LEAF:
 			var home = bag.home;
 			var effect = _Platform_toEffect(isCmd, home, taggers, bag.value);
 			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
 			return;
 
-		case _b_NODE:
+		case __2_NODE:
 			var list = bag.branches;
 			while (list.$ !== '[]')
 			{
@@ -284,7 +284,7 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 			}
 			return;
 
-		case _b_MAP:
+		case __2_MAP:
 			_Platform_gatherEffects(isCmd, bag.tree, effectsDict, {
 				tagger: bag.tagger,
 				rest: taggers
