@@ -462,11 +462,7 @@ function _Json_equality(x, y)
 			return x.index === y.index && _Json_equality(x.decoder, y.decoder);
 
 		case __1_MAP:
-			if (x.func !== y.func)
-			{
-				return false;
-			}
-			return _Json_listEquality(x.decoders, y.decoders);
+			return x.func === y.func && _Json_listEquality(x.decoders, y.decoders);
 
 		case __1_AND_THEN:
 			return x.callback === y.callback && _Json_equality(x.decoder, y.decoder);
