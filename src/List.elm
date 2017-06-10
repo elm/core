@@ -209,7 +209,7 @@ the successes.
 
     isTeen : Int -> Maybe Int
     isTeen n =
-      if 13 <= n && n <= 19 then
+      if 13 <= n && n <= 18 then
         Just n
 
       else
