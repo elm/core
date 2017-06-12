@@ -160,8 +160,96 @@ foldl func acc list =
     foldr (+) 0 [1,2,3] == 6
 -}
 foldr : (a -> b -> b) -> b -> List a -> b
-foldr =
-  Elm.Kernel.List.foldr
+foldr fn acc ls =
+    foldrHelper fn acc 0 ls
+
+
+foldrHelper : (a -> b -> b) -> b -> Int -> List a -> b
+foldrHelper fn acc ctr ls =
+    case ls of
+        [] ->
+            acc
+
+        a :: [] ->
+            fn a acc
+
+        a :: b :: [] ->
+            fn b acc
+                |> fn a
+
+        a :: b :: c :: [] ->
+            fn c acc
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: [] ->
+            fn d acc
+                |> fn c
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: e :: [] ->
+            fn e acc
+                |> fn d
+                |> fn c
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: e :: f :: [] ->
+            fn f acc
+                |> fn e
+                |> fn d
+                |> fn c
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: e :: f :: g :: [] ->
+            fn g acc
+                |> fn f
+                |> fn e
+                |> fn d
+                |> fn c
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: e :: f :: g :: h :: [] ->
+            fn h acc
+                |> fn g
+                |> fn f
+                |> fn e
+                |> fn d
+                |> fn c
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: e :: f :: g :: h :: i :: [] ->
+            fn i acc
+                |> fn h
+                |> fn g
+                |> fn f
+                |> fn e
+                |> fn d
+                |> fn c
+                |> fn b
+                |> fn a
+
+        a :: b :: c :: d :: e :: f :: g :: h :: i :: rest ->
+            let
+                res =
+                    if ctr > 500 then
+                        foldl fn acc <| reverse rest
+                    else
+                        foldrHelper fn acc (ctr + 1) rest
+            in
+                fn i res
+                    |> fn h
+                    |> fn g
+                    |> fn f
+                    |> fn e
+                    |> fn d
+                    |> fn c
+                    |> fn b
+                    |> fn a
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
