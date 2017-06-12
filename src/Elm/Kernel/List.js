@@ -35,16 +35,6 @@ function _List_toArray(xs)
 	return out;
 }
 
-var _List_foldr = F3(function(f, state, xs)
-{
-	var arr = _List_toArray(xs);
-	for (var i = arr.length; i--; )
-	{
-		state = A2(f, arr[i], state);
-	}
-	return state;
-});
-
 var _List_map2 = F3(function(f, xs, ys)
 {
 	var arr = [];
