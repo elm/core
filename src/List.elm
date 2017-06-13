@@ -160,8 +160,65 @@ foldl func acc list =
     foldr (+) 0 [1,2,3] == 6
 -}
 foldr : (a -> b -> b) -> b -> List a -> b
-foldr =
-  Elm.Kernel.List.foldr
+foldr fn acc ls =
+    foldrHelper fn acc 0 ls
+
+
+foldrHelper : (a -> b -> b) -> b -> Int -> List a -> b
+foldrHelper fn acc ctr ls =
+    case ls of
+        [] ->
+            acc
+
+        a :: r1 ->
+            case r1 of
+                [] ->
+                    fn a acc
+
+                b :: r2 ->
+                    case r2 of
+                        [] ->
+                            fn a (fn b acc)
+
+                        c :: r3 ->
+                            case r3 of
+                                [] ->
+                                    fn a (fn b (fn c acc))
+
+                                d :: r4 ->
+                                    case r4 of
+                                        [] ->
+                                            fn a (fn b (fn c (fn d acc)))
+
+                                        e :: r5 ->
+                                            case r5 of
+                                                [] ->
+                                                    fn a (fn b (fn c (fn d (fn e acc))))
+
+                                                f :: r6 ->
+                                                    case r6 of
+                                                        [] ->
+                                                            fn a (fn b (fn c (fn d (fn e (fn f acc)))))
+
+                                                        g :: r7 ->
+                                                            case r7 of
+                                                                [] ->
+                                                                    fn a (fn b (fn c (fn d (fn e (fn f (fn g acc))))))
+
+                                                                h :: r8 ->
+                                                                    case r8 of
+                                                                        [] ->
+                                                                            fn a (fn b (fn c (fn d (fn e (fn f (fn g (fn h acc)))))))
+
+                                                                        i :: r9 ->
+                                                                            let
+                                                                                res =
+                                                                                    if ctr > 500 then
+                                                                                        foldl fn acc <| reverse r9
+                                                                                    else
+                                                                                        foldrHelper fn acc (ctr + 1) r9
+                                                                            in
+                                                                                fn a (fn b (fn c (fn d (fn e (fn f (fn g (fn h (fn i res))))))))
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
