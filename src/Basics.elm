@@ -36,6 +36,9 @@ are your tuples so big?
 @docs pi, cos, sin, tan, acos, asin, atan, atan2
 
 # Number Conversions
+
+Use the following methods to convert numbers between Float and Int.
+
 @docs round, floor, ceiling, truncate, toFloat
 
 # Angle Conversions
