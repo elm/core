@@ -186,39 +186,14 @@ foldrHelper fn acc ctr ls =
                                     fn a (fn b (fn c acc))
 
                                 d :: r4 ->
-                                    case r4 of
-                                        [] ->
-                                            fn a (fn b (fn c (fn d acc)))
-
-                                        e :: r5 ->
-                                            case r5 of
-                                                [] ->
-                                                    fn a (fn b (fn c (fn d (fn e acc))))
-
-                                                f :: r6 ->
-                                                    case r6 of
-                                                        [] ->
-                                                            fn a (fn b (fn c (fn d (fn e (fn f acc)))))
-
-                                                        g :: r7 ->
-                                                            case r7 of
-                                                                [] ->
-                                                                    fn a (fn b (fn c (fn d (fn e (fn f (fn g acc))))))
-
-                                                                h :: r8 ->
-                                                                    case r8 of
-                                                                        [] ->
-                                                                            fn a (fn b (fn c (fn d (fn e (fn f (fn g (fn h acc)))))))
-
-                                                                        i :: r9 ->
-                                                                            let
-                                                                                res =
-                                                                                    if ctr > 500 then
-                                                                                        foldl fn acc <| reverse r9
-                                                                                    else
-                                                                                        foldrHelper fn acc (ctr + 1) r9
-                                                                            in
-                                                                                fn a (fn b (fn c (fn d (fn e (fn f (fn g (fn h (fn i res))))))))
+                                    let
+                                        res =
+                                            if ctr > 500 then
+                                                foldl fn acc <| reverse r4
+                                            else
+                                                foldrHelper fn acc (ctr + 1) r4
+                                    in
+                                        fn a (fn b (fn c (fn d res)))
 
 
 {-| Reduce a list from the left, building up all of the intermediate results into a list.
