@@ -19,7 +19,7 @@ function _JsArray_length(arr)
 
 var _JsArray_initialize = F3(function(size, offset, f)
 {
-    var result = _JsArray_newArray(size);
+    var result = new Array(size);
 
     for (var i = 0; i < size; i++) {
         result[i] = f(offset + i);
@@ -28,43 +28,16 @@ var _JsArray_initialize = F3(function(size, offset, f)
     return result;
 });
 
-function _JsArray_newArray(size)
-{
-    // A JS literal is much faster than `new Array(size)` in Safari.
-    // The following code optimizes the common case of 32-sized arrays,
-    // while falling back to the "proper" way to preallocate arrays
-    // for other sizes. This makes a big performance difference in
-    // Safari, while exerting a minor performance hit in Chrome.
-    // For 32-sized arrays, Chrome and Safari become equally fast.
-    if (size !== 32) {
-        return new Array(size);
-    }
-
-    return [
-        null, null, null, null, null,
-        null, null, null, null, null,
-        null, null, null, null, null,
-        null, null, null, null, null,
-        null, null, null, null, null,
-        null, null, null, null, null,
-        null, null
-    ];
-}
-
 var _JsArray_initializeFromList = F2(function (max, ls)
 {
-    var result = _JsArray_newArray(max);
+    var result = new Array(max);
 
-    for (var i = 0; i < max; i++) {
-        if (ls.$ === '[]') {
-            result.length = i;
-            break;
-        }
-
-        result[i] = ls.a;
-        ls = ls.b;
+    for (var i = 0; i < max && ls.ctor !== '[]'; i++) {
+        result[i] = ls._0;
+        ls = ls._1;
     }
 
+    result.length = i;
     return __Utils_Tuple2(result, ls);
 });
 
@@ -75,40 +48,43 @@ var _JsArray_unsafeGet = F2(function(idx, arr)
 
 var _JsArray_unsafeSet = F3(function(idx, val, arr)
 {
-    var result = arr.slice();
+    var length = arr.length;
+    var result = new Array(length);
+
+    for (var i = 0; i < length; i++) {
+        result[i] = arr[i];
+    }
+
     result[idx] = val;
     return result;
 });
 
 var _JsArray_push = F2(function(val, arr)
 {
-    var len = arr.length;
-    var result = new Array(len + 1);
+    var length = arr.length;
+    var result = new Array(length + 1);
 
-    for (var i = 0; i < len; i++) {
-        result[i] = arr[i]
+    for (var i = 0; i < length; i++) {
+        result[i] = arr[i];
     }
 
-    result[len] = val;
+    result[length] = val;
     return result;
 });
 
-var _JsArray_foldl = F3(function(f, init, arr)
+var _JsArray_foldl = F3(function(f, acc, arr)
 {
-    var acc = init;
-    var len = arr.length;
+    var length = arr.length;
 
-    for (var i = 0; i < len; i++) {
+    for (var i = 0; i < length; i++) {
         acc = A2(f, arr[i], acc);
     }
 
     return acc;
 });
 
-var _JsArray_foldr = F3(function(f, init, arr)
+var _JsArray_foldr = F3(function(f, acc, arr)
 {
-    var acc = init;
-
     for (var i = arr.length - 1; i >= 0; i--) {
         acc = A2(f, arr[i], acc);
     }
@@ -118,10 +94,10 @@ var _JsArray_foldr = F3(function(f, init, arr)
 
 var _JsArray_map = F2(function(f, arr)
 {
-    var len = arr.length;
-    var result = _JsArray_newArray(len);
+    var length = arr.length;
+    var result = new Array(length);
 
-    for (var i = 0; i < len; i++) {
+    for (var i = 0; i < length; i++) {
         result[i] = f(arr[i]);
     }
 
@@ -130,10 +106,10 @@ var _JsArray_map = F2(function(f, arr)
 
 var _JsArray_indexedMap = F3(function(f, offset, arr)
 {
-    var len = arr.length;
-    var result = _JsArray_newArray(len);
+    var length = arr.length;
+    var result = new Array(length);
 
-    for (var i = 0; i < len; i++) {
+    for (var i = 0; i < length; i++) {
         result[i] = A2(f, offset + i, arr[i]);
     }
 
@@ -155,7 +131,7 @@ var _JsArray_appendN = F3(function(n, dest, source)
     }
 
     var size = destLen + itemsToCopy;
-    var result = _JsArray_newArray(size);
+    var result = new Array(size);
 
     for (var i = 0; i < destLen; i++) {
         result[i] = dest[i];
