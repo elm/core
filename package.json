@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "lint": "eslint ./src/Native/"
+  },
+  "devDependencies": {
+    "eslint": "^4.0.0"
+  }
+}
