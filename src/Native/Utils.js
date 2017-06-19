@@ -1,7 +1,12 @@
-//import //
+/* global
+	_elm_lang$core$Native_Array
+	_elm_lang$core$Array$toList
+	_elm_lang$core$Dict$toList
+	_elm_lang$core$Set$toList
+*/
 
-var _elm_lang$core$Native_Utils = function() {
-
+// eslint-disable-next-line camelcase, brace-style
+var _elm_lang$core$Native_Utils = (function _elm_lang$core$Native_Utils() {
 // COMPARISONS
 
 function eq(x, y)
@@ -35,8 +40,10 @@ function eqHelp(x, y, depth, stack)
 		if (typeof x === 'function')
 		{
 			throw new Error(
-				'Trying to use `(==)` on functions. There is no way to know if functions are "the same" in the Elm sense.'
-				+ ' Read more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#=='
+				'Trying to use `(==)` on functions.'
+				+ ' There is no way to know if functions are "the same" in the Elm sense.'
+				+ ' Read more about this at'
+				+ ' http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#=='
 				+ ' which describes why it is this way and what the better version will look like.'
 			);
 		}
@@ -45,7 +52,7 @@ function eqHelp(x, y, depth, stack)
 
 	if (x === null || y === null)
 	{
-		return false
+		return false;
 	}
 
 	if (x instanceof Date)
@@ -118,9 +125,9 @@ function eqHelp(x, y, depth, stack)
 		return false;
 	}
 
-	for (var key in x)
+	for (var key_ in x)
 	{
-		if (!eqHelp(x[key], y[key], depth + 1, stack))
+		if (!eqHelp(x[key_], y[key_], depth + 1, stack))
 		{
 			return false;
 		}
@@ -164,17 +171,35 @@ function cmp(x, y)
 
 	if (x.ctor.slice(0, 6) === '_Tuple')
 	{
-		var ord;
+		var ord_;
 		var n = x.ctor.slice(6) - 0;
 		var err = 'cannot compare tuples with more than 6 elements.';
 		if (n === 0) return EQ;
-		if (n >= 1) { ord = cmp(x._0, y._0); if (ord !== EQ) return ord;
-		if (n >= 2) { ord = cmp(x._1, y._1); if (ord !== EQ) return ord;
-		if (n >= 3) { ord = cmp(x._2, y._2); if (ord !== EQ) return ord;
-		if (n >= 4) { ord = cmp(x._3, y._3); if (ord !== EQ) return ord;
-		if (n >= 5) { ord = cmp(x._4, y._4); if (ord !== EQ) return ord;
-		if (n >= 6) { ord = cmp(x._5, y._5); if (ord !== EQ) return ord;
-		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
+		if (n >= 1)
+		{
+			ord_ = cmp(x._0, y._0); if (ord_ !== EQ) return ord_;
+			if (n >= 2)
+			{
+				ord_ = cmp(x._1, y._1); if (ord_ !== EQ) return ord_;
+				if (n >= 3)
+				{
+					ord_ = cmp(x._2, y._2); if (ord_ !== EQ) return ord_;
+					if (n >= 4)
+					{
+						ord_ = cmp(x._3, y._3); if (ord_ !== EQ) return ord_;
+						if (n >= 5)
+						{
+							ord_ = cmp(x._4, y._4); if (ord_ !== EQ) return ord_;
+							if (n >= 6)
+							{
+								ord_ = cmp(x._5, y._5); if (ord_ !== EQ) return ord_;
+								if (n >= 7) throw new Error('Comparison error: ' + err);
+							}
+						}
+					}
+				}
+			}
+		}
 		return EQ;
 	}
 
@@ -210,7 +235,7 @@ function chr(c)
 // GUID
 
 var count = 0;
-function guid(_)
+function guid()
 {
 	return count++;
 }
@@ -227,16 +252,16 @@ function update(oldRecord, updatedFields)
 		newRecord[key] = oldRecord[key];
 	}
 
-	for (var key in updatedFields)
+	for (var key_ in updatedFields)
 	{
-		newRecord[key] = updatedFields[key];
+		newRecord[key_] = updatedFields[key_];
 	}
 
 	return newRecord;
 }
 
 
-//// LIST STUFF ////
+// LIST STUFF //
 
 var Nil = { ctor: '[]' };
 
@@ -280,9 +305,12 @@ function append(xs, ys)
 
 function crash(moduleName, region)
 {
-	return function(message) {
+	return function crashReport(message)
+	{
 		throw new Error(
-			'Ran into a `Debug.crash` in module `' + moduleName + '` ' + regionToString(region) + '\n'
+			'Ran into a `Debug.crash` in module `'
+			+ moduleName +
+			'` ' + regionToString(region) + '\n'
 			+ 'The message provided by the code author is:\n\n    '
 			+ message
 		);
@@ -291,11 +319,13 @@ function crash(moduleName, region)
 
 function crashCase(moduleName, region, value)
 {
-	return function(message) {
+	return function crashReport(message)
+	{
 		throw new Error(
 			'Ran into a `Debug.crash` in module `' + moduleName + '`\n\n'
 			+ 'This was caused by the `case` expression ' + regionToString(region) + '.\n'
-			+ 'One of the branches ended with a crash and the following value got through:\n\n    ' + toString(value) + '\n\n'
+			+ 'One of the branches ended with a crash and the following value got through:\n\n    '
+			+ toString(value) + '\n\n'
 			+ 'The message provided by the code author is:\n\n    '
 			+ message
 		);
@@ -304,7 +334,7 @@ function crashCase(moduleName, region, value)
 
 function regionToString(region)
 {
-	if (region.start.line == region.end.line)
+	if (region.start.line === region.end.line)
 	{
 		return 'on line ' + region.start.line;
 	}
@@ -353,18 +383,18 @@ function toString(v)
 
 		if (ctorStarter === '_Tupl')
 		{
-			var output = [];
+			var outputTupl = [];
 			for (var k in v)
 			{
 				if (k === 'ctor') continue;
-				output.push(toString(v[k]));
+				outputTupl.push(toString(v[k]));
 			}
-			return '(' + output.join(',') + ')';
+			return '(' + outputTupl.join(',') + ')';
 		}
 
 		if (ctorStarter === '_Task')
 		{
-			return '<task>'
+			return '<task>';
 		}
 
 		if (v.ctor === '_Array')
@@ -410,16 +440,21 @@ function toString(v)
 			return 'Dict.fromList ' + toString(_elm_lang$core$Dict$toList(v));
 		}
 
-		var output = '';
+		var outputEmpty = '';
 		for (var i in v)
 		{
 			if (i === 'ctor') continue;
 			var str = toString(v[i]);
 			var c0 = str[0];
-			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
-			output += ' ' + (parenless ? str : '(' + str + ')');
+			var parenless =
+				c0 === '{' ||
+				c0 === '(' ||
+				c0 === '<' ||
+				c0 === '"' ||
+				str.indexOf(' ') < 0;
+			outputEmpty += ' ' + (parenless ? str : '(' + str + ')');
 		}
-		return v.ctor + output;
+		return v.ctor + outputEmpty;
 	}
 
 	if (type === 'object')
@@ -434,16 +469,16 @@ function toString(v)
 			return '<websocket>';
 		}
 
-		var output = [];
-		for (var k in v)
+		var outputObject = [];
+		for (var kObj in v)
 		{
-			output.push(k + ' = ' + toString(v[k]));
+			outputObject.push(kObj + ' = ' + toString(v[kObj]));
 		}
-		if (output.length === 0)
+		if (outputObject.length === 0)
 		{
 			return '{}';
 		}
-		return '{ ' + output.join(', ') + ' }';
+		return '{ ' + outputObject.join(', ') + ' }';
 	}
 
 	return '<internal structure>';
@@ -461,10 +496,7 @@ function addSlashes(str, isChar)
 	{
 		return s.replace(/\'/g, '\\\'');
 	}
-	else
-	{
-		return s.replace(/\"/g, '\\"');
-	}
+	return s.replace(/\"/g, '\\"');
 }
 
 
@@ -484,5 +516,4 @@ return {
 
 	toString: toString
 };
-
-}();
+})();
