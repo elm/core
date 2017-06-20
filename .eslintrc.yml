@@ -1,0 +1,175 @@
+env:
+  browser: true
+
+globals:
+  F1: true
+  F2: true
+  F3: true
+  F4: true
+  F5: true
+  F6: true
+  F7: true
+  F8: true
+  F9: true
+  A1: true
+  A2: true
+  A3: true
+  A4: true
+  A5: true
+  A6: true
+  A7: true
+  A8: true
+  A9: true
+
+rules:
+  ### STRICT MODE ###
+  strict:
+  - 2
+  - never
+
+  ### VARIABLES ###
+  no-shadow: 2
+  no-shadow-restricted-names: 2
+  no-undef: 2
+  no-unused-vars:
+  - 2
+  - vars: local
+    args: after-used
+    varsIgnorePattern: "[_elm_lang]"
+  no-use-before-define: 1
+
+  ### POSSIBLE ERRORS ###
+  no-cond-assign:
+  - 1
+  - always
+  no-console: 1
+  no-debugger: 1
+  no-alert: 1
+  no-constant-condition: 1
+  no-dupe-keys: 2
+  no-duplicate-case: 2
+  no-empty: 2
+  no-ex-assign: 2
+  no-extra-boolean-cast: 0
+  no-extra-semi: 2
+  no-func-assign: 2
+  no-inner-declarations: 2
+  no-invalid-regexp: 2
+  no-irregular-whitespace: 2
+  no-obj-calls: 2
+  no-sparse-arrays: 2
+  no-unreachable: 2
+  use-isnan: 2
+  block-scoped-var: 2
+
+  ### BEST PRACTICES ###
+  consistent-return: 1
+  curly:
+  - 2
+  - multi-line
+  dot-notation:
+  - 2
+  - allowKeywords: true
+  eqeqeq: 2
+  max-len:
+  - 2
+  - 100
+  - 4
+  guard-for-in: 1
+  no-caller: 2
+  no-else-return: 2
+  no-eq-null: 2
+  no-eval: 2
+  no-extend-native: 2
+  no-extra-bind: 2
+  no-fallthrough: 2
+  no-floating-decimal: 2
+  no-implied-eval: 2
+  no-lone-blocks: 2
+  no-loop-func: 2
+  no-multi-str: 2
+  no-native-reassign: 2
+  no-new: 2
+  no-new-func: 2
+  no-new-wrappers: 1
+  no-octal: 2
+  no-octal-escape: 2
+  no-param-reassign: 1
+  no-proto: 2
+  no-redeclare: 2
+  no-return-assign: 2
+  no-script-url: 2
+  no-self-compare: 1
+  no-sequences: 1
+  no-throw-literal: 2
+  no-with: 2
+  radix: 2
+  wrap-iife:
+  - 2
+  - any
+
+  ### STYLE ###
+  brace-style:
+  - 2
+  - allman
+  - allowSingleLine: true
+  indent:
+  - 2
+  - tab
+  - outerIIFEBody: 0
+    SwitchCase: 1
+  quotes:
+  - 2
+  - single
+  - avoid-escape
+  camelcase:
+  - 2
+  - properties: never
+  comma-spacing:
+  - 2
+  - before: false
+    after: true
+  comma-style:
+  - 2
+  - last
+  eol-last: 2
+  func-names: 1
+  key-spacing:
+  - 2
+  - beforeColon: false
+    afterColon: true
+  no-multiple-empty-lines:
+  - 2
+  - max: 2
+  no-new-object: 2
+  no-spaced-func: 2
+  no-trailing-spaces: 2
+  no-extra-parens:
+  - 2
+  - functions
+  no-underscore-dangle: 0
+  padded-blocks:
+  - 2
+  - never
+  semi:
+  - 2
+  - always
+  semi-spacing:
+  - 2
+  - before: false
+    after: true
+  keyword-spacing: 2
+  space-before-blocks: 2
+  space-before-function-paren:
+  - 2
+  - never
+  space-infix-ops: 2
+  spaced-comment:
+  - 2
+  - always
+  - exceptions:
+    - "-"
+    - "+"
+    markers:
+    - "="
+    - "!"
