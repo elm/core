@@ -60,6 +60,8 @@ type Month
 
 
 {-| Attempt to read a date from a string.
+
+Dates must be in the ISO 8601 format.
 -}
 fromString : String -> Result String Date
 fromString =
