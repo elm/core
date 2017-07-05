@@ -1,6 +1,5 @@
 module Tuple exposing
-  ( (=>)
-  , first, second
+  ( first, second
   , mapFirst, mapSecond
   )
 
@@ -11,9 +10,6 @@ instead of representing a 3D point as `(3,4,5)` and wondering why there are no
 helper functions, represent it as `{ x = 3, y = 4, z = 5 }` and use all the
 built-in syntax for records.
 
-# Rocket
-@docs (=>)
-
 # Accessors
 @docs first, second
 
@@ -21,51 +17,6 @@ built-in syntax for records.
 @docs mapFirst, mapSecond
 
 -}
-
-
-{-| Create a tuple. Saying `a => b` is the same as `(a, b)` which turns out
-to be surprisingly handy!
-
-Use it to create dictionaries.
-
-    import Dict exposing (Dict)
-
-    grades : Dict String Float
-    grades =
-      Dict.fromList
-        [ "Alice" => 94.5    -- ("Alice", 94.5)
-        , "Billy" => 79.8    -- ("Billy", 79.8)
-        , "Chuck" => 88.2    -- ("Chuck", 88.2)
-        ]
-
-Use it to create HTML styles.
-
-    import Html.Attributes exposing (Attribute, style)
-
-    centered : Attribute msg
-    centered =
-      style
-        [ "display" => "block"
-        , "margin-left" => "auto"
-        , "margin-right" => "auto"
-        ]
-
-Use it in your `update` function.
-
-    type Msg = NoOp
-
-    update : Msg -> Model -> ( Model, Cmd Msg )
-    update msg model =
-      case msg of
-        NoOp ->
-          model => Cmd.none
--}
-(=>) : a -> b -> (a, b)
-(=>) a b =
-  (a, b)
-
-
-infixl 0 =>
 
 
 
