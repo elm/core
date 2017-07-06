@@ -129,6 +129,10 @@ bool =
     Elm.Kernel.Json.identity
 
 
+
+-- NULLS
+
+
 {-| Create a JSON `null` value.
 
     import Json.Encode exposing (encode, null)
@@ -141,25 +145,7 @@ null =
 
 
 
--- DATA STRUCTURES
-
-
-{-| Create a JSON object.
-
-    import Json.Encode as Encode
-
-    tom : Encode.Value
-    tom =
-        Encode.object
-            [ ( "name", Encode.string "Tom" )
-            , ( "age", Encode.int 42 )
-            ]
-
-    -- Encode.encode 0 tom == """{"name":"Tom","age":42}"""
--}
-object : List (String, Value) -> Value
-object =
-    Elm.Kernel.Json.encodeObject
+-- ARRAYS
 
 
 {-| Turn a `List` into a JSON array.
@@ -188,6 +174,28 @@ array func values =
 set : (a -> Value) -> Set a -> Value
 set func values =
     list func (Set.toList values)
+
+
+
+-- OBJECTS
+
+
+{-| Create a JSON object.
+
+    import Json.Encode as Encode
+
+    tom : Encode.Value
+    tom =
+        Encode.object
+            [ ( "name", Encode.string "Tom" )
+            , ( "age", Encode.int 42 )
+            ]
+
+    -- Encode.encode 0 tom == """{"name":"Tom","age":42}"""
+-}
+object : List (String, Value) -> Value
+object =
+    Elm.Kernel.Json.encodeObject
 
 
 {-| Turn a `Dict` into a JSON object.
