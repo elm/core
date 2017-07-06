@@ -64,6 +64,34 @@ type Month
     | Sep | Oct | Nov | Dec
 
 
+
+-- TIME CONVERSIONS
+
+
+{-| Convert a `Date` to a time in milliseconds.
+
+A time is the number of milliseconds since
+[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
+-}
+toTime : Date -> Time
+toTime =
+  Elm.Kernel.Date.toTime
+
+
+{-| Convert a time in milliseconds into a `Date`.
+
+A time is the number of milliseconds since
+[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
+-}
+fromTime : Time -> Date
+fromTime =
+  Elm.Kernel.Date.fromTime
+
+
+
+-- STRING CONVERSIONS
+
+
 {-| Turn a `Date` into a `String` in [the ISO 8601 format][iso].
 
 [iso]: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
@@ -98,24 +126,8 @@ fromIso8601 =
   Elm.Kernel.Date.fromIso8601
 
 
-{-| Convert a `Date` to a time in milliseconds.
 
-A time is the number of milliseconds since
-[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
--}
-toTime : Date -> Time
-toTime =
-  Elm.Kernel.Date.toTime
-
-
-{-| Convert a time in milliseconds into a `Date`.
-
-A time is the number of milliseconds since
-[the Unix epoch](http://en.wikipedia.org/wiki/Unix_time).
--}
-fromTime : Time -> Date
-fromTime =
-  Elm.Kernel.Date.fromTime
+-- EXTRACTORS
 
 
 {-| Extract the year of a given date. Given the date 23 June 1990 at 11:45AM
