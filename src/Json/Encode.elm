@@ -2,8 +2,8 @@ module Json.Encode exposing
   ( Value
   , encode
   , string, int, float, bool, null
-  , list, array
-  , object
+  , list, array, set
+  , object, dict, keyValuePairs
   )
 
 {-| Library for turning Elm values into Json values.
@@ -15,15 +15,22 @@ module Json.Encode exposing
 @docs string, int, float, bool, null
 
 # Arrays
-@docs list, array
+@docs list, array, set
 
 # Objects
-@docs object
+@docs object, dict, keyValuePairs
 -}
 
 import Array exposing (Array)
+import Dict exposing (Dict)
+import List
+import Set exposing (Set)
 import Elm.Kernel.Json
 import Elm.Kernel.List
+
+
+
+-- ENCODE
 
 
 {-| Represents a JavaScript value.
@@ -55,6 +62,10 @@ the amount of indentation in the resulting string.
 encode : Int -> Value -> String
 encode =
     Elm.Kernel.Json.encode
+
+
+
+-- PRIMITIVES
 
 
 {-| Turn a `String` into a JSON string.
@@ -129,6 +140,10 @@ null =
     Elm.Kernel.Json.encodeNull
 
 
+
+-- DATA STRUCTURES
+
+
 {-| Create a JSON object.
 
     import Json.Encode as Encode
@@ -147,13 +162,68 @@ object =
     Elm.Kernel.Json.encodeObject
 
 
-{-|-}
-array : Array Value -> Value
-array array =
-    Elm.Kernel.List.toArray (Array.toList array)
+{-| Turn a `List` into a JSON array.
+
+    import Json.Encode as Encode exposing (bool, encode, int, list, string)
+
+    -- encode 0 (list int [1,3,4])       == "[1,3,4]"
+    -- encode 0 (list bool [True,False]) == "[true,false]"
+    -- encode 0 (list string ["a","b"])  == """["a","b"]"""
+
+-}
+list : (a -> Value) -> List a -> Value
+list func values =
+    Elm.Kernel.List.toArray (List.map func values)
 
 
-{-|-}
-list : List Value -> Value
-list =
-    Elm.Kernel.List.toArray
+{-| Turn an `Array` into a JSON array.
+-}
+array : (a -> Value) -> Array a -> Value
+array func values =
+    list func (Array.toList values)
+
+
+{-| Turn an `Set` into a JSON array.
+-}
+set : (a -> Value) -> Set a -> Value
+set func values =
+    list func (Set.toList values)
+
+
+{-| Turn a `Dict` into a JSON object.
+
+    import Dict exposing (Dict)
+    import Json.Encode as Encode
+
+    people : Dict String Int
+    people =
+      Dict.fromList [ ("Tom",42), ("Sue", 38) ]
+
+    -- Encode.encode 0 (Encode.dict identity Encode.int people)
+    --   == """{"Tom":42,"Sue":38}"""
+-}
+dict : (k -> String) -> (v -> Value) -> Dict k v -> Value
+dict toKey toValue dictionary =
+    keyValuePairs toKey toValue (Dict.toList dictionary)
+
+
+{-| Turn a `List` of `Tuple` into a JSON object.
+
+    import Dict exposing (Dict)
+    import Json.Encode as Encode
+
+    people : List (String, Int)
+    people =
+      [ ("Tom",42), ("Sue", 38) ]
+
+    -- Encode.encode 0 (Encode.keyValuePairs identity Encode.int people)
+    --   == """{"Tom":42,"Sue":38}"""
+-}
+keyValuePairs : (k -> String) -> (v -> Value) -> List ( k, v ) -> Value
+keyValuePairs toKey toValue pairs =
+    object (List.map (mapBoth toKey toValue) pairs)
+
+
+mapBoth : (a -> x) -> (b -> y) -> ( a, b ) -> ( x, y )
+mapBoth funcA funcB ( x, y ) =
+  ( funcA x, funcB y )
