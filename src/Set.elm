@@ -119,7 +119,7 @@ diff (Set_elm_builtin d1) (Set_elm_builtin d2) =
 
 {-| Convert a set into a list, sorted from lowest to highest.
 -}
-toList : Set comparable -> List comparable
+toList : Set a -> List a
 toList (Set_elm_builtin d) =
   Dict.keys d
 
@@ -132,7 +132,7 @@ fromList xs = List.foldl insert empty xs
 
 {-| Fold over the values in a set, in order from lowest to highest.
 -}
-foldl : (comparable -> b -> b) -> b -> Set comparable -> b
+foldl : (a -> b -> b) -> b -> Set a -> b
 foldl f b (Set_elm_builtin d) =
   Dict.foldl (\k _ b -> f k b) b d
 

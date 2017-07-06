@@ -551,7 +551,7 @@ merge leftStep bothStep rightStep leftDict rightDict initialResult =
 
 {-| Apply a function to all values in a dictionary.
 -}
-map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
+map : (k -> a -> b) -> Dict k a -> Dict k b
 map f dict =
   case dict of
     RBEmpty_elm_builtin _ ->
@@ -564,7 +564,7 @@ map f dict =
 {-| Fold over the key-value pairs in a dictionary, in order from lowest
 key to highest key.
 -}
-foldl : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
+foldl : (k -> v -> b -> b) -> b -> Dict k v -> b
 foldl f acc dict =
   case dict of
     RBEmpty_elm_builtin _ ->
@@ -577,7 +577,7 @@ foldl f acc dict =
 {-| Fold over the key-value pairs in a dictionary, in order from highest
 key to lowest key.
 -}
-foldr : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
+foldr : (k -> v -> b -> b) -> b -> Dict k v -> b
 foldr f acc t =
   case t of
     RBEmpty_elm_builtin _ ->
@@ -626,7 +626,7 @@ partition predicate dict =
 
     keys (fromList [(0,"Alice"),(1,"Bob")]) == [0,1]
 -}
-keys : Dict comparable v -> List comparable
+keys : Dict k v -> List k
 keys dict =
   foldr (\key value keyList -> key :: keyList) [] dict
 
@@ -635,13 +635,13 @@ keys dict =
 
     values (fromList [(0,"Alice"),(1,"Bob")]) == ["Alice", "Bob"]
 -}
-values : Dict comparable v -> List v
+values : Dict k v -> List v
 values dict =
   foldr (\key value valueList -> value :: valueList) [] dict
 
 
 {-| Convert a dictionary into an association list of key-value pairs, sorted by keys. -}
-toList : Dict comparable v -> List (comparable,v)
+toList : Dict k v -> List (k,v)
 toList dict =
   foldr (\key value list -> (key,value) :: list) [] dict
 
