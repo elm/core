@@ -1,5 +1,6 @@
 module Char exposing
-  ( isUpper, isLower, isDigit, isOctDigit, isHexDigit
+  ( isUpper, isLower, isAlpha, isAlphaNum
+  , isDigit, isOctDigit, isHexDigit
   , toUpper, toLower, toLocaleUpper, toLocaleLower
   , toCode, fromCode
   )
@@ -7,8 +8,11 @@ module Char exposing
 {-| Functions for working with characters. Character literals are enclosed in
 `'a'` pair of single quotes.
 
-# Classification
-@docs isUpper, isLower, isDigit, isOctDigit, isHexDigit
+# ASCII Letters
+@docs isUpper, isLower, isAlpha, isAlphaNum
+
+# Digits
+@docs isDigit, isOctDigit, isHexDigit
 
 # Conversion
 @docs toUpper, toLower, toLocaleUpper, toLocaleLower
@@ -34,6 +38,7 @@ import Elm.Kernel.Char
 
     isUpper '0' == False
     isUpper 'a' == False
+    isUpper '-' == False
     isUpper 'Σ' == False
 -}
 isUpper : Char -> Bool
@@ -54,6 +59,7 @@ isUpper char =
 
     isLower '0' == False
     isLower 'A' == False
+    isLower '-' == False
     isLower 'π' == False
 -}
 isLower : Char -> Bool
@@ -63,6 +69,39 @@ isLower char =
       toCode char
   in
     0x61 <= code && code <= 0x7A
+
+
+{-| Detect upper case and lower case ASCII characters.
+
+    isAlpha 'a' == True
+    isAlpha 'b' == True
+    isAlpha 'E' == True
+    isAlpha 'Y' == True
+
+    isAlpha '0' == False
+    isAlpha '-' == False
+    isAlpha 'π' == False
+-}
+isAlpha : Char -> Bool
+isAlpha char =
+  isLower char || isUpper char
+
+
+{-| Detect upper case and lower case ASCII characters.
+
+    isAlphaNum 'a' == True
+    isAlphaNum 'b' == True
+    isAlphaNum 'E' == True
+    isAlphaNum 'Y' == True
+    isAlphaNum '0' == True
+    isAlphaNum '7' == True
+
+    isAlphaNum '-' == False
+    isAlphaNum 'π' == False
+-}
+isAlphaNum : Char -> Bool
+isAlphaNum char =
+  isLower char || isUpper char || isDigit char
 
 
 {-| Detect digits `0123456789`
