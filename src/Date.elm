@@ -1,5 +1,5 @@
 module Date exposing
-  ( Date, fromString, toTime, fromTime
+  ( Date, fromIso8601, toTime, fromTime
   , year, month, Month(..)
   , day, dayOfWeek, Day(..)
   , hour, minute, second, millisecond
@@ -13,7 +13,7 @@ issues with internationalization or locale formatting.
 @docs Date, now
 
 # Conversions
-@docs fromString, toTime, fromTime
+@docs fromIso8601, toTime, fromTime
 
 # Extractions
 @docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond
@@ -59,11 +59,28 @@ type Month
     | Sep | Oct | Nov | Dec
 
 
-{-| Attempt to read a date from a string.
+{-| Attempt to read `String` values in the ISO 8601 format, described in
+detail [here](http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15).
+
+    fromIso8601 "1990"                      == Ok ...
+    fromIso8601 "1990-09"                   == Ok ...
+    fromIso8601 "1990-09-15"                == Ok ...
+    fromIso8601 "1990/09/15"                == Err ...
+
+    fromIso8601 "1990T08:30"                == Ok ...
+    fromIso8601 "1990-09T14:15"             == Ok ...
+    fromIso8601 "1990-09-15T14:15:06"       == Ok ...
+    fromIso8601 "1990-09-15T14:15:06.123"   == Ok ...
+    fromIso8601 "1990-09-15T14:15:06.12"    == Err ...
+
+    fromIso8601 "1990T08:30Z"               == Ok ...
+    fromIso8601 "1990T08:30-07:00"          == Ok ...
+    fromIso8601 "1990T08:30+13:00"          == Ok ...
+    fromIso8601 "1990T08:30+25:00"          == Err ...
 -}
-fromString : String -> Result String Date
-fromString =
-  Elm.Kernel.Date.fromString
+fromIso8601 : String -> Result String Date
+fromIso8601 =
+  Elm.Kernel.Date.fromIso8601
 
 
 {-| Convert a `Date` to a time in milliseconds.
