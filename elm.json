@@ -27,7 +27,7 @@
 		"Time",
 		"Tuple"
 	],
-	"elm-version": "0.18.0 <= v < 0.19.0",
+	"elm-version": "0.19.0 <= v < 0.20.0",
 	"dependencies": {},
 	"test-dependencies": {},
 	"effect-modules": true
