@@ -7,7 +7,15 @@ import Result exposing (Result(Ok,Err))
 
 function _Date_fromString(str)
 {
-	var date = new Date(str);
+	var date;
+	try
+	{
+		date = new Date(str);
+	}
+	catch(e)
+	{
+		date = NaN;
+	}
 	return isNaN(date.getTime())
 		? __Result_Err('Unable to parse \'' + str + '\' as a date. Dates must be in the ISO 8601 format.')
 		: __Result_Ok(date);
