@@ -146,11 +146,6 @@ function _Debug_toString_dev(v)
 
 	if (type === 'object')
 	{
-		if (v instanceof Date)
-		{
-			return '<' + v.toString() + '>';
-		}
-
 		if (v.elm_web_socket)
 		{
 			return '<websocket>';

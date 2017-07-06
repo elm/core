@@ -10,7 +10,6 @@
         "Bitwise",
         "Char",
         "Color",
-        "Date",
         "Debug",
         "Dict",
         "Json.Decode",
