@@ -59,8 +59,18 @@ type Month
     | Sep | Oct | Nov | Dec
 
 
-{-| Attempt to read `String` values in the ISO 8601 format, described in
-detail [here](http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15).
+{-| Turn a `Date` into a `String` in [the ISO 8601 format][iso].
+
+[iso]: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
+-}
+toIso8601 : Date -> String
+toIso8601 =
+  Elm.Kernel.Date.toIso8601
+
+
+{-| Attempt to read `String` values in [the ISO 8601 format][iso].
+
+[iso]: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
     fromIso8601 "1990"                      == Ok ...
     fromIso8601 "1990-09"                   == Ok ...

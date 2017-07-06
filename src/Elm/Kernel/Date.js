@@ -4,6 +4,10 @@ import Result exposing (Result(Ok,Err))
 
 */
 
+function _Date_toIso8601(date)
+{
+	return date.toISOString();
+}
 
 function _Date_fromIso8601(str)
 {
