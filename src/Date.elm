@@ -1,5 +1,7 @@
 module Date exposing
-  ( Date, fromIso8601, toTime, fromTime
+  ( Date
+  , toTime, fromTime
+  , toIso8601, fromIso8601
   , year, month, Month(..)
   , day, dayOfWeek, Day(..)
   , hour, minute, second, millisecond
@@ -12,8 +14,11 @@ issues with internationalization or locale formatting.
 # Dates
 @docs Date, now
 
-# Conversions
-@docs fromIso8601, toTime, fromTime
+# Time Conversions
+@docs toTime, fromTime
+
+# String Conversions
+@docs toIso8601, fromIso8601
 
 # Extractions
 @docs year, month, Month, day, dayOfWeek, Day, hour, minute, second, millisecond
