@@ -3,7 +3,7 @@ module Json.Decode exposing
   , nullable, list, array, dict, keyValuePairs
   , field, at, index
   , maybe, oneOf
-  , decodeString, decodeValue, Value
+  , decodeString, decodeValue, Value, Error, errorToString
   , map, map2, map3, map4, map5, map6, map7, map8
   , lazy, value, null, succeed, fail, andThen
   )
@@ -26,7 +26,7 @@ JSON decoders][guide] to get a feel for how this library works!
 @docs maybe, oneOf
 
 # Run Decoders
-@docs decodeString, decodeValue, Value
+@docs decodeString, decodeValue, Value, Error, errorToString
 
 # Mapping
 
@@ -44,11 +44,14 @@ errors.
 
 
 import Array exposing (Array)
+import Basics exposing ((+), (++), (&&))
+import Char
 import Dict exposing (Dict)
-import Json.Encode as JsEncode
-import List
+import Json.Encode
+import List exposing ((::))
 import Maybe exposing (Maybe(..))
 import Result exposing (Result(..))
+import String
 import Elm.Kernel.Json
 
 
@@ -389,7 +392,7 @@ fails for some reason.
     decodeString int "4"     == Ok 4
     decodeString int "1 + 2" == Err ...
 -}
-decodeString : Decoder a -> String -> Result String a
+decodeString : Decoder a -> String -> Result Error a
 decodeString =
   Elm.Kernel.Json.runOnString
 
@@ -397,14 +400,112 @@ decodeString =
 {-| Run a `Decoder` on some JSON `Value`. You can send these JSON values
 through ports, so that is probably the main time you would use this function.
 -}
-decodeValue : Decoder a -> Value -> Result String a
+decodeValue : Decoder a -> Value -> Result Error a
 decodeValue =
   Elm.Kernel.Json.run
 
 
 {-| A JSON value.
 -}
-type alias Value = JsEncode.Value
+type alias Value = Json.Encode.Value
+
+
+{-| A structured error describing exactly how the decoder failed. You can use
+this to create more elaborate visualizations of a decoder problem. For example,
+you could show the entire JSON object and show the part causing the failure in
+red.
+-}
+type Error
+  = Field String Error
+  | Index Int Error
+  | OneOf (List Error)
+  | Failure String Value
+
+
+{-| Convert a decoding error into a `String` that is nice for debugging.
+
+It produces multiple lines of output, so you may want to peek at it with
+something like this:
+
+    import Html
+    import Json.Decode as Decode
+
+    errorToHtml : Decode.Error -> Html.Html msg
+    errorToHtml error =
+      Html.pre [] [ Html.text (Decode.errorToString error) ]
+
+**Note:** It would be cool to do nicer coloring and fancier HTML, but we
+cannot have any HTML dependencies in `elm-lang/core`. It is totally possible
+to crawl the `Error` structure and create this separately though!
+-}
+errorToString : Error -> String
+errorToString error =
+  errorToStringHelp error []
+
+
+errorToStringHelp : Error -> List String -> String
+errorToStringHelp error context =
+  case error of
+    Field field err ->
+      let
+        isSimple =
+          String.all Char.isAlphaNum field
+          && String.all Char.isAlpha (String.left 1 field)
+
+        fieldName =
+          if isSimple then "." ++ field else "['" ++ field ++ "']"
+      in
+        errorToStringHelp err (fieldName :: context)
+
+    Index index err ->
+      let
+        indexName =
+          "[" ++ String.fromInt index ++ "]"
+      in
+        errorToStringHelp err (indexName :: context)
+
+    OneOf errors ->
+      case errors of
+        [] ->
+          "Ran into a Json.Decode.oneOf with no possibilities!"
+
+        [err] ->
+          errorToStringHelp err context
+
+        _ ->
+          let
+            starter =
+              case context of
+                [] ->
+                  "Json.Decode.oneOf"
+                _ ->
+                  "The Json.Decode.oneOf at json" ++ String.join "" (List.reverse context)
+
+            introduction =
+              starter ++ " failed in the following " ++ String.fromInt (List.length errors) ++ " ways:"
+          in
+            String.join "\n\n" (introduction :: List.indexedMap errorOneOf errors)
+
+    Failure msg value ->
+      let
+        introduction =
+          case context of
+            [] ->
+              "Problem with the given value:\n\n"
+            _ ->
+              "Problem with the value at json" ++ String.join "" (List.reverse context) ++ ":\n\n    "
+      in
+        introduction ++ indent (Json.Encode.encode 4 value) ++ "\n\n" ++ msg
+
+
+errorOneOf : Int -> Error -> String
+errorOneOf index error =
+  "\n\n(" ++ String.fromInt (index + 1) ++ ") " ++ indent (errorToString error)
+
+
+indent : String -> String
+indent str =
+  String.join "\n    " (String.split "\n" str)
 
 
 

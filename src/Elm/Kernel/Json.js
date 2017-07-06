@@ -1,8 +1,9 @@
 /*
 
 import Array exposing (initialize)
-import Elm.Kernel.List exposing (Cons, Nil)
+import Elm.Kernel.List exposing (Cons, Nil, fromArray)
 import Elm.Kernel.Utils exposing (Tuple2)
+import List exposing (reverse)
 import Maybe exposing (Maybe(Just,Nothing))
 import Result exposing (Result(Ok,Err))
 
@@ -135,109 +136,22 @@ var _Json_map8 = F9(function(f, d1, d2, d3, d4, d5, d6, d7, d8)
 });
 
 
-// DECODE HELPERS
-
-function _Json_ok(value)
-{
-	return { tag: __2_OK, value: value };
-}
-
-function _Json_badPrimitive(type, value)
-{
-	return { tag: __2_PRIMITIVE, type: type, value: value };
-}
-
-function _Json_badField(field, nestedProblems)
-{
-	return { tag: __2_FIELD, field: field, rest: nestedProblems };
-}
-
-function _Json_badIndex(index, nestedProblems)
-{
-	return { tag: __2_INDEX, index: index, rest: nestedProblems };
-}
-
-function _Json_badOneOf(problems)
-{
-	return { tag: __2_ONE_OF, problems: problems };
-}
-
-function _Json_bad(msg)
-{
-	return { tag: __2_FAIL, msg: msg };
-}
-
-function _Json_badToString(problem)
-{
-	var context = '_';
-	while (problem)
-	{
-		switch (problem.tag)
-		{
-			case __2_PRIMITIVE:
-				return 'Expecting ' + problem.type
-					+ (context === '_' ? '' : ' at ' + context)
-					+ ' but instead got: ' + _Json_jsToString(problem.value);
-
-			case __2_INDEX:
-				context += '[' + problem.index + ']';
-				problem = problem.rest;
-				break;
-
-			case __2_FIELD:
-				context += '.' + problem.field;
-				problem = problem.rest;
-				break;
-
-			case __2_ONE_OF:
-				var problems = problem.problems;
-				for (var i = 0; i < problems.length; i++)
-				{
-					problems[i] = _Json_badToString(problems[i]);
-				}
-				return 'I ran into the following problems'
-					+ (context === '_' ? '' : ' at ' + context)
-					+ ':\n\n' + problems.join('\n');
-
-			case __2_FAIL:
-				return 'I ran into a `fail` decoder'
-					+ (context === '_' ? '' : ' at ' + context)
-					+ ': ' + problem.msg;
-		}
-	}
-}
-
-function _Json_jsToString(value)
-{
-	return value === undefined
-		? 'undefined'
-		: JSON.stringify(value);
-}
-
-
 // DECODE
 
 var _Json_runOnString = F2(function(decoder, string)
 {
-	var json;
 	try
 	{
-		json = JSON.parse(string);
+		var value = JSON.parse(string);
+		return _Json_runHelp(decoder, value);
 	}
 	catch (e)
 	{
-		return __Result_Err('Given an invalid JSON: ' + e.message);
+		return __Result_Err({ $: 'Failure', a: 'This is not valid JSON! ' + e.message, b: string });
 	}
-	return run(decoder, json);
 });
 
-var _Json_run = F2(function(decoder, value)
-{
-	var result = _Json_runHelp(decoder, value);
-	return (result.tag === __2_OK)
-		? __Result_Ok(result.value)
-		: __Result_Err(_Json_badToString(result));
-});
+var _Json_run = F2(_Json_runHelp);
 
 function _Json_runHelp(decoder, value)
 {
@@ -245,132 +159,104 @@ function _Json_runHelp(decoder, value)
 	{
 		case __1_BOOL:
 			return (typeof value === 'boolean')
-				? _Json_ok(value)
-				: _Json_badPrimitive('a Bool', value);
+				? __Result_Ok(value)
+				: _Json_expecting('a BOOL', value);
 
 		case __1_INT:
 			if (typeof value !== 'number') {
-				return _Json_badPrimitive('an Int', value);
+				return _Json_expecting('an INT', value);
 			}
 
 			if (-2147483647 < value && value < 2147483647 && (value | 0) === value) {
-				return _Json_ok(value);
+				return __Result_Ok(value);
 			}
 
 			if (isFinite(value) && !(value % 1)) {
-				return _Json_ok(value);
+				return __Result_Ok(value);
 			}
 
-			return _Json_badPrimitive('an Int', value);
+			return _Json_expecting('an INT', value);
 
 		case __1_FLOAT:
 			return (typeof value === 'number')
-				? _Json_ok(value)
-				: _Json_badPrimitive('a Float', value);
+				? __Result_Ok(value)
+				: _Json_expecting('a FLOAT', value);
 
 		case __1_STRING:
 			return (typeof value === 'string')
-				? _Json_ok(value)
+				? __Result_Ok(value)
 				: (value instanceof String)
-					? _Json_ok(value + '')
-					: _Json_badPrimitive('a String', value);
+					? __Result_Ok(value + '')
+					: _Json_expecting('a STRING', value);
 
 		case __1_NULL:
 			return (value === null)
-				? _Json_ok(decoder.value)
-				: _Json_badPrimitive('null', value);
+				? __Result_Ok(decoder.value)
+				: _Json_expecting('null', value);
 
 		case __1_VALUE:
-			return _Json_ok(value);
+			return __Result_Ok(value);
 
 		case __1_LIST:
 			if (!(value instanceof Array))
 			{
-				return _Json_badPrimitive('a List', value);
+				return _Json_expecting('a LIST', value);
 			}
-
-			var list = __List_Nil;
-			for (var i = value.length; i--; )
-			{
-				var result = _Json_runHelp(decoder.decoder, value[i]);
-				if (result.tag !== __2_OK)
-				{
-					return _Json_badIndex(i, result)
-				}
-				list = __List_Cons(result.value, list);
-			}
-			return _Json_ok(list);
+			return _Json_runArrayDecoder(decoder.decoder, value, __List_fromArray);
 
 		case __1_ARRAY:
 			if (!(value instanceof Array))
 			{
-				return _Json_badPrimitive('an Array', value);
+				return _Json_expecting('an ARRAY', value);
 			}
-
-			var len = value.length;
-			var array = new Array(len);
-			for (var i = len; i--; )
-			{
-				var result = _Json_runHelp(decoder.decoder, value[i]);
-				if (result.tag !== __2_OK)
-				{
-					return _Json_badIndex(i, result);
-				}
-				array[i] = result.value;
-			}
-			var elmArray = A2(__Array_initialize, array.length, function (idx) {
-				return array[idx];
-			});
-			return _Json_ok(elmArray);
+			return _Json_runArrayDecoder(decoder.decoder, value, _Json_toElmArray);
 
 		case __1_MAYBE:
 			var result = _Json_runHelp(decoder.decoder, value);
-			return (result.tag === __2_OK)
-				? _Json_ok(__Maybe_Just(result.value))
-				: _Json_ok(__Maybe_Nothing);
+			return (result.$ === 'Ok')
+				? __Result_Ok(__Maybe_Just(result.a))
+				: __Result_Ok(__Maybe_Nothing);
 
 		case __1_FIELD:
 			var field = decoder.field;
 			if (typeof value !== 'object' || value === null || !(field in value))
 			{
-				return _Json_badPrimitive('an object with a field named `' + field + '`', value);
+				return _Json_expecting('an OBJECT with a field named `' + field + '`', value);
 			}
-
 			var result = _Json_runHelp(decoder.decoder, value[field]);
-			return (result.tag === __2_OK) ? result : _Json_badField(field, result);
+			return (result.$ === 'Ok') ? result : __Result_Err({ $: 'Field', a: field, b: result.a });
 
 		case __1_INDEX:
 			var index = decoder.index;
 			if (!(value instanceof Array))
 			{
-				return _Json_badPrimitive('an array', value);
+				return _Json_expecting('an ARRAY', value);
 			}
 			if (index >= value.length)
 			{
-				return _Json_badPrimitive('a longer array. Need index ' + index + ' but there are only ' + value.length + ' entries', value);
+				return _Json_expecting('a LONGER array. Need index ' + index + ' but only see ' + value.length + ' entries', value);
 			}
-
 			var result = _Json_runHelp(decoder.decoder, value[index]);
-			return (result.tag === __2_OK) ? result : _Json_badIndex(index, result);
+			return (result.$ === 'Ok') ? result : __Result_Err({ $: 'Index', a: index, b: result.a });
 
 		case __1_KEY_VALUE:
 			if (typeof value !== 'object' || value === null || value instanceof Array)
 			{
-				return _Json_badPrimitive('an object', value);
+				return _Json_expecting('an OBJECT', value);
 			}
 
 			var keyValuePairs = __List_Nil;
 			for (var key in value)
 			{
 				var result = _Json_runHelp(decoder.decoder, value[key]);
-				if (result.tag !== __2_OK)
+				if (result.$ !== 'Ok')
 				{
-					return _Json_badField(key, result);
+					return __Result_Err({ $: 'Field', a: key, b: result.a });
 				}
 				var pair = __Utils_Tuple2(key, result.value);
 				keyValuePairs = __List_Cons(pair, keyValuePairs);
 			}
-			return _Json_ok(keyValuePairs);
+			return __Result_Ok(keyValuePairs);
 
 		case __1_MAP:
 			var answer = decoder.func;
@@ -378,44 +264,67 @@ function _Json_runHelp(decoder, value)
 			for (var i = 0; i < decoders.length; i++)
 			{
 				var result = _Json_runHelp(decoders[i], value);
-				if (result.tag !== __2_OK)
+				if (result.$ !== 'Ok')
 				{
 					return result;
 				}
-				answer = answer(result.value);
+				answer = answer(result.a);
 			}
-			return _Json_ok(answer);
+			return __Result_Ok(answer);
 
 		case __1_AND_THEN:
 			var result = _Json_runHelp(decoder.decoder, value);
-			return (result.tag !== __2_OK)
+			return (result.$ !== 'Ok')
 				? result
-				: _Json_runHelp(decoder.callback(result.value), value);
+				: _Json_runHelp(decoder.callback(result.a), value);
 
 		case __1_ONE_OF:
-			var errors = [];
+			var errors = __List_Nil;
 			var temp = decoder.decoders;
 			while (temp.$ !== '[]')
 			{
 				var result = _Json_runHelp(temp.a, value);
-
-				if (result.tag === __2_OK)
+				if (result.$ === 'Ok')
 				{
 					return result;
 				}
-
-				errors.push(result);
-
+				errors = __List_Cons(result.a, errors);
 				temp = temp.b;
 			}
-			return _Json_badOneOf(errors);
+			return __Result_Err({ $: 'OneOf', a: __List_reverse(errors) });
 
 		case __1_FAIL:
-			return _Json_bad(decoder.msg);
+			return __Result_Err({ $: 'Failure', a: decoder.msg, b: value });
 
 		case __1_SUCCEED:
-			return _Json_ok(decoder.msg);
+			return __Result_Ok(decoder.msg);
 	}
+}
+
+function _Json_runArrayDecoder(decoder, value, toElmValue)
+{
+	var len = value.length;
+	var array = new Array(len);
+	for (var i = 0; i < len; i++)
+	{
+		var result = _Json_runHelp(decoder, value[i]);
+		if (result.$ !== 'Ok')
+		{
+			return __Result_Err({ $: 'Index', a: i, b: result.a });
+		}
+		array[i] = result.a;
+	}
+	return __Result_Ok(toElmValue(array));
+}
+
+function _Json_toElmArray(array)
+{
+	return A2(__Array_initialize, array.length, function(i) { return array[i]; });
+}
+
+function _Json_expecting(type, value)
+{
+	return __Result_Err({ $: 'Failure', a: 'Expecting ' + type, b: value });
 }
 
 
