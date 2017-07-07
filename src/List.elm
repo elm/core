@@ -125,6 +125,8 @@ member x xs =
     map sqrt [1,4,9] == [1,2,3]
 
     map not [True,False,True] == [False,True,False]
+
+So `map func [ a, b, c ]` is the same as `[ func a, func b, func c ]`
 -}
 map : (a -> b) -> List a -> List b
 map f xs =
@@ -143,7 +145,15 @@ indexedMap f xs =
 
 {-| Reduce a list from the left.
 
+    foldl (+)  0  [1,2,3] == 6
     foldl (::) [] [1,2,3] == [3,2,1]
+
+So `foldl step state [1,2,3]` is like saying:
+
+    state
+      |> step 1
+      |> step 2
+      |> step 3
 -}
 foldl : (a -> b -> b) -> b -> List a -> b
 foldl func acc list =
@@ -157,7 +167,15 @@ foldl func acc list =
 
 {-| Reduce a list from the right.
 
-    foldr (+) 0 [1,2,3] == 6
+    foldr (+)  0  [1,2,3] == 6
+    foldr (::) [] [1,2,3] == [1,2,3]
+
+So `foldr step state [1,2,3]` is like saying:
+
+    state
+      |> step 3
+      |> step 2
+      |> step 1
 -}
 foldr : (a -> b -> b) -> b -> List a -> b
 foldr fn acc ls =
