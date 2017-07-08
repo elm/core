@@ -256,7 +256,7 @@ function _Json_runHelp(decoder, value)
 				var pair = __Utils_Tuple2(key, result.value);
 				keyValuePairs = __List_Cons(pair, keyValuePairs);
 			}
-			return __Result_Ok(keyValuePairs);
+			return __Result_Ok(__List_reverse(keyValuePairs));
 
 		case __1_MAP:
 			var answer = decoder.func;
