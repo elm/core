@@ -36,7 +36,6 @@ var _Json_decodeString = { $: __1_STRING };
 
 function _Json_decodeList(decoder) { return { $: __1_LIST, decoder: decoder }; }
 function _Json_decodeArray(decoder) { return { $: __1_ARRAY, decoder: decoder }; }
-function _Json_decodeMaybe(decoder) { return { $: __1_MAYBE, decoder: decoder }; }
 
 function _Json_decodeNull(value) { return { $: __1_NULL, value: value }; }
 
@@ -211,12 +210,6 @@ function _Json_runHelp(decoder, value)
 			}
 			return _Json_runArrayDecoder(decoder.decoder, value, _Json_toElmArray);
 
-		case __1_MAYBE:
-			var result = _Json_runHelp(decoder.decoder, value);
-			return (result.$ === 'Ok')
-				? __Result_Ok(__Maybe_Just(result.a))
-				: __Result_Ok(__Maybe_Nothing);
-
 		case __1_FIELD:
 			var field = decoder.field;
 			if (typeof value !== 'object' || value === null || !(field in value))
@@ -360,7 +353,6 @@ function _Json_equality(x, y)
 
 		case __1_LIST:
 		case __1_ARRAY:
-		case __1_MAYBE:
 		case __1_KEY_VALUE:
 			return _Json_equality(x.decoder, y.decoder);
 

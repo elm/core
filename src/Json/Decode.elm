@@ -252,8 +252,11 @@ Point is, `maybe` will make exactly what it contains conditional. For optional
 fields, this means you probably want it *outside* a use of `field` or `at`.
 -}
 maybe : Decoder a -> Decoder (Maybe a)
-maybe =
-  Elm.Kernel.Json.decodeMaybe
+maybe decoder =
+  oneOf
+    [ map Just decoder
+    , succeed Nothing
+    ]
 
 
 {-| Try a bunch of different decoders. This can be useful if the JSON may come
