@@ -21,9 +21,11 @@ similarly.
 
 [json]: https://evancz.gitbooks.io/an-introduction-to-elm/content/interop/json.html
 
-This is an implementation of [Permuted Congruential
-Generators](http://www.pcg-random.org/) by M. E. O'Neil, and is not
-cryptographically secure.
+This is an implementation of [Permuted Congruential Generators][pcg]
+by M. E. O'Neil. It is not cryptographically secure.
+
+[pcg]: http://www.pcg-random.org/
+
 
 # Generators
 @docs Generator
@@ -162,10 +164,10 @@ float a b =
 
             -- Get a uniformly distributed IEEE-754 double between 0.0 and 1.0
             hi =
-                toFloat (n0 |> Bitwise.and 0x03FFFFFF) * 1.0
+                toFloat (Bitwise.and 0x03FFFFFF n0) * 1.0
 
             lo =
-                toFloat (n1 |> Bitwise.and 0x07FFFFFF) * 1.0
+                toFloat (Bitwise.and 0x07FFFFFF n1) * 1.0
 
             val =
                 -- These magic constants are 2^27 and 2^53
