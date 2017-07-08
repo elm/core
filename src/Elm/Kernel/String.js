@@ -365,7 +365,7 @@ function _String_toInt(s)
 	}
 
 	// is decimal
-	if (c > '9' || (c < '0' && c !== '-' && c !== '+'))
+	if (c > '9' || (c < '0' && ((c !== '-' && c !== '+') || len === 1)))
 	{
 		return _String_intErr(s);
 	}
