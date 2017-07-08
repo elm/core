@@ -37,7 +37,7 @@ The current sentiment is that it is already quite error prone once you get to
 @docs filterMap, concatMap, indexedMap
 
 # Folding
-@docs foldr, foldl
+@docs foldl, foldr
 
 # Special Folds
 @docs sum, product, maximum, minimum, all, any, scanl
