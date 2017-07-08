@@ -90,8 +90,8 @@ This function *can* produce values outside of the range [[`minInt`](#minInt),
 -}
 int : Int -> Int -> Generator Int
 int a b =
-    Generator <|
-        \seed0 ->
+    Generator
+        (\seed0 ->
             let
                 ( lo, hi ) =
                     if a < b then
@@ -103,13 +103,13 @@ int a b =
                     hi - lo + 1
             in
                 -- fast path for power of 2
-                if (range |> Bitwise.and (range - 1)) == 0 then
-                    ( (peel seed0 |> Bitwise.and (range - 1) |> Bitwise.shiftRightZfBy 0) + lo, next seed0 )
+                if (Bitwise.and (range - 1) range) == 0 then
+                    ( (Bitwise.shiftRightZfBy 0 (Bitwise.and (range - 1) (peel seed0))) + lo, next seed0 )
                 else
                     let
                         threshhold =
                             -- essentially: period % max
-                            rem (-range |> Bitwise.shiftRightZfBy 0) range |> Bitwise.shiftRightZfBy 0
+                            Bitwise.shiftRightZfBy 0 (rem (Bitwise.shiftRightZfBy 0 -range) range)
 
                         accountForBias : Seed -> ( Int, Seed )
                         accountForBias seed =
@@ -127,6 +127,7 @@ int a b =
                                     ( rem x range + lo, seedN )
                     in
                         accountForBias seed0
+        )
 
 
 {-| The maximum value for randomly generated 32-bit ints: 2147483647 -}
@@ -150,7 +151,7 @@ that produces decimals between 0 and 1.
 -}
 float : Float -> Float -> Generator Float
 float a b =
-    Generator <| \seed0 ->
+    Generator (\seed0 ->
         let
             -- Get 64 bits of randomness
             seed1 =
@@ -181,6 +182,7 @@ float a b =
                 val * range + a
         in
             ( scaled, next seed1 )
+        )
 
 
 -- DATA STRUCTURES
@@ -216,8 +218,9 @@ pair genA genB =
 -}
 list : Int -> Generator a -> Generator (List a)
 list n (Generator generate) =
-  Generator <| \seed ->
+  Generator (\seed ->
     listHelp [] n generate seed
+  )
 
 
 listHelp : List a -> Int -> (Seed -> (a,Seed)) -> Seed -> (List a, Seed)
@@ -255,11 +258,12 @@ how to generate booleans and letters based on a basic integer generator.
 -}
 map : (a -> b) -> Generator a -> Generator b
 map func (Generator genA) =
-  Generator <| \seed0 ->
+  Generator (\seed0 ->
     let
       (a, seed1) = genA seed0
     in
       (func a, seed1)
+  )
 
 
 {-| Combine two generators.
@@ -274,12 +278,13 @@ put two generators together.
 -}
 map2 : (a -> b -> c) -> Generator a -> Generator b -> Generator c
 map2 func (Generator genA) (Generator genB) =
-  Generator <| \seed0 ->
+  Generator (\seed0 ->
     let
       (a, seed1) = genA seed0
       (b, seed2) = genB seed1
     in
       (func a b, seed2)
+  )
 
 
 {-| Combine three generators. This could be used to produce random colors.
@@ -296,20 +301,21 @@ map2 func (Generator genA) (Generator genB) =
 -}
 map3 : (a -> b -> c -> d) -> Generator a -> Generator b -> Generator c -> Generator d
 map3 func (Generator genA) (Generator genB) (Generator genC) =
-  Generator <| \seed0 ->
+  Generator (\seed0 ->
     let
       (a, seed1) = genA seed0
       (b, seed2) = genB seed1
       (c, seed3) = genC seed2
     in
       (func a b c, seed3)
+  )
 
 
 {-| Combine four generators.
 -}
 map4 : (a -> b -> c -> d -> e) -> Generator a -> Generator b -> Generator c -> Generator d -> Generator e
 map4 func (Generator genA) (Generator genB) (Generator genC) (Generator genD) =
-  Generator <| \seed0 ->
+  Generator (\seed0 ->
     let
       (a, seed1) = genA seed0
       (b, seed2) = genB seed1
@@ -317,13 +323,14 @@ map4 func (Generator genA) (Generator genB) (Generator genC) (Generator genD) =
       (d, seed4) = genD seed3
     in
       (func a b c d, seed4)
+  )
 
 
 {-| Combine five generators.
 -}
 map5 : (a -> b -> c -> d -> e -> f) -> Generator a -> Generator b -> Generator c -> Generator d -> Generator e -> Generator f
 map5 func (Generator genA) (Generator genB) (Generator genC) (Generator genD) (Generator genE) =
-  Generator <| \seed0 ->
+  Generator (\seed0 ->
     let
       (a, seed1) = genA seed0
       (b, seed2) = genB seed1
@@ -332,6 +339,7 @@ map5 func (Generator genA) (Generator genB) (Generator genC) (Generator genD) (G
       (e, seed5) = genE seed4
     in
       (func a b c d e, seed5)
+  )
 
 
 {-| Chain random operations, threading through the seed. In the following
@@ -353,7 +361,7 @@ lowercase letters.
 -}
 andThen : (a -> Generator b) -> Generator a -> Generator b
 andThen callback (Generator generate) =
-  Generator <| \seed ->
+  Generator (\seed ->
     let
       (result, newSeed) =
         generate seed
@@ -362,6 +370,7 @@ andThen callback (Generator generate) =
         callback result
     in
       genB newSeed
+  )
 
 
 
@@ -386,7 +395,7 @@ andThen callback (Generator generate) =
     essentially you use the "most random" bits to pick some way of scrambling
     the remaining bits. Beyond that, see section 6.3.4 of the [paper].
 
-    [paper](http://www.pcg-random.org/paper)
+    [paper](http://www.pcg-random.org/paper.html)
 
     Once we have 32 random bits, we have to turn it into a number. For integers,
     we first check if the range is a power of two. If it is, we can mask part of
@@ -418,20 +427,20 @@ type Seed
 next : Seed -> Seed
 next (Seed state0) =
     -- The magic constants are from Numerical Recipes and are inlined for perf.
-    Seed ((state0 * 1664525) + 1013904223 |> Bitwise.shiftRightZfBy 0)
+    Seed (Bitwise.shiftRightZfBy 0 ((state0 * 1664525) + 1013904223))
 
 
 -- obtain a psuedorandom 32-bit integer from a seed
 peel : Seed -> Int
 peel (Seed state) =
     -- This is the RXS-M-SH version of PCG, see section 6.3.4 of the paper
-    -- and line 184 of pcg_variants.h in the 0.94 C implementation
+    -- and line 184 of pcg_variants.h in the 0.94 (non-minimal) C implementation,
+    -- the latter of which is the source of the magic constant.
     let
         word =
-            ((state |> Bitwise.shiftRightZfBy ((state |> Bitwise.shiftRightZfBy 28) + 4)) |> Bitwise.xor state) * 277803737
+            (Bitwise.xor state (Bitwise.shiftRightZfBy ((Bitwise.shiftRightZfBy 28 state) + 4) state)) * 277803737
     in
-        Bitwise.xor (word |> Bitwise.shiftRightZfBy 22) word
-            |> Bitwise.shiftRightZfBy 0
+        Bitwise.shiftRightZfBy 0 (Bitwise.xor (Bitwise.shiftRightZfBy 22 word) word)
 
 
 {-| A `Generator` is like a recipe for generating certain random values. So a
@@ -439,7 +448,7 @@ peel (Seed state) =
 describes how to generate strings.
 
 To actually *run* a generator and produce the random values, you need to use
-functions like [`generate`](#generate) and [`initialSeed`](#initialSeed).
+either [`generate`](#generate), or [`step`](#step) and [`initialSeed`](#initialSeed).
 -}
 type Generator a =
     Generator (Seed -> (a, Seed))
@@ -449,7 +458,7 @@ type Generator a =
 and returning a new one.
 
 In the following example, we are trying to generate numbers between 0 and 100
-with the `int 0 100` generator. Each time we call `generate` we need to provide
+with the `int 0 100` generator. Each time we call `step` we need to provide
 a seed. This will produce a random number and a *new* seed to use if we want to
 run other generators later.
 
@@ -473,8 +482,8 @@ times.
 
 Our example is best written as:
 
-    (xs, newSeed) = step (list 3 <| int 0 100) seed0
-    xs -- [85, 0, 38]
+    (values, seed1) = step (list 3 <| int 0 100) seed0
+    values -- [85, 0, 38]
 
 -}
 step : Generator a -> Seed -> (a, Seed)
@@ -517,7 +526,7 @@ initialSeed x =
             next (Seed 0)
 
         state2 =
-            state1 + x |> Bitwise.shiftRightZfBy 0
+            Bitwise.shiftRightZfBy 0 (state1 + x)
     in
         next (Seed state2)
 
@@ -548,8 +557,7 @@ cmdMap func (Generate generator) =
 
 init : Task Never Seed
 init =
-  Time.now
-    |> Task.andThen (\t -> Task.succeed (initialSeed (round t)))
+    Task.andThen (\t -> Task.succeed (initialSeed (round t))) Time.now
 
 
 onEffects : Platform.Router msg Never -> List (MyCmd msg) -> Seed -> Task Never Seed
@@ -563,31 +571,11 @@ onEffects router commands seed =
         (value, newSeed) =
           step generator seed
       in
-        Platform.sendToApp router value
-          |> Task.andThen (\_ -> onEffects router rest newSeed)
+          Task.andThen
+            (\_ -> onEffects router rest newSeed)
+            (Platform.sendToApp router value)
 
 
 onSelfMsg : Platform.Router msg Never -> Never -> Seed -> Task Never Seed
 onSelfMsg _ _ seed =
   Task.succeed seed
-
-
--- multiply 32-bit integers without overflow
-mul32 : Int -> Int -> Int
-mul32 a b =
-    let
-        ah =
-            (a |> Bitwise.shiftRightZfBy 16) |> Bitwise.and 0xFFFF
-
-        al =
-            Bitwise.and a 0xFFFF
-
-        bh =
-            (b |> Bitwise.shiftRightZfBy 16) |> Bitwise.and 0xFFFF
-
-        bl =
-            Bitwise.and b 0xFFFF
-    in
-        -- The Bitwise.or could probably be replaced with shiftRightZfBy but I'm not positive?
-        (al * bl) + (((ah * bl + al * bh) |> Bitwise.shiftLeftBy 16) |> Bitwise.shiftRightZfBy 0) |> Bitwise.or 0
-
