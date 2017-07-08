@@ -449,8 +449,11 @@ errorToStringHelp error context =
     Field field err ->
       let
         isSimple =
-          String.all Char.isAlphaNum field
-          && String.all Char.isAlpha (String.left 1 field)
+          case String.uncons field of
+            Nothing ->
+              False
+            Just (char, rest) ->
+              Char.isAlpha char && String.all Char.isAlphaNum rest
 
         fieldName =
           if isSimple then "." ++ field else "['" ++ field ++ "']"
@@ -467,7 +470,12 @@ errorToStringHelp error context =
     OneOf errors ->
       case errors of
         [] ->
-          "Ran into a Json.Decode.oneOf with no possibilities!"
+          "Ran into a Json.Decode.oneOf with no possibilities" ++
+            case context of
+              [] ->
+                "!"
+              _ ->
+                " at json" ++ String.join "" (List.reverse context)
 
         [err] ->
           errorToStringHelp err context
