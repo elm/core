@@ -239,15 +239,19 @@ function _Json_runHelp(decoder, value)
 			}
 
 			var keyValuePairs = __List_Nil;
+			// TODO test perf of Object.keys and switch when support is good enough
 			for (var key in value)
 			{
-				var result = _Json_runHelp(decoder.decoder, value[key]);
-				if (result.$ !== 'Ok')
+				if (value.hasOwnProperty(key))
 				{
-					return __Result_Err({ $: 'Field', a: key, b: result.a });
+					var result = _Json_runHelp(decoder.decoder, value[key]);
+					if (result.$ !== 'Ok')
+					{
+						return __Result_Err({ $: 'Field', a: key, b: result.a });
+					}
+					var pair = __Utils_Tuple2(key, result.value);
+					keyValuePairs = __List_Cons(pair, keyValuePairs);
 				}
-				var pair = __Utils_Tuple2(key, result.value);
-				keyValuePairs = __List_Cons(pair, keyValuePairs);
 			}
 			return __Result_Ok(__List_reverse(keyValuePairs));
 
