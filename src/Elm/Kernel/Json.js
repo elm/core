@@ -197,14 +197,14 @@ function _Json_runHelp(decoder, value)
 			return __Result_Ok(value);
 
 		case __1_LIST:
-			if (!(value instanceof Array))
+			if (!Array.isArray(value))
 			{
 				return _Json_expecting('a LIST', value);
 			}
 			return _Json_runArrayDecoder(decoder.decoder, value, __List_fromArray);
 
 		case __1_ARRAY:
-			if (!(value instanceof Array))
+			if (!Array.isArray(value))
 			{
 				return _Json_expecting('an ARRAY', value);
 			}
@@ -221,7 +221,7 @@ function _Json_runHelp(decoder, value)
 
 		case __1_INDEX:
 			var index = decoder.index;
-			if (!(value instanceof Array))
+			if (!Array.isArray(value))
 			{
 				return _Json_expecting('an ARRAY', value);
 			}
@@ -233,7 +233,7 @@ function _Json_runHelp(decoder, value)
 			return (result.$ === 'Ok') ? result : __Result_Err({ $: 'Index', a: index, b: result.a });
 
 		case __1_KEY_VALUE:
-			if (typeof value !== 'object' || value === null || value instanceof Array)
+			if (typeof value !== 'object' || value === null || Array.isArray(value))
 			{
 				return _Json_expecting('an OBJECT', value);
 			}
