@@ -48,9 +48,8 @@ The current sentiment is that it is already quite error prone once you get to
 -}
 
 import Basics exposing (..)
-import Maybe
-import Maybe exposing ( Maybe(Just,Nothing) )
 import Elm.Kernel.List
+import Maybe exposing ( Maybe(Just,Nothing) )
 
 
 {-| Add an element to the front of a list. Pronounced *cons*.
