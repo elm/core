@@ -8,7 +8,7 @@ import Elm.Kernel.Debug exposing (toString)
 
 function _Error_throw__PROD(identifier)
 {
-	throw new Error('https://github.com/elm-lang/core/blob/master/help.md#' + identifier);
+	throw new Error('https://github.com/elm-lang/core/blob/master/hints/' + identifier + '.md');
 }
 
 
@@ -86,5 +86,5 @@ function _Error_regionToString(region)
 
 function _Error_dictBug()
 {
-	__Error_throw(12);
+	_Error_throw(12);
 }
