@@ -10,14 +10,14 @@ import Set exposing (toList)
 
 // LOG
 
-var _Debug_log_prod = F2(function(tag, value)
+var _Debug_log__PROD = F2(function(tag, value)
 {
 	return value;
 });
 
-var _Debug_log_dev = F2(function(tag, value)
+var _Debug_log__DEV = F2(function(tag, value)
 {
-	console.log(tag + ': ' + _Debug_toString_dev(value));
+	console.log(tag + ': ' + _Debug_toString(value));
 	return value;
 });
 
@@ -41,12 +41,12 @@ function _Debug_crashCase(moduleName, region, value)
 
 // TO STRING
 
-function _Debug_toString_prod(v)
+function _Debug_toString__PROD(v)
 {
 	return '<internals>';
 }
 
-function _Debug_toString_dev(v)
+function _Debug_toString__DEV(v)
 {
 	var type = typeof v;
 	if (type === 'function')
@@ -94,7 +94,7 @@ function _Debug_toString_dev(v)
 			for (var k in v)
 			{
 				if (k === '$') continue;
-				output.push(_Debug_toString_dev(v[k]));
+				output.push(_Debug_toString(v[k]));
 			}
 			return '(' + output.join(',') + ')';
 		}
@@ -102,16 +102,16 @@ function _Debug_toString_dev(v)
 		if (tag === 'Array')
 		{
 			var list = __Array_toList(v);
-			return 'Array.fromList ' + _Debug_toString_dev(list);
+			return 'Array.fromList ' + _Debug_toString(list);
 		}
 
 		if (tag === '::')
 		{
-			var output = '[' + _Debug_toString_dev(v.a);
+			var output = '[' + _Debug_toString(v.a);
 			v = v.b;
 			while (v.$ === '::')
 			{
-				output += ',' + _Debug_toString_dev(v.a);
+				output += ',' + _Debug_toString(v.a);
 				v = v.b;
 			}
 			return output + ']';
@@ -124,19 +124,19 @@ function _Debug_toString_dev(v)
 
 		if (tag === 'Set_elm_builtin')
 		{
-			return 'Set.fromList ' + _Debug_toString_dev(__Set_toList(v));
+			return 'Set.fromList ' + _Debug_toString(__Set_toList(v));
 		}
 
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
-			return 'Dict.fromList ' + _Debug_toString_dev(__Dict_toList(v));
+			return 'Dict.fromList ' + _Debug_toString(__Dict_toList(v));
 		}
 
 		var output = '';
 		for (var i in v)
 		{
 			if (i === '$') continue;
-			var str = _Debug_toString_dev(v[i]);
+			var str = _Debug_toString(v[i]);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
@@ -154,7 +154,7 @@ function _Debug_toString_dev(v)
 		var output = [];
 		for (var k in v)
 		{
-			output.push(k + ' = ' + _Debug_toString_dev(v[k]));
+			output.push(k + ' = ' + _Debug_toString(v[k]));
 		}
 		if (output.length === 0)
 		{

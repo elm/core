@@ -6,13 +6,13 @@ import Elm.Kernel.Debug exposing (toString)
 */
 
 
-function _Error_throw_prod(identifier)
+function _Error_throw__PROD(identifier)
 {
 	throw new Error('https://github.com/elm-lang/core/blob/master/help.md#' + identifier);
 }
 
 
-function _Error_throw_dev(identifier, fact1, fact2, fact3, fact4)
+function _Error_throw__DEV(identifier, fact1, fact2, fact3, fact4)
 {
 	switch(identifier)
 	{
