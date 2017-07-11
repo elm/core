@@ -74,11 +74,6 @@ function _Debug_toString__DEV(v)
 		return '"' + _Debug_addSlashes(v, false) + '"';
 	}
 
-	if (v === null)
-	{
-		return 'null';
-	}
-
 	if (type === 'object' && '$' in v)
 	{
 		var tag = v.$;

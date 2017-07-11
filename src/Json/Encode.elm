@@ -26,7 +26,6 @@ import Dict exposing (Dict)
 import List
 import Set exposing (Set)
 import Elm.Kernel.Json
-import Elm.Kernel.List
 
 
 
@@ -78,7 +77,7 @@ encode =
 -}
 string : String -> Value
 string =
-    Elm.Kernel.Json.identity
+    Elm.Kernel.Json.wrap
 
 
 {-| Turn an `Int` into a JSON number.
@@ -91,7 +90,7 @@ string =
 -}
 int : Int -> Value
 int =
-    Elm.Kernel.Json.identity
+    Elm.Kernel.Json.wrap
 
 
 {-| Turn a `Float` into a JSON number.
@@ -114,7 +113,7 @@ both as `null`.
 -}
 float : Float -> Value
 float =
-    Elm.Kernel.Json.identity
+    Elm.Kernel.Json.wrap
 
 
 {-| Turn a `Bool` into a JSON boolean.
@@ -126,7 +125,7 @@ float =
 -}
 bool : Bool -> Value
 bool =
-    Elm.Kernel.Json.identity
+    Elm.Kernel.Json.wrap
 
 
 
@@ -158,22 +157,25 @@ null =
 
 -}
 list : (a -> Value) -> List a -> Value
-list func values =
-    Elm.Kernel.List.toArray (List.map func values)
+list func entries =
+    Elm.Kernel.Json.wrap
+        (List.foldl (Elm.Kernel.Json.addEntry func) (Elm.Kernel.Json.emptyArray ()) entries)
 
 
 {-| Turn an `Array` into a JSON array.
 -}
 array : (a -> Value) -> Array a -> Value
-array func values =
-    list func (Array.toList values)
+array func entries =
+    Elm.Kernel.Json.wrap
+        (Array.foldl (Elm.Kernel.Json.addEntry func) (Elm.Kernel.Json.emptyArray ()) entries)
 
 
 {-| Turn an `Set` into a JSON array.
 -}
 set : (a -> Value) -> Set a -> Value
-set func values =
-    list func (Set.toList values)
+set func entries =
+    Elm.Kernel.Json.wrap
+        (Set.foldl (Elm.Kernel.Json.addEntry func) (Elm.Kernel.Json.emptyArray ()) entries)
 
 
 
@@ -194,8 +196,9 @@ set func values =
     -- Encode.encode 0 tom == """{"name":"Tom","age":42}"""
 -}
 object : List (String, Value) -> Value
-object =
-    Elm.Kernel.Json.encodeObject
+object pairs =
+    Elm.Kernel.Json.wrap
+        (List.foldl Elm.Kernel.Json.addField (Elm.Kernel.Json.emptyObject ()) pairs)
 
 
 {-| Turn a `Dict` into a JSON object.
@@ -212,7 +215,12 @@ object =
 -}
 dict : (k -> String) -> (v -> Value) -> Dict k v -> Value
 dict toKey toValue dictionary =
-    keyValuePairs toKey toValue (Dict.toList dictionary)
+    Elm.Kernel.Json.wrap (
+        Dict.foldl
+            (\key value object -> Elm.Kernel.Json.addField (toKey key) (toValue value) object)
+            (Elm.Kernel.Json.emptyObject ())
+            dictionary
+    )
 
 
 {-| Turn a `List` of `Tuple` into a JSON object.
@@ -229,9 +237,9 @@ dict toKey toValue dictionary =
 -}
 keyValuePairs : (k -> String) -> (v -> Value) -> List ( k, v ) -> Value
 keyValuePairs toKey toValue pairs =
-    object (List.map (mapBoth toKey toValue) pairs)
-
-
-mapBoth : (a -> x) -> (b -> y) -> ( a, b ) -> ( x, y )
-mapBoth funcA funcB ( x, y ) =
-  ( funcA x, funcB y )
+    Elm.Kernel.Json.wrap (
+        List.foldl
+            (\(key,value) object -> Elm.Kernel.Json.addField (toKey key) (toValue value) object)
+            (Elm.Kernel.Json.emptyObject ())
+            pairs
+    )

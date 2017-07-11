@@ -150,7 +150,10 @@ var _Json_runOnString = F2(function(decoder, string)
 	}
 });
 
-var _Json_run = F2(_Json_runHelp);
+var _Json_run = F2(function(decoder, value)
+{
+	return _Json_runHelp(decoder, _Json_unwrap(value));
+});
 
 function _Json_runHelp(decoder, value)
 {
@@ -194,7 +197,7 @@ function _Json_runHelp(decoder, value)
 				: _Json_expecting('null', value);
 
 		case __1_VALUE:
-			return __Result_Ok(value);
+			return __Result_Ok(_Json_wrap(value));
 
 		case __1_LIST:
 			if (!Array.isArray(value))
@@ -399,24 +402,31 @@ function _Json_listEquality(aDecoders, bDecoders)
 
 var _Json_encode = F2(function(indentLevel, value)
 {
-	return JSON.stringify(value, null, indentLevel);
+	return JSON.stringify(_Json_unwrap(value), null, indentLevel);
 });
 
-function _Json_identity(value)
-{
-	return value;
-}
+function _Json_wrap__DEV(value) { return { $: __0_JSON, a: value }; }
+function _Json_unwrap__DEV(value) { return value.a; }
 
-function _Json_encodeObject(keyValuePairs)
+function _Json_wrap__PROD(value) { return value; }
+function _Json_unwrap__PROD(value) { return value; }
+
+function _Json_emptyArray() { return []; }
+function _Json_emptyObject() { return {}; }
+
+var _Json_addField = F3(function(key, value, object)
 {
-	var obj = {};
-	while (keyValuePairs.$ !== '[]')
+	object[key] = _Json_unwrap(value);
+	return object;
+});
+
+function _Json_addEntry(func)
+{
+	return F2(function(entry, array)
 	{
-		var pair = keyValuePairs.a;
-		obj[pair.a] = pair.b;
-		keyValuePairs = keyValuePairs.b;
-	}
-	return obj;
+		array.push(_Json_unwrap(entry));
+		return array;
+	});
 }
 
 var _Json_encodeNull = null;
