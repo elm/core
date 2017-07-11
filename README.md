@@ -1,11 +1,11 @@
 # Elm Core Libraries
 
-[![Build Status](https://travis-ci.org/elm-lang/core.svg?branch=master)](https://travis-ci.org/elm-lang/core)
-
 Every Elm project needs the core libraries. They provide basic functionality including:
 
   * The Basics &mdash; addition, subtraction, etc.
   * Data Structures &mdash; lists, dictionaries, sets, etc.
+
+If you want to learn more about Elm, check out the examples on [elm-lang.org](http://elm-lang.org/) or the getting started guide at [guide.elm-lang.org](https://guide.elm-lang.org/).
 
 
 ## Default Imports
@@ -18,13 +18,13 @@ import List exposing ( List, (::) )
 import Maybe exposing ( Maybe( Just, Nothing ) )
 import Result exposing ( Result( Ok, Err ) )
 import String
-import Tuple exposing ( (=>) )
+import Tuple
 
 import Debug
 
 import Platform exposing ( Program )
-import Platform.Cmd exposing ( Cmd )
-import Platform.Sub exposing ( Sub )
+import Platform.Cmd as Cmd exposing ( Cmd )
+import Platform.Sub as Sub exposing ( Sub )
 ```
 
 The intention is to include things that are both extremely useful and very
