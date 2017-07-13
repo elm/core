@@ -1,12 +1,8 @@
 /*
 
-import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.Utils exposing (Tuple0)
 
 */
-
-
-var _Scheduler_MAX_STEPS = 10000;
 
 
 // TASKS
@@ -15,7 +11,7 @@ function _Scheduler_succeed(value)
 {
 	return {
 		$: __1_SUCCEED,
-		value: value
+		a: value
 	};
 }
 
@@ -23,7 +19,7 @@ function _Scheduler_fail(error)
 {
 	return {
 		$: __1_FAIL,
-		value: error
+		a: error
 	};
 }
 
@@ -31,8 +27,8 @@ function _Scheduler_binding(callback)
 {
 	return {
 		$: __1_BINDING,
-		callback: callback,
-		cancel: null
+		a: callback,
+		b: null
 	};
 }
 
@@ -40,8 +36,8 @@ var _Scheduler_andThen = F2(function(callback, task)
 {
 	return {
 		$: __1_AND_THEN,
-		callback: callback,
-		task: task
+		a: callback,
+		b: task
 	};
 });
 
@@ -49,8 +45,8 @@ var _Scheduler_onError = F2(function(callback, task)
 {
 	return {
 		$: __1_ON_ERROR,
-		callback: callback,
-		task: task
+		a: callback,
+		b: task
 	};
 });
 
@@ -58,7 +54,7 @@ function _Scheduler_receive(callback)
 {
 	return {
 		$: __1_RECEIVE,
-		callback: callback
+		a: callback
 	};
 }
 
@@ -69,51 +65,51 @@ var _Scheduler_guid = 0;
 
 function _Scheduler_rawSpawn(task)
 {
-	var process = {
+	var proc = {
 		$: __2_PROCESS,
 		id: _Scheduler_guid++,
 		root: task,
 		stack: null,
-		mailbox: []
+		mb: []
 	};
 
-	_Scheduler_enqueue(process);
+	_Scheduler_enqueue(proc);
 
-	return process;
+	return proc;
 }
 
 function _Scheduler_spawn(task)
 {
 	return _Scheduler_binding(function(callback) {
-		var process = _Scheduler_rawSpawn(task);
-		callback(_Scheduler_succeed(process));
+		var proc = _Scheduler_rawSpawn(task);
+		callback(_Scheduler_succeed(proc));
 	});
 }
 
-function _Scheduler_rawSend(process, msg)
+function _Scheduler_rawSend(proc, msg)
 {
-	process.mailbox.push(msg);
-	_Scheduler_enqueue(process);
+	proc.mb.push(msg);
+	_Scheduler_enqueue(proc);
 }
 
-var _Scheduler_send = F2(function(process, msg)
+var _Scheduler_send = F2(function(proc, msg)
 {
 	return _Scheduler_binding(function(callback) {
-		_Scheduler_rawSend(process, msg);
+		_Scheduler_rawSend(proc, msg);
 		callback(_Scheduler_succeed(__Utils_Tuple0));
 	});
 });
 
-function _Scheduler_kill(process)
+function _Scheduler_kill(proc)
 {
 	return _Scheduler_binding(function(callback) {
-		var root = process.root;
-		if (root.$ === __1_BINDING && root.cancel)
+		var task = proc.root;
+		if (task.$ === __1_BINDING && task.b)
 		{
-			root.cancel();
+			task.b();
 		}
 
-		process.root = null;
+		proc.root = null;
 
 		callback(_Scheduler_succeed(__Utils_Tuple0));
 	});
@@ -131,137 +127,59 @@ function _Scheduler_sleep(time)
 }
 
 
-// STEP PROCESSES
+/* STEP PROCESSES
 
-function _Scheduler_step(numSteps, process)
+type alias Process =
+  { $ : tag
+  , id : unique_id
+  , root : Task
+  , stack : null | { $: SUCCEED | FAIL, a: callback, b: stack }
+  , mb : [msg]
+  }
+
+*/
+function _Scheduler_enqueue(proc)
 {
-	while (numSteps < _Scheduler_MAX_STEPS)
+	while (proc.root)
 	{
-		var tag = process.root.$;
-
-		if (tag === __1_SUCCEED)
+		var rootTag = proc.root.$;
+		if (rootTag === __1_SUCCEED || rootTag === __1_FAIL)
 		{
-			while (process.stack && process.stack.$ === __1_ON_ERROR)
+			while (proc.stack && proc.stack.$ !== rootTag)
 			{
-				process.stack = process.stack.rest;
+				proc.stack = proc.stack.b;
 			}
-			if (process.stack === null)
+			if (!proc.stack)
 			{
-				break;
+				return;
 			}
-			process.root = process.stack.callback(process.root.value);
-			process.stack = process.stack.rest;
-			++numSteps;
-			continue;
+			proc.root = proc.stack.a(proc.root.a);
+			proc.stack = proc.stack.rest;
 		}
-
-		if (tag === __1_FAIL)
+		else if (rootTag === __1_BINDING)
 		{
-			while (process.stack && process.stack.$ === __1_AND_THEN)
-			{
-				process.stack = process.stack.rest;
-			}
-			if (process.stack === null)
-			{
-				break;
-			}
-			process.root = process.stack.callback(process.root.value);
-			process.stack = process.stack.rest;
-			++numSteps;
-			continue;
-		}
-
-		if (tag === __1_AND_THEN)
-		{
-			process.stack = {
-				$: __1_AND_THEN,
-				callback: process.root.callback,
-				rest: process.stack
-			};
-			process.root = process.root.task;
-			++numSteps;
-			continue;
-		}
-
-		if (tag === __1_ON_ERROR)
-		{
-			process.stack = {
-				$: __1_ON_ERROR,
-				callback: process.root.callback,
-				rest: process.stack
-			};
-			process.root = process.root.task;
-			++numSteps;
-			continue;
-		}
-
-		if (tag === __1_BINDING)
-		{
-			process.root.cancel = process.root.callback(function(newRoot) {
-				process.root = newRoot;
-				_Scheduler_enqueue(process);
+			proc.root.b = proc.root.a(function(newRoot) {
+				proc.root = newRoot;
+				_Scheduler_enqueue(proc);
 			});
-
-			break;
+			return;
 		}
-
-		if (tag === __1_RECEIVE)
+		else if (rootTag === __1_RECEIVE)
 		{
-			var mailbox = process.mailbox;
-			if (mailbox.length === 0)
+			if (proc.mb.length === 0)
 			{
-				break;
+				return;
 			}
-
-			process.root = process.root.callback(mailbox.shift());
-			++numSteps;
-			continue;
+			proc.root = proc.root.a(proc.mb.shift());
 		}
-
-		__Error_throw(10, tag);
-	}
-
-	if (numSteps < _Scheduler_MAX_STEPS)
-	{
-		return numSteps + 1;
-	}
-	_Scheduler_enqueue(process);
-
-	return numSteps;
-}
-
-
-// WORK QUEUE
-
-var _Scheduler_working = false;
-var _Scheduler_workQueue = [];
-
-function _Scheduler_enqueue(process)
-{
-	_Scheduler_workQueue.push(process);
-
-	if (!_Scheduler_working)
-	{
-		setTimeout(_Scheduler_work, 0);
-		_Scheduler_working = true;
-	}
-}
-
-function _Scheduler_work()
-{
-	var numSteps = 0;
-	var process;
-	while (numSteps < _Scheduler_MAX_STEPS && (process = _Scheduler_workQueue.shift()))
-	{
-		if (process.root)
+		else // if (rootTag === __1_AND_THEN || rootTag === __1_ON_ERROR)
 		{
-			numSteps = _Scheduler_step(numSteps, process);
+			proc.stack = {
+				$: rootTag === __1_AND_THEN ? __1_SUCCEED : __1_FAIL,
+				a: proc.root.a,
+				b: proc.stack
+			};
+			proc.root = proc.root.b;
 		}
 	}
-	if (!process)
-	{
-		_Scheduler_working = false;
-		return;
-	}
-	setTimeout(_Scheduler_work, 0);
 }

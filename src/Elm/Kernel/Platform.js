@@ -75,41 +75,21 @@ function _Platform_renderer()
 
 function _Platform_initialize(init, update, subscriptions, renderer)
 {
-	// ambient state
 	var managers = {};
-	var updateView;
+	var model = init.a;
+	var view = renderer(sendToApp, model);
 
-	// init and update state in main process
-	var initApp = __Scheduler_binding(function(callback) {
-		var model = init.a;
-		updateView = renderer(enqueue, model);
-		var cmds = init.b;
-		var subs = subscriptions(model);
-		_Platform_dispatchEffects(managers, cmds, subs);
-		callback(__Scheduler_succeed(model));
-	});
-
-	function onMessage(msg, model)
+	function sendToApp(msg, viewMetadata)
 	{
-		return __Scheduler_binding(function(callback) {
-			var results = A2(update, msg, model);
-			model = results.a;
-			updateView(model);
-			var cmds = results.b;
-			var subs = subscriptions(model);
-			_Platform_dispatchEffects(managers, cmds, subs);
-			callback(__Scheduler_succeed(model));
-		});
+		var results = A2(update, msg, model);
+		model = results.a;
+		view(model, viewMetadata);
+		_Platform_dispatchEffects(managers, results.b, subscriptions(model));
 	}
 
-	var mainProcess = _Platform_spawnLoop(initApp, onMessage);
+	var ports = _Platform_setupEffects(managers, sendToApp);
 
-	function enqueue(msg)
-	{
-		__Scheduler_rawSend(mainProcess, msg);
-	}
-
-	var ports = _Platform_setupEffects(managers, enqueue);
+	_Platform_dispatchEffects(managers, init.b, subscriptions(model));
 
 	return ports ? { ports: ports } : {};
 }
@@ -119,7 +99,7 @@ function _Platform_initialize(init, update, subscriptions, renderer)
 
 var _Platform_effectManagers = {};
 
-function _Platform_setupEffects(managers, callback)
+function _Platform_setupEffects(managers, sendToApp)
 {
 	var ports;
 
@@ -128,24 +108,22 @@ function _Platform_setupEffects(managers, callback)
 	{
 		var manager = _Platform_effectManagers[key];
 
-		if (manager.isForeign)
+		if (manager.portSetup)
 		{
 			ports = ports || {};
-			ports[key] = manager.tag === 'cmd'
-				? _Platform_setupOutgoingPort(key)
-				: _Platform_setupIncomingPort(key, callback);
+			ports[key] = manager.portSetup(key, sendToApp);
 		}
 
-		managers[key] = _Platform_makeManager(manager, callback);
+		managers[key] = _Platform_makeManager(manager, sendToApp);
 	}
 
 	return ports;
 }
 
-function _Platform_makeManager(info, callback)
+function _Platform_makeManager(info, sendToApp)
 {
 	var router = {
-		main: callback,
+		main: sendToApp,
 		self: undefined
 	};
 
@@ -153,31 +131,27 @@ function _Platform_makeManager(info, callback)
 	var onEffects = info.onEffects;
 	var onSelfMsg = info.onSelfMsg;
 
-	function onMessage(msg, state)
+	function loop(state)
 	{
-		if (msg.$ === __2_SELF)
+		return A2(__Scheduler_andThen, loop, __Scheduler_receive(function(msg)
 		{
-			return A3(onSelfMsg, router, msg.a, state);
-		}
+			if (msg.$ === __2_SELF)
+			{
+				return A3(onSelfMsg, router, msg.a, state);
+			}
 
-		var fx = msg.a;
-		switch (tag)
-		{
-			case 'cmd':
-				return A3(onEffects, router, fx.cmds, state);
-
-			case 'sub':
-				return A3(onEffects, router, fx.subs, state);
-
-			case 'fx':
-				return A4(onEffects, router, fx.cmds, fx.subs, state);
-		}
+			var fx = msg.a;
+			return tag === 'fx'
+				? A4(onEffects, router, fx.cmds, fx.subs, state)
+				: A3(onEffects, router, tag === 'cmd' ? fx.cmds : fx.subs, state);
+		}));
 	}
 
-	var process = _Platform_spawnLoop(info.init, onMessage);
-	router.self = process;
-	return process;
+	return router.self = __Scheduler_rawSpawn(A2(__Scheduler_andThen, loop, info.init));
 }
+
+
+// ROUTING
 
 var _Platform_sendToApp = F2(function(router, msg)
 {
@@ -197,24 +171,6 @@ var _Platform_sendToSelf = F2(function(router, msg)
 });
 
 
-// HELPER for STATEFUL LOOPS
-
-function _Platform_spawnLoop(init, onMessage)
-{
-	function loop(state)
-	{
-		var handleMsg = __Scheduler_receive(function(msg) {
-			return onMessage(msg, state);
-		});
-		return A2(__Scheduler_andThen, loop, handleMsg);
-	}
-
-	var task = A2(__Scheduler_andThen, loop, init);
-
-	return __Scheduler_rawSpawn(task);
-}
-
-
 // BAGS
 
 function _Platform_leaf(home)
@@ -223,8 +179,8 @@ function _Platform_leaf(home)
 	{
 		return {
 			$: __2_LEAF,
-			home: home,
-			value: value
+			a: home,
+			b: value
 		};
 	};
 }
@@ -233,7 +189,7 @@ function _Platform_batch(list)
 {
 	return {
 		$: __2_NODE,
-		branches: list
+		a: list
 	};
 }
 
@@ -241,8 +197,8 @@ var _Platform_map = F2(function(tagger, bag)
 {
 	return {
 		$: __2_MAP,
-		tagger: tagger,
-		tree: bag
+		a: tagger,
+		b: bag
 	}
 });
 
@@ -257,26 +213,27 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 
 	for (var home in managers)
 	{
-		var fx = home in effectsDict
-			? effectsDict[home]
-			: { cmds: __List_Nil, subs: __List_Nil };
-
-		__Scheduler_rawSend(managers[home], { $: 'fx', a: fx });
+		__Scheduler_rawSend(managers[home], {
+			$: 'fx',
+			a: effectsDict[home] || _Platform_noFx
+		});
 	}
 }
+
+var _Platform_noFx = { cmds: __List_Nil, subs: __List_Nil };
 
 function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
 	switch (bag.$)
 	{
 		case __2_LEAF:
-			var home = bag.home;
-			var effect = _Platform_toEffect(isCmd, home, taggers, bag.value);
+			var home = bag.a;
+			var effect = _Platform_toEffect(isCmd, home, taggers, bag.b);
 			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
 			return;
 
 		case __2_NODE:
-			var list = bag.branches;
+			var list = bag.a;
 			while (list.$ !== '[]')
 			{
 				_Platform_gatherEffects(isCmd, list.a, effectsDict, taggers);
@@ -285,8 +242,8 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 			return;
 
 		case __2_MAP:
-			_Platform_gatherEffects(isCmd, bag.tree, effectsDict, {
-				tagger: bag.tagger,
+			_Platform_gatherEffects(isCmd, bag.b, effectsDict, {
+				tagger: bag.a,
 				rest: taggers
 			});
 			return;
@@ -317,12 +274,10 @@ function _Platform_insert(isCmd, newEffect, effects)
 {
 	effects = effects || { cmds: __List_Nil, subs: __List_Nil };
 
-	if (isCmd)
-	{
-		effects.cmds = __List_Cons(newEffect, effects.cmds);
-		return effects;
-	}
-	effects.subs = __List_Cons(newEffect, effects.subs);
+	isCmd
+		? (effects.cmds = __List_Cons(newEffect, effects.cmds))
+		: (effects.subs = __List_Cons(newEffect, effects.subs));
+
 	return effects;
 }
 
@@ -331,7 +286,7 @@ function _Platform_insert(isCmd, newEffect, effects)
 
 function _Platform_checkPortName(name)
 {
-	if (name in _Platform_effectManagers)
+	if (_Platform_effectManagers[name])
 	{
 		__Error_throw(3, name)
 	}
@@ -347,7 +302,7 @@ function _Platform_outgoingPort(name, converter)
 		tag: 'cmd',
 		cmdMap: _Platform_outgoingPortMap,
 		converter: converter,
-		isForeign: true
+		portSetup: _Platform_setupOutgoingPort
 	};
 	return _Platform_leaf(name);
 }
@@ -363,7 +318,8 @@ function _Platform_setupOutgoingPort(name)
 
 	var init = __Scheduler_succeed(null);
 
-	function onEffects(router, cmdList, state)
+	_Platform_effectManagers[name].init = init;
+	_Platform_effectManagers[name].onEffects = F3(function(router, cmdList, state)
 	{
 		while (cmdList.$ !== '[]')
 		{
@@ -377,10 +333,7 @@ function _Platform_setupOutgoingPort(name)
 			cmdList = cmdList.b;
 		}
 		return init;
-	}
-
-	_Platform_effectManagers[name].init = init;
-	_Platform_effectManagers[name].onEffects = F3(onEffects);
+	});
 
 	// PUBLIC API
 
@@ -417,7 +370,7 @@ function _Platform_incomingPort(name, converter)
 		tag: 'sub',
 		subMap: _Platform_incomingPortMap,
 		converter: converter,
-		isForeign: true
+		portSetup: _Platform_setupIncomingPort
 	};
 	return _Platform_leaf(name);
 }
@@ -430,63 +383,23 @@ var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
 	};
 });
 
-function _Platform_setupIncomingPort(name, callback)
+function _Platform_setupIncomingPort(name, sendToApp)
 {
-	var sentBeforeInit = [];
 	var subs = __List_Nil;
 	var converter = _Platform_effectManagers[name].converter;
-	var currentOnEffects = preInitOnEffects;
-	var currentSend = preInitSend;
 
 	// CREATE MANAGER
 
 	var init = __Scheduler_succeed(null);
 
-	function preInitOnEffects(router, subList, state)
-	{
-		var postInitResult = postInitOnEffects(router, subList, state);
-
-		for(var i = 0; i < sentBeforeInit.length; i++)
-		{
-			postInitSend(sentBeforeInit[i]);
-		}
-
-		sentBeforeInit = null; // to release objects held in queue
-		currentSend = postInitSend;
-		currentOnEffects = postInitOnEffects;
-		return postInitResult;
-	}
-
-	function postInitOnEffects(router, subList, state)
+	_Platform_effectManagers[name].init = init;
+	_Platform_effectManagers[name].onEffects = F3(function(router, subList, state)
 	{
 		subs = subList;
 		return init;
-	}
-
-	function onEffects(router, subList, state)
-	{
-		return currentOnEffects(router, subList, state);
-	}
-
-	_Platform_effectManagers[name].init = init;
-	_Platform_effectManagers[name].onEffects = F3(onEffects);
+	});
 
 	// PUBLIC API
-
-	function preInitSend(value)
-	{
-		sentBeforeInit.push(value);
-	}
-
-	function postInitSend(value)
-	{
-		var temp = subs;
-		while (temp.$ !== '[]')
-		{
-			callback(temp.a(value));
-			temp = temp.b;
-		}
-	}
 
 	function send(incomingValue)
 	{
@@ -496,7 +409,13 @@ function _Platform_setupIncomingPort(name, callback)
 			__Error_throw(4, name, result.a);
 		}
 
-		currentSend(result.a);
+		var value = result.a;
+		var temp = subs;
+		while (temp.$ !== '[]')
+		{
+			sendToApp(temp.a(value));
+			temp = temp.b;
+		}
 	}
 
 	return { send: send };
