@@ -55,18 +55,6 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return x.getTime() === y.getTime();
 	}
 
-	if (!('$' in x))
-	{
-		for (var key in x)
-		{
-			if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
 	// convert Dicts and Sets to lists
 	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
 	{
@@ -94,11 +82,6 @@ function _Utils_eqHelp(x, y, depth, stack)
 			b = b.b;
 		}
 		return a.$ === b.$;
-	}
-
-	if (!_Utils_eqHelp(x.$, y.$, depth + 1, stack))
-	{
-		return false;
 	}
 
 	for (var key in x)
