@@ -32,9 +32,9 @@ var _JsArray_initializeFromList = F2(function (max, ls)
 {
     var result = new Array(max);
 
-    for (var i = 0; i < max && ls.ctor !== '[]'; i++) {
-        result[i] = ls._0;
-        ls = ls._1;
+    for (var i = 0; i < max && ls.$ !== '[]'; i++) {
+        result[i] = ls.a;
+        ls = ls.b;
     }
 
     result.length = i;
