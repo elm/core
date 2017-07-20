@@ -277,8 +277,8 @@ function _Platform_toEffect(isCmd, home, taggers, value)
 	}
 
 	var map = isCmd
-		? _Platform_effectManagers[home].cmdMap
-		: _Platform_effectManagers[home].subMap;
+		? _Platform_effectManagers[home].__cmdMap
+		: _Platform_effectManagers[home].__subMap;
 
 	return A2(map, applyTaggers, value)
 }
