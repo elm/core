@@ -160,7 +160,7 @@ function _Platform_instantiateManager(info, sendToApp)
 		}));
 	}
 
-	return router.__selfProcess = __Scheduler_rawSpawn(A2(__Scheduler_andThen, loop, info.init));
+	return router.__selfProcess = __Scheduler_rawSpawn(A2(__Scheduler_andThen, loop, info.__init));
 }
 
 
