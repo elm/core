@@ -73,11 +73,11 @@ function _Error_throw__DEV(identifier, fact1, fact2, fact3, fact4)
 
 function _Error_regionToString(region)
 {
-	if (region.start.line == region.end.line)
+	if (region.__$start.__$line == region.__$end.__$line)
 	{
-		return 'on line ' + region.start.line;
+		return 'on line ' + region.__$start.__$line;
 	}
-	return 'between lines ' + region.start.line + ' and ' + region.end.line;
+	return 'between lines ' + region.__$start.__$line + ' and ' + region.__$end.__$line;
 }
 
 function _Error_dictBug()

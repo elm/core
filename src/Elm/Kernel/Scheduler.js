@@ -11,7 +11,7 @@ function _Scheduler_succeed(value)
 {
 	return {
 		$: __1_SUCCEED,
-		a: value
+		__value: value
 	};
 }
 
@@ -19,7 +19,7 @@ function _Scheduler_fail(error)
 {
 	return {
 		$: __1_FAIL,
-		a: error
+		__value: error
 	};
 }
 
@@ -27,8 +27,8 @@ function _Scheduler_binding(callback)
 {
 	return {
 		$: __1_BINDING,
-		a: callback,
-		b: null
+		__callback: callback,
+		__kill: null
 	};
 }
 
@@ -36,8 +36,8 @@ var _Scheduler_andThen = F2(function(callback, task)
 {
 	return {
 		$: __1_AND_THEN,
-		a: callback,
-		b: task
+		__callback: callback,
+		__task: task
 	};
 });
 
@@ -45,8 +45,8 @@ var _Scheduler_onError = F2(function(callback, task)
 {
 	return {
 		$: __1_ON_ERROR,
-		a: callback,
-		b: task
+		__callback: callback,
+		__task: task
 	};
 });
 
@@ -54,7 +54,7 @@ function _Scheduler_receive(callback)
 {
 	return {
 		$: __1_RECEIVE,
-		a: callback
+		__callback: callback
 	};
 }
 
@@ -67,10 +67,10 @@ function _Scheduler_rawSpawn(task)
 {
 	var proc = {
 		$: __2_PROCESS,
-		id: _Scheduler_guid++,
-		root: task,
-		stack: null,
-		mb: []
+		__id: _Scheduler_guid++,
+		__root: task,
+		__stack: null,
+		__mailbox: []
 	};
 
 	_Scheduler_enqueue(proc);
@@ -88,7 +88,7 @@ function _Scheduler_spawn(task)
 
 function _Scheduler_rawSend(proc, msg)
 {
-	proc.mb.push(msg);
+	proc.__mailbox.push(msg);
 	_Scheduler_enqueue(proc);
 }
 
@@ -103,13 +103,13 @@ var _Scheduler_send = F2(function(proc, msg)
 function _Scheduler_kill(proc)
 {
 	return _Scheduler_binding(function(callback) {
-		var task = proc.root;
-		if (task.$ === __1_BINDING && task.b)
+		var task = proc.__root;
+		if (task.$ === __1_BINDING && task.__kill)
 		{
-			task.b();
+			task.__kill();
 		}
 
-		proc.root = null;
+		proc.__root = null;
 
 		callback(_Scheduler_succeed(__Utils_Tuple0));
 	});
@@ -134,52 +134,52 @@ type alias Process =
   , id : unique_id
   , root : Task
   , stack : null | { $: SUCCEED | FAIL, a: callback, b: stack }
-  , mb : [msg]
+  , mailbox : [msg]
   }
 
 */
 function _Scheduler_enqueue(proc)
 {
-	while (proc.root)
+	while (proc.__root)
 	{
-		var rootTag = proc.root.$;
+		var rootTag = proc.__root.$;
 		if (rootTag === __1_SUCCEED || rootTag === __1_FAIL)
 		{
-			while (proc.stack && proc.stack.$ !== rootTag)
+			while (proc.__stack && proc.__stack.$ !== rootTag)
 			{
-				proc.stack = proc.stack.b;
+				proc.__stack = proc.__stack.__rest;
 			}
-			if (!proc.stack)
+			if (!proc.__stack)
 			{
 				return;
 			}
-			proc.root = proc.stack.a(proc.root.a);
-			proc.stack = proc.stack.rest;
+			proc.__root = proc.__stack.__callback(proc.__root.__value);
+			proc.__stack = proc.__stack.__rest;
 		}
 		else if (rootTag === __1_BINDING)
 		{
-			proc.root.b = proc.root.a(function(newRoot) {
-				proc.root = newRoot;
+			proc.__root.__kill = proc.__root.__callback(function(newRoot) {
+				proc.__root = newRoot;
 				_Scheduler_enqueue(proc);
 			});
 			return;
 		}
 		else if (rootTag === __1_RECEIVE)
 		{
-			if (proc.mb.length === 0)
+			if (proc.__mailbox.length === 0)
 			{
 				return;
 			}
-			proc.root = proc.root.a(proc.mb.shift());
+			proc.__root = proc.__root.__callback(proc.__mailbox.shift());
 		}
 		else // if (rootTag === __1_AND_THEN || rootTag === __1_ON_ERROR)
 		{
-			proc.stack = {
+			proc.__stack = {
 				$: rootTag === __1_AND_THEN ? __1_SUCCEED : __1_FAIL,
-				a: proc.root.a,
-				b: proc.stack
+				__callback: proc.__root.__callback,
+				__rest: proc.__stack
 			};
-			proc.root = proc.root.b;
+			proc.__root = proc.__root.__task;
 		}
 	}
 }

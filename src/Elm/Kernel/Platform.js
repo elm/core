@@ -25,9 +25,9 @@ function _Platform_program(impl)
 				}
 
 				return _Platform_initialize(
-					impl.init,
-					impl.update,
-					impl.subscriptions,
+					impl.__$init,
+					impl.__$update,
+					impl.__$subscriptions,
 					_Platform_renderer
 				);
 			};
@@ -55,9 +55,9 @@ function _Platform_programWithFlags(impl)
 				}
 
 				return _Platform_initialize(
-					impl.init(result.a),
-					impl.update,
-					impl.subscriptions,
+					impl.__$init(result.a),
+					impl.__$update,
+					impl.__$subscriptions,
 					_Platform_renderer
 				);
 			};
@@ -108,46 +108,59 @@ function _Platform_setupEffects(managers, sendToApp)
 	{
 		var manager = _Platform_effectManagers[key];
 
-		if (manager.portSetup)
+		if (manager.__portSetup)
 		{
 			ports = ports || {};
-			ports[key] = manager.portSetup(key, sendToApp);
+			ports[key] = manager.__portSetup(key, sendToApp);
 		}
 
-		managers[key] = _Platform_makeManager(manager, sendToApp);
+		managers[key] = _Platform_instantiateManager(manager, sendToApp);
 	}
 
 	return ports;
 }
 
-function _Platform_makeManager(info, sendToApp)
+function _Platform_createManager(init, onEffects, onSelfMsg, cmdMap, subMap)
+{
+	return {
+		__init: init,
+		__onEffects: onEffects,
+		__onSelfMsg: onSelfMsg,
+		__cmdMap: cmdMap,
+		__subMap: subMap
+	};
+}
+
+function _Platform_instantiateManager(info, sendToApp)
 {
 	var router = {
-		main: sendToApp,
-		self: undefined
+		__sendToApp: sendToApp,
+		__selfProcess: undefined
 	};
 
-	var tag = info.tag;
-	var onEffects = info.onEffects;
-	var onSelfMsg = info.onSelfMsg;
+	var onEffects = info.__onEffects;
+	var onSelfMsg = info.__onSelfMsg;
+	var cmdMap = info.__cmdMap;
+	var subMap = info.__subMap;
 
 	function loop(state)
 	{
 		return A2(__Scheduler_andThen, loop, __Scheduler_receive(function(msg)
 		{
+			var value = msg.a;
+
 			if (msg.$ === __2_SELF)
 			{
-				return A3(onSelfMsg, router, msg.a, state);
+				return A3(onSelfMsg, router, value, state);
 			}
 
-			var fx = msg.a;
-			return tag === 'fx'
-				? A4(onEffects, router, fx.cmds, fx.subs, state)
-				: A3(onEffects, router, tag === 'cmd' ? fx.cmds : fx.subs, state);
+			return cmdMap && subMap
+				? A4(onEffects, router, value.__cmds, value.__subs, state)
+				: A3(onEffects, router, cmdMap ? value.__cmds : value.__subs, state);
 		}));
 	}
 
-	return router.self = __Scheduler_rawSpawn(A2(__Scheduler_andThen, loop, info.init));
+	return router.__selfProcess = __Scheduler_rawSpawn(A2(__Scheduler_andThen, loop, info.init));
 }
 
 
@@ -157,14 +170,14 @@ var _Platform_sendToApp = F2(function(router, msg)
 {
 	return __Scheduler_binding(function(callback)
 	{
-		router.main(msg);
+		router.__sendToApp(msg);
 		callback(__Scheduler_succeed(__Utils_Tuple0));
 	});
 });
 
 var _Platform_sendToSelf = F2(function(router, msg)
 {
-	return A2(__Scheduler_send, router.self, {
+	return A2(__Scheduler_send, router.__selfProcess, {
 		$: __2_SELF,
 		a: msg
 	});
@@ -179,8 +192,8 @@ function _Platform_leaf(home)
 	{
 		return {
 			$: __2_LEAF,
-			a: home,
-			b: value
+			__home: home,
+			__value: value
 		};
 	};
 }
@@ -189,7 +202,7 @@ function _Platform_batch(list)
 {
 	return {
 		$: __2_NODE,
-		a: list
+		__bags: list
 	};
 }
 
@@ -197,8 +210,8 @@ var _Platform_map = F2(function(tagger, bag)
 {
 	return {
 		$: __2_MAP,
-		a: tagger,
-		b: bag
+		__func: tagger,
+		__bag: bag
 	}
 });
 
@@ -220,20 +233,20 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 	}
 }
 
-var _Platform_noFx = { cmds: __List_Nil, subs: __List_Nil };
+var _Platform_noFx = { __cmds: __List_Nil, __subs: __List_Nil };
 
 function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
 	switch (bag.$)
 	{
 		case __2_LEAF:
-			var home = bag.a;
-			var effect = _Platform_toEffect(isCmd, home, taggers, bag.b);
+			var home = bag.__home;
+			var effect = _Platform_toEffect(isCmd, home, taggers, bag.__value);
 			effectsDict[home] = _Platform_insert(isCmd, effect, effectsDict[home]);
 			return;
 
 		case __2_NODE:
-			var list = bag.a;
+			var list = bag.__bags;
 			while (list.$ !== '[]')
 			{
 				_Platform_gatherEffects(isCmd, list.a, effectsDict, taggers);
@@ -242,9 +255,9 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 			return;
 
 		case __2_MAP:
-			_Platform_gatherEffects(isCmd, bag.b, effectsDict, {
-				tagger: bag.a,
-				rest: taggers
+			_Platform_gatherEffects(isCmd, bag.__bag, effectsDict, {
+				__tagger: bag.__func,
+				__rest: taggers
 			});
 			return;
 	}
@@ -257,8 +270,8 @@ function _Platform_toEffect(isCmd, home, taggers, value)
 		var temp = taggers;
 		while (temp)
 		{
-			x = temp.tagger(x);
-			temp = temp.rest;
+			x = temp.__tagger(x);
+			temp = temp.__rest;
 		}
 		return x;
 	}
@@ -272,11 +285,11 @@ function _Platform_toEffect(isCmd, home, taggers, value)
 
 function _Platform_insert(isCmd, newEffect, effects)
 {
-	effects = effects || { cmds: __List_Nil, subs: __List_Nil };
+	effects = effects || { __cmds: __List_Nil, __subs: __List_Nil };
 
 	isCmd
-		? (effects.cmds = __List_Cons(newEffect, effects.cmds))
-		: (effects.subs = __List_Cons(newEffect, effects.subs));
+		? (effects.__cmds = __List_Cons(newEffect, effects.__cmds))
+		: (effects.__subs = __List_Cons(newEffect, effects.__subs));
 
 	return effects;
 }
@@ -299,10 +312,9 @@ function _Platform_outgoingPort(name, converter)
 {
 	_Platform_checkPortName(name);
 	_Platform_effectManagers[name] = {
-		tag: 'cmd',
-		cmdMap: _Platform_outgoingPortMap,
-		converter: converter,
-		portSetup: _Platform_setupOutgoingPort
+		__cmdMap: _Platform_outgoingPortMap,
+		__converter: converter,
+		__portSetup: _Platform_setupOutgoingPort
 	};
 	return _Platform_leaf(name);
 }
@@ -312,14 +324,14 @@ var _Platform_outgoingPortMap = F2(function(tagger, value) { return value; });
 function _Platform_setupOutgoingPort(name)
 {
 	var subs = [];
-	var converter = _Platform_effectManagers[name].converter;
+	var converter = _Platform_effectManagers[name].__converter;
 
 	// CREATE MANAGER
 
 	var init = __Scheduler_succeed(null);
 
-	_Platform_effectManagers[name].init = init;
-	_Platform_effectManagers[name].onEffects = F3(function(router, cmdList, state)
+	_Platform_effectManagers[name].__init = init;
+	_Platform_effectManagers[name].__onEffects = F3(function(router, cmdList, state)
 	{
 		while (cmdList.$ !== '[]')
 		{
@@ -367,10 +379,9 @@ function _Platform_incomingPort(name, converter)
 {
 	_Platform_checkPortName(name);
 	_Platform_effectManagers[name] = {
-		tag: 'sub',
-		subMap: _Platform_incomingPortMap,
-		converter: converter,
-		portSetup: _Platform_setupIncomingPort
+		__subMap: _Platform_incomingPortMap,
+		__converter: converter,
+		__portSetup: _Platform_setupIncomingPort
 	};
 	return _Platform_leaf(name);
 }
@@ -386,14 +397,14 @@ var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
 function _Platform_setupIncomingPort(name, sendToApp)
 {
 	var subs = __List_Nil;
-	var converter = _Platform_effectManagers[name].converter;
+	var converter = _Platform_effectManagers[name].__converter;
 
 	// CREATE MANAGER
 
 	var init = __Scheduler_succeed(null);
 
-	_Platform_effectManagers[name].init = init;
-	_Platform_effectManagers[name].onEffects = F3(function(router, subList, state)
+	_Platform_effectManagers[name].__init = init;
+	_Platform_effectManagers[name].__onEffects = F3(function(router, subList, state)
 	{
 		subs = subList;
 		return init;
