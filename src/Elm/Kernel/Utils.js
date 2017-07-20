@@ -50,11 +50,6 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return false
 	}
 
-	if (x instanceof Date)
-	{
-		return x.getTime() === y.getTime();
-	}
-
 	// convert Dicts and Sets to lists
 	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
 	{
