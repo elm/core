@@ -7,11 +7,6 @@ import Maybe exposing (Maybe(Just,Nothing))
 */
 
 
-function _String_isEmpty(str)
-{
-	return str.length === 0;
-}
-
 var _String_cons = F2(function(chr, str)
 {
 	return chr + str;

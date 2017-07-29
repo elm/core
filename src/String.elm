@@ -65,8 +65,8 @@ import Result exposing (Result)
     isEmpty "the world" == False
 -}
 isEmpty : String -> Bool
-isEmpty =
-  Elm.Kernel.String.isEmpty
+isEmpty string =
+  string == ""
 
 
 {-| Add a character to the beginning of a string.
