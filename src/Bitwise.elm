@@ -61,7 +61,7 @@ whatever is the topmost bit. This can be used to divide numbers by powers of two
     shiftRightBy 2  32 == 8
     shiftRightBy 1 -32 == -16
 
-This is called an [arithmetic right shift][ars], often written (>>), and
+This is called an [arithmetic right shift][ars], often written `>>`, and
 sometimes called a sign-propagating right shift because it fills empty spots
 with copies of the highest bit.
 
@@ -78,7 +78,7 @@ shiftRightBy =
     shiftRightZfBy 2  32 == 8
     shiftRightZfBy 1 -32 == 2147483632
 
-This is called an [logical right shift][lrs], often written (>>>), and
+This is called an [logical right shift][lrs], often written `>>>`, and
 sometimes called a zero-fill right shift because it fills empty spots with
 zeros.
 
