@@ -1,5 +1,5 @@
 module String exposing
-  ( isEmpty, length, reverse, repeat
+  ( isEmpty, length, reverse, repeat, replace
   , cons, uncons, fromChar, append, concat, split, join, words, lines
   , slice, left, right, dropLeft, dropRight
   , contains, startsWith, endsWith, indexes, indices
@@ -14,7 +14,7 @@ module String exposing
 are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 
 # Basics
-@docs isEmpty, length, reverse, repeat
+@docs isEmpty, length, reverse, repeat, replace
 
 # Building and Splitting
 @docs cons, uncons, fromChar, append, concat, split, join, words, lines
@@ -207,6 +207,19 @@ repeatHelp n chunk result =
   else
     repeatHelp (Bitwise.shiftRightBy n 1) (chunk ++ chunk) <|
       if Bitwise.and n 1 == 0 then result else result ++ chunk
+
+
+{-| Replace all occurrences of some substring.
+
+    replace "." "-" "Json.Decode.succeed" == "Json-Decode-succeed"
+    replace "," "/" "a,b,c,d,e"           == "a/b/c/d/e"
+
+**Note:** If you need more advanced replacements, check out the
+`elm-lang/parser` or `elm-lang/regexp` package.
+-}
+replace : String -> String -> String -> String
+replace before after string =
+  join after (split before string)
 
 
 {-| Take a substring given a start and end index. Negative indexes
