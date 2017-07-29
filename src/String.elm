@@ -1,10 +1,11 @@
 module String exposing
   ( isEmpty, length, reverse, repeat, replace
-  , cons, uncons, fromChar, append, concat, split, join, words, lines
+  , append, concat, split, join, words, lines
   , slice, left, right, dropLeft, dropRight
   , contains, startsWith, endsWith, indexes, indices
   , toInt, fromInt
   , toFloat, fromFloat
+  , fromChar, cons, uncons
   , toList, fromList
   , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
   , map, filter, foldl, foldr, any, all
@@ -17,7 +18,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 @docs isEmpty, length, reverse, repeat, replace
 
 # Building and Splitting
-@docs cons, uncons, fromChar, append, concat, split, join, words, lines
+@docs append, concat, split, join, words, lines
 
 # Get Substrings
 @docs slice, left, right, dropLeft, dropRight
@@ -30,6 +31,9 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 
 # Float Conversions
 @docs toFloat, fromFloat
+
+# Char Conversions
+@docs fromChar, cons, uncons
 
 # List Conversions
 @docs toList, fromList
