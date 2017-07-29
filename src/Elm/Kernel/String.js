@@ -3,7 +3,6 @@
 import Elm.Kernel.List exposing (fromArray, toArray, Nil)
 import Elm.Kernel.Utils exposing (chr, Tuple2)
 import Maybe exposing (Maybe(Just,Nothing))
-import Result exposing (Result(Ok,Err))
 
 */
 
@@ -345,7 +344,7 @@ function _String_toInt(s)
 	// if empty
 	if (len === 0)
 	{
-		return _String_intErr(s);
+		return __Maybe_Nothing;
 	}
 
 	// if hex
@@ -359,31 +358,26 @@ function _String_toInt(s)
 			{
 				continue;
 			}
-			return _String_intErr(s);
+			return __Maybe_Nothing;
 		}
-		return __Result_Ok(parseInt(s, 16));
+		return __Maybe_Just(parseInt(s, 16));
 	}
 
 	// is decimal
 	if (c > '9' || (c < '0' && ((c !== '-' && c !== '+') || len === 1)))
 	{
-		return _String_intErr(s);
+		return __Maybe_Nothing;
 	}
 	for (var i = 1; i < len; ++i)
 	{
 		var c = s[i];
 		if (c < '0' || '9' < c)
 		{
-			return _String_intErr(s);
+			return __Maybe_Nothing;
 		}
 	}
 
-	return __Result_Ok(parseInt(s, 10));
-}
-
-function _String_intErr(s)
-{
-	return __Result_Err('could not convert string "' + s + '" to an Int');
+	return __Maybe_Just(parseInt(s, 10));
 }
 
 
@@ -394,16 +388,11 @@ function _String_toFloat(s)
 	// check if it is a hex, octal, or binary number
 	if (s.length === 0 || /[\sxbo]/.test(s))
 	{
-		return _String_floatErr(s);
+		return __Maybe_Nothing;
 	}
 	var n = +s;
 	// faster isNaN check
-	return n === n ? __Result_Ok(n) : _String_floatErr(s);
-}
-
-function _String_floatErr(s)
-{
-	return __Result_Err('could not convert string "' + s + '" to a Float');
+	return n === n ? __Maybe_Just(n) : __Maybe_Nothing;
 }
 
 function _String_fromList(chars)
