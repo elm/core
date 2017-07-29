@@ -160,58 +160,8 @@ var _String_join = F2(function(sep, strs)
 	return strs.join(sep);
 });
 
-var _String_repeat = F2(function(n, str)
-{
-	var result = '';
-	while (n > 0)
-	{
-		if (n & 1)
-		{
-			result += str;
-		}
-		n >>= 1, str += str;
-	}
-	return result;
-});
-
 var _String_slice = F3(function(start, end, str) {
 	return str.slice(start, end);
-});
-
-var _String_left = F2(function(n, str)
-{
-	return n < 1 ? ''  : str.slice(0, n);
-});
-
-var _String_right = F2(function(n, str)
-{
-	return n < 1 ? ''  : str.slice(-n);
-});
-
-var _String_dropLeft = F2(function(n, str)
-{
-	return n < 1 ? str : str.slice(n);
-});
-
-var _String_dropRight = F2(function(n, str)
-{
-	return n < 1 ? str : str.slice(0, -n);
-});
-
-var _String_pad = F3(function(n, chr, str)
-{
-	var half = (n - str.length) / 2;
-	return repeat(Math.ceil(half), chr) + str + repeat(half | 0, chr);
-});
-
-var _String_padRight = F3(function(n, chr, str)
-{
-	return str + repeat(n - str.length, chr);
-});
-
-var _String_padLeft = F3(function(n, chr, str)
-{
-	return repeat(n - str.length, chr) + str;
 });
 
 function _String_trim(str)

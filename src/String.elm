@@ -45,6 +45,8 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 @docs map, filter, foldl, foldr, any, all
 -}
 
+import Basics exposing (..)
+import Bitwise
 import Char
 import Elm.Kernel.List
 import Elm.Kernel.String
@@ -194,8 +196,17 @@ join sep chunks =
     repeat 3 "ha" == "hahaha"
 -}
 repeat : Int -> String -> String
-repeat =
-  Elm.Kernel.String.repeat
+repeat n chunk =
+  repeatHelp n chunk ""
+
+
+repeatHelp : Int -> String -> String -> String
+repeatHelp n chunk result =
+  if n <= 0 then
+    result
+  else
+    repeatHelp (Bitwise.shiftRightBy n 1) (chunk ++ chunk) <|
+      if Bitwise.and n 1 == 0 then result else result ++ chunk
 
 
 {-| Take a substring given a start and end index. Negative indexes
@@ -216,8 +227,11 @@ slice =
     left 2 "Mulder" == "Mu"
 -}
 left : Int -> String -> String
-left =
-  Elm.Kernel.String.left
+left n string =
+  if n < 1 then
+    ""
+  else
+    slice 0 n string
 
 
 {-| Take *n* characters from the right side of a string.
@@ -225,8 +239,11 @@ left =
     right 2 "Scully" == "ly"
 -}
 right : Int -> String -> String
-right =
-  Elm.Kernel.String.right
+right n string =
+  if n < 1 then
+    ""
+  else
+    slice -n (length string) string
 
 
 {-| Drop *n* characters from the left side of a string.
@@ -234,8 +251,11 @@ right =
     dropLeft 2 "The Lone Gunmen" == "e Lone Gunmen"
 -}
 dropLeft : Int -> String -> String
-dropLeft =
-  Elm.Kernel.String.dropLeft
+dropLeft n string =
+  if n < 1 then
+    string
+  else
+    slice n (length string) string
 
 
 {-| Drop *n* characters from the right side of a string.
@@ -243,8 +263,11 @@ dropLeft =
     dropRight 2 "Cigarette Smoking Man" == "Cigarette Smoking M"
 -}
 dropRight : Int -> String -> String
-dropRight =
-  Elm.Kernel.String.dropRight
+dropRight n string =
+  if n < 1 then
+    string
+  else
+    slice 0 -n string
 
 
 {-| Pad a string on both sides until it has a given length.
@@ -254,8 +277,12 @@ dropRight =
     pad 5 ' ' "121" == " 121 "
 -}
 pad : Int -> Char -> String -> String
-pad =
-  Elm.Kernel.String.pad
+pad n char string =
+  let
+    half =
+      Basics.toFloat (n - length string) / 2
+  in
+    repeat (ceiling half) (fromChar char) ++ string ++ repeat (floor half) (fromChar char)
 
 
 {-| Pad a string on the left until it has a given length.
@@ -265,8 +292,8 @@ pad =
     padLeft 5 '.' "121" == "..121"
 -}
 padLeft : Int -> Char -> String -> String
-padLeft =
-  Elm.Kernel.String.padLeft
+padLeft n char string =
+  repeat (n - length string) (fromChar char) ++ string
 
 
 {-| Pad a string on the right until it has a given length.
@@ -276,8 +303,8 @@ padLeft =
     padRight 5 '.' "121" == "121.."
 -}
 padRight : Int -> Char -> String -> String
-padRight =
-  Elm.Kernel.String.padRight
+padRight n char string =
+  string ++ repeat (n - length string) (fromChar char)
 
 
 {-| Get rid of whitespace on both sides of a string.
