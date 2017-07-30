@@ -41,9 +41,7 @@ are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 # Formatting
 Cosmetic operations such as padding with extra characters or trimming whitespace.
 
-@docs toUpper, toLower,
-      pad, padLeft, padRight,
-      trim, trimLeft, trimRight
+@docs toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
 
 # Higher-Order Functions
 @docs map, filter, foldl, foldr, any, all
@@ -59,6 +57,10 @@ import Maybe exposing (Maybe)
 import Result exposing (Result)
 
 
+
+-- BASICS
+
+
 {-| Determine if a string is empty.
 
     isEmpty "" == True
@@ -67,54 +69,6 @@ import Result exposing (Result)
 isEmpty : String -> Bool
 isEmpty string =
   string == ""
-
-
-{-| Add a character to the beginning of a string.
-
-    cons 'T' "he truth is out there" == "The truth is out there"
--}
-cons : Char -> String -> String
-cons =
-  Elm.Kernel.String.cons
-
-
-{-| Create a string from a given character.
-
-    fromChar 'a' == "a"
--}
-fromChar : Char -> String
-fromChar char =
-  cons char ""
-
-
-{-| Split a non-empty string into its head and tail. This lets you
-pattern match on strings exactly as you would with lists.
-
-    uncons "abc" == Just ('a',"bc")
-    uncons ""    == Nothing
--}
-uncons : String -> Maybe (Char, String)
-uncons =
-  Elm.Kernel.String.uncons
-
-
-{-| Append two strings. You can also use [the `(++)` operator](Basics#++)
-to do this.
-
-    append "butter" "fly" == "butterfly"
--}
-append : String -> String -> String
-append =
-  Elm.Kernel.String.append
-
-
-{-| Concatenate many strings into one.
-
-    concat ["never","the","less"] == "nevertheless"
--}
-concat : List String -> String
-concat strings =
-  join "" strings
 
 
 {-| Get the length of a string.
@@ -128,24 +82,6 @@ length =
   Elm.Kernel.String.length
 
 
-{-| Transform every character in a string
-
-    map (\c -> if c == '/' then '.' else c) "a/b/c" == "a.b.c"
--}
-map : (Char -> Char) -> String -> String
-map =
-  Elm.Kernel.String.map
-
-
-{-| Keep only the characters that satisfy the predicate.
-
-    filter isDigit "R2-D2" == "22"
--}
-filter : (Char -> Bool) -> String -> String
-filter =
-  Elm.Kernel.String.filter
-
-
 {-| Reverse a string.
 
     reverse "stressed" == "desserts"
@@ -153,46 +89,6 @@ filter =
 reverse : String -> String
 reverse =
   Elm.Kernel.String.reverse
-
-
-{-| Reduce a string from the left.
-
-    foldl cons "" "time" == "emit"
--}
-foldl : (Char -> b -> b) -> b -> String -> b
-foldl =
-  Elm.Kernel.String.foldl
-
-
-{-| Reduce a string from the right.
-
-    foldr cons "" "time" == "time"
--}
-foldr : (Char -> b -> b) -> b -> String -> b
-foldr =
-  Elm.Kernel.String.foldr
-
-
-{-| Split a string using a given separator.
-
-    split "," "cat,dog,cow"        == ["cat","dog","cow"]
-    split "/" "home/evan/Desktop/" == ["home","evan","Desktop", ""]
-
--}
-split : String -> String -> List String
-split sep string =
-  Elm.Kernel.List.fromArray (Elm.Kernel.String.split sep string)
-
-
-{-| Put many strings together with a given separator.
-
-    join "a" ["H","w","ii","n"]        == "Hawaiian"
-    join " " ["cat","dog","cow"]       == "cat dog cow"
-    join "/" ["home","evan","Desktop"] == "home/evan/Desktop"
--}
-join : String -> List String -> String
-join sep chunks =
-  Elm.Kernel.String.join sep (Elm.Kernel.List.toArray chunks)
 
 
 {-| Repeat a string *n* times.
@@ -224,6 +120,73 @@ repeatHelp n chunk result =
 replace : String -> String -> String -> String
 replace before after string =
   join after (split before string)
+
+
+
+-- BUILDING AND SPLITTING
+
+
+{-| Append two strings. You can also use [the `(++)` operator](Basics#++)
+to do this.
+
+    append "butter" "fly" == "butterfly"
+-}
+append : String -> String -> String
+append =
+  Elm.Kernel.String.append
+
+
+{-| Concatenate many strings into one.
+
+    concat ["never","the","less"] == "nevertheless"
+-}
+concat : List String -> String
+concat strings =
+  join "" strings
+
+
+{-| Split a string using a given separator.
+
+    split "," "cat,dog,cow"        == ["cat","dog","cow"]
+    split "/" "home/evan/Desktop/" == ["home","evan","Desktop", ""]
+
+-}
+split : String -> String -> List String
+split sep string =
+  Elm.Kernel.List.fromArray (Elm.Kernel.String.split sep string)
+
+
+{-| Put many strings together with a given separator.
+
+    join "a" ["H","w","ii","n"]        == "Hawaiian"
+    join " " ["cat","dog","cow"]       == "cat dog cow"
+    join "/" ["home","evan","Desktop"] == "home/evan/Desktop"
+-}
+join : String -> List String -> String
+join sep chunks =
+  Elm.Kernel.String.join sep (Elm.Kernel.List.toArray chunks)
+
+
+{-| Break a string into words, splitting on chunks of whitespace.
+
+    words "How are \t you? \n Good?" == ["How","are","you?","Good?"]
+-}
+words : String -> List String
+words =
+  Elm.Kernel.String.words
+
+
+{-| Break a string into lines, splitting on newlines.
+
+    lines "How are you?\nGood?" == ["How are you?", "Good?"]
+-}
+lines : String -> List String
+lines =
+  Elm.Kernel.String.lines
+
+
+
+-- SUBSTRINGS
 
 
 {-| Take a substring given a start and end index. Negative indexes
@@ -285,6 +248,82 @@ dropRight n string =
     string
   else
     slice 0 -n string
+
+
+
+-- DETECT SUBSTRINGS
+
+
+{-| See if the second string contains the first one.
+
+    contains "the" "theory" == True
+    contains "hat" "theory" == False
+    contains "THE" "theory" == False
+
+-}
+contains : String -> String -> Bool
+contains =
+  Elm.Kernel.String.contains
+
+
+{-| See if the second string starts with the first one.
+
+    startsWith "the" "theory" == True
+    startsWith "ory" "theory" == False
+-}
+startsWith : String -> String -> Bool
+startsWith =
+  Elm.Kernel.String.startsWith
+
+
+{-| See if the second string ends with the first one.
+
+    endsWith "the" "theory" == False
+    endsWith "ory" "theory" == True
+-}
+endsWith : String -> String -> Bool
+endsWith =
+  Elm.Kernel.String.endsWith
+
+
+{-| Get all of the indexes for a substring in another string.
+
+    indexes "i" "Mississippi"   == [1,4,7,10]
+    indexes "ss" "Mississippi"  == [2,5]
+    indexes "needle" "haystack" == []
+-}
+indexes : String -> String -> List Int
+indexes =
+  Elm.Kernel.String.indexes
+
+
+{-| Alias for `indexes`. -}
+indices : String -> String -> List Int
+indices =
+  Elm.Kernel.String.indexes
+
+
+
+-- FORMATTING
+
+
+{-| Convert a string to all upper case. Useful for case-insensitive comparisons
+and VIRTUAL YELLING.
+
+    toUpper "skinner" == "SKINNER"
+-}
+toUpper : String -> String
+toUpper =
+  Elm.Kernel.String.toUpper
+
+
+{-| Convert a string to all lower case. Useful for case-insensitive comparisons.
+
+    toLower "X-FILES" == "x-files"
+-}
+toLower : String -> String
+toLower =
+  Elm.Kernel.String.toLower
 
 
 {-| Pad a string on both sides until it has a given length.
@@ -349,114 +388,6 @@ trimLeft =
 trimRight : String -> String
 trimRight =
   Elm.Kernel.String.trimRight
-
-
-{-| Break a string into words, splitting on chunks of whitespace.
-
-    words "How are \t you? \n Good?" == ["How","are","you?","Good?"]
--}
-words : String -> List String
-words =
-  Elm.Kernel.String.words
-
-
-{-| Break a string into lines, splitting on newlines.
-
-    lines "How are you?\nGood?" == ["How are you?", "Good?"]
--}
-lines : String -> List String
-lines =
-  Elm.Kernel.String.lines
-
-
-{-| Convert a string to all upper case. Useful for case-insensitive comparisons
-and VIRTUAL YELLING.
-
-    toUpper "skinner" == "SKINNER"
--}
-toUpper : String -> String
-toUpper =
-  Elm.Kernel.String.toUpper
-
-
-{-| Convert a string to all lower case. Useful for case-insensitive comparisons.
-
-    toLower "X-FILES" == "x-files"
--}
-toLower : String -> String
-toLower =
-  Elm.Kernel.String.toLower
-
-
-{-| Determine whether *any* characters satisfy a predicate.
-
-    any isDigit "90210" == True
-    any isDigit "R2-D2" == True
-    any isDigit "heart" == False
--}
-any : (Char -> Bool) -> String -> Bool
-any =
-  Elm.Kernel.String.any
-
-
-{-| Determine whether *all* characters satisfy a predicate.
-
-    all isDigit "90210" == True
-    all isDigit "R2-D2" == False
-    all isDigit "heart" == False
--}
-all : (Char -> Bool) -> String -> Bool
-all =
-  Elm.Kernel.String.all
-
-
-{-| See if the second string contains the first one.
-
-    contains "the" "theory" == True
-    contains "hat" "theory" == False
-    contains "THE" "theory" == False
-
--}
-contains : String -> String -> Bool
-contains =
-  Elm.Kernel.String.contains
-
-
-{-| See if the second string starts with the first one.
-
-    startsWith "the" "theory" == True
-    startsWith "ory" "theory" == False
--}
-startsWith : String -> String -> Bool
-startsWith =
-  Elm.Kernel.String.startsWith
-
-
-{-| See if the second string ends with the first one.
-
-    endsWith "the" "theory" == False
-    endsWith "ory" "theory" == True
--}
-endsWith : String -> String -> Bool
-endsWith =
-  Elm.Kernel.String.endsWith
-
-
-{-| Get all of the indexes for a substring in another string.
-
-    indexes "i" "Mississippi"   == [1,4,7,10]
-    indexes "ss" "Mississippi"  == [2,5]
-    indexes "needle" "haystack" == []
--}
-indexes : String -> String -> List Int
-indexes =
-  Elm.Kernel.String.indexes
-
-
-{-| Alias for `indexes`. -}
-indices : String -> String -> List Int
-indices =
-  Elm.Kernel.String.indexes
 
 
 
@@ -555,3 +486,97 @@ fromList : List Char -> String
 fromList =
   Elm.Kernel.String.fromList
 
+
+
+-- CHAR CONVERSIONS
+
+
+{-| Create a string from a given character.
+
+    fromChar 'a' == "a"
+-}
+fromChar : Char -> String
+fromChar char =
+  cons char ""
+
+
+{-| Add a character to the beginning of a string.
+
+    cons 'T' "he truth is out there" == "The truth is out there"
+-}
+cons : Char -> String -> String
+cons =
+  Elm.Kernel.String.cons
+
+
+{-| Split a non-empty string into its head and tail. This lets you
+pattern match on strings exactly as you would with lists.
+
+    uncons "abc" == Just ('a',"bc")
+    uncons ""    == Nothing
+-}
+uncons : String -> Maybe (Char, String)
+uncons =
+  Elm.Kernel.String.uncons
+
+
+
+-- HIGHER-ORDER FUNCTIONS
+
+
+{-| Transform every character in a string
+
+    map (\c -> if c == '/' then '.' else c) "a/b/c" == "a.b.c"
+-}
+map : (Char -> Char) -> String -> String
+map =
+  Elm.Kernel.String.map
+
+
+{-| Keep only the characters that satisfy the predicate.
+
+    filter isDigit "R2-D2" == "22"
+-}
+filter : (Char -> Bool) -> String -> String
+filter =
+  Elm.Kernel.String.filter
+
+
+{-| Reduce a string from the left.
+
+    foldl cons "" "time" == "emit"
+-}
+foldl : (Char -> b -> b) -> b -> String -> b
+foldl =
+  Elm.Kernel.String.foldl
+
+
+{-| Reduce a string from the right.
+
+    foldr cons "" "time" == "time"
+-}
+foldr : (Char -> b -> b) -> b -> String -> b
+foldr =
+  Elm.Kernel.String.foldr
+
+
+{-| Determine whether *any* characters satisfy a predicate.
+
+    any isDigit "90210" == True
+    any isDigit "R2-D2" == True
+    any isDigit "heart" == False
+-}
+any : (Char -> Bool) -> String -> Bool
+any =
+  Elm.Kernel.String.any
+
+
+{-| Determine whether *all* characters satisfy a predicate.
+
+    all isDigit "90210" == True
+    all isDigit "R2-D2" == False
+    all isDigit "heart" == False
+-}
+all : (Char -> Bool) -> String -> Bool
+all =
+  Elm.Kernel.String.all
