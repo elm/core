@@ -1,6 +1,7 @@
 module Tuple exposing
   ( first, second
-  , mapFirst, mapSecond
+  , mapFirst, mapSecond, mapBoth
+  , apply
   )
 
 {-| Some helpers for working with 2-tuples.
@@ -14,10 +15,13 @@ built-in syntax for records.
 @docs first, second
 
 # Mapping
-@docs mapFirst, mapSecond
+@docs mapFirst, mapSecond, mapBoth, apply
 
 -}
 
+
+
+-- ACCESSORS
 
 
 {-| Extract the first value from a tuple.
@@ -40,6 +44,10 @@ second (_,y) =
   y
 
 
+
+-- MAPPING
+
+
 {-| Transform the first value in a tuple.
 
     import String
@@ -47,19 +55,47 @@ second (_,y) =
     mapFirst String.reverse ("stressed", 16) == ("desserts", 16)
     mapFirst String.length  ("stressed", 16) == (8, 16)
 -}
-mapFirst : (a1 -> a2) -> (a1, b) -> (a2, b)
+mapFirst : (a -> x) -> (a, b) -> (x, b)
 mapFirst func (x,y) =
   (func x, y)
 
 
 {-| Transform the second value in a tuple.
 
-    import String
-
-    mapSecond sqrt          ("stressed", 16) == ("stressed", 4)
-    mapSecond (\x -> x + 1) ("stressed", 16) == ("stressed", 17)
+    mapSecond sqrt   ("stressed", 16) == ("stressed", 4)
+    mapSecond negate ("stressed", 16) == ("stressed", -16)
 -}
-mapSecond : (b1 -> b2) -> (a, b1) -> (a, b2)
+mapSecond : (b -> y) -> (a, b) -> (a, y)
 mapSecond func (x,y) =
   (x, func y)
 
+
+{-| Transform both parts of a tuple.
+
+    import String
+
+    mapBoth String.reverse sqrt  ("stressed", 16) == ("desserts", 4)
+    mapBoth String.length negate ("stressed", 16) == (8, -16)
+-}
+mapBoth : (a -> x) -> (b -> y) -> (a, b) -> (x, y)
+mapBoth funcA funcB (x,y) =
+  ( funcA x, funcB y )
+
+
+{-| Sometimes you have a normal function that takes *two* arguments, but the
+arguments happen to be in a tuple for some reason.
+
+    apply max  (3,4) == 4
+    apply (==) (3,4) == False
+
+These examples are pretty silly! It is occasionally useful in practice though.
+Maybe you have some `view` code like this:
+
+  - A list `books : List (String, Int)` of titles and page counts.
+  - A `viewBook : String -> Int -> Html msg` to display that info.
+
+You could say `List.map (Tuple.apply viewBook) books` and have it all work out!
+-}
+apply : (a -> b -> result) -> (a, b) -> result
+apply func (x, y) =
+  func x y
