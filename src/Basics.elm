@@ -1,18 +1,25 @@
 module Basics exposing
-  ( (==), (/=)
-  , (<), (>), (<=), (>=), max, min, Order (..), compare
+  ( (+), (-), (*), (/), (//), (^)
+  , toFloat, round, floor, ceiling, truncate
+  , (==), (/=)
+  , (<), (>), (<=), (>=), max, min, compare, Order(..)
   , not, (&&), (||), xor
-  , (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
+  , (++)
+  , modBy, remainderBy, negate, abs, clamp, sqrt, logBase, e
   , pi, cos, sin, tan, acos, asin, atan, atan2
-  , round, floor, ceiling, truncate, toFloat
   , degrees, radians, turns
   , toPolar, fromPolar
   , isNaN, isInfinite
-  , (++)
   , identity, always, (<|), (|>), (<<), (>>), Never, never
   )
 
 {-| Tons of useful functions that get imported by default.
+
+# Math
+@docs (+), (-), (*), (/), (//), (^)
+
+# Int to Float / Float to Int
+@docs toFloat, round, floor, ceiling, truncate
 
 # Equality
 @docs (==), (/=)
@@ -21,28 +28,25 @@ module Basics exposing
 
 These functions only work on `comparable` types. This includes numbers,
 characters, strings, lists of comparable things, and tuples of comparable
-things. Note that tuples with 7 or more elements are not comparable; why
+things. Note that tuples with 7 or more elements are not comparable. Why
 are your tuples so big?
 
-@docs (<), (>), (<=), (>=), max, min, Order, compare
+@docs (<), (>), (<=), (>=), max, min, compare, Order
 
 # Booleans
 @docs not, (&&), (||), xor
 
-# Mathematics
-@docs (+), (-), (*), (/), (^), (//), rem, (%), negate, abs, sqrt, clamp, logBase, e
+# Append Strings and Lists
+@docs (++)
+
+# Fancier Math
+@docs modBy, remainderBy, negate, abs, clamp, sqrt, logBase, e
+
+# Angles
+@docs degrees, radians, turns
 
 # Trigonometry
 @docs pi, cos, sin, tan, acos, asin, atan, atan2
-
-# Number Conversions
-@docs round, floor, ceiling, truncate, toFloat
-
-# Angle Conversions
-All angle conversions result in &ldquo;standard Elm angles&rdquo;
-which happen to be radians.
-
-@docs degrees, radians, turns
 
 # Polar Coordinates
 @docs toPolar, fromPolar
@@ -50,48 +54,43 @@ which happen to be radians.
 # Floating Point Checks
 @docs isNaN, isInfinite
 
-# Append Strings and Lists
-@docs (++)
-
-# Higher-Order Helpers
+# Function Helpers
 @docs identity, always, (<|), (|>), (<<), (>>), Never, never
 
 -}
+
 
 import Elm.Kernel.Basics
 import Elm.Kernel.Utils
 
 
-{-| Convert radians to standard Elm angles (radians). -}
-radians : Float -> Float
-radians t =
-  t
+
+-- INFIX OPERATOR PRECEDENCE
 
 
-{-| Convert degrees to standard Elm angles (radians). -}
-degrees : Float -> Float
-degrees degs =
-  degs * pi / 180
+infixr 0 <|
+infixl 0 |>
+infixr 2 ||
+infixr 3 &&
+infix  4 ==
+infix  4 /=
+infix  4 <
+infix  4 >
+infix  4 <=
+infix  4 >=
+infixr 5 ++
+infixl 6 +
+infixl 6 -
+infixl 7 *
+infixl 7 /
+infixl 7 //
+infixr 8 ^
+infixr 9 <<
+infixl 9 >>
 
 
-{-| Convert turns to standard Elm angles (radians).
-One turn is equal to 360&deg;.
--}
-turns : Float -> Float
-turns ts =
-  2 * pi * ts
 
-
-{-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
-fromPolar : (Float,Float) -> (Float,Float)
-fromPolar ( radius, theta ) =
-  ( radius * cos theta, radius * sin theta )
-
-
-{-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
-toPolar : (Float,Float) -> (Float,Float)
-toPolar ( x, y ) =
-  ( sqrt (x * x + y * y), atan2 y x )
+-- MATHEMATICS
 
 
 {-|-}
@@ -115,45 +114,13 @@ toPolar ( x, y ) =
 {-| Floating point division. -}
 (/) : Float -> Float -> Float
 (/) =
-  Elm.Kernel.Basics.floatDiv
-
-
-infixl 6 +
-infixl 6 -
-infixl 7 *
-infixl 7 /
-infixr 8 ^
-
-infixl 7 //
-infixl 7 %
+  Elm.Kernel.Basics.fdiv
 
 
 {-| Integer division. The remainder is discarded. -}
 (//) : Int -> Int -> Int
 (//) =
-  Elm.Kernel.Basics.div
-
-
-{-| Find the remainder after dividing one number by another.
-
-    rem 11 4 == 3
-    rem 12 4 == 0
-    rem 13 4 == 1
-    rem -1 4 == -1
--}
-rem : Int -> Int -> Int
-rem =
-  Elm.Kernel.Basics.rem
-
-
-{-| Perform [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic).
-
-     7 % 2 == 1
-    -1 % 4 == 3
--}
-(%) : Int -> Int -> Int
-(%) =
-  Elm.Kernel.Basics.mod
+  Elm.Kernel.Basics.idiv
 
 
 {-| Exponentiation
@@ -163,6 +130,361 @@ rem =
 (^) : number -> number -> number
 (^) =
   Elm.Kernel.Basics.exp
+
+
+
+-- INT TO FLOAT / FLOAT TO INT
+
+
+{-| Convert an integer into a float. -}
+toFloat : Int -> Float
+toFloat =
+  Elm.Kernel.Basics.toFloat
+
+
+{-| Round a number to the nearest integer. -}
+round : Float -> Int
+round =
+  Elm.Kernel.Basics.round
+
+
+{-| Floor function, rounding down. -}
+floor : Float -> Int
+floor =
+  Elm.Kernel.Basics.floor
+
+
+{-| Ceiling function, rounding up. -}
+ceiling : Float -> Int
+ceiling =
+  Elm.Kernel.Basics.ceiling
+
+
+{-| Truncate a number, rounding towards zero. -}
+truncate : Float -> Int
+truncate =
+  Elm.Kernel.Basics.truncate
+
+
+
+-- EQUALITY
+
+
+{-| Check if values are &ldquo;the same&rdquo;.
+
+**Note:** Elm uses structural equality on tuples, records, and user-defined
+union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
+This is not true in languages like JavaScript that use reference equality on
+objects.
+
+**Note:** Equality (in the Elm sense) is not possible for certain types. For
+example, the functions `(\n -> n + 1)` and `(\n -> 1 + n)` are &ldquo;the
+same&rdquo; but detecting this in general is [undecidable][]. In a future
+release, the compiler will detect when `(==)` is used with problematic
+types and provide a helpful error message. This will require quite serious
+infrastructure work that makes sense to batch with another big project, so the
+stopgap is to crash as quickly as possible. Problematic types include functions
+and JavaScript values like `Json.Encode.Value` which could contain functions
+if passed through a port.
+
+[undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
+-}
+(==) : a -> a -> Bool
+(==) =
+  Elm.Kernel.Utils.equal
+
+
+{-| Check if values are not &ldquo;the same&rdquo;.
+
+So `(a /= b)` is the same as `(not (a == b))`.
+-}
+(/=) : a -> a -> Bool
+(/=) =
+  Elm.Kernel.Utils.notEqual
+
+
+
+-- COMPARISONS
+
+
+{-|-}
+(<) : comparable -> comparable -> Bool
+(<) =
+  Elm.Kernel.Utils.lt
+
+
+{-|-}
+(>) : comparable -> comparable -> Bool
+(>) =
+  Elm.Kernel.Utils.gt
+
+
+{-|-}
+(<=) : comparable -> comparable -> Bool
+(<=) =
+  Elm.Kernel.Utils.le
+
+
+{-|-}
+(>=) : comparable -> comparable -> Bool
+(>=) =
+  Elm.Kernel.Utils.ge
+
+
+{-| Find the smaller of two comparables.
+
+    min 42 12345678 == 42
+    min "abc" "xyz" == "abc"
+-}
+min : comparable -> comparable -> comparable
+min x y =
+  if x < y then x else y
+
+
+{-| Find the larger of two comparables.
+
+    max 42 12345678 == 12345678
+    max "abc" "xyz" == "xyz"
+-}
+max : comparable -> comparable -> comparable
+max x y =
+  if x > y then x else y
+
+
+{-| Compare any two comparable values. Comparable values include `String`, `Char`,
+`Int`, `Float`, `Time`, or a list or tuple containing comparable values.
+These are also the only values that work as `Dict` keys or `Set` members.
+
+    compare 3 4 == LT
+    compare 4 4 == EQ
+    compare 5 4 == GT
+-}
+compare : comparable -> comparable -> Order
+compare =
+  Elm.Kernel.Utils.compare
+
+
+{-| Represents the relative ordering of two things.
+The relations are less than, equal to, and greater than.
+-}
+type Order = LT | EQ | GT
+
+
+
+-- BOOLEANS
+
+
+{-| Negate a boolean value.
+
+    not True == False
+    not False == True
+-}
+not : Bool -> Bool
+not bool =
+  if bool then False else True
+
+
+{-| The logical AND operator. `True` if both inputs are `True`.
+
+    True  && True  == True
+    True  && False == False
+    False && True  == False
+    False && False == False
+
+**Note:** When used in the infix position, like `(left && right)`, the operator
+short-circuits. This means if `left` is `False` we do not bother evaluating `right`
+and just return `False` overall.
+-}
+(&&) : Bool -> Bool -> Bool
+(&&) =
+  Elm.Kernel.Basics.and
+
+
+{-| The logical OR operator. `True` if one or both inputs are `True`.
+
+    True  || True  == True
+    True  || False == True
+    False || True  == True
+    False || False == False
+
+**Note:** When used in the infix position, like `(left || right)`, the operator
+short-circuits. This means if `left` is `True` we do not bother evaluating `right`
+and just return `True` overall.
+-}
+(||) : Bool -> Bool -> Bool
+(||) =
+  Elm.Kernel.Basics.or
+
+
+{-| The exclusive-or operator. `True` if exactly one input is `True`.
+
+    xor True  True  == False
+    xor True  False == True
+    xor False True  == True
+    xor False False == False
+-}
+xor : Bool -> Bool -> Bool
+xor =
+  Elm.Kernel.Basics.xor
+
+
+
+-- APPEND
+
+
+{-| Put two appendable things together. This includes strings, lists, and text.
+
+    "hello" ++ "world" == "helloworld"
+    [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
+-}
+(++) : appendable -> appendable -> appendable
+(++) =
+  Elm.Kernel.Utils.append
+
+
+
+-- FANCIER MATH
+
+
+{-| Perform [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic).
+A common trick is to use (n mod 2) to detect even and odd numbers:
+
+    modBy 2 0 == 0
+    modBy 2 1 == 1
+    modBy 2 2 == 0
+    modBy 2 3 == 1
+
+Our `modBy` function works in the typical mathematical way when you run into
+negative numbers:
+
+    List.map (modBy 4) [ -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5 ]
+    --                 [  3,  0,  1,  2,  3,  0,  1,  2,  3,  0,  1 ]
+
+Use [`remainderBy`](#remainderBy) for a different treatment of negative numbers.
+-}
+modBy : Int -> Int -> Int
+modBy =
+  Elm.Kernel.Basics.modBy
+
+
+{-| Get the remainder after division. Here are bunch of examples of dividing by four:
+
+    List.map (remainderBy 4) [ -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5 ]
+    --                       [ -1,  0, -3, -2, -1,  0,  1,  2,  3,  0,  1 ]
+
+Use [`modBy`](#modBy) for a different treatment of negative numbers.
+-}
+remainderBy : Int -> Int -> Int
+remainderBy =
+  Elm.Kernel.Basics.remainderBy
+
+
+{-| Negate a number.
+
+    negate 42 == -42
+    negate -42 == 42
+    negate 0 == 0
+-}
+negate : number -> number
+negate n =
+  -n
+
+
+{-| Get the [absolute value][abs] of a number.
+
+    abs 16   == 16
+    abs -4   == 4
+    abs -8.5 == 8.5
+    abs 3.14 == 3.14
+
+[abs]: https://en.wikipedia.org/wiki/Absolute_value
+-}
+abs : number -> number
+abs n =
+  if n < 0 then -n else n
+
+
+{-| Clamps a number within a given range. With the expression
+`clamp 100 200 x` the results are as follows:
+
+    100     if x < 100
+     x      if 100 <= x < 200
+    200     if 200 <= x
+-}
+clamp : number -> number -> number -> number
+clamp low high number =
+  if number < low then
+    low
+  else if number > high then
+    high
+  else
+    number
+
+
+{-| Take the square root of a number.
+
+    sqrt  4 == 2
+    sqrt  9 == 3
+    sqrt 16 == 4
+    sqrt 25 == 5
+-}
+sqrt : Float -> Float
+sqrt =
+  Elm.Kernel.Basics.sqrt
+
+
+{-| Calculate the logarithm of a number with a given base.
+
+    logBase 10 100 == 2
+    logBase 2 256 == 8
+-}
+logBase : Float -> Float -> Float
+logBase =
+  Elm.Kernel.Basics.logBase
+
+
+{-| An approximation of e.
+-}
+e : Float
+e =
+  Elm.Kernel.Basics.e
+
+
+
+-- ANGLES
+
+
+{-| Convert radians to standard Elm angles (radians).
+-}
+radians : Float -> Float
+radians t =
+  t
+
+
+{-| Convert degrees to standard Elm angles (radians).
+-}
+degrees : Float -> Float
+degrees degs =
+  degs * pi / 180
+
+
+{-| Convert turns to standard Elm angles (radians). One turn is equal to
+360&deg;.
+-}
+turns : Float -> Float
+turns ts =
+  2 * pi * ts
+
+
+
+-- TRIGONOMETRY
+
+
+{-| An approximation of pi.
+-}
+pi : Float
+pi =
+  Elm.Kernel.Basics.pi
 
 
 {-|-}
@@ -216,246 +538,24 @@ atan2 =
   Elm.Kernel.Basics.atan2
 
 
-{-| Take the square root of a number. -}
-sqrt : Float -> Float
-sqrt =
-  Elm.Kernel.Basics.sqrt
 
+-- POLAR COORDINATES
 
-{-| Negate a number.
 
-    negate 42 == -42
-    negate -42 == 42
-    negate 0 == 0
--}
-negate : number -> number
-negate n =
-  -n
+{-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
+fromPolar : (Float,Float) -> (Float,Float)
+fromPolar ( radius, theta ) =
+  ( radius * cos theta, radius * sin theta )
 
 
-{-| Take the absolute value of a number. -}
-abs : number -> number
-abs =
-  Elm.Kernel.Basics.abs
+{-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
+toPolar : (Float,Float) -> (Float,Float)
+toPolar ( x, y ) =
+  ( sqrt (x * x + y * y), atan2 y x )
 
 
-{-| Calculate the logarithm of a number with a given base.
 
-    logBase 10 100 == 2
-    logBase 2 256 == 8
--}
-logBase : Float -> Float -> Float
-logBase =
-  Elm.Kernel.Basics.logBase
-
-
-{-| Clamps a number within a given range. With the expression
-`clamp 100 200 x` the results are as follows:
-
-    100     if x < 100
-     x      if 100 <= x < 200
-    200     if 200 <= x
--}
-clamp : number -> number -> number -> number
-clamp low high number =
-  if number < low then
-    low
-  else if number > high then
-    high
-  else
-    number
-
-
-{-| An approximation of pi. -}
-pi : Float
-pi =
-  Elm.Kernel.Basics.pi
-
-
-{-| An approximation of e. -}
-e : Float
-e =
-  Elm.Kernel.Basics.e
-
-
-{-| Check if values are &ldquo;the same&rdquo;.
-
-**Note:** Elm uses structural equality on tuples, records, and user-defined
-union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
-This is not true in languages like JavaScript that use reference equality on
-objects.
-
-**Note:** Equality (in the Elm sense) is not possible for certain types. For
-example, the functions `(\n -> n + 1)` and `(\n -> 1 + n)` are &ldquo;the
-same&rdquo; but detecting this in general is [undecidable][]. In a future
-release, the compiler will detect when `(==)` is used with problematic
-types and provide a helpful error message. This will require quite serious
-infrastructure work that makes sense to batch with another big project, so the
-stopgap is to crash as quickly as possible. Problematic types include functions
-and JavaScript values like `Json.Encode.Value` which could contain functions
-if passed through a port.
-
-[undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
--}
-(==) : a -> a -> Bool
-(==) =
-  Elm.Kernel.Utils.equal
-
-
-{-| Check if values are not &ldquo;the same&rdquo;.
-
-So `(a /= b)` is the same as `(not (a == b))`.
--}
-(/=) : a -> a -> Bool
-(/=) =
-  Elm.Kernel.Utils.notEqual
-
-
-{-|-}
-(<) : comparable -> comparable -> Bool
-(<) =
-  Elm.Kernel.Utils.lt
-
-
-{-|-}
-(>) : comparable -> comparable -> Bool
-(>) =
-  Elm.Kernel.Utils.gt
-
-
-{-|-}
-(<=) : comparable -> comparable -> Bool
-(<=) =
-  Elm.Kernel.Utils.le
-
-
-{-|-}
-(>=) : comparable -> comparable -> Bool
-(>=) =
-  Elm.Kernel.Utils.ge
-
-
-infix 4 ==
-infix 4 /=
-infix 4 <
-infix 4 >
-infix 4 <=
-infix 4 >=
-
-
-{-| Compare any two comparable values. Comparable values include `String`, `Char`,
-`Int`, `Float`, `Time`, or a list or tuple containing comparable values.
-These are also the only values that work as `Dict` keys or `Set` members.
--}
-compare : comparable -> comparable -> Order
-compare =
-  Elm.Kernel.Utils.compare
-
-
-{-| Represents the relative ordering of two things.
-The relations are less than, equal to, and greater than.
--}
-type Order = LT | EQ | GT
-
-
-{-| Find the smaller of two comparables.
-
-    min 42 12345678 == 42
-    min "abc" "xyz" == "abc"
--}
-min : comparable -> comparable -> comparable
-min x y =
-  if x < y then x else y
-
-
-{-| Find the larger of two comparables.
-
-    max 42 12345678 == 12345678
-    max "abc" "xyz" == "xyz"
--}
-max : comparable -> comparable -> comparable
-max x y =
-  if x > y then x else y
-
-
-{-| The logical AND operator. `True` if both inputs are `True`.
-
-**Note:** When used in the infix position, like `(left && right)`, the operator
-short-circuits. This means if `left` is `False` we do not bother evaluating `right`
-and just return `False` overall.
--}
-(&&) : Bool -> Bool -> Bool
-(&&) =
-  Elm.Kernel.Basics.and
-
-
-{-| The logical OR operator. `True` if one or both inputs are `True`.
-
-**Note:** When used in the infix position, like `(left || right)`, the operator
-short-circuits. This means if `left` is `True` we do not bother evaluating `right`
-and just return `True` overall.
--}
-(||) : Bool -> Bool -> Bool
-(||) =
-  Elm.Kernel.Basics.or
-
-
-infixr 3 &&
-infixr 2 ||
-
-
-{-| The exclusive-or operator. `True` if exactly one input is `True`.
-
-    xor False False == False
-    xor True  False == True
-    xor False True  == True
-    xor True  True  == False
--}
-xor : Bool -> Bool -> Bool
-xor =
-  Elm.Kernel.Basics.xor
-
-
-{-| Negate a boolean value.
-
-    not True == False
-    not False == True
--}
-not : Bool -> Bool
-not =
-  Elm.Kernel.Basics.not
-
-
--- Conversions
-
-{-| Round a number to the nearest integer. -}
-round : Float -> Int
-round =
-  Elm.Kernel.Basics.round
-
-
-{-| Truncate a number, rounding towards zero. -}
-truncate : Float -> Int
-truncate =
-  Elm.Kernel.Basics.truncate
-
-
-{-| Floor function, rounding down. -}
-floor : Float -> Int
-floor =
-  Elm.Kernel.Basics.floor
-
-
-{-| Ceiling function, rounding up. -}
-ceiling : Float -> Int
-ceiling =
-  Elm.Kernel.Basics.ceiling
-
-
-{-| Convert an integer into a float. -}
-toFloat : Int -> Float
-toFloat =
-  Elm.Kernel.Basics.toFloat
+-- CRAZY FLOATS
 
 
 {-| Determine whether a float is an undefined or unrepresentable number.
@@ -487,20 +587,9 @@ isInfinite =
   Elm.Kernel.Basics.isInfinite
 
 
-{-| Put two appendable things together. This includes strings, lists, and text.
 
-    "hello" ++ "world" == "helloworld"
-    [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
--}
-(++) : appendable -> appendable -> appendable
-(++) =
-  Elm.Kernel.Utils.append
+-- FUNCTION HELPERS
 
-
-infixr 5 ++
-
-
--- Function Helpers
 
 {-| Function composition, passing results along in the suggested direction. For
 example, the following code checks if the square root of a number is odd:
@@ -563,12 +652,6 @@ This can also be written as:
 (<|) : (a -> b) -> a -> b
 (<|) f x =
   f x
-
-
-infixr 9 <<
-infixl 9 >>
-infixr 0 <|
-infixl 0 |>
 
 
 {-| Given a value, returns exactly the same value. This is called

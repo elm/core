@@ -109,7 +109,7 @@ int a b =
                     let
                         threshhold =
                             -- essentially: period % max
-                            Bitwise.shiftRightZfBy 0 (rem (Bitwise.shiftRightZfBy 0 -range) range)
+                            Bitwise.shiftRightZfBy 0 (remainderBy range (Bitwise.shiftRightZfBy 0 -range))
 
                         accountForBias : Seed -> ( Int, Seed )
                         accountForBias seed =
@@ -124,7 +124,7 @@ int a b =
                                     -- in practice this recurses almost never
                                     accountForBias seedN
                                 else
-                                    ( rem x range + lo, seedN )
+                                    ( remainderBy range x + lo, seedN )
                     in
                         accountForBias seed0
         )

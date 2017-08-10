@@ -178,7 +178,7 @@ initialize length fn =
     else
         let
             tailLen =
-                rem length branchFactor
+                remainderBy branchFactor length
 
             tail =
                 JsArray.initialize tailLen (length - tailLen) fn

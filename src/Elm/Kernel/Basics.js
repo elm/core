@@ -5,26 +5,26 @@ import Elm.Kernel.Error exposing (throw)
 */
 
 
-// ARITHMETIC
+// MATH
 
 var _Basics_add = F2(function(a, b) { return a + b; });
 var _Basics_sub = F2(function(a, b) { return a - b; });
 var _Basics_mul = F2(function(a, b) { return a * b; });
-var _Basics_rem = F2(function(a, b) { return a % b; });
-var _Basics_div = F2(function(a, b) { return (a / b) | 0; });
-var _Basics_floatDiv = F2(function(a, b) { return a / b; });
+var _Basics_fdiv = F2(function(a, b) { return a / b; });
+var _Basics_idiv = F2(function(a, b) { return (a / b) | 0; });
 var _Basics_exp = F2(Math.pow);
 
-var _Basics_mod = F2(_Basics_mod_help);
+var _Basics_remainderBy = F2(function(b, a) { return a % b; });
+var _Basics_modBy = F2(_Basics_modBy_help);
 
-function _Basics_mod_help(a, b)
+function _Basics_modBy_help(b, a)
 {
 	if (b === 0)
 	{
 		__Error_throw(11);
 	}
 	var r = a % b;
-	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -_Basics_mod_help(-a, -b));
+	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -_Basics_modBy_help(-a, -b));
 
 	return m === b ? 0 : m;
 }
@@ -43,40 +43,18 @@ var _Basics_atan = Math.atan;
 var _Basics_atan2 = F2(Math.atan2);
 
 
-// MATH STUFF
+// MORE MATH
 
-var _Basics_sqrt = Math.sqrt;
-
-var _Basics_logBase = F2(function(base, n)
-{
-	return Math.log(n) / Math.log(base);
-});
-
-function _Basics_abs(n)
-{
-	return n < 0 ? -n : n;
-}
-
-function _Basics_toFloat(x)
-{
-	return x;
-};
-
-var _Basics_isNaN = isNaN;
-
-function _Basics_isInfinite(n)
-{
-	return n === Infinity || n === -Infinity;
-}
+function _Basics_toFloat(x) { return x; }
+function _Basics_truncate(n) { return n | 0; }
+function _Basics_isInfinite(n) { return n === Infinity || n === -Infinity; }
 
 var _Basics_ceiling = Math.ceil;
 var _Basics_floor = Math.floor;
 var _Basics_round = Math.round;
-
-function _Basics_truncate(n)
-{
-	return n | 0;
-}
+var _Basics_sqrt = Math.sqrt;
+var _Basics_log = Math.log;
+var _Basics_isNaN = isNaN;
 
 
 // BOOLEANS
@@ -84,8 +62,3 @@ function _Basics_truncate(n)
 var _Basics_and = F2(function(a, b) { return a && b; });
 var _Basics_or  = F2(function(a, b) { return a || b; });
 var _Basics_xor = F2(function(a, b) { return a !== b; });
-
-function _Basics_not(b)
-{
-	return !b;
-}
