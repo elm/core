@@ -9,7 +9,7 @@ module Basics exposing
   , toPolar, fromPolar
   , isNaN, isInfinite
   , (++)
-  , identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
+  , identity, always, (<|), (|>), (<<), (>>), Never, never
   )
 
 {-| Tons of useful functions that get imported by default.
@@ -54,7 +54,7 @@ which happen to be radians.
 @docs (++)
 
 # Higher-Order Helpers
-@docs identity, always, (<|), (|>), (<<), (>>), flip, curry, uncurry, Never, never
+@docs identity, always, (<|), (|>), (<<), (>>), Never, never
 
 -}
 
@@ -590,28 +590,6 @@ functions like `map`:
 always : a -> b -> a
 always a _ =
   a
-
-
-{-| Flip the order of the first two arguments to a function. -}
-flip : (a -> b -> c) -> (b -> a -> c)
-flip f b a =
-  f a b
-
-
-{-| Change how arguments are passed to a function.
-This splits paired arguments into two separate arguments.
--}
-curry : ((a,b) -> c) -> a -> b -> c
-curry f a b =
-  f (a,b)
-
-
-{-| Change how arguments are passed to a function.
-This combines two arguments into a single pair.
--}
-uncurry : (a -> b -> c) -> (a,b) -> c
-uncurry f (a,b) =
-  f a b
 
 
 {-| A value that can never happen! For context:
