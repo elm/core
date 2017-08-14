@@ -439,8 +439,8 @@ sqrt =
     logBase 2 256 == 8
 -}
 logBase : Float -> Float -> Float
-logBase =
-  Elm.Kernel.Basics.logBase
+logBase base number =
+  Elm.Kernel.Basics.log number / Elm.Kernel.Basics.log Elm.Kernel.Basics.e
 
 
 {-| An approximation of e.
