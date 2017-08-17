@@ -9,69 +9,33 @@ import Elm.Kernel.Utils exposing (Tuple0)
 */
 
 
+
 // PROGRAMS
 
-function _Platform_program(impl)
+
+var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugMetadata)
 {
-	return function(flagDecoder)
+	object['worker'] = function worker(flags)
 	{
-		return function(object, moduleName)
+		var result = A2(__Json_run, flagDecoder, flags);
+		if (result.$ === 'Err')
 		{
-			object['worker'] = function worker(flags)
-			{
-				if (typeof flags !== 'undefined')
-				{
-					__Error_throw(0, moduleName);
-				}
+			__Error_throw(2, moduleName, result.a);
+		}
 
-				return _Platform_initialize(
-					impl.__$init,
-					impl.__$update,
-					impl.__$subscriptions,
-					_Platform_renderer
-				);
-			};
-		};
+		return _Platform_initialize(
+			impl.__$init(result.a),
+			impl.__$update,
+			impl.__$subscriptions,
+			function() { return function() {} }
+		);
 	};
-}
+});
 
-function _Platform_programWithFlags(impl)
-{
-	return function(flagDecoder)
-	{
-		return function(object, moduleName)
-		{
-			object['worker'] = function worker(flags)
-			{
-				if (typeof flagDecoder === 'undefined')
-				{
-					__Error_throw(1, moduleName);
-				}
-
-				var result = A2(__Json_run, flagDecoder, flags);
-				if (result.$ === 'Err')
-				{
-					__Error_throw(2, moduleName, result.a);
-				}
-
-				return _Platform_initialize(
-					impl.__$init(result.a),
-					impl.__$update,
-					impl.__$subscriptions,
-					_Platform_renderer
-				);
-			};
-		};
-	};
-}
-
-function _Platform_renderer()
-{
-	return function() {};
-}
 
 
 // INITIALIZE A PROGRAM
+
 
 function _Platform_initialize(init, update, subscriptions, renderer)
 {

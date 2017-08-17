@@ -1,5 +1,5 @@
 module Platform exposing
-  ( Program, program, programWithFlags
+  ( Program, worker
   , Task, ProcessId
   , Router, sendToApp, sendToSelf
   )
@@ -7,7 +7,7 @@ module Platform exposing
 {-|
 
 # Programs
-@docs Program, program, programWithFlags
+@docs Program, worker
 
 # Platform Internals
 
@@ -64,38 +64,19 @@ Initializing a headless program from JavaScript looks like this:
 var app = Elm.MyThing.worker();
 ```
 -}
-program
-  : { init : (model, Cmd msg)
-    , update : msg -> model -> (model, Cmd msg)
-    , subscriptions : model -> Sub msg
-    }
-  -> Program Never model msg
-program =
-  Elm.Kernel.Platform.program
-
-
-{-| Same as [`program`](#program), but you can provide flags. Initializing a
-headless program (with flags) from JavaScript looks like this:
-
-```javascript
-var app = Elm.MyThing.worker({ user: 'Tom', token: 1234 });
-```
-
-Whatever argument you provide to `worker` will get converted to an Elm value,
-allowing you to configure your Elm program however you want from JavaScript!
--}
-programWithFlags
-  : { init : flags -> (model, Cmd msg)
-    , update : msg -> model -> (model, Cmd msg)
+worker
+  : { init : flags -> ( model, Cmd msg )
+    , update : msg -> model -> ( model, Cmd msg )
     , subscriptions : model -> Sub msg
     }
   -> Program flags model msg
-programWithFlags =
-  Elm.Kernel.Platform.programWithFlags
+worker =
+  Elm.Kernel.Platform.worker
 
 
 
 -- TASKS and PROCESSES
+
 
 {-| Head over to the documentation for the [`Task`](Task) module for more
 information on this. It is only defined here because it is a platform
