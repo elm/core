@@ -17,14 +17,11 @@ var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugM
 {
 	object['worker'] = function worker(flags)
 	{
-		var result = A2(__Json_run, flagDecoder, flags);
-		if (result.$ === 'Err')
-		{
-			__Error_throw(2, moduleName, result.a);
-		}
-
 		return _Platform_initialize(
-			impl.__$init(result.a),
+			moduleName,
+			flagDecoder,
+			flags
+			impl.__$init,
 			impl.__$update,
 			impl.__$subscriptions,
 			function() { return function() {} }
@@ -37,23 +34,24 @@ var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugM
 // INITIALIZE A PROGRAM
 
 
-function _Platform_initialize(init, update, subscriptions, renderer)
+function _Platform_initialize(moduleName, flagDecoder, flags, init, update, subscriptions, stepperBuilder)
 {
+	var result = A2(__Json_run, flagDecoder, flags);
 	var managers = {};
-	var model = init.a;
-	var view = renderer(sendToApp, model);
+	var model = result.$ === 'Err'
+		? __Error_throw(2, moduleName, result.a)
+		: (result = init(result.a), result.a);
+	var stepper = stepperBuilder(sendToApp, model);
+	var ports = _Platform_setupEffects(managers, sendToApp);
 
 	function sendToApp(msg, viewMetadata)
 	{
-		var results = A2(update, msg, model);
-		model = results.a;
-		view(model, viewMetadata);
-		_Platform_dispatchEffects(managers, results.b, subscriptions(model));
+		result = A2(update, msg, model);
+		stepper(model = result.a, viewMetadata);
+		_Platform_dispatchEffects(managers, result.b, subscriptions(model));
 	}
 
-	var ports = _Platform_setupEffects(managers, sendToApp);
-
-	_Platform_dispatchEffects(managers, init.b, subscriptions(model));
+	_Platform_dispatchEffects(managers, result.b, subscriptions(model));
 
 	return ports ? { ports: ports } : {};
 }
