@@ -20,7 +20,7 @@ var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugM
 		return _Platform_initialize(
 			moduleName,
 			flagDecoder,
-			flags
+			flags,
 			impl.__$init,
 			impl.__$update,
 			impl.__$subscriptions,
