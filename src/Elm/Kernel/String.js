@@ -14,21 +14,14 @@ var _String_cons = F2(function(chr, str)
 
 function _String_uncons(string)
 {
-	if (string.length === 0)
-	{
-		return __Maybe_Nothing;
-	}
-	var char = string[i];
-	var offset = 1;
 	var word = string.charCodeAt(0);
-	if (0xD800 <= word && word <= 0xDBFF)
-	{
-		char += string[i+1];
-		offset = 2;
-	}
-	return __Maybe_Just(
-		__Utils_Tuple2(__Utils_chr(char), string.slice(offset))
-	);
+	return word
+		? __Maybe_Just(
+			0xD800 <= word && word <= 0xDBFF
+				? __Utils_Tuple2(string[0], string.slice(1))
+				: __Utils_Tuple2(string[0] + string[1], string.slice(2))
+		)
+		: __Maybe_Nothing;
 }
 
 var _String_append = F2(function(a, b)
