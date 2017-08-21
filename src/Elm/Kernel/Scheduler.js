@@ -81,8 +81,7 @@ function _Scheduler_rawSpawn(task)
 function _Scheduler_spawn(task)
 {
 	return _Scheduler_binding(function(callback) {
-		var proc = _Scheduler_rawSpawn(task);
-		callback(_Scheduler_succeed(proc));
+		callback(_Scheduler_succeed(_Scheduler_rawSpawn(task)));
 	});
 }
 
@@ -138,7 +137,29 @@ type alias Process =
   }
 
 */
+
+
+var _Scheduler_working = false;
+var _Scheduler_queue = [];
+
+
 function _Scheduler_enqueue(proc)
+{
+	_Scheduler_queue.push(proc);
+	if (_Scheduler_working)
+	{
+		return;
+	}
+	_Scheduler_working = true;
+	while (proc = _Scheduler_queue.shift())
+	{
+		_Scheduler_step(proc);
+	}
+	_Scheduler_working = false;
+}
+
+
+function _Scheduler_step(proc)
 {
 	while (proc.__root)
 	{
