@@ -141,11 +141,6 @@ function _Debug_toString__DEV(v)
 
 	if (type === 'object')
 	{
-		if (v.elm_web_socket)
-		{
-			return '<websocket>';
-		}
-
 		var output = [];
 		for (var k in v)
 		{
