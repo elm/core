@@ -1,7 +1,7 @@
 /*
 
 import Elm.Kernel.Error exposing (throw)
-import Elm.Kernel.Json exposing (run)
+import Elm.Kernel.Json exposing (run, wrap)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
 import Elm.Kernel.Utils exposing (Tuple0)
@@ -36,7 +36,7 @@ var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugM
 
 function _Platform_initialize(moduleName, flagDecoder, flags, init, update, subscriptions, stepperBuilder)
 {
-	var result = A2(__Json_run, flagDecoder, flags);
+	var result = A2(__Json_run, flagDecoder, __Json_wrap(flags));
 	var managers = {};
 	var model = result.$ === 'Err'
 		? __Error_throw(2, moduleName, result.a)
