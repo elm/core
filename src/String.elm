@@ -431,6 +431,12 @@ want to use [`Result.withDefault`](Result#withDefault) to handle bad data:
 
     Result.withDefault 0 (String.toInt "42") == 42
     Result.withDefault 0 (String.toInt "ab") == 0
+    
+Keep in mind that the strings "+" and "-" return Ok NaN.
+You can test for NaN with [`Basics.isNaN`](Basics#isNaN).
+
+    String.toInt "+" == Ok NaN
+    String.toInt "-" == Ok NaN
 -}
 toInt : String -> Result String Int
 toInt =
