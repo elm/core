@@ -370,7 +370,7 @@ function _Json_equality(x, y)
 			return x.index === y.index && _Json_equality(x.decoder, y.decoder);
 
 		case __1_MAP:
-			return x.func === y.func && _Json_listEquality(x.decoders, y.decoders);
+			return x.func === y.func && _Json_arrayEquality(x.decoders, y.decoders);
 
 		case __1_AND_THEN:
 			return x.callback === y.callback && _Json_equality(x.decoder, y.decoder);
@@ -380,7 +380,7 @@ function _Json_equality(x, y)
 	}
 }
 
-function _Json_listEquality(aDecoders, bDecoders)
+function _Json_arrayEquality(aDecoders, bDecoders)
 {
 	var len = aDecoders.length;
 	if (len !== bDecoders.length)
@@ -393,6 +393,30 @@ function _Json_listEquality(aDecoders, bDecoders)
 		{
 			return false;
 		}
+	}
+	return true;
+}
+
+function _Json_listEquality(aDecoders, bDecoders)
+{
+	var tempA = aDecoders;
+	var tempB = bDecoders;
+	while (tempA.$ !== '[]')
+	{
+		if (tempB.$ === '[]')
+		{
+			return false;
+		}
+		if (!_Json_equality(tempA.a, tempB.a))
+		{
+			return false;
+		}
+		tempA = tempA.b;
+		tempB = tempB.b;
+	}
+	if (tempB.$ !== '[]')
+	{
+		return false;
 	}
 	return true;
 }
