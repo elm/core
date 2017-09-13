@@ -18,8 +18,8 @@ function _String_uncons(string)
 	return word
 		? __Maybe_Just(
 			0xD800 <= word && word <= 0xDBFF
-				? __Utils_Tuple2(string[0], string.slice(1))
-				: __Utils_Tuple2(string[0] + string[1], string.slice(2))
+				? __Utils_Tuple2(string[0] + string[1], string.slice(2))
+				: __Utils_Tuple2(string[0], string.slice(1))
 		)
 		: __Maybe_Nothing;
 }
