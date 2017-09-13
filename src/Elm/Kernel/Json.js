@@ -405,8 +405,8 @@ var _Json_encode = F2(function(indentLevel, value)
 	return JSON.stringify(_Json_unwrap(value), null, indentLevel);
 });
 
-function _Json_wrap__DEV(value) { return { $: __0_JSON, a: value }; }
-function _Json_unwrap__DEV(value) { return value.a; }
+function _Json_wrap__DEBUG(value) { return { $: __0_JSON, a: value }; }
+function _Json_unwrap__DEBUG(value) { return value.a; }
 
 function _Json_wrap__PROD(value) { return value; }
 function _Json_unwrap__PROD(value) { return value; }

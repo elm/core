@@ -15,7 +15,7 @@ var _Debug_log__PROD = F2(function(tag, value)
 	return value;
 });
 
-var _Debug_log__DEV = F2(function(tag, value)
+var _Debug_log__DEBUG = F2(function(tag, value)
 {
 	console.log(tag + ': ' + _Debug_toString(value));
 	return value;
@@ -46,7 +46,7 @@ function _Debug_toString__PROD(v)
 	return '<internals>';
 }
 
-function _Debug_toString__DEV(v)
+function _Debug_toString__DEBUG(v)
 {
 	var type = typeof v;
 	if (type === 'function')

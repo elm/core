@@ -12,7 +12,7 @@ function _Error_throw__PROD(identifier)
 }
 
 
-function _Error_throw__DEV(identifier, fact1, fact2, fact3, fact4)
+function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 {
 	switch(identifier)
 	{
