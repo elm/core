@@ -120,7 +120,3 @@ As an example, the effect manager for web sockets
 sendToSelf : Router a msg -> msg -> Task x ()
 sendToSelf =
   Elm.Kernel.Platform.sendToSelf
-
-
-hack =
-  Elm.Kernel.Scheduler.succeed
