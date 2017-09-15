@@ -252,8 +252,7 @@ function _Json_runHelp(decoder, value)
 					{
 						return __Result_Err({ $: 'Field', a: key, b: result.a });
 					}
-					var pair = __Utils_Tuple2(key, result.value);
-					keyValuePairs = __List_Cons(pair, keyValuePairs);
+					keyValuePairs = __List_Cons(__Utils_Tuple2(key, result.a), keyValuePairs);
 				}
 			}
 			return __Result_Ok(__List_reverse(keyValuePairs));
