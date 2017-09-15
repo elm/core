@@ -25,4 +25,8 @@ tests =
             [ test "applies function to second element" <|
                 \() -> Expect.equal ( 1, 5 ) (mapSecond ((*) 5) ( 1, 1 ))
             ]
+        , describe "mapBoth"
+            [ test "applies function to both elements" <|
+                \() -> Expect.equal ( 9, 7 ) (mapBoth ((+) 1) ( 9, 6 ))
+            ]
         ]

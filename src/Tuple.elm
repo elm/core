@@ -1,6 +1,6 @@
 module Tuple exposing
   ( first, second
-  , mapFirst, mapSecond
+  , mapFirst, mapSecond, mapBoth
   )
 
 {-| Some helpers for working with 2-tuples.
@@ -62,4 +62,13 @@ mapFirst func (x,y) =
 mapSecond : (b1 -> b2) -> (a, b1) -> (a, b2)
 mapSecond func (x,y) =
   (x, func y)
+
+
+{-| Transform both values in a tuple.
+
+    mapBoth ((+) 1) (6, 8) == (7, 9)
+-}
+mapBoth : (a -> b) -> (a, a) -> (b, b)
+mapBoth func (x,y) =
+    (func x, func y)
 
