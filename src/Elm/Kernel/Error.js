@@ -21,13 +21,12 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			throw new Error('The `' + moduleName + '` module does not need flags.\nInitialize it with no arguments and you should be all set!');
 
 		case 1:
-			var moduleName = fact1;
-			throw new Error('Are you trying to sneak a Never value into Elm? Trickster!\nIt looks like ' + moduleName + '.main is defined with `programWithFlags` but has type `Program Never`.\nUse `program` instead if you do not want flags.');
+			var url = fact1;
+			throw new Error('Cannot navigate to the following URL. It seems to be invalid:\n' + url);
 
 		case 2:
-			var moduleName = fact1;
-			var message = fact2;
-			throw new Error('Trying to initialize the `' + moduleName + '` module with an unexpected argument.\nI tried to convert it to an Elm value, but ran into this problem:\n\n' + message);
+			var message = fact1;
+			throw new Error('Problem with the flags given to your Elm program on initialization.\n\n' + message);
 
 		case 3:
 			var portName = fact1;
