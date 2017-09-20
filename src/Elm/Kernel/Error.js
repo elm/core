@@ -17,8 +17,7 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 	switch(identifier)
 	{
 		case 0:
-			var moduleName = fact1;
-			throw new Error('The `' + moduleName + '` module does not need flags.\nInitialize it with no arguments and you should be all set!');
+			throw new Error('Internal red-black tree invariant violated');
 
 		case 1:
 			var url = fact1;
@@ -64,9 +63,6 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 
 		case 11:
 			throw new Error('Cannot perform mod 0. Division by zero error.');
-
-		case 12:
-			throw new Error('Internal red-black tree invariant violated');
 	}
 }
 
@@ -81,5 +77,5 @@ function _Error_regionToString(region)
 
 function _Error_dictBug()
 {
-	_Error_throw(12);
+	_Error_throw(0);
 }
