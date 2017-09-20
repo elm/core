@@ -13,12 +13,11 @@ import Elm.Kernel.Utils exposing (Tuple0)
 // PROGRAMS
 
 
-var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugMetadata)
+var _Platform_worker = F4(function(impl, flagDecoder, object, debugMetadata)
 {
 	object['worker'] = function worker(flags)
 	{
 		return _Platform_initialize(
-			moduleName,
 			flagDecoder,
 			flags,
 			impl.__$init,
@@ -34,12 +33,12 @@ var _Platform_worker = F5(function(impl, flagDecoder, object, moduleName, debugM
 // INITIALIZE A PROGRAM
 
 
-function _Platform_initialize(moduleName, flagDecoder, flags, init, update, subscriptions, stepperBuilder)
+function _Platform_initialize(flagDecoder, flags, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(__Json_run, flagDecoder, __Json_wrap(flags));
 	var managers = {};
 	var model = result.$ === 'Err'
-		? __Error_throw(2, moduleName, result.a)
+		? __Error_throw(2, result.a)
 		: (result = init(result.a), result.a);
 	var stepper = stepperBuilder(sendToApp, model);
 	var ports = _Platform_setupEffects(managers, sendToApp);
@@ -57,9 +56,29 @@ function _Platform_initialize(moduleName, flagDecoder, flags, init, update, subs
 }
 
 
+
+// TRACK PRELOADS
+//
+// This is used by code in elm-lang/browser and elm-lang/http
+// to register any HTTP requests that are triggered by init.
+//
+
+
+var _Platform_preload;
+
+
+function _Platform_registerPreload(url)
+{
+	_Platform_preload.add(url);
+}
+
+
+
 // EFFECT MANAGERS
 
+
 var _Platform_effectManagers = {};
+
 
 function _Platform_setupEffects(managers, sendToApp)
 {
@@ -82,6 +101,7 @@ function _Platform_setupEffects(managers, sendToApp)
 	return ports;
 }
 
+
 function _Platform_createManager(init, onEffects, onSelfMsg, cmdMap, subMap)
 {
 	return {
@@ -92,6 +112,7 @@ function _Platform_createManager(init, onEffects, onSelfMsg, cmdMap, subMap)
 		__subMap: subMap
 	};
 }
+
 
 function _Platform_instantiateManager(info, sendToApp)
 {
@@ -126,7 +147,9 @@ function _Platform_instantiateManager(info, sendToApp)
 }
 
 
+
 // ROUTING
+
 
 var _Platform_sendToApp = F2(function(router, msg)
 {
@@ -137,6 +160,7 @@ var _Platform_sendToApp = F2(function(router, msg)
 	});
 });
 
+
 var _Platform_sendToSelf = F2(function(router, msg)
 {
 	return A2(__Scheduler_send, router.__selfProcess, {
@@ -146,7 +170,9 @@ var _Platform_sendToSelf = F2(function(router, msg)
 });
 
 
+
 // BAGS
+
 
 function _Platform_leaf(home)
 {
@@ -160,6 +186,7 @@ function _Platform_leaf(home)
 	};
 }
 
+
 function _Platform_batch(list)
 {
 	return {
@@ -167,6 +194,7 @@ function _Platform_batch(list)
 		__bags: list
 	};
 }
+
 
 var _Platform_map = F2(function(tagger, bag)
 {
@@ -178,7 +206,9 @@ var _Platform_map = F2(function(tagger, bag)
 });
 
 
+
 // PIPE BAGS INTO EFFECT MANAGERS
+
 
 function _Platform_dispatchEffects(managers, cmdBag, subBag)
 {
@@ -195,7 +225,9 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 	}
 }
 
+
 var _Platform_noFx = { __cmds: __List_Nil, __subs: __List_Nil };
+
 
 function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 {
@@ -225,6 +257,7 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 	}
 }
 
+
 function _Platform_toEffect(isCmd, home, taggers, value)
 {
 	function applyTaggers(x)
@@ -245,6 +278,7 @@ function _Platform_toEffect(isCmd, home, taggers, value)
 	return A2(map, applyTaggers, value)
 }
 
+
 function _Platform_insert(isCmd, newEffect, effects)
 {
 	effects = effects || { __cmds: __List_Nil, __subs: __List_Nil };
@@ -257,7 +291,9 @@ function _Platform_insert(isCmd, newEffect, effects)
 }
 
 
+
 // PORTS
+
 
 function _Platform_checkPortName(name)
 {
@@ -268,7 +304,9 @@ function _Platform_checkPortName(name)
 }
 
 
+
 // OUTGOING PORTS
+
 
 function _Platform_outgoingPort(name, converter)
 {
@@ -281,7 +319,9 @@ function _Platform_outgoingPort(name, converter)
 	return _Platform_leaf(name);
 }
 
+
 var _Platform_outgoingPortMap = F2(function(tagger, value) { return value; });
+
 
 function _Platform_setupOutgoingPort(name)
 {
@@ -335,7 +375,9 @@ function _Platform_setupOutgoingPort(name)
 }
 
 
+
 // INCOMING PORTS
+
 
 function _Platform_incomingPort(name, converter)
 {
@@ -348,6 +390,7 @@ function _Platform_incomingPort(name, converter)
 	return _Platform_leaf(name);
 }
 
+
 var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
 {
 	return function(value)
@@ -355,6 +398,7 @@ var _Platform_incomingPortMap = F2(function(tagger, finalTagger)
 		return tagger(finalTagger(value));
 	};
 });
+
 
 function _Platform_setupIncomingPort(name, sendToApp)
 {
