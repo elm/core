@@ -114,17 +114,6 @@ function _Scheduler_kill(proc)
 	});
 }
 
-function _Scheduler_sleep(time)
-{
-	return _Scheduler_binding(function(callback) {
-		var id = setTimeout(function() {
-			callback(_Scheduler_succeed(__Utils_Tuple0));
-		}, time);
-
-		return function() { clearTimeout(id); };
-	});
-}
-
 
 /* STEP PROCESSES
 
