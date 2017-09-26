@@ -88,7 +88,7 @@ testListOfN n =
             , test "repeat" <| \() -> Expect.equal (map (\x -> -1) xs) (repeat n -1)
             , test "append" <| \() -> Expect.equal (xsSum * 2) (append xs xs |> foldl (+) 0)
             , test "(::)" <| \() -> Expect.equal (append [ -1 ] xs) (-1 :: xs)
-            , test "List.concat" <| \() -> Expect.equal (append xs (append zs xs)) (List.concat [ xs, zs, xs ])
+            , test "List.flatten" <| \() -> Expect.equal (append xs (append zs xs)) (List.flatten [ xs, zs, xs ])
             , test "intersperse" <|
                 \() ->
                     Expect.equal
@@ -117,9 +117,9 @@ testListOfN n =
                   in
                     test "some" <| \() -> Expect.equal (List.range 1 mid) (filterMap halve xs)
                 ]
-            , describe "concatMap"
-                [ test "none" <| \() -> Expect.equal ([]) (concatMap (\x -> []) xs)
-                , test "all" <| \() -> Expect.equal (xsNeg) (concatMap (\x -> [ -x ]) xs)
+            , describe "flatMap"
+                [ test "none" <| \() -> Expect.equal ([]) (flatMap (\x -> []) xs)
+                , test "all" <| \() -> Expect.equal (xsNeg) (flatMap (\x -> [ -x ]) xs)
                 ]
             , test "indexedMap" <| \() -> Expect.equal (map2 (,) zs xsNeg) (indexedMap (\i x -> ( i, -x )) xs)
             , test "sum" <| \() -> Expect.equal (xsSum) (sum xs)

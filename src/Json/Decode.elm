@@ -5,7 +5,7 @@ module Json.Decode exposing
   , maybe, oneOf
   , decodeString, decodeValue, Value, Error, errorToString
   , map, map2, map3, map4, map5, map6, map7, map8
-  , lazy, value, null, succeed, fail, andThen
+  , lazy, value, null, succeed, fail, flatMap
   )
 
 {-| Turn JSON values into Elm values. Definitely check out this [intro to
@@ -39,7 +39,7 @@ errors.
 @docs map, map2, map3, map4, map5, map6, map7, map8
 
 # Fancy Decoding
-@docs lazy, value, null, succeed, fail, andThen
+@docs lazy, value, null, succeed, fail, flatMap
 -}
 
 
@@ -276,7 +276,7 @@ for your health. The point is that you can use `oneOf` to handle situations
 like this!
 
 You could also use `oneOf` to help version your data. Try the latest format,
-then a few older ones that you still support. You could use `andThen` to be
+then a few older ones that you still support. You could use `flatMap` to be
 even more particular if you wanted.
 -}
 oneOf : List (Decoder a) -> Decoder a
@@ -529,7 +529,7 @@ indent str =
     decodeString (succeed 42) "[1,2,3]" == Ok 42
     decodeString (succeed 42) "hello"   == Err ... -- this is not a valid JSON string
 
-This is handy when used with `oneOf` or `andThen`.
+This is handy when used with `oneOf` or `flatMap`.
 -}
 succeed : a -> Decoder a
 succeed =
@@ -537,10 +537,10 @@ succeed =
 
 
 {-| Ignore the JSON and make the decoder fail. This is handy when used with
-`oneOf` or `andThen` where you want to give a custom error message in some
+`oneOf` or `flatMap` where you want to give a custom error message in some
 case.
 
-See the [`andThen`](#andThen) docs for an example.
+See the [`flatMap`](#flatMap) docs for an example.
 -}
 fail : String -> Decoder a
 fail =
@@ -553,7 +553,7 @@ versioned data, you might do something like this:
     info : Decoder Info
     info =
       field "version" int
-        |> andThen infoHelp
+        |> flatMap infoHelp
 
     infoHelp : Int -> Decoder Info
     infoHelp version =
@@ -572,9 +572,9 @@ versioned data, you might do something like this:
     -- infoDecoder4 : Decoder Info
     -- infoDecoder3 : Decoder Info
 -}
-andThen : (a -> Decoder b) -> Decoder a -> Decoder b
-andThen =
-  Elm.Kernel.Json.andThen
+flatMap : (a -> Decoder b) -> Decoder a -> Decoder b
+flatMap =
+  Elm.Kernel.Json.flatMap
 
 
 {-| Sometimes you have JSON with recursive structure, like nested comments.
@@ -605,7 +605,7 @@ structures [here][].
 -}
 lazy : (() -> Decoder a) -> Decoder a
 lazy thunk =
-  andThen thunk (succeed ())
+  flatMap thunk (succeed ())
 
 
 {-| Do not do anything with a JSON value, just bring it into Elm as a `Value`.

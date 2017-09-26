@@ -3,7 +3,7 @@ effect module Task where { command = MyCmd } exposing
   , succeed, fail
   , map, map2, map3, map4, map5
   , sequence
-  , andThen
+  , flatMap
   , onError, mapError
   , perform, attempt
   )
@@ -19,7 +19,7 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 @docs map, map2, map3, map4, map5
 
 # Chaining
-@docs andThen, sequence
+@docs flatMap, sequence
 
 # Errors
 @docs onError, mapError
@@ -84,7 +84,7 @@ fail =
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
   taskA
-    |> andThen (\a -> succeed (func a))
+    |> flatMap (\a -> succeed (func a))
 
 
 {-| Put the results of two tasks together. If either task fails, the whole
@@ -96,38 +96,38 @@ finished before the second task starts.
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
   taskA
-    |> andThen (\a -> taskB
-    |> andThen (\b -> succeed (func a b)))
+    |> flatMap (\a -> taskB
+    |> flatMap (\b -> succeed (func a b)))
 
 
 {-|-}
 map3 : (a -> b -> c -> result) -> Task x a -> Task x b -> Task x c -> Task x result
 map3 func taskA taskB taskC =
   taskA
-    |> andThen (\a -> taskB
-    |> andThen (\b -> taskC
-    |> andThen (\c -> succeed (func a b c))))
+    |> flatMap (\a -> taskB
+    |> flatMap (\b -> taskC
+    |> flatMap (\c -> succeed (func a b c))))
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x result
 map4 func taskA taskB taskC taskD =
   taskA
-    |> andThen (\a -> taskB
-    |> andThen (\b -> taskC
-    |> andThen (\c -> taskD
-    |> andThen (\d -> succeed (func a b c d)))))
+    |> flatMap (\a -> taskB
+    |> flatMap (\b -> taskC
+    |> flatMap (\c -> taskD
+    |> flatMap (\d -> succeed (func a b c d)))))
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> result) -> Task x a -> Task x b -> Task x c -> Task x d -> Task x e -> Task x result
 map5 func taskA taskB taskC taskD taskE =
   taskA
-    |> andThen (\a -> taskB
-    |> andThen (\b -> taskC
-    |> andThen (\c -> taskD
-    |> andThen (\d -> taskE
-    |> andThen (\e -> succeed (func a b c d e))))))
+    |> flatMap (\a -> taskB
+    |> flatMap (\b -> taskC
+    |> flatMap (\c -> taskD
+    |> flatMap (\d -> taskE
+    |> flatMap (\e -> succeed (func a b c d e))))))
 
 
 {-| Start with a list of tasks, and turn them into a single task that returns a
@@ -152,15 +152,15 @@ successful, you give the result to the callback resulting in another task. This
 task then gets run.
 
     succeed 2
-      |> andThen (\n -> succeed (n + 2))
+      |> flatMap (\n -> succeed (n + 2))
       -- succeed 4
 
 This is useful for chaining tasks together. Maybe you need to get a user from
 your servers *and then* lookup their picture once you know their name.
 -}
-andThen : (a -> Task x b) -> Task x a -> Task x b
-andThen =
-  Elm.Kernel.Scheduler.andThen
+flatMap : (a -> Task x b) -> Task x a -> Task x b
+flatMap =
+  Elm.Kernel.Scheduler.flatMap
 
 
 -- ERRORS
@@ -233,7 +233,7 @@ attempt : (Result x a -> msg) -> Task x a -> Cmd msg
 attempt resultToMessage task =
   command (Perform (
     task
-      |> andThen (succeed << resultToMessage << Ok)
+      |> flatMap (succeed << resultToMessage << Ok)
       |> onError (succeed << resultToMessage << Err)
   ))
 
@@ -268,5 +268,5 @@ spawnCmd : Platform.Router msg Never -> MyCmd msg -> Task x ()
 spawnCmd router (Perform task) =
   Elm.Kernel.Scheduler.spawn (
     task
-      |> andThen (Platform.sendToApp router)
+      |> flatMap (Platform.sendToApp router)
   )

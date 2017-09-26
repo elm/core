@@ -36,7 +36,7 @@ function _Scheduler_binding(callback)
 	};
 }
 
-var _Scheduler_andThen = F2(function(callback, task)
+var _Scheduler_flatMap = F2(function(callback, task)
 {
 	return {
 		$: __1_AND_THEN,

@@ -147,22 +147,22 @@ tests =
 
     , describe "Chaining Maybes Tests"
 
-      [ describe "andThen Tests"
+      [ describe "flatMap Tests"
         [ test "succeeding chain" <|
             \() ->
               Expect.equal
                 (Just 1)
-                (Maybe.andThen (\a -> Just a) (Just 1))
+                (Maybe.flatMap (\a -> Just a) (Just 1))
         , test "failing chain (original Maybe failed)" <|
             \() ->
               Expect.equal
                 Nothing
-                (Maybe.andThen (\a -> Just a) Nothing)
+                (Maybe.flatMap (\a -> Just a) Nothing)
         , test "failing chain (chained function failed)" <|
             \() ->
               Expect.equal
                 Nothing
-                (Maybe.andThen (\a -> Nothing) (Just 1))
+                (Maybe.flatMap (\a -> Nothing) (Just 1))
         ]
       ]
 

@@ -1,10 +1,10 @@
 module List exposing
   ( isEmpty, length, reverse, member
   , head, tail, filter, take, drop
-  , singleton, repeat, range, (::), append, concat, intersperse
+  , singleton, repeat, range, (::), append, flatten, intersperse
   , partition, unzip
   , map, map2, map3, map4, map5
-  , filterMap, concatMap, indexedMap
+  , filterMap, flatMap, indexedMap
   , foldr, foldl
   , sum, product, maximum, minimum, all, any, scanl
   , sort, sortBy, sortWith
@@ -20,7 +20,7 @@ list must have the same type.
 @docs head, tail, filter, take, drop
 
 # Putting Lists Together
-@docs singleton, repeat, range, (::), append, concat, intersperse
+@docs singleton, repeat, range, (::), append, flatten, intersperse
 
 # Taking Lists Apart
 @docs partition, unzip
@@ -34,7 +34,7 @@ The current sentiment is that it is already quite error prone once you get to
 4 and possibly should be approached another way.
 
 # Special Maps
-@docs filterMap, concatMap, indexedMap
+@docs filterMap, flattMap, indexedMap
 
 # Folding
 @docs foldl, foldr
@@ -344,22 +344,22 @@ append xs ys =
       foldr (::) ys xs
 
 
-{-| Concatenate a bunch of lists into a single list:
+{-| Flattens a list of lists into a single list:
 
-    concat [[1,2],[3],[4,5]] == [1,2,3,4,5]
+    flatten [[1,2],[3],[4,5]] == [1,2,3,4,5]
 -}
-concat : List (List a) -> List a
-concat lists =
+flatten : List (List a) -> List a
+flatten lists =
   foldr append [] lists
 
 
 {-| Map a given function onto a list and flatten the resulting lists.
 
-    concatMap f xs == concat (map f xs)
+    flatMap f xs == flatten (map f xs)
 -}
-concatMap : (a -> List b) -> List a -> List b
-concatMap f list =
-  concat (map f list)
+flatMap : (a -> List b) -> List a -> List b
+flatMap f list =
+  flat (map f list)
 
 
 {-| Get the sum of the list elements.

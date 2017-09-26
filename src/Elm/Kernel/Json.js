@@ -74,7 +74,7 @@ function _Json_mapMany(f, decoders)
 	};
 }
 
-var _Json_andThen = F2(function(callback, decoder)
+var _Json_flatMap = F2(function(callback, decoder)
 {
 	return {
 		$: __1_AND_THEN,

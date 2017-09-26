@@ -64,7 +64,7 @@ customTests =
             "I want to see this message!"
 
         myDecoder =
-            Json.field "foo" Json.string |> Json.andThen (\_ -> Json.fail customErrorMessage)
+            Json.field "foo" Json.string |> Json.flatMap (\_ -> Json.fail customErrorMessage)
 
         assertion =
             case Json.decodeString myDecoder jsonString of
