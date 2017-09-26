@@ -105,7 +105,7 @@ import Signal ( Signal )
         withDefault : a -> Maybe a -> a
         oneOf : List (Maybe a) -> Maybe a
         map : (a -> b) -> Maybe a -> Maybe b
-        andThen : Maybe a -> (a -> Maybe b) -> Maybe b
+        flatMap : Maybe a -> (a -> Maybe b) -> Maybe b
 
   * Remove `Maybe.maybe` so `maybe 0 sqrt Nothing` becomes `withDefault 0 (map sqrt Nothing)`
 

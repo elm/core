@@ -48,23 +48,23 @@ tests =
                 , test "map5 Err" <| \() -> Expect.equal (Err "x") (Result.map5 add5 (Ok 1) (Ok 2) (Ok 3) (Ok 4) (Err "x"))
                 ]
 
-        andThenTests =
-            describe "andThen Tests"
-                [ test "andThen Ok" <| \() -> Expect.equal (Ok 42) ((String.toInt "42") |> Result.andThen isEven)
-                , test "andThen first Err" <|
+        flatMapTests =
+            describe "flatMap Tests"
+                [ test "flatMap Ok" <| \() -> Expect.equal (Ok 42) ((String.toInt "42") |> Result.flatMap isEven)
+                , test "flatMap first Err" <|
                     \() ->
                         Expect.equal
                             (Err "could not convert string '4.2' to an Int")
-                            (String.toInt "4.2" |> Result.andThen isEven)
-                , test "andThen second Err" <|
+                            (String.toInt "4.2" |> Result.flatMap isEven)
+                , test "flatMap second Err" <|
                     \() ->
                         Expect.equal
                             (Err "number is odd")
-                            (String.toInt "41" |> Result.andThen isEven)
+                            (String.toInt "41" |> Result.flatMap isEven)
                 ]
     in
         describe "Result Tests"
             [ mapTests
             , mapNTests
-            , andThenTests
+            , flatMapTests
             ]

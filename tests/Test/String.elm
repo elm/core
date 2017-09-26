@@ -31,7 +31,7 @@ tests =
                 , test "append 1" <| \() -> Expect.equal "butterfly" (String.append "butter" "fly")
                 , test "append 2" <| \() -> Expect.equal "butter" (String.append "butter" "")
                 , test "append 3" <| \() -> Expect.equal "butter" (String.append "" "butter")
-                , test "concat" <| \() -> Expect.equal "nevertheless" (String.concat [ "never", "the", "less" ])
+                , test "flatten" <| \() -> Expect.equal "nevertheless" (String.concat [ "never", "the", "less" ])
                 , test "split commas" <| \() -> Expect.equal [ "cat", "dog", "cow" ] (String.split "," "cat,dog,cow")
                 , test "split slashes" <| \() -> Expect.equal [ "home", "steve", "Desktop", "" ] (String.split "/" "home/steve/Desktop/")
                 , test "join spaces" <| \() -> Expect.equal "cat dog cow" (String.join " " [ "cat", "dog", "cow" ])

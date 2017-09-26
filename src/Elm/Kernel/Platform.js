@@ -3,7 +3,7 @@
 import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.Json exposing (run)
 import Elm.Kernel.List exposing (Cons, Nil)
-import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
+import Elm.Kernel.Scheduler exposing (flatMap, binding, rawSend, rawSpawn, receive, send, succeed)
 import Elm.Kernel.Utils exposing (Tuple0)
 
 */
@@ -206,10 +206,10 @@ function _Platform_spawnLoop(init, onMessage)
 		var handleMsg = __Scheduler_receive(function(msg) {
 			return onMessage(msg, state);
 		});
-		return A2(__Scheduler_andThen, loop, handleMsg);
+		return A2(__Scheduler_flatMap, loop, handleMsg);
 	}
 
-	var task = A2(__Scheduler_andThen, loop, init);
+	var task = A2(__Scheduler_flatMap, loop, init);
 
 	return __Scheduler_rawSpawn(task);
 }
