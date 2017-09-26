@@ -3,7 +3,7 @@ effect module Random where { command = MyCmd } exposing
   , bool, int, float
   , list, pair
   , map, map2, map3, map4, map5
-  , andThen
+  , flatMap
   , minInt, maxInt
   , generate
   , step, initialSeed
@@ -37,7 +37,7 @@ by M. E. O'Neil. It is not cryptographically secure.
 @docs pair, list
 
 # Custom Generators
-@docs map, map2, map3, map4, map5, andThen
+@docs map, map2, map3, map4, map5, flatMap
 
 # Generate Values
 @docs generate
@@ -349,7 +349,7 @@ lowercase letters.
     letter : Generator Char
     letter =
       bool
-        |> andThen upperOrLower
+        |> flatMap upperOrLower
 
     upperOrLower : Bool -> Generator Char
     upperOrLower b =
@@ -359,8 +359,8 @@ lowercase letters.
     -- uppercaseLetter : Generator Char
     -- lowercaseLetter : Generator Char
 -}
-andThen : (a -> Generator b) -> Generator a -> Generator b
-andThen callback (Generator generate) =
+flatMap : (a -> Generator b) -> Generator a -> Generator b
+flatMap callback (Generator generate) =
   Generator (\seed ->
     let
       (result, newSeed) =
@@ -557,7 +557,7 @@ cmdMap func (Generate generator) =
 
 init : Task Never Seed
 init =
-    Task.andThen (\t -> Task.succeed (initialSeed (round t))) Time.now
+    Task.flatMap (\t -> Task.succeed (initialSeed (round t))) Time.now
 
 
 onEffects : Platform.Router msg Never -> List (MyCmd msg) -> Seed -> Task Never Seed
@@ -571,7 +571,7 @@ onEffects router commands seed =
         (value, newSeed) =
           step generator seed
       in
-          Task.andThen
+          Task.flatMap
             (\_ -> onEffects router rest newSeed)
             (Platform.sendToApp router value)
 

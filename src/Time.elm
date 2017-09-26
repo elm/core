@@ -177,7 +177,7 @@ onEffects router subs {processes} =
       ( spawnList
       , existingDict
       , Elm.Kernel.Scheduler.kill id
-          |> Task.andThen (\_ -> killTask)
+          |> Task.flatMap (\_ -> killTask)
       )
 
     (spawnList, existingDict, killTask) =
@@ -190,8 +190,8 @@ onEffects router subs {processes} =
         ([], Dict.empty, Task.succeed ())
   in
     killTask
-      |> Task.andThen (\_ -> spawnHelp router spawnList existingDict)
-      |> Task.andThen (\newProcesses -> Task.succeed (State newTaggers newProcesses))
+      |> Task.flatMap (\_ -> spawnHelp router spawnList existingDict)
+      |> Task.flatMap (\newProcesses -> Task.succeed (State newTaggers newProcesses))
 
 
 addMySub : MySub msg -> Taggers msg -> Taggers msg
@@ -219,7 +219,7 @@ spawnHelp router intervals processes =
           spawnHelp router rest (Dict.insert interval id processes)
       in
         spawnTimer
-          |> Task.andThen spawnRest
+          |> Task.flatMap spawnRest
 
 
 onSelfMsg : Platform.Router msg Time -> Time -> State msg -> Task Never (State msg)
@@ -234,8 +234,8 @@ onSelfMsg router interval state =
           Task.sequence (List.map (\tagger -> Platform.sendToApp router (tagger time)) taggers)
       in
         now
-          |> Task.andThen tellTaggers
-          |> Task.andThen (\_ -> Task.succeed state)
+          |> Task.flatMap tellTaggers
+          |> Task.flatMap (\_ -> Task.succeed state)
 
 
 setInterval : Time -> Task Never () -> Task x Never

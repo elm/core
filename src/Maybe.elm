@@ -1,6 +1,6 @@
 module Maybe exposing
   ( Maybe(Just,Nothing)
-  , andThen
+  , flatMap
   , map, map2, map3, map4, map5
   , withDefault
   )
@@ -15,7 +15,7 @@ you with optional arguments, error handling, and records with optional fields.
 @docs withDefault, map, map2, map3, map4, map5
 
 # Chaining Maybes
-@docs andThen
+@docs flatMap
 -}
 
 {-| Represent values that may or may not exist. It can be useful if you have a
@@ -117,8 +117,8 @@ map5 func ma mb mc md me =
 {-| Chain together many computations that may fail. It is helpful to see its
 definition:
 
-    andThen : (a -> Maybe b) -> Maybe a -> Maybe b
-    andThen callback maybe =
+    flatMap : (a -> Maybe b) -> Maybe a -> Maybe b
+    flatMap callback maybe =
         case maybe of
             Just value ->
                 callback value
@@ -140,15 +140,15 @@ first month from a `List` and then make sure it is between 1 and 12:
     getFirstMonth : List Int -> Maybe Int
     getFirstMonth months =
         head months
-          |> andThen toValidMonth
+          |> flatMap toValidMonth
 
 If `head` fails and results in `Nothing` (because the `List` was `empty`),
 this entire chain of operations will short-circuit and result in `Nothing`.
 If `toValidMonth` results in `Nothing`, again the chain of computations
 will result in `Nothing`.
 -}
-andThen : (a -> Maybe b) -> Maybe a -> Maybe b
-andThen callback maybeValue =
+flatMap : (a -> Maybe b) -> Maybe a -> Maybe b
+flatMap callback maybeValue =
     case maybeValue of
         Just value ->
             callback value

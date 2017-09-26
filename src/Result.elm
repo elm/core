@@ -2,7 +2,7 @@ module Result exposing
   ( Result(..)
   , withDefault
   , map, map2, map3, map4, map5
-  , andThen
+  , flatMap
   , toMaybe, fromMaybe, mapError
   )
 
@@ -16,7 +16,7 @@ way to manage errors in Elm.
 @docs map, map2, map3, map4, map5
 
 # Chaining
-@docs andThen
+@docs flatMap
 
 # Handling Errors
 @docs withDefault, toMaybe, fromMaybe, mapError
@@ -113,8 +113,8 @@ map5 func ra rb rc rd re =
 {-| Chain together a sequence of computations that may fail. It is helpful
 to see its definition:
 
-    andThen : (a -> Result e b) -> Result e a -> Result e b
-    andThen callback result =
+    flatMap : (a -> Result e b) -> Result e a -> Result e b
+    flatMap callback result =
         case result of
           Ok value -> callback value
           Err msg -> Err msg
@@ -132,7 +132,7 @@ a month and make sure it is between 1 and 12:
     toMonth : String -> Result String Int
     toMonth rawString =
         toInt rawString
-          |> andThen toValidMonth
+          |> flatMap toValidMonth
 
     -- toMonth "4" == Ok 4
     -- toMonth "9" == Ok 9
@@ -144,8 +144,8 @@ message. It is often best to create a custom type that explicitly represents
 the exact ways your computation may fail. This way it is easy to handle in your
 code.
 -}
-andThen : (a -> Result x b) -> Result x a -> Result x b
-andThen callback result =
+flatMap : (a -> Result x b) -> Result x a -> Result x b
+flatMap callback result =
     case result of
       Ok value ->
         callback value

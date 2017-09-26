@@ -54,7 +54,7 @@ import Time exposing (Time)
 {-| A light-weight process that runs concurrently. You can use `spawn` to
 get a bunch of different tasks running in different processes. The Elm runtime
 will interleave their progress. So if a task is taking too long, we will pause
-it at an `andThen` and switch over to other stuff.
+it at an `flatMap` and switch over to other stuff.
 
 **Note:** We make a distinction between *concurrency* which means interleaving
 different sequences and *parallelism* which means running different
@@ -73,7 +73,7 @@ or is just taking a long time, we can hop over to `task2` and do some work
 there.
 
     spawn task1
-      |> Task.andThen (\_ -> spawn task2)
+      |> Task.flatMap (\_ -> spawn task2)
 
 **Note:** This creates a relatively restricted kind of `Process` because it
 cannot receive any messages. More flexibility for user-defined processes will
