@@ -132,16 +132,16 @@ function _Utils_cmp(x, y)
 	if (x.$[0] === '#')
 	{
 		var ord;
-		var n = x.$.slice(1) - 0;
-		if (n === 0) return _Utils_EQ;
-		if (n >= 1) { ord = _Utils_cmp(x.a, y.a); if (ord !== _Utils_EQ) return ord;
-		if (n >= 2) { ord = _Utils_cmp(x.b, y.b); if (ord !== _Utils_EQ) return ord;
-		if (n >= 3) { ord = _Utils_cmp(x.c, y.c); if (ord !== _Utils_EQ) return ord;
-		if (n >= 4) { ord = _Utils_cmp(x.d, y.d); if (ord !== _Utils_EQ) return ord;
-		if (n >= 5) { ord = _Utils_cmp(x.e, y.e); if (ord !== _Utils_EQ) return ord;
-		if (n >= 6) { ord = _Utils_cmp(x.f, y.f); if (ord !== _Utils_EQ) return ord;
-		if (n >= 7) __Error_throw(6); } } } } } }
-		return _Utils_EQ;
+		return x.$ === '#0'
+			? _Utils_EQ
+			:
+		((ord = _Utils_cmp(x.a, y.a)) !== _Utils_EQ)
+			? ord
+			:
+		((ord = _Utils_cmp(x.b, y.b)) !== _Utils_EQ || x.$ === '#2')
+			? ord
+			:
+		_Utils_cmp(x.c, y.c);
 	}
 
 	__Error_throw(7);
