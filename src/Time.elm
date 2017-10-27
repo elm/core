@@ -1,8 +1,28 @@
 effect module Time where { subscription = MySub } exposing
-  ( Time
-  , now, every
-  , millisecond, second, minute, hour
-  , inMilliseconds, inSeconds, inMinutes, inHours
+  ( Posix
+  , now
+  , epoch
+  , posixToMillis
+  , millisToPosix
+  , toIso8601
+  , fromIso8601
+  , Zone
+  , utc
+  , Date
+  , year
+  , month
+  , day
+  , weekday
+  , hour
+  , minute
+  , second
+  , millis
+  , diff
+  , travel
+  , Unit(..)
+  , every
+  , Month(..)
+  , Weekday(..)
   )
 
 {-| Library for working with time.
@@ -29,100 +49,286 @@ import Task exposing (Task)
 
 
 
--- TIMES
+-- POSIX
 
 
 {-| Type alias to make it clearer when you are working with time values.
 Using the `Time` helpers like `second` and `inSeconds` instead of raw numbers
 is very highly recommended.
 -}
-type alias Time = Float
+type Posix = Posix Int
 
 
-{-| Get the `Time` at the moment when this task is run.
+{-| Get the POSIX time at the moment when this task is run.
 -}
-now : Task x Time
+now : Task x Posix
 now =
   Elm.Kernel.Time.now ()
 
 
-{-| Subscribe to the current time. First you provide an interval describing how
-frequently you want updates. Second, you give a tagger that turns a time into a
-message for your `update` function. So if you want to hear about the current
-time every second, you would say something like this:
+epoch : Posix
+epoch =
+  Posix 0
 
-    type Msg = Tick Time | ...
 
-    subscriptions model =
-      every second Tick
+posixToMillis : Posix -> Int
+posixToMillis (Posix millis) =
+  millis
 
-Check out the [Elm Architecture Tutorial][arch] for more info on how
-subscriptions work.
 
-[arch]: https://github.com/evancz/elm-architecture-tutorial/
+millisToPosix : Int -> Maybe Posix
+millisToPosix millis =
+  if millis < 0 then
+    Nothing
+  else
+    Just (Posix millis)
 
-**Note:** this function is not for animation! You need to use something based
-on `requestAnimationFrame` to get smooth animations. This is based on
-`setInterval` which is better for recurring tasks like “check on something
-every 30 seconds”.
+
+toIso8601 : Posix -> String
+toIso8601 posix =
+  Debug.crash "TODO toIso8601"
+
+
+fromIso8601 : String -> Maybe Posix
+fromIso8601 string =
+  Debug.crash "TODO fromIso8601"
+
+
+
+-- TIME ZONES
+
+
+type Zone =
+  Zone String (List Era)
+
+
+type alias Era =
+  { start : Int
+  , offset : Int
+  , abbr : String
+  }
+
+
+utc : Zone
+utc =
+  Zone "etc_utc" []
+
+
+-- here : Task x Zone
+
+
+toZone : String -> Maybe Zone
+toZone string =
+  case String.split "|" string of
+    [name, rawAbbrs, rawOffsets, rawIndexes, rawDiffs] ->
+      let
+        abbrs = String.split " " rawAbbrs
+        offsets = String.split " " rawOffsets
+        indexes = String.toList rawIndexes
+        diffs = String.split " " rawDiffs
+      in
+      toZoneHelp name (toAbbrOffsetMap abbrs offsets) indexes diffs 0 []
+
+    _ ->
+      Nothing
+
+
+toAbbrOffsetMap : List String -> List String -> List (String, Int) -> List (String, Int)
+toAbbrOffsetMap abbrs offsets revAbbrOffsetMap =
+  case (abbrs, offsets) of
+    (abbr :: otherAbbrs, offset :: otherOffsets) ->
+      let
+        intOffset =
+          String.foldr addChar60 0 offset
+      in
+      if intOffset < 0 then
+        Nothing
+      else
+        toAbbrOffsetMap otherAbbrs otherOffsets ((abbr, intOffset) :: revAbbrOffsetMap)
+
+    ([], []) ->
+      Just (List.reverse revAbbrOffsetMap)
+
+    _ ->
+      Nothing
+
+
+addChar60 : Char -> Int -> Int
+addChar60 char answer =
+  let code = Char.toCode char in
+  if answer < 0 then
+    answer
+
+  else if 0x30 <= code && code <= 0x39 then
+    60 * answer + code - 0x30
+
+  else if 0x41 <= code && code <= 0x5A then
+    60 * answer + 10 + code - 0x41
+
+  else if 0x61 <= code && code <= 0x7A then
+    60 * answer + 36 + code - 0x61
+
+  else
+    -1
+
+
+toZoneHelp : String -> List (String, Int) -> List Char -> List String -> Int -> List Era -> Maybe Zone
+toZoneHelp name abbrOffsetMap index60s diff60s runningOffset eras =
+  case (index60s, diff60s) of
+    (index60 : futureIndex60s, diff60 : futureDiff60s) ->
+      case lookupChar60 index60 abbrOffsetMap of
+        Nothing ->
+          Nothing
+
+        Just (abbr, offset) ->
+          let diff = String.foldr addChar60 0 diff60 in
+          if diff < 0 then
+            Nothing
+          else
+            let start = runningOffset + diff in
+            toZoneHelp name abbrOffsetMap futureIndex60s futureDiff60s start <|
+              Era start offset abbr :: eras
+
+    ([], []) ->
+      Just (Zone name eras)
+
+    _ ->
+      Nothing
+
+
+
+-- DATES
+
+
+type alias Date =
+  { time : Posix
+  , zone : Zone
+  }
+
+
+year : Date -> Int
+year date =
+  Debug.crash "TODO year"
+
+
+month : Date -> Month
+month date =
+  Debug.crash "TODO month"
+
+
+day : Date -> Int
+day date =
+  Debug.crash "TODO day"
+
+
+weekday : Date -> Weekday
+weekday date =
+  Debug.crash "TODO weekday"
+
+
+hour : Date -> Int
+hour date =
+  modBy 24 (toAdjustedMinutes date // 60)
+
+
+minute : Date -> Int
+minute date =
+  modBy 60 (toAdjustedMinutes date)
+
+
+toAdjustedMinutes : Date -> Int
+toAdjustedMinutes date =
+  let (Zone _ eras) = date.zone in
+  toAdjustedMinutesHelp (posixToMillis date.time // 60000) eras
+
+
+toAdjustedMinutesHelp : Int -> List Era -> Int
+toAdjustedMinutesHelp posixMinutes eras =
+  case eras of
+    [] ->
+      posixMinutes
+
+    era :: olderEras ->
+      if era.start < posixMinutes then
+        posixMinutes + era.offset
+      else
+        toAdjustedMinutesHelp posixMinutes olderEras
+
+
+second : Date -> Int
+second date =
+  modBy 60 (posixToMillis date.time // 1000)
+
+
+millis : Date -> Int
+millis date =
+  modBy 1000 (posixToMillis date.time)
+
+
+
+-- MOVING AROUND STUFF
+
+
+-- diff : Unit -> Date -> Date -> Int
+travel : Unit -> Int -> Date -> Date
+
+type Unit = Years | Months | Days | Hours | Minutes | Seconds | Millis
+
+
+
+{-|
+
+**Note:** this function is not for animation!
 -}
-every : Time -> (Time -> msg) -> Sub msg
+every : Unit -> Int -> (Posix -> msg) -> Sub msg
 every interval tagger =
   subscription (Every interval tagger)
 
 
 
--- UNITS
+-- WEEKDAYS AND MONTHS
 
 
-{-| Units of time, making it easier to specify things like a half-second
-`(500 * millisecond)` without remembering Elm&rsquo;s underlying units of time.
+{-| Represents a `Weekday` so that you can convert it to a `String` or `Int`
+however you please. For example, if you need the Japanese representation, you
+can say:
+
+    toJapaneseWeekday : Weekday -> String
+    toJapaneseWeekday weekday =
+      case weekday of
+        Mon -> "日"
+        Tue -> "月"
+        Wed -> "火"
+        Thu -> "水"
+        Fri -> "木"
+        Sat -> "金"
+        Sun -> "土"
 -}
-millisecond : Time
-millisecond =
-  1
+type Weekday = Mon | Tue | Wed | Thu | Fri | Sat | Sun
 
 
-{-|-}
-second : Time
-second =
-  1000 * millisecond
 
+{-| Represents a `Month` so that you can convert it to a `String` or `Int`
+however you please. For example, if you need the Danish representation, you
+can say:
 
-{-|-}
-minute : Time
-minute =
-  60 * second
-
-
-{-|-}
-hour : Time
-hour =
-  60 * minute
-
-
-{-|-}
-inMilliseconds : Time -> Float
-inMilliseconds t =
-  t
-
-
-{-|-}
-inSeconds : Time -> Float
-inSeconds t =
-  t / second
-
-
-{-|-}
-inMinutes : Time -> Float
-inMinutes t =
-  t / minute
-
-
-{-|-}
-inHours : Time -> Float
-inHours t =
-  t / hour
+    toDanishMonth : Month -> String
+    toDanishMonth month =
+      case month of
+        Jan -> "januar"
+        Feb -> "februar"
+        Mar -> "marts"
+        Apr -> "april"
+        May -> "maj"
+        Jun -> "juni"
+        Jul -> "juli"
+        Aug -> "august"
+        Sep -> "september"
+        Oct -> "oktober"
+        Nov -> "november"
+        Dec -> "december"
+-}
+type Month = Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec
 
 
 
