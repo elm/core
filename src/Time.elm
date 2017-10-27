@@ -208,22 +208,29 @@ type alias Date =
 
 year : Date -> Int
 year date =
-  Debug.crash "TODO year"
+  (toCivil (toAdjustedMinutes date)).year
 
 
 month : Date -> Month
 month date =
-  Debug.crash "TODO month"
+  unsafeIntToMonth (toCivil (toAdjustedMinutes date)).month
 
 
 day : Date -> Int
 day date =
-  Debug.crash "TODO day"
+  (toCivil (toAdjustedMinutes date)).day
 
 
 weekday : Date -> Weekday
 weekday date =
-  Debug.crash "TODO weekday"
+  case modBy 7 (toAdjustedMinutes date // (60 * 24)) of
+    0 -> Thu
+    1 -> Fri
+    2 -> Sun
+    3 -> Sat
+    4 -> Mon
+    5 -> Tue
+    _ -> Wed
 
 
 hour : Date -> Int
@@ -234,6 +241,20 @@ hour date =
 minute : Date -> Int
 minute date =
   modBy 60 (toAdjustedMinutes date)
+
+
+second : Date -> Int
+second date =
+  modBy 60 (posixToMillis date.time // 1000)
+
+
+millis : Date -> Int
+millis date =
+  modBy 1000 (posixToMillis date.time)
+
+
+
+-- DATE HELPERS
 
 
 toAdjustedMinutes : Date -> Int
@@ -255,14 +276,22 @@ toAdjustedMinutesHelp posixMinutes eras =
         toAdjustedMinutesHelp posixMinutes olderEras
 
 
-second : Date -> Int
-second date =
-  modBy 60 (posixToMillis date.time // 1000)
-
-
-millis : Date -> Int
-millis date =
-  modBy 1000 (posixToMillis date.time)
+toCivil : Int -> { year : Int, month : Int, day : Int }
+toCivil minutes =
+  let
+    rawDay    = (minutes // (60 * 24)) + 719468
+    era       = (if rawDay >= 0 then rawDay else rawDay - 146096) // 146097
+    dayOfEra  = rawDay - era * 146097 -- [0, 146096]
+    yearOfEra = (dayOfEra - dayOfEra // 1460 + dayOfEra // 36524 - dayOfEra // 146096) // 365 -- [0, 399]
+    year      = yearOfEra + era * 400
+    dayOfYear = dayOfEra - (365 * yearOfEra + yearOfEra // 4 - yearOfEra // 100) -- [0, 365]
+    mp        = (5 * dayOfYear + 2) // 153 -- [0, 11]
+    month     = mp + (if mp < 10 then 3 else -9) -- [1, 12]
+  in
+  { year = year + (if month <= 2 then 1 else 0)
+  , month = month
+  , day = dayOfYear - (153 * mp + 2) // 5 + 1 -- [1, 31]
+  }
 
 
 
@@ -307,7 +336,6 @@ can say:
 type Weekday = Mon | Tue | Wed | Thu | Fri | Sat | Sun
 
 
-
 {-| Represents a `Month` so that you can convert it to a `String` or `Int`
 however you please. For example, if you need the Danish representation, you
 can say:
@@ -329,6 +357,23 @@ can say:
         Dec -> "december"
 -}
 type Month = Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec
+
+
+unsafeIntToMonth : Int -> Month
+unsafeIntToMonth int =
+  case int of
+    1  -> Jan
+    2  -> Feb
+    3  -> Mar
+    4  -> Apr
+    5  -> May
+    6  -> Jun
+    7  -> Jul
+    8  -> Aug
+    9  -> Sep
+    10 -> Oct
+    11 -> Nov
+    _  -> Dec
 
 
 
