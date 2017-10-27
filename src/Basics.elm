@@ -3,7 +3,7 @@ module Basics exposing
   , toFloat, round, floor, ceiling, truncate
   , (==), (/=)
   , (<), (>), (<=), (>=), max, min, compare, Order(..)
-  , not, (&&), (||), xor
+  , Bool(..), not, (&&), (||), xor
   , (++)
   , modBy, remainderBy, negate, abs, clamp, sqrt, logBase, e
   , pi, cos, sin, tan, acos, asin, atan, atan2
@@ -65,28 +65,28 @@ import Elm.Kernel.Utils
 
 
 
--- INFIX OPERATOR PRECEDENCE
+-- INFIX OPERATORS
 
 
-infixr 0 <|
-infixl 0 |>
-infixr 2 ||
-infixr 3 &&
-infix  4 ==
-infix  4 /=
-infix  4 <
-infix  4 >
-infix  4 <=
-infix  4 >=
-infixr 5 ++
-infixl 6 +
-infixl 6 -
-infixl 7 *
-infixl 7 /
-infixl 7 //
-infixr 8 ^
-infixr 9 <<
-infixl 9 >>
+infix right 0 (<|) = apply
+infix left  0 (|>) = forwardApply
+infix right 2 (||) = or
+infix right 3 (&&) = and
+infix non   4 (==) = eq
+infix non   4 (/=) = neq
+infix non   4 (<)  = lt
+infix non   4 (>)  = gt
+infix non   4 (<=) = le
+infix non   4 (>=) = ge
+infix right 5 (++) = append
+infix left  6 (+)  = add
+infix left  6 (-)  = sub
+infix left  7 (*)  = mul
+infix left  7 (/)  = fdiv
+infix left  7 (//) = idiv
+infix right 8 (^)  = pow
+infix right 9 (<<) = composeLeft
+infix left  9 (>>) = composeRight
 
 
 
@@ -94,32 +94,32 @@ infixl 9 >>
 
 
 {-|-}
-(+) : number -> number -> number
-(+) =
+add : number -> number -> number
+add =
   Elm.Kernel.Basics.add
 
 
 {-|-}
-(-) : number -> number -> number
-(-) =
+sub : number -> number -> number
+sub =
   Elm.Kernel.Basics.sub
 
 
 {-|-}
-(*) : number -> number -> number
-(*) =
+mul : number -> number -> number
+mul =
   Elm.Kernel.Basics.mul
 
 
 {-| Floating point division. -}
-(/) : Float -> Float -> Float
-(/) =
+fdiv : Float -> Float -> Float
+fdiv =
   Elm.Kernel.Basics.fdiv
 
 
 {-| Integer division. The remainder is discarded. -}
-(//) : Int -> Int -> Int
-(//) =
+idiv : Int -> Int -> Int
+idiv =
   Elm.Kernel.Basics.idiv
 
 
@@ -127,9 +127,9 @@ infixl 9 >>
 
     3^2 == 9
 -}
-(^) : number -> number -> number
-(^) =
-  Elm.Kernel.Basics.exp
+pow : number -> number -> number
+pow =
+  Elm.Kernel.Basics.pow
 
 
 
@@ -189,8 +189,8 @@ if passed through a port.
 
 [undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
 -}
-(==) : a -> a -> Bool
-(==) =
+eq : a -> a -> Bool
+eq =
   Elm.Kernel.Utils.equal
 
 
@@ -198,8 +198,8 @@ if passed through a port.
 
 So `(a /= b)` is the same as `(not (a == b))`.
 -}
-(/=) : a -> a -> Bool
-(/=) =
+neq : a -> a -> Bool
+neq =
   Elm.Kernel.Utils.notEqual
 
 
@@ -208,26 +208,26 @@ So `(a /= b)` is the same as `(not (a == b))`.
 
 
 {-|-}
-(<) : comparable -> comparable -> Bool
-(<) =
+lt : comparable -> comparable -> Bool
+lt =
   Elm.Kernel.Utils.lt
 
 
 {-|-}
-(>) : comparable -> comparable -> Bool
-(>) =
+gt : comparable -> comparable -> Bool
+gt =
   Elm.Kernel.Utils.gt
 
 
 {-|-}
-(<=) : comparable -> comparable -> Bool
-(<=) =
+le : comparable -> comparable -> Bool
+le =
   Elm.Kernel.Utils.le
 
 
 {-|-}
-(>=) : comparable -> comparable -> Bool
-(>=) =
+ge : comparable -> comparable -> Bool
+ge =
   Elm.Kernel.Utils.ge
 
 
@@ -274,14 +274,28 @@ type Order = LT | EQ | GT
 -- BOOLEANS
 
 
+{-| A “Boolean” value. It can either be `True` or `False`.
+
+**Note:** Programmers coming from JavaScript, Java, etc. tend to reach for
+boolean values way too often in Elm. Using a [union type][ut] is often clearer
+and more reliable. You can learn more about this from Jeremy [here][jf] or
+from Richard [here][rt].
+
+[ut]: https://guide.elm-lang.org/types/union_types.html
+[jf]: https://youtu.be/6TDKHGtAxeg?t=1m25s
+[rt]: https://youtu.be/IcgmSRJHu_8?t=1m14s
+-}
+type Bool = True | False
+
+
 {-| Negate a boolean value.
 
     not True == False
     not False == True
 -}
 not : Bool -> Bool
-not bool =
-  if bool then False else True
+not =
+  Elm.Kernel.Basics.not
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
@@ -295,8 +309,8 @@ not bool =
 short-circuits. This means if `left` is `False` we do not bother evaluating `right`
 and just return `False` overall.
 -}
-(&&) : Bool -> Bool -> Bool
-(&&) =
+and : Bool -> Bool -> Bool
+and =
   Elm.Kernel.Basics.and
 
 
@@ -311,8 +325,8 @@ and just return `False` overall.
 short-circuits. This means if `left` is `True` we do not bother evaluating `right`
 and just return `True` overall.
 -}
-(||) : Bool -> Bool -> Bool
-(||) =
+or : Bool -> Bool -> Bool
+or =
   Elm.Kernel.Basics.or
 
 
@@ -337,8 +351,8 @@ xor =
     "hello" ++ "world" == "helloworld"
     [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
 -}
-(++) : appendable -> appendable -> appendable
-(++) =
+append : appendable -> appendable -> appendable
+append =
   Elm.Kernel.Utils.append
 
 
@@ -604,8 +618,8 @@ So our example expands out to something like this:
 
     \n -> not (isEven (sqrt n))
 -}
-(<<) : (b -> c) -> (a -> b) -> (a -> c)
-(<<) g f x =
+composeLeft : (b -> c) -> (a -> b) -> (a -> c)
+composeLeft g f x =
   g (f x)
 
 
@@ -617,40 +631,61 @@ example, the following code checks if the square root of a number is odd:
 This direction of function composition seems less pleasant than `(<<)` which
 reads nicely in expressions like: `filter (not << isRegistered) students`
 -}
-(>>) : (a -> b) -> (b -> c) -> (a -> c)
-(>>) f g x =
+composeRight : (a -> b) -> (b -> c) -> (a -> c)
+composeRight f g x =
   g (f x)
 
 
-{-| Forward function application `x |> f == f x`. This function is useful
-for avoiding parentheses and writing code in a more natural way.
-Consider the following code to create a pentagon:
+{-| Saying `x |> f` is exactly the same as `f x`.
 
-    scale 2 (move (10,10) (filled blue (ngon 5 30)))
+It is called the “pipe” operator because it lets you write “pipelined” code.
+For example, say we have a `toRadians` function for turning user input in
+degrees into radians. We can rewrite it like this:
 
-This can also be written as:
+    import Maybe
+    import String
 
-    ngon 5 30
-      |> filled blue
-      |> move (10,10)
-      |> scale 2
+    -- BEFORE
+    toRadians : String -> Float
+    toRadians input =
+      degrees (toFloat (Maybe.withDefault 0 (String.toInt input))
+
+    -- AFTER
+    toRadians : String -> Float
+    toRadians input =
+      input
+        |> String.toInt
+        |> Maybe.withDefault 0
+        |> toFloat
+        |> degrees
+
+Once you get the hang of it, it can be quite nice! To get a better intuition,
+I recommend trying to rewrite code that uses `x |> f` into code like `f x`
+until there are no pipes left.
+
+**Note:** The compiler rewrites this to normal function application, so `(|>)`
+has no runtime overhead.
 -}
-(|>) : a -> (a -> b) -> b
-(|>) x f =
+forwardApply : a -> (a -> b) -> b
+forwardApply x f =
   f x
 
 
-{-| Backward function application `f <| x == f x`. This function is useful for
-avoiding parentheses. Consider the following code to create a text element:
+{-| Saying `f <| x` is exactly the same as `f x`.
 
-    leftAligned (monospace (fromString "code"))
+It can help you avoid parentheses, which can be nice sometimes. For example:
 
-This can also be written as:
+    Maybe.withDefault 0 (String.toInt "123")
 
-    leftAligned <| monospace <| fromString "code"
+Can be written as:
+
+    Maybe.withDefault 0 <| String.toInt "123"
+
+**Note:** The compiler rewrites this to normal function application, so `(<|)`
+has no runtime overhead.
 -}
-(<|) : (a -> b) -> a -> b
-(<|) f x =
+apply : (a -> b) -> a -> b
+apply f x =
   f x
 
 
