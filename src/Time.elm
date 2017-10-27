@@ -296,13 +296,13 @@ can say:
     toJapaneseWeekday : Weekday -> String
     toJapaneseWeekday weekday =
       case weekday of
-        Mon -> "日"
-        Tue -> "月"
-        Wed -> "火"
-        Thu -> "水"
-        Fri -> "木"
-        Sat -> "金"
-        Sun -> "土"
+        Mon -> "月"
+        Tue -> "火"
+        Wed -> "水"
+        Thu -> "木"
+        Fri -> "金"
+        Sat -> "土"
+        Sun -> "日"
 -}
 type Weekday = Mon | Tue | Wed | Thu | Fri | Sat | Sun
 
