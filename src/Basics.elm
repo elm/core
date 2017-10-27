@@ -374,7 +374,11 @@ negative numbers:
     List.map (modBy 4) [ -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5 ]
     --                 [  3,  0,  1,  2,  3,  0,  1,  2,  3,  0,  1 ]
 
-Use [`remainderBy`](#remainderBy) for a different treatment of negative numbers.
+Use [`remainderBy`](#remainderBy) for a different treatment of negative numbers,
+or read Daan Leijen’s [Division and Modulus for Computer Scientists][dm] for more
+information.
+
+[dm]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
 -}
 modBy : Int -> Int -> Int
 modBy =
@@ -386,7 +390,11 @@ modBy =
     List.map (remainderBy 4) [ -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5 ]
     --                       [ -1,  0, -3, -2, -1,  0,  1,  2,  3,  0,  1 ]
 
-Use [`modBy`](#modBy) for a different treatment of negative numbers.
+Use [`modBy`](#modBy) for a different treatment of negative numbers,
+or read Daan Leijen’s [Division and Modulus for Computer Scientists][dm] for more
+information.
+
+[dm]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
 -}
 remainderBy : Int -> Int -> Int
 remainderBy =

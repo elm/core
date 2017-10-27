@@ -15,19 +15,18 @@ var _Basics_idiv = F2(function(a, b) { return (a / b) | 0; });
 var _Basics_pow = F2(Math.pow);
 
 var _Basics_remainderBy = F2(function(b, a) { return a % b; });
-var _Basics_modBy = F2(_Basics_modBy_help);
 
-function _Basics_modBy_help(b, a)
+// https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
+var _Basics_modBy = F2(function(modulus, x)
 {
-	if (b === 0)
-	{
-		__Error_throw(11);
-	}
-	var r = a % b;
-	var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r + b) : -_Basics_modBy_help(-a, -b));
-
-	return m === b ? 0 : m;
-}
+	var answer = x % modulus;
+	return modulus === 0
+		? __Error_throw(11)
+		:
+	((answer > 0 && modulus < 0) || (answer < 0 && modulus > 0))
+		? answer + modulus
+		: answer;
+});
 
 
 // TRIGONOMETRY
