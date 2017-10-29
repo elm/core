@@ -1,11 +1,8 @@
 effect module Time where { subscription = MySub } exposing
   ( Posix
   , now
-  , epoch
   , posixToMillis
   , millisToPosix
-  , toIso8601
-  , fromIso8601
   , Zone
   , utc
   , Date
@@ -25,14 +22,26 @@ effect module Time where { subscription = MySub } exposing
   , Weekday(..)
   )
 
-{-| Library for working with time.
+
+{-| Library for working with time, time zones, and dates.
 
 # Time
-@docs Time, now, every
+@docs Posix, now, posixToMillis, millisToPosix
 
-# Units
-@docs millisecond, second, minute, hour,
-  inMilliseconds, inSeconds, inMinutes, inHours
+# Time Zones
+@docs Zone, utc
+
+# Dates
+@docs Date, year, month, day, weekday, hour, minute, second, millis
+
+# Date Math
+@docs diff, travel, Unit(..)
+
+# Time Subscriptions
+@docs every
+
+# Weeks and Months
+@docs Weekday(..), Month(..)
 
 -}
 
@@ -52,9 +61,12 @@ import Task exposing (Task)
 -- POSIX
 
 
-{-| Type alias to make it clearer when you are working with time values.
-Using the `Time` helpers like `second` and `inSeconds` instead of raw numbers
-is very highly recommended.
+{-| A common representation of time on computers. Think of it like “seconds”.
+
+As with most time-related things, there are some odd details. For example, POSIX
+time does not take leap seconds into account. Find more details [here][].
+
+[here]: https://en.wikipedia.org/wiki/Unix_time
 -}
 type Posix = Posix Int
 
@@ -66,32 +78,19 @@ now =
   Elm.Kernel.Time.now ()
 
 
-epoch : Posix
-epoch =
-  Posix 0
-
-
+{-| Turn a `Posix` time into the milliseconds since 1970 January 1 at
+00:00:00 UTC. It was a Thursday.
+-}
 posixToMillis : Posix -> Int
 posixToMillis (Posix millis) =
   millis
 
 
-millisToPosix : Int -> Maybe Posix
-millisToPosix millis =
-  if millis < 0 then
-    Nothing
-  else
-    Just (Posix millis)
-
-
-toIso8601 : Posix -> String
-toIso8601 posix =
-  Debug.crash "TODO toIso8601"
-
-
-fromIso8601 : String -> Maybe Posix
-fromIso8601 string =
-  Debug.crash "TODO fromIso8601"
+{-| Turn milliseconds into a `Posix` time.
+-}
+millisToPosix : Int -> Posix
+millisToPosix =
+  Posix
 
 
 
