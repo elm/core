@@ -199,7 +199,19 @@ year date =
 -}
 month : Date -> Month
 month date =
-  unsafeIntToMonth (toCivil (toAdjustedMinutes date)).month
+  case (toCivil (toAdjustedMinutes date)).month of
+    1  -> Jan
+    2  -> Feb
+    3  -> Mar
+    4  -> Apr
+    5  -> May
+    6  -> Jun
+    7  -> Jul
+    8  -> Aug
+    9  -> Sep
+    10 -> Oct
+    11 -> Nov
+    _  -> Dec
 
 
 {-| What day is it?!
@@ -381,23 +393,6 @@ can say:
         Dec -> "december"
 -}
 type Month = Jan | Feb | Mar | Apr | May | Jun | Jul | Aug | Sep | Oct | Nov | Dec
-
-
-unsafeIntToMonth : Int -> Month
-unsafeIntToMonth int =
-  case int of
-    1  -> Jan
-    2  -> Feb
-    3  -> Mar
-    4  -> Apr
-    5  -> May
-    6  -> Jun
-    7  -> Jul
-    8  -> Aug
-    9  -> Sep
-    10 -> Oct
-    11 -> Nov
-    _  -> Dec
 
 
 
