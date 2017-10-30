@@ -14,12 +14,10 @@ effect module Time where { subscription = MySub } exposing
   , minute
   , second
   , millis
-  , diff
-  , travel
-  , Unit(..)
   , every
   , Month(..)
   , Weekday(..)
+  , customZone
   )
 
 
@@ -34,14 +32,14 @@ effect module Time where { subscription = MySub } exposing
 # Dates
 @docs Date, year, month, day, weekday, hour, minute, second, millis
 
-# Date Math
-@docs diff, travel, Unit(..)
-
 # Time Subscriptions
 @docs every
 
 # Weeks and Months
 @docs Weekday(..), Month(..)
+
+# Time Zone Builder
+@docs customZone
 
 -}
 
@@ -75,11 +73,11 @@ type Posix = Posix Int
 -}
 now : Task x Posix
 now =
-  Elm.Kernel.Time.now ()
+  Elm.Kernel.Time.now Posix
 
 
-{-| Turn a `Posix` time into the milliseconds since 1970 January 1 at
-00:00:00 UTC. It was a Thursday.
+{-| Turn a `Posix` time into the number of milliseconds since 1970 January 1
+at 00:00:00 UTC. It was a Thursday.
 -}
 posixToMillis : Posix -> Int
 posixToMillis (Posix millis) =
@@ -97,6 +95,18 @@ millisToPosix =
 -- TIME ZONES
 
 
+{-| Information about a particular time zone.
+
+The [IANA Time Zone Database][iana] tracks things like UTC offsets and
+daylight-saving rules so that you can turn a `Posix` time into local times
+within a time zone.
+
+Did you know that in California the times change from 3pm PST to 3pm PDT to
+capture whether it is daylight-saving time? The database tracks those
+abbreviation changes too. (Tons of time zones do that actually.)
+
+[iana]: https://www.iana.org/time-zones
+-}
 type Zone =
   Zone String (List Era)
 
@@ -108,118 +118,113 @@ type alias Era =
   }
 
 
+{-| The time zone for Coordinated Universal Time ([UTC][])
+
+The `utc` zone has no time adjustments. It never observes daylight-saving
+time and it never shifts around based on political restructuring.
+
+[UTC]: https://en.wikipedia.org/wiki/Coordinated_Universal_Time
+-}
 utc : Zone
 utc =
-  Zone "etc_utc" []
+  Zone "Etc/Utc" []
 
 
--- here : Task x Zone
+{-| **Primarily for library authors.**
 
+I am proposing [a JavaScript API][api] that would allow us to expose a function
+like this:
 
-toZone : String -> Maybe Zone
-toZone string =
-  case String.split "|" string of
-    [name, rawAbbrs, rawOffsets, rawIndexes, rawDiffs] ->
-      let
-        abbrs = String.split " " rawAbbrs
-        offsets = String.split " " rawOffsets
-        indexes = String.toList rawIndexes
-        diffs = String.split " " rawDiffs
-      in
-      toZoneHelp name (toAbbrOffsetMap abbrs offsets) indexes diffs 0 []
+    here : Task x Zone
 
-    _ ->
-      Nothing
+Until that becomes possible, it is necessary to load information from the IANA
+time zone database yourself, and different people will want to do this in
+different ways. For example, if your users all live in one time-zone, you may
+just want to have the data in Elm. If you have users everywhere, maybe you want
+to load time zone information as needed through HTTP requests? Or all at once
+and cache it?
 
+To avoid forcing everyone to use one strategy, the `customZone` function allows
+you to create a `Zone` with data you have obtained however you please. This
+means libraries can hard-code the data, provide HTTP requests, etc. and you can
+pick the strategy that is best for you.
 
-toAbbrOffsetMap : List String -> List String -> List (String, Int) -> List (String, Int)
-toAbbrOffsetMap abbrs offsets revAbbrOffsetMap =
-  case (abbrs, offsets) of
-    (abbr :: otherAbbrs, offset :: otherOffsets) ->
-      let
-        intOffset =
-          String.foldr addChar60 0 offset
-      in
-      if intOffset < 0 then
-        Nothing
-      else
-        toAbbrOffsetMap otherAbbrs otherOffsets ((abbr, intOffset) :: revAbbrOffsetMap)
-
-    ([], []) ->
-      Just (List.reverse revAbbrOffsetMap)
-
-    _ ->
-      Nothing
-
-
-addChar60 : Char -> Int -> Int
-addChar60 char answer =
-  let code = Char.toCode char in
-  if answer < 0 then
-    answer
-
-  else if 0x30 <= code && code <= 0x39 then
-    60 * answer + code - 0x30
-
-  else if 0x41 <= code && code <= 0x5A then
-    60 * answer + 10 + code - 0x41
-
-  else if 0x61 <= code && code <= 0x7A then
-    60 * answer + 36 + code - 0x61
-
-  else
-    -1
-
-
-toZoneHelp : String -> List (String, Int) -> List Char -> List String -> Int -> List Era -> Maybe Zone
-toZoneHelp name abbrOffsetMap index60s diff60s runningOffset eras =
-  case (index60s, diff60s) of
-    (index60 : futureIndex60s, diff60 : futureDiff60s) ->
-      case lookupChar60 index60 abbrOffsetMap of
-        Nothing ->
-          Nothing
-
-        Just (abbr, offset) ->
-          let diff = String.foldr addChar60 0 diff60 in
-          if diff < 0 then
-            Nothing
-          else
-            let start = runningOffset + diff in
-            toZoneHelp name abbrOffsetMap futureIndex60s futureDiff60s start <|
-              Era start offset abbr :: eras
-
-    ([], []) ->
-      Just (Zone name eras)
-
-    _ ->
-      Nothing
+**Note:** If you prefer the `here` API, try to get TC39 to consider [this
+JavaScript API][api] for time zones!
+-}
+customZone : String -> List Era -> Maybe Zone
+customZone abbr eras =
+  Debug.crash "TODO"
 
 
 
 -- DATES
 
 
+{-| A `Date` is the combination of a `Posix` time and a time `Zone`.
+
+With those two pieces of information, you can figure out the year, month, day,
+hour, etc. within any time zone. This way you can say a meeting is at a
+particular `Posix` time, and then display that as “6am on Wednesday” or “10pm
+on Tuesday” depending on the `Zone` of the viewer.
+-}
 type alias Date =
   { time : Posix
   , zone : Zone
   }
 
 
+{-| What year is it?!
+
+    import Time exposing (millisToPosix, utc, year)
+
+    year { time = millisToPosix 0, zone = utc } == 1970
+    year { time = millisToPosix 0, zone = nyc } == 1969
+
+    -- pretend `nyc` is the `Zone` for America/New_York.
+-}
 year : Date -> Int
 year date =
   (toCivil (toAdjustedMinutes date)).year
 
 
+{-| What month is it?!
+
+    import Time exposing (millisToPosix, month, utc)
+
+    month { time = millisToPosix 0, zone = utc } == Jan
+    month { time = millisToPosix 0, zone = nyc } == Dec
+
+    -- pretend `nyc` is the `Zone` for America/New_York.
+-}
 month : Date -> Month
 month date =
   unsafeIntToMonth (toCivil (toAdjustedMinutes date)).month
 
 
+{-| What day is it?!
+
+    import Time exposing (day, millisToPosix, utc)
+
+    day { time = millisToPosix 0, zone = utc } == 1
+    day { time = millisToPosix 0, zone = nyc } == 31
+
+    -- pretend `nyc` is the `Zone` for America/New_York.
+-}
 day : Date -> Int
 day date =
   (toCivil (toAdjustedMinutes date)).day
 
 
+{-| What day of the week is it?
+
+    import Time exposing (millisToPosix, utc, weekday)
+
+    weekday { time = millisToPosix 0, zone = utc } == Thu
+    weekday { time = millisToPosix 0, zone = nyc } == Wed
+
+    -- pretend `nyc` is the `Zone` for America/New_York.
+-}
 weekday : Date -> Weekday
 weekday date =
   case modBy 7 (toAdjustedMinutes date // (60 * 24)) of
@@ -232,21 +237,52 @@ weekday date =
     _ -> Wed
 
 
+{-| What hour is it?
+
+    import Time exposing (hour, millisToPosix, utc)
+
+    hour { time = millisToPosix 0, zone = utc } == 0  -- 12am
+    hour { time = millisToPosix 0, zone = nyc } == 19 -- 7pm
+
+    -- pretend `nyc` is the `Zone` for America/New_York.
+-}
 hour : Date -> Int
 hour date =
   modBy 24 (toAdjustedMinutes date // 60)
 
 
+{-|
+    import Time exposing (millisToPosix, minute, utc)
+
+    minute { time = millisToPosix 0, zone = utc } == 0
+
+This can be different in different time zones. Some time zones are offset
+by a half-hour!
+-}
 minute : Date -> Int
 minute date =
   modBy 60 (toAdjustedMinutes date)
 
 
+{-|
+    import Time exposing (millisToPosix, second, utc)
+
+    second { time = millisToPosix    0, zone = utc } == 0
+    second { time = millisToPosix 1234, zone = utc } == 1
+    second { time = millisToPosix 5678, zone = utc } == 5
+-}
 second : Date -> Int
 second date =
   modBy 60 (posixToMillis date.time // 1000)
 
 
+{-|
+    import Time exposing (millis, millisToPosix, utc)
+
+    millis { time = millisToPosix    0, zone = utc } == 0
+    millis { time = millisToPosix 1234, zone = utc } == 234
+    millis { time = millisToPosix 5678, zone = utc } == 678
+-}
 millis : Date -> Int
 millis date =
   modBy 1000 (posixToMillis date.time)
@@ -294,23 +330,12 @@ toCivil minutes =
 
 
 
--- MOVING AROUND STUFF
+-- TIME TRAVEL
 
 
 -- diff : Unit -> Date -> Date -> Int
-travel : Unit -> Int -> Date -> Date
-
-type Unit = Years | Months | Days | Hours | Minutes | Seconds | Millis
-
-
-
-{-|
-
-**Note:** this function is not for animation!
--}
-every : Unit -> Int -> (Posix -> msg) -> Sub msg
-every interval tagger =
-  subscription (Every interval tagger)
+-- travel : Unit -> Int -> Date -> Date
+-- type Unit = Years | Months | Days | Hours | Minutes | Seconds | Millis
 
 
 
@@ -377,6 +402,15 @@ unsafeIntToMonth int =
 
 
 -- SUBSCRIPTIONS
+
+
+{-|
+
+**Note:** this function is not for animation!
+-}
+every : Unit -> Int -> (Posix -> msg) -> Sub msg
+every interval tagger =
+  subscription (Every interval tagger)
 
 
 type MySub msg =

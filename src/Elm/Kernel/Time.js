@@ -6,11 +6,11 @@ import Elm.Kernel.Utils exposing (Tuple0)
 */
 
 
-function _Time_now()
+function _Time_now(toPosix)
 {
 	return __Scheduler_binding(function(callback)
 	{
-		callback(__Scheduler_succeed(Date.now()));
+		callback(__Scheduler_succeed(toPosix(Date.now())));
 	});
 }
 
