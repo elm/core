@@ -152,11 +152,11 @@ var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_GT; });
 var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_GT; });
 var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_LT; });
 
-var _Utils_ordTable = ['LT', 'EQ', 'GT'];
+var _Utils_ordTable = [{ $: 'LT' }, { $: 'EQ' }, { $: 'GT' }];
 
 var _Utils_compare = F2(function(x, y)
 {
-	return { $: _Utils_ordTable[_Utils_cmp(x, y) + 1] };
+	return _Utils_ordTable[_Utils_cmp(x, y) + 1];
 });
 
 
