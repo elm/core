@@ -1,5 +1,6 @@
 module Basics exposing
-  ( (+), (-), (*), (/), (//), (^)
+  ( Int, Float
+  , (+), (-), (*), (/), (//), (^)
   , toFloat, round, floor, ceiling, truncate
   , (==), (/=)
   , (<), (>), (<=), (>=), max, min, compare, Order(..)
@@ -16,7 +17,7 @@ module Basics exposing
 {-| Tons of useful functions that get imported by default.
 
 # Math
-@docs (+), (-), (*), (/), (//), (^)
+@docs Int, Float, (+), (-), (*), (/), (//), (^)
 
 # Int to Float / Float to Int
 @docs toFloat, round, floor, ceiling, truncate
@@ -93,31 +94,117 @@ infix left  9 (>>) = composeRight
 -- MATHEMATICS
 
 
-{-|-}
+{-| An `Int` is a whole number. Valid syntax for integers includes:
+
+    0
+    42
+    9000
+    0xFF   -- 255 in hexidecimal
+    0x000A --  10 in hexidecimal
+
+**Note:** `Int` math is well-defined in the range `-2^31` to `2^31 - 1`. Outside
+of that range, the behavior is determined by the compilation target. When
+generating JavaScript, the safe range expands to `-2^53` to `2^53 - 1` for some
+operations, but if we generate WebAssembly some day, we would do the traditional
+[integer overflow][io]. This quirk is necessary to get good performance on
+quirky compilation targets.
+
+**Historical Note:** The name `Int` comes from the term [integer][]. It appears
+that the `int` abbreviation was introduced in [ALGOL 68][68], shortening it
+from `integer` in [ALGOL 60][60]. Today, almost all programming languages use
+this abbreviation.
+
+[io]: https://en.wikipedia.org/wiki/Integer_overflow
+[integer]: https://en.wikipedia.org/wiki/Integer
+[60]: https://en.wikipedia.org/wiki/ALGOL_60
+[68]: https://en.wikipedia.org/wiki/ALGOL_68
+-}
+type Int = Int -- NOTE: The compiler provides the real implementation.
+
+
+{-| A `Float` is a [floating-point number][fp]. Valid syntax for floats includes:
+
+    0
+    42
+    3.14
+    0.1234
+    6.022e23   -- == (6.022 * 10^23)
+    6.022e+23  -- == (6.022 * 10^23)
+    1.602e−19  -- == (1.602 * 10^-19)
+    1e3        -- == (1 * 10^3) == 1000
+
+**Historical Note:** The particular details of floats (e.g. `NaN`) are
+specified by [IEEE 754][ieee] which is literally hard-coded into almost all
+CPUs in the world. That means if you think `NaN` is wierd, you must
+successfully overtake Intel and AMD with a chip that is not backwards
+compatible with any widely-used assembly language.
+
+[fp]: https://en.wikipedia.org/wiki/Floating-point_arithmetic
+[ieee]: https://en.wikipedia.org/wiki/IEEE_754
+-}
+type Float = Float -- NOTE: The compiler provides the real implementation.
+
+
+{-| Add two numbers. The `number` type variable means this operation can be
+specialized to `Int -> Int -> Int` or to `Float -> Float -> Float`. So you
+can do things like this:
+
+    3002 + 4004 == 7006  -- all ints
+    3.14 + 3.14 == 6.28  -- all floats
+
+You _cannot_ add an `Int` and a `Float` directly though. Use functions like
+[toFloat](#toFloat) or [round](#round) to convert both values to the same type.
+So if you needed to add a list length to a `Float` for some crazy reason, you
+could say one of these:
+
+    3.14 + toFloat (List.length [1,2,3]) == 6.14
+    round 3.14 + List.length [1,2,3]     == 6
+
+**Note:** Languages like Java and JavaScript automatically convert `Int` values
+to `Float` values when you mix and match. This can make it difficult to be sure
+exactly what type of number you are dealing with. When you try to _infer_ these
+conversions (as Scala does) it can be even more confusing. Elm has opted for a
+design that makes all conversions explicit.
+-}
 add : number -> number -> number
 add =
   Elm.Kernel.Basics.add
 
 
-{-|-}
+{-| Subtract numbers like `4 - 3 == 1`.
+
+See [`(+)`](#+) for docs on the `number` type variable.
+-}
 sub : number -> number -> number
 sub =
   Elm.Kernel.Basics.sub
 
 
-{-|-}
+{-| Multiply numbers like `2 * 3 == 6`.
+
+See [`(+)`](#+) for docs on the `number` type variable.
+-}
 mul : number -> number -> number
 mul =
   Elm.Kernel.Basics.mul
 
 
-{-| Floating point division. -}
+{-| Floating-point division:
+
+    3.14 / 2 == 1.57
+
+-}
 fdiv : Float -> Float -> Float
 fdiv =
   Elm.Kernel.Basics.fdiv
 
 
-{-| Integer division. The remainder is discarded. -}
+{-| Integer division:
+
+    3 // 2 == 1
+
+Notice that the remainder is discarded.
+-}
 idiv : Int -> Int -> Int
 idiv =
   Elm.Kernel.Basics.idiv
@@ -126,6 +213,7 @@ idiv =
 {-| Exponentiation
 
     3^2 == 9
+    3^3 == 27
 -}
 pow : number -> number -> number
 pow =
@@ -136,31 +224,78 @@ pow =
 -- INT TO FLOAT / FLOAT TO INT
 
 
-{-| Convert an integer into a float. -}
+{-| Convert an integer into a float. Useful when mixing `Int` and `Float`
+values like this:
+
+    halfOf : Int -> Float
+    halfOf number =
+      toFloat number / 2
+
+-}
 toFloat : Int -> Float
 toFloat =
   Elm.Kernel.Basics.toFloat
 
 
-{-| Round a number to the nearest integer. -}
+{-| Round a number to the nearest integer.
+
+    round 1.0 == 1
+    round 1.2 == 1
+    round 1.5 == 2
+    round 1.8 == 2
+
+    round -1.2 == -1
+    round -1.5 == -1
+    round -1.8 == -2
+-}
 round : Float -> Int
 round =
   Elm.Kernel.Basics.round
 
 
-{-| Floor function, rounding down. -}
+{-| Floor function, rounding down.
+
+    floor 1.0 == 1
+    floor 1.2 == 1
+    floor 1.5 == 1
+    floor 1.8 == 1
+
+    floor -1.2 == -2
+    floor -1.5 == -2
+    floor -1.8 == -2
+-}
 floor : Float -> Int
 floor =
   Elm.Kernel.Basics.floor
 
 
-{-| Ceiling function, rounding up. -}
+{-| Ceiling function, rounding up.
+
+    ceiling 1.0 == 1
+    ceiling 1.2 == 2
+    ceiling 1.5 == 2
+    ceiling 1.8 == 2
+
+    ceiling -1.2 == -1
+    ceiling -1.5 == -1
+    ceiling -1.8 == -1
+-}
 ceiling : Float -> Int
 ceiling =
   Elm.Kernel.Basics.ceiling
 
 
-{-| Truncate a number, rounding towards zero. -}
+{-| Truncate a number, rounding towards zero.
+
+    truncate 1.0 == 1
+    truncate 1.2 == 1
+    truncate 1.5 == 1
+    truncate 1.8 == 1
+
+    truncate -1.2 == -1
+    truncate -1.5 == -1
+    truncate -1.8 == -1
+-}
 truncate : Float -> Int
 truncate =
   Elm.Kernel.Basics.truncate
@@ -238,7 +373,7 @@ ge =
 -}
 min : comparable -> comparable -> comparable
 min x y =
-  if x < y then x else y
+  if lt x y then x else y
 
 
 {-| Find the larger of two comparables.
@@ -248,7 +383,7 @@ min x y =
 -}
 max : comparable -> comparable -> comparable
 max x y =
-  if x > y then x else y
+  if gt x y then x else y
 
 
 {-| Compare any two comparable values. Comparable values include `String`, `Char`,
@@ -423,7 +558,7 @@ negate n =
 -}
 abs : number -> number
 abs n =
-  if n < 0 then -n else n
+  if lt n 0 then -n else n
 
 
 {-| Clamps a number within a given range. With the expression
@@ -435,9 +570,9 @@ abs n =
 -}
 clamp : number -> number -> number -> number
 clamp low high number =
-  if number < low then
+  if lt number low then
     low
-  else if number > high then
+  else if gt number high then
     high
   else
     number
@@ -462,7 +597,9 @@ sqrt =
 -}
 logBase : Float -> Float -> Float
 logBase base number =
-  Elm.Kernel.Basics.log number / Elm.Kernel.Basics.log Elm.Kernel.Basics.e
+  fdiv
+    (Elm.Kernel.Basics.log number)
+    (Elm.Kernel.Basics.log Elm.Kernel.Basics.e)
 
 
 {-| An approximation of e.
@@ -479,23 +616,23 @@ e =
 {-| Convert radians to standard Elm angles (radians).
 -}
 radians : Float -> Float
-radians t =
-  t
+radians angleInRadians =
+  angleInRadians
 
 
 {-| Convert degrees to standard Elm angles (radians).
 -}
 degrees : Float -> Float
-degrees degs =
-  degs * pi / 180
+degrees angleInDegrees =
+  fdiv (mul angleInDegrees pi) 180
 
 
 {-| Convert turns to standard Elm angles (radians). One turn is equal to
 360&deg;.
 -}
 turns : Float -> Float
-turns ts =
-  2 * pi * ts
+turns angleInTurns =
+  mul (mul 2 pi) angleInTurns
 
 
 
@@ -566,14 +703,18 @@ atan2 =
 
 {-| Convert polar coordinates (r,&theta;) to Cartesian coordinates (x,y). -}
 fromPolar : (Float,Float) -> (Float,Float)
-fromPolar ( radius, theta ) =
-  ( radius * cos theta, radius * sin theta )
+fromPolar (radius, theta) =
+  ( mul radius (cos theta)
+  , mul radius (sin theta)
+  )
 
 
 {-| Convert Cartesian coordinates (x,y) to polar coordinates (r,&theta;). -}
 toPolar : (Float,Float) -> (Float,Float)
 toPolar ( x, y ) =
-  ( sqrt (x * x + y * y), atan2 y x )
+  ( sqrt (add (mul x x) (mul y y))
+  , atan2 y x
+  )
 
 
 
