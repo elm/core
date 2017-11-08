@@ -1,5 +1,6 @@
 module String exposing
-  ( isEmpty, length, reverse, repeat, replace
+  ( String
+  , isEmpty, length, reverse, repeat, replace
   , append, concat, split, join, words, lines
   , slice, left, right, dropLeft, dropRight
   , contains, startsWith, endsWith, indexes, indices
@@ -14,8 +15,8 @@ module String exposing
 {-| A built-in representation for efficient string manipulation. String literals
 are enclosed in `"double quotes"`. Strings are *not* lists of characters.
 
-# Basics
-@docs isEmpty, length, reverse, repeat, replace
+# Strings
+@docs String, isEmpty, length, reverse, repeat, replace
 
 # Building and Splitting
 @docs append, concat, split, join, words, lines
@@ -58,7 +59,38 @@ import Result exposing (Result)
 
 
 
--- BASICS
+-- STRINGS
+
+
+{-| A `String` is a chunk of text:
+
+    "Hello!"
+    "How are you?"
+    "🙈🙉🙊"
+
+    -- strings with escape characters
+    "this\n\t\"that\""
+    "\u{1F648}\u{1F649}\u{1F64A}" -- "🙈🙉🙊"
+
+    -- multiline strings
+    """Triple double quotes let you
+    create "multiline strings" which
+    can have unescaped quotes and newlines.
+    """
+
+A `String` can represent any sequence of [unicode characters][u]. You can use
+the unicode escapes from `\u{0000}` to `\u{10FFFF}` to represent characters
+by their code point. You can also include the unicode characters directly.
+Using the escapes can be better if you need one of the many whitespace
+characters with different widths.
+
+[u]: https://en.wikipedia.org/wiki/Unicode
+
+**Note:** JavaScript lets you use double quotes and single quotes interchangably.
+This is not true in Elm. You must use double quotes for a `String`, and you must
+use single quotes for a [`Char`](Char#Char).
+-}
+type String = String -- NOTE: The compiler provides the real implementation.
 
 
 {-| Determine if a string is empty.

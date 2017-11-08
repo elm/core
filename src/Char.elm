@@ -1,5 +1,6 @@
 module Char exposing
-  ( isUpper, isLower, isAlpha, isAlphaNum
+  ( Char
+  , isUpper, isLower, isAlpha, isAlphaNum
   , isDigit, isOctDigit, isHexDigit
   , toUpper, toLower, toLocaleUpper, toLocaleLower
   , toCode, fromCode
@@ -7,6 +8,9 @@ module Char exposing
 
 {-| Functions for working with characters. Character literals are enclosed in
 `'a'` pair of single quotes.
+
+# Characters
+@docs Char
 
 # ASCII Letters
 @docs isUpper, isLower, isAlpha, isAlphaNum
@@ -23,6 +27,39 @@ module Char exposing
 
 import Basics exposing ((&&), (||), (>=), (<=))
 import Elm.Kernel.Char
+
+
+
+-- CHAR
+
+
+{-| A `Char` is a single [unicode][u] character:
+
+    'a'
+    '0'
+    'Z'
+    '?'
+    '"'
+    'Σ'
+    '🙈'
+
+    '\t'
+    '\"'
+    '\''
+    '\u{1F648}' -- '🙈'
+
+**Note 1:** You _cannot_ use single quotes around multiple characters like in
+JavaScript. This is how we distinguish [`String`](String#String) and `Char`
+values in syntax.
+
+**Note 2:** You can use the unicode escapes from `\u{0000}` to `\u{10FFFF}` to
+represent characters by their code point. You can also include the unicode
+characters directly. Using the escapes can be better if you need one of the
+many whitespace characters with different widths.
+
+[u]: https://en.wikipedia.org/wiki/Unicode
+-}
+type Char = Char -- NOTE: The compiler provides the real implementation.
 
 
 
