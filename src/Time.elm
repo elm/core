@@ -101,25 +101,25 @@ hour =
   60 * minute
 
 
-{-|-}
+{-| The number of milliseconds since January 1st, 1970. -}
 inMilliseconds : Time -> Float
 inMilliseconds t =
   t
 
 
-{-|-}
+{-| The number of seconds since January 1st, 1970. -}
 inSeconds : Time -> Float
 inSeconds t =
   t / second
 
 
-{-|-}
+{-| The number of minutes since January 1st, 1970. -}
 inMinutes : Time -> Float
 inMinutes t =
   t / minute
 
 
-{-|-}
+{-| The number of hours since January 1st, 1970. -}
 inHours : Time -> Float
 inHours t =
   t / hour
