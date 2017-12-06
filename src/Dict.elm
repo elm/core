@@ -1,14 +1,30 @@
-module Dict exposing
-  ( Dict
-  , empty, singleton, insert, update
-  , isEmpty, get, remove, member, size
-  , filter
-  , partition
-  , foldl, foldr, map
-  , union, intersect, diff, merge
-  , keys, values
-  , toList, fromList
-  )
+module Dict
+    exposing
+        ( Dict
+        , empty
+        , singleton
+        , insert
+        , update
+        , isEmpty
+        , get
+        , remove
+        , member
+        , size
+        , filter
+        , partition
+        , foldl
+        , foldr
+        , map
+        , union
+        , intersect
+        , diff
+        , merge
+        , keys
+        , values
+        , toList
+        , fromList
+          -- , validateInvariants
+        )
 
 {-| A dictionary mapping unique keys to values. The keys can be any comparable
 type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or
@@ -16,75 +32,110 @@ lists of comparable types.
 
 Insert, remove, and query operations all take *O(log n)* time.
 
+
 # Dictionaries
+
 @docs Dict
 
+
 # Build
-@docs empty, singleton, insert, update, remove
+
+@docs empty, singleton, insert, remove, update
+
 
 # Query
-@docs isEmpty, member, get, size
 
-# Lists
-@docs keys, values, toList, fromList
+@docs isEmpty, size, get, member
+
 
 # Transform
-@docs map, foldl, foldr, filter, partition
+
+@docs map, filter, foldl, foldr, partition
+
 
 # Combine
+
 @docs union, intersect, diff, merge
+
+
+# Lists
+
+@docs keys, values, toList, fromList
 
 -}
 
-
 import Basics exposing (..)
 import Debug
-import Elm.Kernel.Error
 import Maybe exposing (..)
 import List exposing (..)
 
 
+{-
+   The following is an implementation of Left-Leaning Red Black Trees (LLRB Tree).
+   More information about this implementation can be found at the following links:
 
--- DICTIONARIES
+   http://www.cs.princeton.edu/~rs/talks/LLRB/LLRB.pdf
+   http://www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
-
--- BBlack and NBlack should only be used during the deletion
--- algorithm. Any other occurrence is a bug and should fail an assert.
-type NColor
-    = Red
-    | Black
-    | BBlack  -- Double Black, counts as 2 blacks for the invariant
-    | NBlack  -- Negative Black, counts as -1 blacks for the invariant
-
-
-type LeafColor
-    = LBlack
-    | LBBlack -- Double Black, counts as 2
+   The short of it is, that in addition to the regular rules for RB trees, the following rule
+   applies: No right references can be red.
+-}
 
 
 {-| A dictionary of keys and values. So a `(Dict String User)` is a dictionary
 that lets you look up a `String` (such as user names) and find the associated
 `User`.
 -}
-type Dict k v
-    = RBNode_elm_builtin NColor k v (Dict k v) (Dict k v)
-    | RBEmpty_elm_builtin LeafColor
+type Dict key value
+    = Leaf
+    | Node Color key value (Dict key value) (Dict key value)
 
 
-{-| Create an empty dictionary. -}
+{-| The color of a Node. Leafs are considered black.
+-}
+type Color
+    = Black
+    | Red
+
+
+{-| Create an empty dictionary.
+-}
 empty : Dict k v
 empty =
-  RBEmpty_elm_builtin LBlack
+    Leaf
 
 
-maxWithDefault : k -> v -> Dict k v -> (k, v)
-maxWithDefault k v r =
-  case r of
-    RBEmpty_elm_builtin _ ->
-      (k, v)
+{-| Determine if a dictionary is empty.
+isEmpty empty == True
+-}
+isEmpty : Dict k v -> Bool
+isEmpty dict =
+    dict == empty
 
-    RBNode_elm_builtin _ kr vr _ rr ->
-      maxWithDefault kr vr rr
+
+{-| Create a dictionary with one key-value pair.
+-}
+singleton : comparable -> v -> Dict comparable v
+singleton key value =
+    -- Root is always black
+    Node Black key value Leaf Leaf
+
+
+{-| Determine the number of key-value pairs in the dictionary.
+-}
+size : Dict k v -> Int
+size dict =
+    sizeHelp 0 dict
+
+
+sizeHelp : Int -> Dict k v -> Int
+sizeHelp n dict =
+    case dict of
+        Leaf ->
+            n
+
+        Node _ _ _ left right ->
+            sizeHelp (sizeHelp (n + 1) right) left
 
 
 {-| Get the value associated with a key. If the key is not found, return
@@ -92,393 +143,394 @@ maxWithDefault k v r =
 dictionary.
 
     animals = fromList [ ("Tom", Cat), ("Jerry", Mouse) ]
-
-    get "Tom"   animals == Just Cat
+    get "Tom" animals == Just Cat
     get "Jerry" animals == Just Mouse
     get "Spike" animals == Nothing
 
 -}
 get : comparable -> Dict comparable v -> Maybe v
 get targetKey dict =
-  case dict of
-    RBEmpty_elm_builtin _ ->
-      Nothing
+    case dict of
+        Leaf ->
+            Nothing
 
-    RBNode_elm_builtin _ key value left right ->
-      case compare targetKey key of
-        LT ->
-          get targetKey left
+        Node _ key value left right ->
+            case compare targetKey key of
+                LT ->
+                    get targetKey left
 
-        EQ ->
-          Just value
+                EQ ->
+                    Just value
 
-        GT ->
-          get targetKey right
+                GT ->
+                    get targetKey right
 
 
-{-| Determine if a key is in a dictionary. -}
+{-| Determine if a key is in a dictionary.
+-}
 member : comparable -> Dict comparable v -> Bool
 member key dict =
-  case get key dict of
-    Just _ ->
-      True
+    case get key dict of
+        Just _ ->
+            True
 
-    Nothing ->
-      False
-
-
-{-| Determine the number of key-value pairs in the dictionary. -}
-size : Dict k v -> Int
-size dict =
-  sizeHelp 0 dict
-
-
-sizeHelp : Int -> Dict k v -> Int
-sizeHelp n dict =
-  case dict of
-    RBEmpty_elm_builtin _ ->
-      n
-
-    RBNode_elm_builtin _ _ _ left right ->
-      sizeHelp (sizeHelp (n+1) right) left
-
-
-{-| Determine if a dictionary is empty.
-
-    isEmpty empty == True
--}
-isEmpty : Dict k v -> Bool
-isEmpty dict =
-  case dict of
-    RBEmpty_elm_builtin _ ->
-      True
-
-    RBNode_elm_builtin _ _ _ _ _ ->
-      False
-
-
-{- The actual pattern match here is somewhat lax. If it is given invalid input,
-it will do the wrong thing. The expected behavior is:
-
-  red node => black node
-  black node => same
-  bblack node => xxx
-  nblack node => xxx
-
-  black leaf => same
-  bblack leaf => xxx
--}
-ensureBlackRoot : Dict k v -> Dict k v
-ensureBlackRoot dict =
-  case dict of
-    RBNode_elm_builtin Red key value left right ->
-      RBNode_elm_builtin Black key value left right
-
-    _ ->
-      dict
+        Nothing ->
+            False
 
 
 {-| Insert a key-value pair into a dictionary. Replaces value when there is
-a collision. -}
+a collision.
+-}
 insert : comparable -> v -> Dict comparable v -> Dict comparable v
 insert key value dict =
-  update key (always (Just value)) dict
+    case insertHelp key value dict of
+        Node Red k v l r ->
+            -- Root is always black
+            Node Black k v l r
+
+        x ->
+            x
+
+
+insertHelp : comparable -> v -> Dict comparable v -> Dict comparable v
+insertHelp key value dict =
+    case dict of
+        Leaf ->
+            -- New nodes are always red. If it violates the rules, it will be fixed
+            -- when balancing.
+            Node Red key value Leaf Leaf
+
+        Node nColor nKey nValue nLeft nRight ->
+            case compare key nKey of
+                LT ->
+                    balance nColor nKey nValue (insertHelp key value nLeft) nRight
+
+                EQ ->
+                    Node nColor nKey value nLeft nRight
+
+                GT ->
+                    balance nColor nKey nValue nLeft (insertHelp key value nRight)
+
+
+balance : Color -> k -> v -> Dict k v -> Dict k v -> Dict k v
+balance color key value left right =
+    case right of
+        Node Red rK rV rLeft rRight ->
+            case left of
+                Node Red lK lV lLeft lRight ->
+                    Node
+                        Red
+                        key
+                        value
+                        (Node Black lK lV lLeft lRight)
+                        (Node Black rK rV rLeft rRight)
+
+                _ ->
+                    Node color rK rV (Node Red key value left rLeft) rRight
+
+        _ ->
+            case left of
+                Node Red lK lV (Node Red llK llV llLeft llRight) lRight ->
+                    Node
+                        Red
+                        lK
+                        lV
+                        (Node Black llK llV llLeft llRight)
+                        (Node Black key value lRight right)
+
+                _ ->
+                    Node color key value left right
 
 
 {-| Remove a key-value pair from a dictionary. If the key is not found,
-no changes are made. -}
-remove : comparable -> Dict comparable v -> Dict comparable v
-remove key dict =
-  update key (always Nothing) dict
-
-
-type Flag = Insert | Remove | Same
-
-
-{-| Update the value of a dictionary for a specific key with a given function. -}
-update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
-update targetKey alter dictionary =
-  let
-    up dict =
-      case dict of
-        -- expecting only black nodes, never double black nodes here
-        RBEmpty_elm_builtin _ ->
-          case alter Nothing of
-            Nothing ->
-              (Same, empty)
-
-            Just v ->
-              (Insert, RBNode_elm_builtin Red targetKey v empty empty)
-
-        RBNode_elm_builtin color key value left right ->
-          case compare targetKey key of
-            EQ ->
-              case alter (Just value) of
-                Nothing ->
-                  (Remove, rem color left right)
-
-                Just newValue ->
-                  (Same, RBNode_elm_builtin color key newValue left right)
-
-            LT ->
-              let (flag, newLeft) = up left in
-              case flag of
-                Same ->
-                  (Same, RBNode_elm_builtin color key value newLeft right)
-
-                Insert ->
-                  (Insert, balance color key value newLeft right)
-
-                Remove ->
-                  (Remove, bubble color key value newLeft right)
-
-            GT ->
-              let (flag, newRight) = up right in
-              case flag of
-                Same ->
-                  (Same, RBNode_elm_builtin color key value left newRight)
-
-                Insert ->
-                  (Insert, balance color key value left newRight)
-
-                Remove ->
-                  (Remove, bubble color key value left newRight)
-
-    (finalFlag, updatedDict) =
-      up dictionary
-  in
-    case finalFlag of
-      Same ->
-        updatedDict
-
-      Insert ->
-        ensureBlackRoot updatedDict
-
-      Remove ->
-        blacken updatedDict
-
-
-{-| Create a dictionary with one key-value pair. -}
-singleton : comparable -> v -> Dict comparable v
-singleton key value =
-  insert key value empty
-
-
-
--- HELPERS
-
-
-isBBlack : Dict k v -> Bool
-isBBlack dict =
-  case dict of
-    RBNode_elm_builtin BBlack _ _ _ _ ->
-      True
-
-    RBEmpty_elm_builtin LBBlack ->
-      True
-
-    _ ->
-      False
-
-
-moreBlack : NColor -> NColor
-moreBlack color =
-  case color of
-    Black ->
-      BBlack
-
-    Red ->
-      Black
-
-    NBlack ->
-      Red
-
-    BBlack ->
-      Elm.Kernel.Error.dictBug 0 -- "Can't make a double black node more black!"
-
-
-lessBlack : NColor -> NColor
-lessBlack color =
-  case color of
-    BBlack ->
-      Black
-
-    Black ->
-      Red
-
-    Red ->
-      NBlack
-
-    NBlack ->
-      Elm.Kernel.Error.dictBug 0 -- "Can't make a negative black node less black!"
-
-
-{- The actual pattern match here is somewhat lax. If it is given invalid input,
-it will do the wrong thing. The expected behavior is:
-
-  node => less black node
-
-  bblack leaf => black leaf
-  black leaf => xxx
+no changes are made.
 -}
-lessBlackTree : Dict k v -> Dict k v
-lessBlackTree dict =
-  case dict of
-    RBNode_elm_builtin c k v l r ->
-      RBNode_elm_builtin (lessBlack c) k v l r
+remove : comparable -> Dict comparable v -> Dict comparable v
+remove targetKey dict =
+    case removeHelp targetKey dict of
+        Node Red k v l r ->
+            -- Root is always black
+            Node Black k v l r
 
-    RBEmpty_elm_builtin _ ->
-      RBEmpty_elm_builtin LBlack
+        x ->
+            x
 
 
--- Remove the top node from the tree, may leave behind BBlacks
-rem : NColor -> Dict k v -> Dict k v -> Dict k v
-rem color left right =
-  case (left, right) of
-    (RBEmpty_elm_builtin _, RBEmpty_elm_builtin _) ->
-      case color of
-        Red ->
-          RBEmpty_elm_builtin LBlack
+{-| The easiest thing to remove from the tree, is a red node. However, when searching for the
+node to remove, we have no way of knowing if it will be red or not. This remove implementation
+makes sure that the bottom node is red by moving red colors down the tree through rotation
+and color flips. Any violations this will cause, can easily be fixed by balancing on the way
+up again.
+-}
+removeHelp : comparable -> Dict comparable v -> Dict comparable v
+removeHelp targetKey dict =
+    case dict of
+        Leaf ->
+            Leaf
 
-        Black ->
-          RBEmpty_elm_builtin LBBlack
+        Node color key value left right ->
+            if targetKey < key then
+                case left of
+                    Node Black _ _ lLeft _ ->
+                        case lLeft of
+                            Node Red _ _ _ _ ->
+                                Node color key value (removeHelp targetKey left) right
+
+                            _ ->
+                                case moveRedLeft dict of
+                                    Node color key value left right ->
+                                        balance color key value (removeHelp targetKey left) right
+
+                                    Leaf ->
+                                        Leaf
+
+                    _ ->
+                        Node color key value (removeHelp targetKey left) right
+            else
+                removeHelpEQGT targetKey (removeHelpPrepEQGT targetKey dict color key value left right)
+
+
+removeHelpPrepEQGT :
+    comparable
+    -> Dict comparable v
+    -> Color
+    -> comparable
+    -> v
+    -> Dict comparable v
+    -> Dict comparable v
+    -> Dict comparable v
+removeHelpPrepEQGT targetKey dict color key value left right =
+    case left of
+        Node Red lK lV lLeft lRight ->
+            Node
+                color
+                lK
+                lV
+                lLeft
+                (Node Red key value lRight right)
 
         _ ->
-          Elm.Kernel.Error.dictBug 0 -- "cannot have bblack or nblack nodes at this point"
+            case right of
+                Node Black _ _ (Node Black _ _ _ _) _ ->
+                    moveRedRight dict
 
-    (RBEmpty_elm_builtin cl, RBNode_elm_builtin cr k v l r) ->
-      case (color, cl, cr) of
-        (Black, LBlack, Red) ->
-          RBNode_elm_builtin Black k v l r
+                Node Black _ _ Leaf _ ->
+                    moveRedRight dict
+
+                _ ->
+                    dict
+
+
+{-| When we find the node we are looking for, we can remove by replacing the key-value
+pair with the key-value pair of the left-most node on the right side (the closest pair).
+-}
+removeHelpEQGT : comparable -> Dict comparable v -> Dict comparable v
+removeHelpEQGT targetKey dict =
+    case dict of
+        Node color key value left right ->
+            if targetKey == key then
+                case getMin right of
+                    Node _ minKey minValue _ _ ->
+                        balance color minKey minValue left (removeMin right)
+
+                    Leaf ->
+                        Leaf
+            else
+                balance color key value left (removeHelp targetKey right)
+
+        Leaf ->
+            Leaf
+
+
+getMin : Dict k v -> Dict k v
+getMin dict =
+    case dict of
+        Node _ _ _ ((Node _ _ _ _ _) as left) _ ->
+            getMin left
 
         _ ->
-          Elm.Kernel.Error.dictBug 0 -- "bad remove"
+            dict
 
-    (RBNode_elm_builtin cl k v l r, RBEmpty_elm_builtin cr) ->
-      case (color, cl, cr) of
-        (Black, Red, LBlack) ->
-          RBNode_elm_builtin Black k v l r
+
+removeMin : Dict k v -> Dict k v
+removeMin dict =
+    case dict of
+        Node color key value ((Node lColor _ _ lLeft _) as left) right ->
+            case lColor of
+                Black ->
+                    case lLeft of
+                        Node Red _ _ _ _ ->
+                            Node color key value (removeMin left) right
+
+                        _ ->
+                            case moveRedLeft dict of
+                                Node color key value left right ->
+                                    balance color key value (removeMin left) right
+
+                                Leaf ->
+                                    Leaf
+
+                _ ->
+                    Node color key value (removeMin left) right
 
         _ ->
-          Elm.Kernel.Error.dictBug 0 -- "bad remove"
-
-    -- l and r are both RBNodes
-    (RBNode_elm_builtin cl kl vl ll rl, RBNode_elm_builtin _ _ _ _ _) ->
-      let
-        (k, v) =
-          maxWithDefault kl vl rl
-
-        newLeft =
-          removeMax cl kl vl ll rl
-      in
-        bubble color k v newLeft right
+            Leaf
 
 
--- Kills a BBlack or moves it upward, may leave behind NBlack
-bubble : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-bubble color key value left right =
-  if isBBlack left || isBBlack right then
-    balance (moreBlack color) key value (lessBlackTree left) (lessBlackTree right)
+moveRedLeft : Dict k v -> Dict k v
+moveRedLeft dict =
+    case dict of
+        Node clr k v (Node lClr lK lV lLeft lRight) (Node rClr rK rV ((Node Red rlK rlV rlL rlR) as rLeft) rRight) ->
+            Node
+                Red
+                rlK
+                rlV
+                (Node Black k v (Node Red lK lV lLeft lRight) rlL)
+                (Node Black rK rV rlR rRight)
 
-  else
-    RBNode_elm_builtin color key value left right
+        Node clr k v (Node lClr lK lV lLeft lRight) (Node rClr rK rV rLeft rRight) ->
+            case clr of
+                Black ->
+                    Node
+                        Black
+                        k
+                        v
+                        (Node Red lK lV lLeft lRight)
+                        (Node Red rK rV rLeft rRight)
 
+                Red ->
+                    Node
+                        Black
+                        k
+                        v
+                        (Node Red lK lV lLeft lRight)
+                        (Node Red rK rV rLeft rRight)
 
--- Removes rightmost node, may leave root as BBlack
-removeMax : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-removeMax color key value left right =
-  case right of
-    RBEmpty_elm_builtin _ ->
-      rem color left right
-
-    RBNode_elm_builtin cr kr vr lr rr ->
-      bubble color key value left (removeMax cr kr vr lr rr)
-
-
--- generalized tree balancing act
-balance : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-balance color key value left right =
-  let
-    dict =
-      RBNode_elm_builtin color key value left right
-  in
-    if blackish dict then
-      balanceHelp dict
-
-    else
-      dict
+        _ ->
+            dict
 
 
-blackish : Dict k v -> Bool
-blackish dict =
-  case dict of
-    RBNode_elm_builtin color _ _ _ _ ->
-      color == Black || color == BBlack
+moveRedRight : Dict k v -> Dict k v
+moveRedRight dict =
+    case dict of
+        Node clr k v (Node lClr lK lV (Node Red llK llV llLeft llRight) lRight) (Node rClr rK rV rLeft rRight) ->
+            Node
+                Red
+                lK
+                lV
+                (Node Black llK llV llLeft llRight)
+                (Node Black k v lRight (Node Red rK rV rLeft rRight))
 
-    RBEmpty_elm_builtin _ ->
-      True
+        Node clr k v (Node lClr lK lV lLeft lRight) (Node rClr rK rV rLeft rRight) ->
+            case clr of
+                Black ->
+                    Node
+                        Black
+                        k
+                        v
+                        (Node Red lK lV lLeft lRight)
+                        (Node Red rK rV rLeft rRight)
 
+                Red ->
+                    Node
+                        Black
+                        k
+                        v
+                        (Node Red lK lV lLeft lRight)
+                        (Node Red rK rV rLeft rRight)
 
-balanceHelp : Dict k v -> Dict k v
-balanceHelp tree =
-  case tree of
-    -- double red: left, left
-    RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red yk yv (RBNode_elm_builtin Red xk xv a b) c) d ->
-      balancedTree col xk xv yk yv zk zv a b c d
-
-    -- double red: left, right
-    RBNode_elm_builtin col zk zv (RBNode_elm_builtin Red xk xv a (RBNode_elm_builtin Red yk yv b c)) d ->
-      balancedTree col xk xv yk yv zk zv a b c d
-
-    -- double red: right, left
-    RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red zk zv (RBNode_elm_builtin Red yk yv b c) d) ->
-      balancedTree col xk xv yk yv zk zv a b c d
-
-    -- double red: right, right
-    RBNode_elm_builtin col xk xv a (RBNode_elm_builtin Red yk yv b (RBNode_elm_builtin Red zk zv c d)) ->
-      balancedTree col xk xv yk yv zk zv a b c d
-
-    -- handle double blacks
-    RBNode_elm_builtin BBlack xk xv a (RBNode_elm_builtin NBlack zk zv (RBNode_elm_builtin Black yk yv b c) (RBNode_elm_builtin Black _ _ _ _ as d)) ->
-      RBNode_elm_builtin Black yk yv (RBNode_elm_builtin Black xk xv a b) (balance Black zk zv c (redden d))
-
-    RBNode_elm_builtin BBlack zk zv (RBNode_elm_builtin NBlack xk xv (RBNode_elm_builtin Black _ _ _ _ as a) (RBNode_elm_builtin Black yk yv b c)) d ->
-      RBNode_elm_builtin Black yk yv (balance Black xk xv (redden a) b) (RBNode_elm_builtin Black zk zv c d)
-
-    _ ->
-      tree
+        _ ->
+            dict
 
 
-balancedTree : NColor -> k -> v -> k -> v -> k -> v -> Dict k v -> Dict k v -> Dict k v -> Dict k v -> Dict k v
-balancedTree col xk xv yk yv zk zv a b c d =
-  RBNode_elm_builtin
-    (lessBlack col)
-    yk
-    yv
-    (RBNode_elm_builtin Black xk xv a b)
-    (RBNode_elm_builtin Black zk zv c d)
+{-| Update the value of a dictionary for a specific key with a given function.
+The given function gets the current value as a parameter and its return value
+determines if the value is updated or removed. New key-value pairs can be
+inserted too.
+-}
+update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
+update key alter dict =
+    case alter (get key dict) of
+        Nothing ->
+            remove key dict
+
+        Just value ->
+            insert key value dict
 
 
--- make the top node black
-blacken : Dict k v -> Dict k v
-blacken t =
-  case t of
-    RBEmpty_elm_builtin _ ->
-      RBEmpty_elm_builtin LBlack
 
-    RBNode_elm_builtin _ k v l r ->
-      RBNode_elm_builtin Black k v l r
+-- TRANSFORM
 
 
--- make the top node red
-redden : Dict k v -> Dict k v
-redden t =
-  case t of
-    RBEmpty_elm_builtin _ ->
-      Elm.Kernel.Error.dictBug 0 -- "can't make a Leaf red"
+{-| Apply a function to all values in a dictionary.
+-}
+map : (k -> a -> b) -> Dict k a -> Dict k b
+map f dict =
+    case dict of
+        Leaf ->
+            Leaf
 
-    RBNode_elm_builtin _ k v l r ->
-      RBNode_elm_builtin Red k v l r
+        Node color key value left right ->
+            Node color key (f key value) (map f left) (map f right)
+
+
+{-| Keep a key-value pair when it satisfies a predicate.
+-}
+filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+filter predicate dict =
+    let
+        helper key value list =
+            if predicate key value then
+                ( key, value ) :: list
+            else
+                list
+    in
+        fromSortedList True (foldr helper [] dict)
+
+
+{-| Fold over the key-value pairs in a dictionary, in order from lowest
+key to highest key.
+-}
+foldl : (k -> v -> b -> b) -> b -> Dict k v -> b
+foldl f acc dict =
+    case dict of
+        Leaf ->
+            acc
+
+        Node _ key value left right ->
+            foldl f (f key value (foldl f acc left)) right
+
+
+{-| Fold over the key-value pairs in a dictionary, in order from highest
+key to lowest key.
+-}
+foldr : (k -> v -> b -> b) -> b -> Dict k v -> b
+foldr f acc dict =
+    case dict of
+        Leaf ->
+            acc
+
+        Node _ key value left right ->
+            foldr f (f key value (foldr f acc right)) left
+
+
+{-| Partition a dictionary according to a predicate. The first dictionary
+contains all key-value pairs which satisfy the predicate, and the second
+contains the rest.
+-}
+partition : (comparable -> v -> Bool) -> Dict comparable v -> ( Dict comparable v, Dict comparable v )
+partition predicate dict =
+    let
+        helper key value ( trues, falses ) =
+            if predicate key value then
+                ( ( key, value ) :: trues, falses )
+            else
+                ( trues, ( key, value ) :: falses )
+
+        ( trues, falses ) =
+            foldr helper ( [], [] ) dict
+    in
+        ( fromSortedList True trues, fromSortedList True falses )
 
 
 
@@ -489,137 +541,198 @@ redden t =
 to the first dictionary.
 -}
 union : Dict comparable v -> Dict comparable v -> Dict comparable v
-union t1 t2 =
-  foldl insert t2 t1
+union left right =
+    case ( left, right ) of
+        ( _, Leaf ) ->
+            left
+
+        ( Leaf, _ ) ->
+            right
+
+        _ ->
+            let
+                ( lt, gt ) =
+                    foldl unionAccumulator ( [], toList right ) left
+            in
+                fromSortedList False (List.foldl (\e acc -> e :: acc) lt gt)
+
+
+unionAccumulator :
+    comparable
+    -> v
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+unionAccumulator lKey lVal ( result, rList ) =
+    case rList of
+        [] ->
+            ( ( lKey, lVal ) :: result, [] )
+
+        ( rKey, rVal ) :: rRest ->
+            case compare lKey rKey of
+                LT ->
+                    ( ( lKey, lVal ) :: result, rList )
+
+                EQ ->
+                    ( ( lKey, lVal ) :: result, rRest )
+
+                GT ->
+                    unionAccumulator lKey lVal ( ( rKey, rVal ) :: result, rRest )
 
 
 {-| Keep a key-value pair when its key appears in the second dictionary.
 Preference is given to values in the first dictionary.
 -}
 intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
-intersect t1 t2 =
-  filter (\k _ -> member k t2) t1
+intersect left right =
+    case ( getRange left, getRange right ) of
+        ( _, Nothing ) ->
+            empty
+
+        ( Nothing, _ ) ->
+            empty
+
+        ( Just ( lMin, lMax ), Just ( rMin, rMax ) ) ->
+            if lMax < rMin || rMax < lMin then
+                -- disjoint ranges
+                empty
+            else
+                (foldl intersectAccumulator ( [], toList right ) left)
+                    |> Tuple.first
+                    |> fromSortedList False
+
+
+intersectAccumulator :
+    comparable
+    -> v
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+intersectAccumulator lKey lVal (( result, rList ) as return) =
+    case rList of
+        [] ->
+            return
+
+        ( rKey, rVal ) :: rRest ->
+            case compare lKey rKey of
+                LT ->
+                    return
+
+                EQ ->
+                    ( ( lKey, lVal ) :: result, rRest )
+
+                GT ->
+                    intersectAccumulator lKey lVal ( result, rRest )
 
 
 {-| Keep a key-value pair when its key does not appear in the second dictionary.
 -}
 diff : Dict comparable v -> Dict comparable v -> Dict comparable v
-diff t1 t2 =
-  foldl (\k v t -> remove k t) t1 t2
+diff left right =
+    case ( getRange left, getRange right ) of
+        ( _, Nothing ) ->
+            left
+
+        ( Nothing, _ ) ->
+            empty
+
+        ( Just ( lMin, lMax ), Just ( rMin, rMax ) ) ->
+            if lMax < rMin || rMax < lMin then
+                -- disjoint ranges
+                left
+            else
+                (foldl diffAccumulator ( [], toList right ) left)
+                    |> Tuple.first
+                    |> fromSortedList False
+
+
+diffAccumulator :
+    comparable
+    -> v
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+diffAccumulator lKey lVal ( result, rList ) =
+    case rList of
+        [] ->
+            ( ( lKey, lVal ) :: result, [] )
+
+        ( rKey, rVal ) :: rRest ->
+            case compare lKey rKey of
+                LT ->
+                    ( ( lKey, lVal ) :: result, rList )
+
+                EQ ->
+                    ( result, rRest )
+
+                GT ->
+                    diffAccumulator lKey lVal ( result, rRest )
+
+
+getRange : Dict comparable v -> Maybe ( comparable, comparable )
+getRange dict =
+    case dict of
+        Leaf ->
+            Nothing
+
+        Node _ key _ left right ->
+            Just ( getMinKeyHelp key left, getMaxKeyHelp key right )
+
+
+getMinKeyHelp : comparable -> Dict comparable v -> comparable
+getMinKeyHelp minKey dict =
+    case dict of
+        Leaf ->
+            minKey
+
+        Node _ newMinKey _ left _ ->
+            getMinKeyHelp newMinKey left
+
+
+getMaxKeyHelp : comparable -> Dict comparable v -> comparable
+getMaxKeyHelp maxKey dict =
+    case dict of
+        Leaf ->
+            maxKey
+
+        Node _ newMaxKey _ _ right ->
+            getMaxKeyHelp newMaxKey right
 
 
 {-| The most general way of combining two dictionaries. You provide three
 accumulators for when a given key appears:
 
-  1. Only in the left dictionary.
-  2. In both dictionaries.
-  3. Only in the right dictionary.
+1.  Only in the left dictionary.
+2.  In both dictionaries.
+3.  Only in the right dictionary.
+    You then traverse all the keys from lowest to highest, building up whatever
+    you want.
 
-You then traverse all the keys from lowest to highest, building up whatever
-you want.
 -}
-merge
-  :  (comparable -> a -> result -> result)
-  -> (comparable -> a -> b -> result -> result)
-  -> (comparable -> b -> result -> result)
-  -> Dict comparable a
-  -> Dict comparable b
-  -> result
-  -> result
+merge :
+    (comparable -> a -> result -> result)
+    -> (comparable -> a -> b -> result -> result)
+    -> (comparable -> b -> result -> result)
+    -> Dict comparable a
+    -> Dict comparable b
+    -> result
+    -> result
 merge leftStep bothStep rightStep leftDict rightDict initialResult =
-  let
-    stepState rKey rValue (list, result) =
-      case list of
-        [] ->
-          (list, rightStep rKey rValue result)
+    let
+        stepState rKey rValue ( list, result ) =
+            case list of
+                [] ->
+                    ( list, rightStep rKey rValue result )
 
-        (lKey, lValue) :: rest ->
-          if lKey < rKey then
-            stepState rKey rValue (rest, leftStep lKey lValue result)
+                ( lKey, lValue ) :: rest ->
+                    if lKey < rKey then
+                        stepState rKey rValue ( rest, leftStep lKey lValue result )
+                    else if lKey > rKey then
+                        ( list, rightStep rKey rValue result )
+                    else
+                        ( rest, bothStep lKey lValue rValue result )
 
-          else if lKey > rKey then
-            (list, rightStep rKey rValue result)
-
-          else
-            (rest, bothStep lKey lValue rValue result)
-
-    (leftovers, intermediateResult) =
-      foldl stepState (toList leftDict, initialResult) rightDict
-  in
-    List.foldl (\(k,v) result -> leftStep k v result) intermediateResult leftovers
-
-
-
--- TRANSFORM
-
-
-{-| Apply a function to all values in a dictionary.
--}
-map : (k -> a -> b) -> Dict k a -> Dict k b
-map func dict =
-  case dict of
-    RBEmpty_elm_builtin _ ->
-      RBEmpty_elm_builtin LBlack
-
-    RBNode_elm_builtin color key value left right ->
-      RBNode_elm_builtin color key (func key value) (map func left) (map func right)
-
-
-{-| Fold over the key-value pairs in a dictionary, in order from lowest
-key to highest key.
--}
-foldl : (k -> v -> b -> b) -> b -> Dict k v -> b
-foldl func acc dict =
-  case dict of
-    RBEmpty_elm_builtin _ ->
-      acc
-
-    RBNode_elm_builtin _ key value left right ->
-      foldl func (func key value (foldl func acc left)) right
-
-
-{-| Fold over the key-value pairs in a dictionary, in order from highest
-key to lowest key.
--}
-foldr : (k -> v -> b -> b) -> b -> Dict k v -> b
-foldr func acc t =
-  case t of
-    RBEmpty_elm_builtin _ ->
-      acc
-
-    RBNode_elm_builtin _ key value left right ->
-      foldr func (func key value (foldr func acc right)) left
-
-
-{-| Keep a key-value pair when it satisfies a predicate. -}
-filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-filter predicate dictionary =
-  let
-    add key value dict =
-      if predicate key value then
-        insert key value dict
-
-      else
-        dict
-  in
-    foldl add empty dictionary
-
-
-{-| Partition a dictionary according to a predicate. The first dictionary
-contains all key-value pairs which satisfy the predicate, and the second
-contains the rest.
--}
-partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
-partition predicate dict =
-  let
-    add key value (t1, t2) =
-      if predicate key value then
-        (insert key value t1, t2)
-
-      else
-        (t1, insert key value t2)
-  in
-    foldl add (empty, empty) dict
+        ( leftovers, intermediateResult ) =
+            foldl stepState ( toList leftDict, initialResult ) rightDict
+    in
+        List.foldl (\( k, v ) result -> leftStep k v result) intermediateResult leftovers
 
 
 
@@ -627,30 +740,250 @@ partition predicate dict =
 
 
 {-| Get all of the keys in a dictionary, sorted from lowest to highest.
-
-    keys (fromList [(0,"Alice"),(1,"Bob")]) == [0,1]
+keys (fromList [(0,"Alice"),(1,"Bob")]) == [0,1]
 -}
 keys : Dict k v -> List k
 keys dict =
-  foldr (\key value keyList -> key :: keyList) [] dict
+    foldr (\key _ keyList -> key :: keyList) [] dict
 
 
 {-| Get all of the values in a dictionary, in the order of their keys.
-
-    values (fromList [(0,"Alice"),(1,"Bob")]) == ["Alice", "Bob"]
+values (fromList [(0,"Alice"),(1,"Bob")]) == ["Alice", "Bob"]
 -}
 values : Dict k v -> List v
 values dict =
-  foldr (\key value valueList -> value :: valueList) [] dict
+    foldr (\_ value valueList -> value :: valueList) [] dict
 
 
-{-| Convert a dictionary into an association list of key-value pairs, sorted by keys. -}
-toList : Dict k v -> List (k,v)
+{-| Convert a dictionary into an association list of key-value pairs, sorted by keys.
+-}
+toList : Dict k v -> List ( k, v )
 toList dict =
-  foldr (\key value list -> (key,value) :: list) [] dict
+    foldr (\key value list -> ( key, value ) :: list) [] dict
 
 
-{-| Convert an association list into a dictionary. -}
-fromList : List (comparable,v) -> Dict comparable v
-fromList assocs =
-  List.foldl (\(key,value) dict -> insert key value dict) empty assocs
+{-| Convert an association list into a dictionary.
+-}
+fromList : List ( comparable, v ) -> Dict comparable v
+fromList list =
+    case list of
+        pair :: rest ->
+            let
+                ( sorted, remainder ) =
+                    splitSortedHelp [] pair rest
+            in
+                List.foldl
+                    (\( k, v ) dict -> insert k v dict)
+                    (fromSortedList False sorted)
+                    remainder
+
+        [] ->
+            empty
+
+
+{-| Split a list into its sorted prefix and the remainder. The sorted prefix
+is returned in reversed order.
+-}
+splitSortedHelp :
+    List ( comparable, v )
+    -> ( comparable, v )
+    -> List ( comparable, v )
+    -> ( List ( comparable, v ), List ( comparable, v ) )
+splitSortedHelp sorted (( k1, _ ) as p1) list =
+    case list of
+        (( k2, _ ) as p2) :: rest ->
+            if k1 < k2 then
+                splitSortedHelp (p1 :: sorted) p2 rest
+            else
+                ( sorted, p1 :: list )
+
+        [] ->
+            ( p1 :: sorted, [] )
+
+
+{-| Convert an association list with sorted and distinct keys into a dictionary.
+-}
+fromSortedList : Bool -> List ( k, v ) -> Dict k v
+fromSortedList isAsc list =
+    case list of
+        [] ->
+            Leaf
+
+        pair :: rest ->
+            fromNodeList isAsc (sortedListToNodeList isAsc [] pair rest)
+
+
+{-| Represents a non-empty list of nodes separated by key-value pairs.
+-}
+type alias NodeList k v =
+    ( Dict k v, List ( ( k, v ), Dict k v ) )
+
+
+{-| Convert a non-empty association list to the bottom level of nodes separated
+by key-value pairs. (reverses order)
+-}
+sortedListToNodeList : Bool -> List ( ( k, v ), Dict k v ) -> ( k, v ) -> List ( k, v ) -> NodeList k v
+sortedListToNodeList isAsc revList ( k1, v1 ) list =
+    case list of
+        [] ->
+            ( Node Black k1 v1 Leaf Leaf, revList )
+
+        ( k2, v2 ) :: [] ->
+            if isAsc then
+                ( Node Black k2 v2 (Node Red k1 v1 Leaf Leaf) Leaf, revList )
+            else
+                ( Node Black k1 v1 (Node Red k2 v2 Leaf Leaf) Leaf, revList )
+
+        p2 :: ( k3, v3 ) :: [] ->
+            ( Node Black k3 v3 Leaf Leaf, ( p2, Node Black k1 v1 Leaf Leaf ) :: revList )
+
+        ( k2, v2 ) :: p3 :: p4 :: rest ->
+            if isAsc then
+                sortedListToNodeList isAsc (( p3, Node Black k2 v2 (Node Red k1 v1 Leaf Leaf) Leaf ) :: revList) p4 rest
+            else
+                sortedListToNodeList isAsc (( p3, Node Black k1 v1 (Node Red k2 v2 Leaf Leaf) Leaf ) :: revList) p4 rest
+
+
+{-| Gather up a NodeList one level at a time, in successive passes of alternating
+direction, until a single root-node remains.
+-}
+fromNodeList : Bool -> NodeList k v -> Dict k v
+fromNodeList isReversed nodeList =
+    case nodeList of
+        ( node, [] ) ->
+            node
+
+        ( a, ( p1, b ) :: list ) ->
+            fromNodeList (not isReversed)
+                (accumulateNodeList isReversed [] a p1 b list)
+
+
+{-| Gather up a NodeList to the next level. (reverses order)
+-}
+accumulateNodeList : Bool -> List ( ( k, v ), Dict k v ) -> Dict k v -> ( k, v ) -> Dict k v -> List ( ( k, v ), Dict k v ) -> NodeList k v
+accumulateNodeList isReversed revList a ( k1, v1 ) b list =
+    case list of
+        [] ->
+            if isReversed then
+                ( Node Black k1 v1 b a, revList )
+            else
+                ( Node Black k1 v1 a b, revList )
+
+        ( ( k2, v2 ), c ) :: [] ->
+            if isReversed then
+                ( Node Black k1 v1 (Node Red k2 v2 c b) a, revList )
+            else
+                ( Node Black k2 v2 (Node Red k1 v1 a b) c, revList )
+
+        ( p2, c ) :: ( ( k3, v3 ), d ) :: [] ->
+            if isReversed then
+                ( Node Black k3 v3 d c, ( p2, Node Black k1 v1 b a ) :: revList )
+            else
+                ( Node Black k3 v3 c d, ( p2, Node Black k1 v1 a b ) :: revList )
+
+        ( ( k2, v2 ), c ) :: ( p3, d ) :: ( p4, e ) :: rest ->
+            if isReversed then
+                accumulateNodeList isReversed (( p3, Node Black k1 v1 (Node Red k2 v2 c b) a ) :: revList) d p4 e rest
+            else
+                accumulateNodeList isReversed (( p3, Node Black k2 v2 (Node Red k1 v1 a b) c ) :: revList) d p4 e rest
+
+
+
+{-
+   --  Validation code, useful for tests
+
+
+   validateInvariants : Dict comparable v -> String
+   validateInvariants dict =
+       if not (isBST dict) then
+           "Not in symmetric order"
+       else if not (is23 dict) then
+           "Not a 2-3 tree"
+       else if not (isBalanced dict) then
+           "Not balanced"
+       else
+           ""
+
+
+   isBST : Dict comparable v -> Bool
+   isBST dict =
+       isBSTHelper True (keys dict)
+
+
+   isBSTHelper : Bool -> List comparable -> Bool
+   isBSTHelper acc keys =
+       case keys of
+           [] ->
+               acc
+
+           x :: [] ->
+               acc
+
+           x :: y :: xs ->
+               isBSTHelper (acc && x < y) (y :: xs)
+
+
+   is23 : Dict k v -> Bool
+   is23 dict =
+       is23Helper dict dict
+
+
+   is23Helper : Dict k v -> Dict k v -> Bool
+   is23Helper root node =
+       case node of
+           Leaf ->
+               True
+
+           Node clr _ _ left right ->
+               if isRed right then
+                   False
+               else if node /= root && clr == Red && isRed left then
+                   False
+               else
+                   is23Helper root left && is23Helper root right
+
+
+   isRed : Dict k v -> Bool
+   isRed dict =
+       case dict of
+           Node Red _ _ _ _ ->
+               True
+
+           _ ->
+               False
+
+
+   isBalanced : Dict k v -> Bool
+   isBalanced dict =
+       isBalancedHelper dict <| isBalancedBlacksHelper dict 0
+
+
+   isBalancedBlacksHelper : Dict k v -> Int -> Int
+   isBalancedBlacksHelper node blacks =
+       case node of
+           Leaf ->
+               blacks
+
+           Node color _ _ left _ ->
+               if color == Red then
+                   isBalancedBlacksHelper left blacks
+               else
+                   isBalancedBlacksHelper left (blacks + 1)
+
+
+   isBalancedHelper : Dict k v -> Int -> Bool
+   isBalancedHelper node blacks =
+       case node of
+           Leaf ->
+               blacks == 0
+
+           Node color _ _ left right ->
+               let
+                   nextBlacks =
+                       if color == Red then
+                           blacks
+                       else
+                           blacks - 1
+               in
+                   isBalancedHelper left nextBlacks && isBalancedHelper right nextBlacks
+-}
