@@ -61,10 +61,12 @@ subscriptions work.
 
 [arch]: https://github.com/evancz/elm-architecture-tutorial/
 
-**Note:** this function is not for animation! You need to use something based
-on `requestAnimationFrame` to get smooth animations. This is based on
+**Note:** this function is not for animation! It is based on
 `setInterval` which is better for recurring tasks like “check on something
-every 30 seconds”.
+every 30 seconds”. For smooth animations you should use [AnimationFrame][animationframe] 
+which is based on `requestAnimationFrame`.
+
+[animationframe]: http://package.elm-lang.org/packages/elm-lang/animation-frame/latest
 -}
 every : Time -> (Time -> msg) -> Sub msg
 every interval tagger =
