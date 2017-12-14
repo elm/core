@@ -55,9 +55,12 @@ function eqHelp(x, y, depth, stack)
 
 	if (!('ctor' in x))
 	{
-		for (var key in x)
+		var keys = Object.keys(x).sort();
+
+		for (var i in keys)
 		{
-			if (!eqHelp(x[key], y[key], depth + 1, stack))
+			var k = keys[i];
+			if (!eqHelp(x[k], y[k], depth + 1, stack))
 			{
 				return false;
 			}
@@ -435,8 +438,11 @@ function toString(v)
 		}
 
 		var output = [];
-		for (var k in v)
+		var keys = Object.keys(v).sort();
+
+		for (var i in keys)
 		{
+			var k = keys[i];
 			output.push(k + ' = ' + toString(v[k]));
 		}
 		if (output.length === 0)
