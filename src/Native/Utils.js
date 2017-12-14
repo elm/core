@@ -138,7 +138,9 @@ var LT = -1, EQ = 0, GT = 1;
 
 function cmp(x, y)
 {
-	if (typeof x !== 'object')
+	var type = typeof x;
+
+	if (type !== 'object' && type !== 'function')
 	{
 		return x === y ? EQ : x < y ? LT : GT;
 	}
@@ -150,42 +152,113 @@ function cmp(x, y)
 		return a === b ? EQ : a < b ? LT : GT;
 	}
 
-	if (x.ctor === '::' || x.ctor === '[]')
-	{
-		while (x.ctor === '::' && y.ctor === '::')
-		{
-			var ord = cmp(x._0, y._0);
-			if (ord !== EQ)
-			{
-				return ord;
-			}
-			x = x._1;
-			y = y._1;
-		}
-		return x.ctor === y.ctor ? EQ : x.ctor === '[]' ? LT : GT;
+	if (type === 'function') {
+		throw new Error(
+			'Comparison error: There is no way to compare functions. '
+			+ 'Comparison is only defined on ints, '
+			+ 'floats, times, chars, strings, lists of comparable values, '
+			+ 'and tuples of comparable values.'
+		);
 	}
 
-	if (x.ctor.slice(0, 6) === '_Tuple')
+	// Only Javascript objects past this point.
+
+	if ('ctor' in x)
 	{
+		if (x.ctor === '::' || x.ctor === '[]')
+		{
+			while (x.ctor === '::' && y.ctor === '::')
+			{
+				var ord = cmp(x._0, y._0);
+				if (ord !== EQ)
+				{
+					return ord;
+				}
+				x = x._1;
+				y = y._1;
+			}
+			return x.ctor === y.ctor ? EQ : x.ctor === '[]' ? LT : GT;
+		}
+
+		if (x.ctor.slice(0, 6) === '_Tuple')
+		{
+			var ord;
+			var n = x.ctor.slice(6) - 0;
+			var err = 'cannot compare tuples with more than 6 elements.';
+			if (n === 0) return EQ;
+			if (n >= 1) { ord = cmp(x._0, y._0); if (ord !== EQ) return ord;
+			if (n >= 2) { ord = cmp(x._1, y._1); if (ord !== EQ) return ord;
+			if (n >= 3) { ord = cmp(x._2, y._2); if (ord !== EQ) return ord;
+			if (n >= 4) { ord = cmp(x._3, y._3); if (ord !== EQ) return ord;
+			if (n >= 5) { ord = cmp(x._4, y._4); if (ord !== EQ) return ord;
+			if (n >= 6) { ord = cmp(x._5, y._5); if (ord !== EQ) return ord;
+			if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
+			return EQ;
+		}
+
+		// Non-comparable types below, for use in sets and as dictionary keys.
+		//
+		// Type checker prevents these being used with < > <= >=.
+
+		// convert Dicts and Sets to lists
+		if (x.ctor === 'RBNode_elm_builtin' || x.ctor === 'RBEmpty_elm_builtin')
+		{
+			x = _elm_lang$core$Dict$toList(x);
+			y = _elm_lang$core$Dict$toList(y);
+
+			return cmp(x, y);
+		}
+		if (x.ctor === 'Set_elm_builtin')
+		{
+			x = _elm_lang$core$Set$toList(x);
+			y = _elm_lang$core$Set$toList(y);
+
+			return cmp(x, y);
+		}
+
+		// Other ADTs
+		if (x.ctor < y.ctor) { return LT; }
+		if (x.ctor > y.ctor) { return GT; }
+
 		var ord;
-		var n = x.ctor.slice(6) - 0;
-		var err = 'cannot compare tuples with more than 6 elements.';
-		if (n === 0) return EQ;
-		if (n >= 1) { ord = cmp(x._0, y._0); if (ord !== EQ) return ord;
-		if (n >= 2) { ord = cmp(x._1, y._1); if (ord !== EQ) return ord;
-		if (n >= 3) { ord = cmp(x._2, y._2); if (ord !== EQ) return ord;
-		if (n >= 4) { ord = cmp(x._3, y._3); if (ord !== EQ) return ord;
-		if (n >= 5) { ord = cmp(x._4, y._4); if (ord !== EQ) return ord;
-		if (n >= 6) { ord = cmp(x._5, y._5); if (ord !== EQ) return ord;
-		if (n >= 7) throw new Error('Comparison error: ' + err); } } } } } }
+		for (var i in x)
+		{
+			if (i === 'ctor') continue;
+
+			ord = cmp(x[i], y[i]);
+
+			if (ord !== EQ) { return ord; }
+		}
+
 		return EQ;
 	}
 
-	throw new Error(
-		'Comparison error: comparison is only defined on ints, '
-		+ 'floats, times, chars, strings, lists of comparable values, '
-		+ 'and tuples of comparable values.'
-	);
+	if (x instanceof Date)
+	{
+		return x == y ? EQ : x < y ? LT : GT;
+	}
+
+	if (x === null || x.elm_web_socket)
+	{
+		throw new Error(
+			'Comparison error: comparison is only defined on ints, '
+			+ 'floats, times, chars, strings, lists of comparable values, '
+			+ 'and tuples of comparable values.'
+		);
+	}
+
+	// Two records.
+	var keys = Object.keys(x).sort();
+
+	for (var i in keys)
+	{
+		var k = keys[i];
+		ord = cmp(x[k], y[k]);
+
+		if (ord !== EQ) { return ord; }
+	}
+
+	return EQ;
 }
 
 

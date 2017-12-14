@@ -10,9 +10,8 @@ module Dict exposing
   , toList, fromList
   )
 
-{-| A dictionary mapping unique keys to values. The keys can be any comparable
-type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or
-lists of comparable types.
+{-| A dictionary mapping unique keys to values. The keys can be any type
+other than functions.
 
 Insert, remove, and query operations all take *O(log n)* time.
 
@@ -40,6 +39,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 import Basics exposing (..)
 import Maybe exposing (..)
 import List exposing (..)
+import Native.Basics
 import Native.Debug
 import String
 
@@ -98,14 +98,14 @@ dictionary.
     get "Spike" animals == Nothing
 
 -}
-get : comparable -> Dict comparable v -> Maybe v
+get : k -> Dict k v -> Maybe v
 get targetKey dict =
   case dict of
     RBEmpty_elm_builtin _ ->
       Nothing
 
     RBNode_elm_builtin _ key value left right ->
-      case compare targetKey key of
+      case keyCompare targetKey key of
         LT ->
           get targetKey left
 
@@ -117,7 +117,7 @@ get targetKey dict =
 
 
 {-| Determine if a key is in a dictionary. -}
-member : comparable -> Dict comparable v -> Bool
+member : k -> Dict k v -> Bool
 member key dict =
   case get key dict of
     Just _ ->
@@ -175,14 +175,14 @@ ensureBlackRoot dict =
 
 {-| Insert a key-value pair into a dictionary. Replaces value when there is
 a collision. -}
-insert : comparable -> v -> Dict comparable v -> Dict comparable v
+insert : k -> v -> Dict k v -> Dict k v
 insert key value dict =
   update key (always (Just value)) dict
 
 
 {-| Remove a key-value pair from a dictionary. If the key is not found,
 no changes are made. -}
-remove : comparable -> Dict comparable v -> Dict comparable v
+remove : k -> Dict k v -> Dict k v
 remove key dict =
   update key (always Nothing) dict
 
@@ -191,7 +191,7 @@ type Flag = Insert | Remove | Same
 
 
 {-| Update the value of a dictionary for a specific key with a given function. -}
-update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
+update : k -> (Maybe v -> Maybe v) -> Dict k v -> Dict k v
 update k alter dict =
   let
     up dict =
@@ -206,7 +206,7 @@ update k alter dict =
               (Insert, RBNode_elm_builtin Red k v empty empty)
 
         RBNode_elm_builtin clr key value left right ->
-          case compare k key of
+          case keyCompare k key of
             EQ ->
               case alter (Just value) of
                 Nothing ->
@@ -254,13 +254,20 @@ update k alter dict =
 
 
 {-| Create a dictionary with one key-value pair. -}
-singleton : comparable -> v -> Dict comparable v
+singleton : k -> v -> Dict k v
 singleton key value =
   insert key value empty
 
 
 
 -- HELPERS
+
+keyCompare : a -> a -> Order
+keyCompare =
+  -- Basics.compare is limited to only comparable types by the type checker, but
+  -- Native.Basics.compare is able to also compare arbitrary ADTs and records.
+  Native.Basics.compare
+
 
 
 isBBlack : Dict k v -> Bool
@@ -493,7 +500,7 @@ redden t =
 {-| Combine two dictionaries. If there is a collision, preference is given
 to the first dictionary.
 -}
-union : Dict comparable v -> Dict comparable v -> Dict comparable v
+union : Dict k v -> Dict k v -> Dict k v
 union t1 t2 =
   foldl insert t2 t1
 
@@ -501,14 +508,14 @@ union t1 t2 =
 {-| Keep a key-value pair when its key appears in the second dictionary.
 Preference is given to values in the first dictionary.
 -}
-intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
+intersect : Dict k v -> Dict k v -> Dict k v
 intersect t1 t2 =
   filter (\k _ -> member k t2) t1
 
 
 {-| Keep a key-value pair when its key does not appear in the second dictionary.
 -}
-diff : Dict comparable v -> Dict comparable v -> Dict comparable v
+diff : Dict k v -> Dict k v -> Dict k v
 diff t1 t2 =
   foldl (\k v t -> remove k t) t1 t2
 
@@ -524,11 +531,11 @@ You then traverse all the keys from lowest to highest, building up whatever
 you want.
 -}
 merge
-  :  (comparable -> a -> result -> result)
-  -> (comparable -> a -> b -> result -> result)
-  -> (comparable -> b -> result -> result)
-  -> Dict comparable a
-  -> Dict comparable b
+  :  (k -> a -> result -> result)
+  -> (k -> a -> b -> result -> result)
+  -> (k -> b -> result -> result)
+  -> Dict k a
+  -> Dict k b
   -> result
   -> result
 merge leftStep bothStep rightStep leftDict rightDict initialResult =
@@ -539,14 +546,15 @@ merge leftStep bothStep rightStep leftDict rightDict initialResult =
           (list, rightStep rKey rValue result)
 
         (lKey, lValue) :: rest ->
-          if lKey < rKey then
-            stepState rKey rValue (rest, leftStep lKey lValue result)
+          case keyCompare lKey rKey of
+            LT ->
+              stepState rKey rValue (rest, leftStep lKey lValue result)
 
-          else if lKey > rKey then
-            (list, rightStep rKey rValue result)
+            GT ->
+              (list, rightStep rKey rValue result)
 
-          else
-            (rest, bothStep lKey lValue rValue result)
+            EQ ->
+              (rest, bothStep lKey lValue rValue result)
 
     (leftovers, intermediateResult) =
       foldl stepState (toList leftDict, initialResult) rightDict
@@ -560,7 +568,7 @@ merge leftStep bothStep rightStep leftDict rightDict initialResult =
 
 {-| Apply a function to all values in a dictionary.
 -}
-map : (comparable -> a -> b) -> Dict comparable a -> Dict comparable b
+map : (k -> a -> b) -> Dict k a -> Dict k b
 map f dict =
   case dict of
     RBEmpty_elm_builtin _ ->
@@ -573,7 +581,7 @@ map f dict =
 {-| Fold over the key-value pairs in a dictionary, in order from lowest
 key to highest key.
 -}
-foldl : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
+foldl : (k -> v -> b -> b) -> b -> Dict k v -> b
 foldl f acc dict =
   case dict of
     RBEmpty_elm_builtin _ ->
@@ -586,7 +594,7 @@ foldl f acc dict =
 {-| Fold over the key-value pairs in a dictionary, in order from highest
 key to lowest key.
 -}
-foldr : (comparable -> v -> b -> b) -> b -> Dict comparable v -> b
+foldr : (k -> v -> b -> b) -> b -> Dict k v -> b
 foldr f acc t =
   case t of
     RBEmpty_elm_builtin _ ->
@@ -597,7 +605,7 @@ foldr f acc t =
 
 
 {-| Keep a key-value pair when it satisfies a predicate. -}
-filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+filter : (k -> v -> Bool) -> Dict k v -> Dict k v
 filter predicate dictionary =
   let
     add key value dict =
@@ -614,7 +622,7 @@ filter predicate dictionary =
 contains all key-value pairs which satisfy the predicate, and the second
 contains the rest.
 -}
-partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
+partition : (k -> v -> Bool) -> Dict k v -> (Dict k v, Dict k v)
 partition predicate dict =
   let
     add key value (t1, t2) =
@@ -635,7 +643,7 @@ partition predicate dict =
 
     keys (fromList [(0,"Alice"),(1,"Bob")]) == [0,1]
 -}
-keys : Dict comparable v -> List comparable
+keys : Dict k v -> List k
 keys dict =
   foldr (\key value keyList -> key :: keyList) [] dict
 
@@ -644,18 +652,18 @@ keys dict =
 
     values (fromList [(0,"Alice"),(1,"Bob")]) == ["Alice", "Bob"]
 -}
-values : Dict comparable v -> List v
+values : Dict k v -> List v
 values dict =
   foldr (\key value valueList -> value :: valueList) [] dict
 
 
 {-| Convert a dictionary into an association list of key-value pairs, sorted by keys. -}
-toList : Dict comparable v -> List (comparable,v)
+toList : Dict k v -> List (k,v)
 toList dict =
   foldr (\key value list -> (key,value) :: list) [] dict
 
 
 {-| Convert an association list into a dictionary. -}
-fromList : List (comparable,v) -> Dict comparable v
+fromList : List (k,v) -> Dict k v
 fromList assocs =
   List.foldl (\(key,value) dict -> insert key value dict) empty assocs
