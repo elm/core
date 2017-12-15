@@ -13,9 +13,9 @@ import Elm.Kernel.Utils exposing (Tuple0)
 // PROGRAMS
 
 
-var _Platform_worker = F4(function(impl, flagDecoder, object, debugMetadata)
+var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
 {
-	object['worker'] = function worker(flags)
+	object['worker'] = function(flags)
 	{
 		return _Platform_initialize(
 			flagDecoder,
@@ -436,4 +436,66 @@ function _Platform_setupIncomingPort(name, sendToApp)
 	}
 
 	return { send: send };
+}
+
+
+
+// EXPORT ELM MODULES
+//
+// Have DEBUG and PROD versions so that we can (1) give nicer errors in
+// debug mode and (2) not pay for the bits needed for that in prod mode.
+//
+
+
+function _Platform_export__PROD(exports)
+{
+	(typeof define === 'function' && define['amd'])
+		? define([], function() { return exports; })
+		:
+	(typeof module === 'object')
+		? module['exports'] = exports
+		:
+	scope['Elm']
+		? _Platform_mergeExportsProd(scope['Elm'], exports)
+		: scope['Elm'] = exports;
+}
+
+
+function _Platform_mergeExportsProd(obj, exports)
+{
+	for (var name in exports)
+	{
+		(name in obj)
+			? (typeof name === 'function')
+				? __Error_throw(6)
+				: _Platform_mergeExportsProd(obj[name], exports[name])
+			: (obj[name] = exports[name]);
+	}
+}
+
+
+function _Platform_export__DEBUG(exports)
+{
+	(typeof define === 'function' && define['amd'])
+		? define([], function() { return exports; })
+		:
+	(typeof module === 'object')
+		? module['exports'] = exports
+		:
+	scope['Elm']
+		? _Platform_mergeExportsDebug('Elm', scope['Elm'], exports)
+		: scope['Elm'] = exports;
+}
+
+
+function _Platform_mergeExportsDebug(moduleName, obj, exports)
+{
+	for (var name in exports)
+	{
+		(name in obj)
+			? (typeof name === 'function')
+				? __Error_throw(6, moduleName)
+				: _Platform_mergeExportsDebug(moduleName + '.' + name, obj[name], exports[name])
+			: (obj[name] = exports[name]);
+	}
 }
