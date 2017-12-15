@@ -40,10 +40,8 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			throw new Error('Trying to use `(==)` on functions.\nThere is no way to know if functions are "the same" in the Elm sense.\nRead more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#== which describes why it is this way and what the better version will look like.');
 
 		case 6:
-			throw new Error('Comparison error: cannot compare tuples with more than 6 elements.');
-
-		case 7:
-			throw new Error('Comparison error: comparison is only defined on ints, floats, times, chars, strings, lists of comparable values, and tuples of comparable values.');
+			var moduleName = fact1;
+			throw new Error('Your page is loading multiple Elm scripts with a module named ' + moduleName + '. Maybe a duplicate script is getting loaded accidentally? If not, rename one of them so I know which is which!');
 
 		case 8:
 			var moduleName = fact1;
