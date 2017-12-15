@@ -4,12 +4,28 @@ module Tuple exposing
   , apply
   )
 
-{-| Some helpers for working with 2-tuples.
+{-| Elm has built-in syntax for tuples, so you can define 2D points like this:
 
-**Note:** For larger chunks of data, it is best to switch to using records. So
-instead of representing a 3D point as `(3,4,5)` and wondering why there are no
-helper functions, represent it as `{ x = 3, y = 4, z = 5 }` and use all the
-built-in syntax for records.
+    origin : (Float, Float)
+    origin =
+      (0, 0)
+
+    position : (Float, Float)
+    position =
+      (3, 4)
+
+This module is a bunch of helpers for working with 2-tuples.
+
+**Note 1:** For more complex data, it is best to switch to records. So instead
+of representing a 3D point as `(3,4,5)` and not having any helper functions,
+represent it as `{ x = 3, y = 4, z = 5 }` and use all the built-in record
+syntax!
+
+**Note 2:** If your record contains a bunch of `Bool` and `Maybe` values,
+you may want to upgrade to union types. Check out [Joël’s post][ut] for more
+info on this. (Picking appropriate data structures is super important in Elm!)
+
+[ut]: https://robots.thoughtbot.com/modeling-with-union-types
 
 # Accessors
 @docs first, second
