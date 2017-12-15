@@ -69,8 +69,8 @@ import Elm.Kernel.Utils
 -- INFIX OPERATORS
 
 
-infix right 0 (<|) = apply
-infix left  0 (|>) = forwardApply
+infix right 0 (<|) = apL
+infix left  0 (|>) = apR
 infix right 2 (||) = or
 infix right 3 (&&) = and
 infix non   4 (==) = eq
@@ -86,8 +86,8 @@ infix left  7 (*)  = mul
 infix left  7 (/)  = fdiv
 infix left  7 (//) = idiv
 infix right 8 (^)  = pow
-infix right 9 (<<) = composeLeft
-infix left  9 (>>) = composeRight
+infix left  9 (<<) = composeL
+infix right 9 (>>) = composeR
 
 
 
@@ -767,8 +767,8 @@ So our example expands out to something like this:
 
     \n -> not (isEven (sqrt n))
 -}
-composeLeft : (b -> c) -> (a -> b) -> (a -> c)
-composeLeft g f x =
+composeL : (b -> c) -> (a -> b) -> (a -> c)
+composeL g f x =
   g (f x)
 
 
@@ -780,8 +780,8 @@ example, the following code checks if the square root of a number is odd:
 This direction of function composition seems less pleasant than `(<<)` which
 reads nicely in expressions like: `filter (not << isRegistered) students`
 -}
-composeRight : (a -> b) -> (b -> c) -> (a -> c)
-composeRight f g x =
+composeR : (a -> b) -> (b -> c) -> (a -> c)
+composeR f g x =
   g (f x)
 
 
@@ -815,8 +815,8 @@ until there are no pipes left.
 **Note:** The compiler rewrites this to normal function application, so `(|>)`
 has no runtime overhead.
 -}
-forwardApply : a -> (a -> b) -> b
-forwardApply x f =
+apR : a -> (a -> b) -> b
+apR x f =
   f x
 
 
@@ -833,8 +833,8 @@ Can be written as:
 **Note:** The compiler rewrites this to normal function application, so `(<|)`
 has no runtime overhead.
 -}
-apply : (a -> b) -> a -> b
-apply f x =
+apL : (a -> b) -> a -> b
+apL f x =
   f x
 
 
