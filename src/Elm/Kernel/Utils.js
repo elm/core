@@ -1,6 +1,7 @@
 /*
 
 import Array exposing (toList)
+import Basics exposing (LT, EQ, GT)
 import Dict exposing (toList)
 import Elm.Kernel.Error exposing (throw)
 import Elm.Kernel.List exposing (Cons, Nil)
@@ -98,87 +99,85 @@ var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
 // Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
 // the particular integer values assigned to LT, EQ, and GT.
 
-var _Utils_LT = -1, _Utils_EQ = 0, _Utils_GT = 1;
-
-function _Utils_cmp(x, y)
+function _Utils_cmp__PROD(x, y, ord)
 {
 	if (typeof x !== 'object')
 	{
-		return x === y ? _Utils_EQ : x < y ? _Utils_LT : _Utils_GT;
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	if (!x.$)
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	while (x.$ === '::' && y.$ === '::' && !(ord = _Utils_cmp(x.a, y.a)))
+	{
+		x = x.b;
+		y = y.b;
+	}
+	return ord || (x.$ === y.$ ? /*EQ*/ 0 : x.$ === '[]' ? /*LT*/ -1 : /*GT*/ 1);
+}
+
+function _Utils_cmp__DEBUG(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
 	}
 
 	if (x instanceof String)
 	{
 		var a = x.valueOf();
 		var b = y.valueOf();
-		return a === b ? _Utils_EQ : a < b ? _Utils_LT : _Utils_GT;
-	}
-
-	if (x.$ === '::' || x.$ === '[]')
-	{
-		while (x.$ === '::' && y.$ === '::')
-		{
-			var ord = _Utils_cmp(x.a, y.a);
-			if (ord !== _Utils_EQ)
-			{
-				return ord;
-			}
-			x = x.b;
-			y = y.b;
-		}
-		return x.$ === y.$ ? _Utils_EQ : x.$ === '[]' ? _Utils_LT : _Utils_GT;
+		return a === b ? /*EQ*/ 0 : a < b ? /*LT*/ -1 : /*GT*/ 1;
 	}
 
 	if (x.$[0] === '#')
 	{
-		var ord;
-		return x.$ === '#0'
-			? _Utils_EQ
-			:
-		((ord = _Utils_cmp(x.a, y.a)) !== _Utils_EQ)
+		return (ord = _Utils_cmp(x.a, y.a))
 			? ord
-			:
-		((ord = _Utils_cmp(x.b, y.b)) !== _Utils_EQ || x.$ === '#2')
-			? ord
-			:
-		_Utils_cmp(x.c, y.c);
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
 	}
 
-	__Error_throw(7);
+	while (x.$ === '::' && y.$ === '::' && !(ord = _Utils_cmp(x.a, y.a)))
+	{
+		x = x.b;
+		y = y.b;
+	}
+	return ord || (x.$ === y.$ ? /*EQ*/ 0 : x.$ === '[]' ? /*LT*/ -1 : /*GT*/ 1);
 }
 
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_LT; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_GT; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === _Utils_GT; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== _Utils_LT; });
-
-var _Utils_ordTable = ['LT', 'EQ', 'GT'];
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) === /*LT*/ -1; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== /*GT*/ 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === /*GT*/ 1; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== /*LT*/ -1; });
 
 var _Utils_compare = F2(function(x, y)
 {
-	return { $: _Utils_ordTable[_Utils_cmp(x, y) + 1] };
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? __Basics_LT : n ? __Basics_GT : __Basics_EQ;
 });
 
 
 // COMMON VALUES
 
-var _Utils_Tuple0 = {
-	$: '#0'
-};
+var _Utils_Tuple0__PROD = 0;
+var _Utils_Tuple0__DEBUG = { $: '#0' };
 
-function _Utils_Tuple2(x, y)
-{
-	return {
-		$: '#2',
-		a: x,
-		b: y
-	};
-}
+function _Utils_Tuple2__PROD(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2__DEBUG(a, b) { return { $: '#2', a: a, b: b }; }
 
-function _Utils_chr(c)
-{
-	return new String(c);
-}
+function _Utils_Tuple3__PROD(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3__DEBUG(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr__DEBUG(c) { return new String(c); }
 
 
 // RECORDS
@@ -203,7 +202,9 @@ function _Utils_update(oldRecord, updatedFields)
 
 // APPEND
 
-var _Utils_append = F2(function(xs, ys)
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
 {
 	// append Strings
 	if (typeof xs === 'string')
@@ -227,4 +228,4 @@ var _Utils_append = F2(function(xs, ys)
 	}
 	curr.b = ys;
 	return root;
-});
+}
