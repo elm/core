@@ -138,11 +138,17 @@ var LT = -1, EQ = 0, GT = 1;
 
 function cmp(x, y)
 {
+	// This avoids looping forever if someone hacked cycles into the object graph.
+	if (x === y)
+	{
+		return EQ;
+	}
+
 	var type = typeof x;
 
 	if (type !== 'object' && type !== 'function')
 	{
-		return x === y ? EQ : x < y ? LT : GT;
+		return x < y ? LT : GT;
 	}
 
 	if (x instanceof String)
