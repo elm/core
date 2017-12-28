@@ -165,19 +165,22 @@ rem =
   Elm.Kernel.Basics.exp
 
 
-{-|-}
+{-| Calculate the cosine of the given number (in radians).
+-}
 cos : Float -> Float
 cos =
   Elm.Kernel.Basics.cos
 
 
-{-|-}
+{-| Calculate the sine of the given number (in radians).
+-}
 sin : Float -> Float
 sin =
   Elm.Kernel.Basics.sin
 
 
-{-|-}
+{-| Calculate the tangent of the given number (in radians).
+-}
 tan : Float -> Float
 tan =
   Elm.Kernel.Basics.tan
