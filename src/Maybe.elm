@@ -36,6 +36,14 @@ type Maybe a
     | Nothing
 
 
+{-| Eliminate an optional value. -}
+maybe : (a -> b) -> b -> Maybe a -> b
+maybe f b m =
+    case m of
+        Just a -> f a
+        Nothing -> b
+
+
 {-| Provide a default value, turning an optional value into a normal
 value.  This comes in handy when paired with functions like
 [`Dict.get`](Dict#get) which gives back a `Maybe`.
