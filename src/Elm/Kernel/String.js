@@ -2,7 +2,7 @@
 
 import Elm.Kernel.List exposing (fromArray, toArray, Nil)
 import Elm.Kernel.Utils exposing (chr, Tuple2)
-import Maybe exposing (Maybe(Just,Nothing))
+import Maybe exposing (Just, Nothing)
 
 */
 
