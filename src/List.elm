@@ -49,7 +49,13 @@ The current sentiment is that it is already quite error prone once you get to
 
 import Basics exposing (..)
 import Elm.Kernel.List
-import Maybe exposing ( Maybe(Just,Nothing) )
+import Maybe exposing ( Maybe(..) )
+
+
+
+
+infix right 5 (::) = cons
+
 
 
 {-| Add an element to the front of a list. Pronounced *cons*.
@@ -57,12 +63,9 @@ import Maybe exposing ( Maybe(Just,Nothing) )
     1 :: [2,3] == [1,2,3]
     1 :: [] == [1]
 -}
-(::) : a -> List a -> List a
-(::) =
+cons : a -> List a -> List a
+cons =
   Elm.Kernel.List.cons
-
-
-infixr 5 ::
 
 
 {-| Extract the first element of a list.
@@ -129,7 +132,7 @@ So `map func [ a, b, c ]` is the same as `[ func a, func b, func c ]`
 -}
 map : (a -> b) -> List a -> List b
 map f xs =
-  foldr (\x acc -> f x :: acc) [] xs
+  foldr (\x acc -> cons (f x) acc) [] xs
 
 
 {-| Same as `map` but the function is also applied to the index of each
@@ -206,7 +209,7 @@ foldrHelper fn acc ctr ls =
                                     let
                                         res =
                                             if ctr > 500 then
-                                                foldl fn acc <| reverse r4
+                                                foldl fn acc (reverse r4)
                                             else
                                                 foldrHelper fn acc (ctr + 1) r4
                                     in
@@ -223,7 +226,7 @@ scanl f b xs =
     scan1 x accAcc =
       case accAcc of
         acc :: _ ->
-          f x acc :: accAcc
+          cons (f x acc) accAcc
 
         [] ->
           [] -- impossible
@@ -240,7 +243,7 @@ filter pred xs =
   let
     conditionalCons front back =
       if pred front then
-        front :: back
+        cons front back
 
       else
         back
@@ -271,7 +274,7 @@ maybeCons : (a -> Maybe b) -> a -> List b -> List b
 maybeCons f mx xs =
   case f mx of
     Just x ->
-      x :: xs
+      cons x xs
 
     Nothing ->
       xs
@@ -292,7 +295,7 @@ length xs =
 -}
 reverse : List a -> List a
 reverse list =
-  foldl (::) [] list
+  foldl cons [] list
 
 
 {-| Determine if all elements satisfy the predicate.
@@ -341,7 +344,7 @@ append xs ys =
       xs
 
     _ ->
-      foldr (::) ys xs
+      foldr cons ys xs
 
 
 {-| Concatenate a bunch of lists into a single list:
@@ -422,10 +425,10 @@ partition pred list =
   let
     step x (trues, falses) =
       if pred x then
-        (x :: trues, falses)
+        (cons x trues, falses)
 
       else
-        (trues, x :: falses)
+        (trues, cons x falses)
   in
     foldr step ([],[]) list
 
@@ -472,7 +475,7 @@ unzip : List (a,b) -> (List a, List b)
 unzip pairs =
   let
     step (x,y) (xs,ys) =
-      (x :: xs, y :: ys)
+      (cons x xs, cons y ys)
   in
     foldr step ([], []) pairs
 
@@ -490,12 +493,12 @@ intersperse sep xs =
     hd :: tl ->
       let
         step x rest =
-          sep :: x :: rest
+          cons sep (cons x rest)
 
         spersed =
           foldr step [] tl
       in
-        hd :: spersed
+        cons hd spersed
 
 
 {-| Take the first *n* members of a list.
@@ -527,9 +530,9 @@ takeFast ctr n list =
 
       ( _, x :: y :: z :: w :: tl ) ->
         if ctr > 1000 then
-          x :: y :: z :: w :: takeTailRec (n - 4) tl
+          cons x (cons y (cons z (cons w (takeTailRec (n - 4) tl))))
         else
-          x :: y :: z :: w :: takeFast (ctr + 1) (n - 4) tl
+          cons x (cons y (cons z (cons w (takeFast (ctr + 1) (n - 4) tl))))
 
       _ ->
         list
@@ -549,7 +552,7 @@ takeReverse n list taken =
         taken
 
       x :: xs ->
-        takeReverse (n - 1) xs (x :: taken)
+        takeReverse (n - 1) xs (cons x taken)
 
 
 {-| Drop the first *n* members of a list.
@@ -595,7 +598,7 @@ repeatHelp result n value =
     result
 
   else
-    repeatHelp (value :: result) (n-1) value
+    repeatHelp (cons value result) (n-1) value
 
 
 {-| Create a list of numbers, every element increasing by one.
@@ -613,7 +616,7 @@ range lo hi =
 rangeHelp : Int -> Int -> List Int -> List Int
 rangeHelp lo hi list =
   if lo <= hi then
-    rangeHelp lo (hi - 1) (hi :: list)
+    rangeHelp lo (hi - 1) (cons hi list)
 
   else
     list
