@@ -42,7 +42,6 @@ import Debug
 import Elm.Kernel.Error
 import Maybe exposing (..)
 import List exposing (..)
-import String
 
 
 
@@ -193,7 +192,7 @@ type Flag = Insert | Remove | Same
 
 {-| Update the value of a dictionary for a specific key with a given function. -}
 update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
-update k alter dict =
+update k alter dictionary =
   let
     up dict =
       case dict of
@@ -240,10 +239,10 @@ update k alter dict =
                 Remove ->
                   (Remove, bubble clr key value left newRight)
 
-    (flag, updatedDict) =
-      up dict
+    (finalFlag, updatedDict) =
+      up dictionary
   in
-    case flag of
+    case finalFlag of
       Same ->
         updatedDict
 
