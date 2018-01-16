@@ -25,7 +25,7 @@ module Char exposing
 @docs toCode, fromCode
 -}
 
-import Basics exposing ((&&), (||), (>=), (<=))
+import Basics exposing (Bool, Int, (&&), (||), (>=), (<=))
 import Elm.Kernel.Char
 
 

@@ -52,6 +52,7 @@ import List exposing ((::))
 import Maybe exposing (Maybe(..))
 import Platform
 import Platform.Sub exposing (Sub)
+import String exposing (String)
 import Task exposing (Task)
 
 
@@ -345,6 +346,7 @@ toCivil minutes =
 -- TIME TRAVEL
 
 
+-- getDaysInMonth : TimeZone -> Year -> Month -> List Int
 -- diff : Unit -> Date -> Date -> Int
 -- travel : Unit -> Int -> Date -> Date
 -- type Unit = Years | Months | Days | Hours | Minutes | Seconds | Millis

@@ -50,7 +50,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 
 import Basics exposing (..)
 import Bitwise
-import Char
+import Char exposing (Char)
 import Elm.Kernel.List
 import Elm.Kernel.String
 import List exposing ((::))

@@ -34,7 +34,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 
 -}
 
-import Basics exposing ((<|))
+import Basics exposing (Bool, Int, (<|))
 import Dict as Dict
 import List as List
 

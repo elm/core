@@ -11,7 +11,9 @@ module Debug exposing
 @docs toString, log, crash
 -}
 
+
 import Elm.Kernel.Debug
+import String exposing (String)
 
 
 {-| Turn any kind of value into a string.

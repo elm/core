@@ -12,7 +12,10 @@ module Bitwise exposing
 @docs shiftLeftBy, shiftRightBy, shiftRightZfBy
 -}
 
+
+import Basics exposing (Int)
 import Elm.Kernel.Bitwise
+
 
 
 {-| Bitwise AND

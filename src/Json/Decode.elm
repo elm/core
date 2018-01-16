@@ -44,14 +44,14 @@ errors.
 
 
 import Array exposing (Array)
-import Basics exposing ((+), (++), (&&))
+import Basics exposing (Bool, Int, (+), (++), (&&))
 import Char
 import Dict exposing (Dict)
 import Json.Encode
 import List exposing ((::))
 import Maybe exposing (Maybe(..))
 import Result exposing (Result(..))
-import String
+import String exposing (String)
 import Elm.Kernel.Json
 
 

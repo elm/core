@@ -36,7 +36,10 @@ For general purpose use, try the `Array` module instead.
 
 -}
 
+
+import Basics exposing (Int)
 import Elm.Kernel.JsArray
+
 
 
 {-| Representation of a javascript array.

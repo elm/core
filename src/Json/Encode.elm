@@ -22,9 +22,11 @@ module Json.Encode exposing
 -}
 
 import Array exposing (Array)
+import Basics exposing (Bool, Int)
 import Dict exposing (Dict)
 import List
 import Set exposing (Set)
+import String exposing (String)
 import Elm.Kernel.Json
 
 
