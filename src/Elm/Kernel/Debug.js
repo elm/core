@@ -94,29 +94,6 @@ function _Debug_toString__DEBUG(v)
 			return '(' + output.join(',') + ')';
 		}
 
-		if (tag === 'Array')
-		{
-			var list = __Array_toList(v);
-			return 'Array.fromList ' + _Debug_toString(list);
-		}
-
-		if (tag === '::')
-		{
-			var output = '[' + _Debug_toString(v.a);
-			v = v.b;
-			while (v.$ === '::')
-			{
-				output += ',' + _Debug_toString(v.a);
-				v = v.b;
-			}
-			return output + ']';
-		}
-
-		if (tag === '[]')
-		{
-			return '[]';
-		}
-
 		if (tag === 'Set_elm_builtin')
 		{
 			return 'Set.fromList ' + _Debug_toString(__Set_toList(v));
@@ -125,6 +102,24 @@ function _Debug_toString__DEBUG(v)
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
 			return 'Dict.fromList ' + _Debug_toString(__Dict_toList(v));
+		}
+
+		if (tag === 'Array_elm_builtin')
+		{
+			return 'Array.fromList ' + _Debug_toString(__Array_toList(v));
+		}
+
+		if (tag === '::' || tag === '[]')
+		{
+			var output = '[';
+
+			v.b && (output += _Debug_toString(v.a), v = v.b)
+
+			for (v.b; v = v.b) // WHILE_CONS
+			{
+				output += ',' + _Debug_toString(v.a);
+			}
+			return output + ']';
 		}
 
 		var output = '';
