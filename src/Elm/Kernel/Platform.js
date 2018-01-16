@@ -5,6 +5,7 @@ import Elm.Kernel.Json exposing (run, wrap)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
 import Elm.Kernel.Utils exposing (Tuple0)
+import Result exposing (isOk)
 
 */
 
@@ -36,10 +37,10 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
 function _Platform_initialize(flagDecoder, flags, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(__Json_run, flagDecoder, __Json_wrap(flags));
+	__Result_isOk(result) || __Error_throw(2, result.a);
 	var managers = {};
-	var model = result.$ === 'Err'
-		? __Error_throw(2, result.a)
-		: (result = init(result.a), result.a);
+	result = init(result.a);
+	var model = result.a;
 	var stepper = stepperBuilder(sendToApp, model);
 	var ports = _Platform_setupEffects(managers, sendToApp);
 
@@ -240,11 +241,9 @@ function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
 			return;
 
 		case __2_NODE:
-			var list = bag.__bags;
-			while (list.$ !== '[]')
+			for (var list = bag.__bags; list.b; list = list.b) // WHILE_CONS
 			{
 				_Platform_gatherEffects(isCmd, list.a, effectsDict, taggers);
-				list = list.b;
 			}
 			return;
 
@@ -262,11 +261,9 @@ function _Platform_toEffect(isCmd, home, taggers, value)
 {
 	function applyTaggers(x)
 	{
-		var temp = taggers;
-		while (temp)
+		for (var temp = taggers; temp; temp = temp.__rest)
 		{
 			x = temp.__tagger(x);
-			temp = temp.__rest;
 		}
 		return x;
 	}
@@ -335,7 +332,7 @@ function _Platform_setupOutgoingPort(name)
 	_Platform_effectManagers[name].__init = init;
 	_Platform_effectManagers[name].__onEffects = F3(function(router, cmdList, state)
 	{
-		while (cmdList.$ !== '[]')
+		for ( ; cmdList.b; cmdList = cmdList.b) // WHILE_CONS
 		{
 			// grab a separate reference to subs in case unsubscribe is called
 			var currentSubs = subs;
@@ -344,7 +341,6 @@ function _Platform_setupOutgoingPort(name)
 			{
 				currentSubs[i](value);
 			}
-			cmdList = cmdList.b;
 		}
 		return init;
 	});
@@ -421,17 +417,13 @@ function _Platform_setupIncomingPort(name, sendToApp)
 	function send(incomingValue)
 	{
 		var result = A2(__Json_run, converter, incomingValue);
-		if (result.$ === 'Err')
-		{
-			__Error_throw(4, name, result.a);
-		}
+
+		__Result_isOk(result) || __Error_throw(4, name, result.a);
 
 		var value = result.a;
-		var temp = subs;
-		while (temp.$ !== '[]')
+		while (var temp = subs; temp.b; temp = temp.b) // WHILE_CONS
 		{
 			sendToApp(temp.a(value));
-			temp = temp.b;
 		}
 	}
 
