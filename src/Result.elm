@@ -22,7 +22,8 @@ way to manage errors in Elm.
 @docs withDefault, toMaybe, fromMaybe, mapError
 -}
 
-import Maybe exposing ( Maybe(Just, Nothing) )
+import Basics exposing ( Bool(..) )
+import Maybe exposing ( Maybe(..) )
 
 
 {-| A `Result` is either `Ok` meaning the computation succeeded, or it is an
@@ -36,8 +37,8 @@ type Result error value
 {-| If the result is `Ok` return the value, but if the result is an `Err` then
 return a given default value. The following examples try to parse integers.
 
-    Result.withDefault 0 (String.toInt "123") == 123
-    Result.withDefault 0 (String.toInt "abc") == 0
+    Result.withDefault 0 (Ok 123)   == 123
+    Result.withDefault 0 (Err "no") == 0
 -}
 withDefault : a -> Result x a -> a
 withDefault def result =
@@ -57,57 +58,116 @@ If the result is an `Err`, the same error value will propagate through.
 -}
 map : (a -> value) -> Result x a -> Result x value
 map func ra =
-    case ra of
-      Ok a -> Ok (func a)
-      Err e -> Err e
+  case ra of
+    Ok a ->
+      Ok (func a)
+
+    Err e ->
+      Err e
 
 
-{-| Apply a function to two results, if both results are `Ok`. If not,
-the first argument which is an `Err` will propagate through.
+{-| Apply a function if both results are `Ok`. If not, the first `Err` will
+propagate through.
 
-    map2 (+) (String.toInt "1") (String.toInt "2") == Ok 3
-    map2 (+) (String.toInt "1") (String.toInt "y") == Err "could not convert string 'y' to an Int"
-    map2 (+) (String.toInt "x") (String.toInt "y") == Err "could not convert string 'x' to an Int"
+    map2 max (Ok 42)   (Ok 13)   == Ok 42
+    map2 max (Err "x") (Ok 13)   == Err "x"
+    map2 max (Ok 42)   (Err "y") == Err "y"
+    map2 max (Err "x") (Err "y") == Err "x"
+
+This can be useful if you have two computations that may fail, and you want
+to put them together quickly.
 -}
 map2 : (a -> b -> value) -> Result x a -> Result x b -> Result x value
 map2 func ra rb =
-    case (ra,rb) of
-      (Ok a, Ok b) -> Ok (func a b)
-      (Err x, _) -> Err x
-      (_, Err x) -> Err x
+  case ra of
+    Err x ->
+      Err x
+
+    Ok a ->
+      case rb of
+        Err x ->
+          Err x
+
+        Ok b ->
+          Ok (func a b)
 
 
 {-|-}
 map3 : (a -> b -> c -> value) -> Result x a -> Result x b -> Result x c -> Result x value
 map3 func ra rb rc =
-    case (ra,rb,rc) of
-      (Ok a, Ok b, Ok c) -> Ok (func a b c)
-      (Err x, _, _) -> Err x
-      (_, Err x, _) -> Err x
-      (_, _, Err x) -> Err x
+  case ra of
+    Err x ->
+      Err x
+
+    Ok a ->
+      case rb of
+        Err x ->
+          Err x
+
+        Ok b ->
+          case rc of
+            Err x ->
+              Err x
+
+            Ok c ->
+              Ok (func a b c)
 
 
 {-|-}
 map4 : (a -> b -> c -> d -> value) -> Result x a -> Result x b -> Result x c -> Result x d -> Result x value
 map4 func ra rb rc rd =
-    case (ra,rb,rc,rd) of
-      (Ok a, Ok b, Ok c, Ok d) -> Ok (func a b c d)
-      (Err x, _, _, _) -> Err x
-      (_, Err x, _, _) -> Err x
-      (_, _, Err x, _) -> Err x
-      (_, _, _, Err x) -> Err x
+  case ra of
+    Err x ->
+      Err x
+
+    Ok a ->
+      case rb of
+        Err x ->
+          Err x
+
+        Ok b ->
+          case rc of
+            Err x ->
+              Err x
+
+            Ok c ->
+              case rd of
+                Err x ->
+                  Err x
+
+                Ok d ->
+                  Ok (func a b c d)
 
 
 {-|-}
 map5 : (a -> b -> c -> d -> e -> value) -> Result x a -> Result x b -> Result x c -> Result x d -> Result x e -> Result x value
 map5 func ra rb rc rd re =
-    case (ra,rb,rc,rd,re) of
-      (Ok a, Ok b, Ok c, Ok d, Ok e) -> Ok (func a b c d e)
-      (Err x, _, _, _, _) -> Err x
-      (_, Err x, _, _, _) -> Err x
-      (_, _, Err x, _, _) -> Err x
-      (_, _, _, Err x, _) -> Err x
-      (_, _, _, _, Err x) -> Err x
+  case ra of
+    Err x ->
+      Err x
+
+    Ok a ->
+      case rb of
+        Err x ->
+          Err x
+
+        Ok b ->
+          case rc of
+            Err x ->
+              Err x
+
+            Ok c ->
+              case rd of
+                Err x ->
+                  Err x
+
+                Ok d ->
+                  case re of
+                    Err x ->
+                      Err x
+
+                    Ok e ->
+                      Ok (func a b c d e)
 
 
 {-| Chain together a sequence of computations that may fail. It is helpful
@@ -208,3 +268,19 @@ fromMaybe err maybe =
     case maybe of
       Just v  -> Ok v
       Nothing -> Err err
+
+
+
+-- FOR INTERNAL USE ONLY
+--
+-- Use `case` expressions for this in Elm code!
+
+
+isOk : Result x a -> Bool
+isOk result =
+  case result of
+    Ok _ ->
+      True
+
+    Err _ ->
+      False
