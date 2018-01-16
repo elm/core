@@ -32,10 +32,10 @@ documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
 import Basics exposing (Never, (|>), (<<))
 import Elm.Kernel.Scheduler
 import List exposing ((::))
-import Maybe exposing (Maybe(Just,Nothing))
+import Maybe exposing (Maybe(..))
 import Platform
 import Platform.Cmd exposing (Cmd)
-import Result exposing (Result(Ok,Err))
+import Result exposing (Result(..))
 
 
 
