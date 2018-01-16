@@ -3,9 +3,10 @@
 import Array exposing (initialize)
 import Elm.Kernel.List exposing (Cons, Nil, fromArray)
 import Elm.Kernel.Utils exposing (Tuple2)
+import Json.Decoder as Json exposing (Field, Index, OneOf, Failure)
 import List exposing (reverse)
-import Maybe exposing (Maybe(Just,Nothing))
-import Result exposing (Result(Ok,Err))
+import Maybe exposing (Just, Nothing)
+import Result exposing (Ok, Err, isOk)
 
 */
 
@@ -146,7 +147,7 @@ var _Json_runOnString = F2(function(decoder, string)
 	}
 	catch (e)
 	{
-		return __Result_Err({ $: 'Failure', a: 'This is not valid JSON! ' + e.message, b: string });
+		return __Result_Err(A2(__Json_Failure, 'This is not valid JSON! ' + e.message, string));
 	}
 });
 
@@ -220,7 +221,7 @@ function _Json_runHelp(decoder, value)
 				return _Json_expecting('an OBJECT with a field named `' + field + '`', value);
 			}
 			var result = _Json_runHelp(decoder.__decoder, value[field]);
-			return (result.$ === 'Ok') ? result : __Result_Err({ $: 'Field', a: field, b: result.a });
+			return (__Result_isOk(result)) ? result : __Result_Err(A2(__Json_Field, field, result.a));
 
 		case __1_INDEX:
 			var index = decoder.__index;
@@ -233,7 +234,7 @@ function _Json_runHelp(decoder, value)
 				return _Json_expecting('a LONGER array. Need index ' + index + ' but only see ' + value.length + ' entries', value);
 			}
 			var result = _Json_runHelp(decoder.__decoder, value[index]);
-			return (result.$ === 'Ok') ? result : __Result_Err({ $: 'Index', a: index, b: result.a });
+			return (__Result_isOk(result)) ? result : __Result_Err(A2(__Json_Index, index, result.a));
 
 		case __1_KEY_VALUE:
 			if (typeof value !== 'object' || value === null || Array.isArray(value))
@@ -248,9 +249,9 @@ function _Json_runHelp(decoder, value)
 				if (value.hasOwnProperty(key))
 				{
 					var result = _Json_runHelp(decoder.__decoder, value[key]);
-					if (result.$ !== 'Ok')
+					if (!__Result_isOk(result))
 					{
-						return __Result_Err({ $: 'Field', a: key, b: result.a });
+						return __Result_Err(A2(__Json_Field, key, result.a));
 					}
 					keyValuePairs = __List_Cons(__Utils_Tuple2(key, result.a), keyValuePairs);
 				}
@@ -263,7 +264,7 @@ function _Json_runHelp(decoder, value)
 			for (var i = 0; i < decoders.length; i++)
 			{
 				var result = _Json_runHelp(decoders[i], value);
-				if (result.$ !== 'Ok')
+				if (!__Result_isOk(result))
 				{
 					return result;
 				}
@@ -273,27 +274,25 @@ function _Json_runHelp(decoder, value)
 
 		case __1_AND_THEN:
 			var result = _Json_runHelp(decoder.__decoder, value);
-			return (result.$ !== 'Ok')
+			return (!__Result_isOk(result))
 				? result
 				: _Json_runHelp(decoder.__callback(result.a), value);
 
 		case __1_ONE_OF:
 			var errors = __List_Nil;
-			var temp = decoder.__decoders;
-			while (temp.$ !== '[]')
+			for (var temp = decoder.__decoders; temp.b; temp = temp.b) // WHILE_CONS
 			{
 				var result = _Json_runHelp(temp.a, value);
-				if (result.$ === 'Ok')
+				if (__Result_isOk(result))
 				{
 					return result;
 				}
 				errors = __List_Cons(result.a, errors);
-				temp = temp.b;
 			}
-			return __Result_Err({ $: 'OneOf', a: __List_reverse(errors) });
+			return __Result_Err(__Json_OneOf(__List_reverse(errors)));
 
 		case __1_FAIL:
-			return __Result_Err({ $: 'Failure', a: decoder.__msg, b: value });
+			return __Result_Err(A2(__Json_Failure, decoder.__msg, value));
 
 		case __1_SUCCEED:
 			return __Result_Ok(decoder.__msg);
@@ -307,9 +306,9 @@ function _Json_runArrayDecoder(decoder, value, toElmValue)
 	for (var i = 0; i < len; i++)
 	{
 		var result = _Json_runHelp(decoder, value[i]);
-		if (result.$ !== 'Ok')
+		if (!__Result_isOk(result))
 		{
-			return __Result_Err({ $: 'Index', a: i, b: result.a });
+			return __Result_Err(A2(__Json_Index, i, result.a));
 		}
 		array[i] = result.a;
 	}
@@ -323,7 +322,7 @@ function _Json_toElmArray(array)
 
 function _Json_expecting(type, value)
 {
-	return __Result_Err({ $: 'Failure', a: 'Expecting ' + type, b: value });
+	return __Result_Err(A2(__Json_Failure, 'Expecting ' + type, value));
 }
 
 
