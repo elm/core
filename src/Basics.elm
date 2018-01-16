@@ -35,7 +35,7 @@ are your tuples so big?
 @docs (<), (>), (<=), (>=), max, min, compare, Order
 
 # Booleans
-@docs not, (&&), (||), xor
+@docs Bool, not, (&&), (||), xor
 
 # Append Strings and Lists
 @docs (++)
