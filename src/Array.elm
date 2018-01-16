@@ -42,6 +42,7 @@ module Array
 @docs foldl, foldr, filter, map, indexedMap
 -}
 
+
 import Basics exposing (..)
 import Bitwise
 import Elm.JsArray as JsArray exposing (JsArray)
@@ -90,8 +91,7 @@ factor.
 -}
 shiftStep : Int
 shiftStep =
-    logBase 2 (toFloat branchFactor)
-        |> ceiling
+    ceiling (logBase 2 (toFloat branchFactor))
 
 
 {-| A mask which, when used in a bitwise and, reads the first `shiftStep` bits
@@ -117,7 +117,7 @@ type Array a
          optimization. It makes operations at the end (push, pop, read, write)
          fast.
       -}
-      Array Int Int (Tree a) (JsArray a)
+      Array_elm_builtin Int Int (Tree a) (JsArray a)
 
 
 {-| Each level in the tree is represented by a `JsArray` of `Node`s.
@@ -143,7 +143,7 @@ empty =
        `startShift` is only used when there is at least one `Node` in the
        `tree`. The minimal value is therefore equal to the `shiftStep`.
     -}
-    Array 0 shiftStep JsArray.empty JsArray.empty
+    Array_elm_builtin 0 shiftStep JsArray.empty JsArray.empty
 
 
 {-| Determine if an array is empty.
@@ -151,8 +151,8 @@ empty =
     isEmpty empty == True
 -}
 isEmpty : Array a -> Bool
-isEmpty (Array length _ _ _) =
-    length == 0
+isEmpty (Array_elm_builtin len _ _ _) =
+    len == 0
 
 
 {-| Return the length of an array.
@@ -160,8 +160,8 @@ isEmpty (Array length _ _ _) =
     length (fromList [1,2,3]) == 3
 -}
 length : Array a -> Int
-length (Array length _ _ _) =
-    length
+length (Array_elm_builtin len _ _ _) =
+    len
 
 
 {-| Initialize an array. `initialize n f` creates an array of length `n` with
@@ -172,30 +172,30 @@ the element at index `i` initialized to the result of `(f i)`.
     initialize 4 (always 0)  == fromList [0,0,0,0]
 -}
 initialize : Int -> (Int -> a) -> Array a
-initialize length fn =
-    if length <= 0 then
+initialize len fn =
+    if len <= 0 then
         empty
     else
         let
             tailLen =
-                remainderBy branchFactor length
+                remainderBy branchFactor len
 
             tail =
-                JsArray.initialize tailLen (length - tailLen) fn
+                JsArray.initialize tailLen (len - tailLen) fn
 
             initialFromIndex =
-                length - tailLen - branchFactor
+                len - tailLen - branchFactor
         in
-            initializeHelp fn initialFromIndex length [] tail
+            initializeHelp fn initialFromIndex len [] tail
 
 
 initializeHelp : (Int -> a) -> Int -> Int -> List (Node a) -> JsArray a -> Array a
-initializeHelp fn fromIndex length nodeList tail =
+initializeHelp fn fromIndex len nodeList tail =
     if fromIndex < 0 then
         builderToArray False
             { tail = tail
             , nodeList = nodeList
-            , nodeListSize = length // branchFactor
+            , nodeListSize = len // branchFactor
             }
     else
         let
@@ -205,7 +205,7 @@ initializeHelp fn fromIndex length nodeList tail =
             initializeHelp
                 fn
                 (fromIndex - branchFactor)
-                length
+                len
                 (leaf :: nodeList)
                 tail
 
@@ -225,13 +225,13 @@ repeat n e =
 {-| Create an array from a `List`.
 -}
 fromList : List a -> Array a
-fromList ls =
-    case ls of
+fromList list =
+    case list of
         [] ->
             empty
 
         _ ->
-            fromListHelp ls [] 0
+            fromListHelp list [] 0
 
 
 fromListHelp : List a -> List (Node a) -> Int -> Array a
@@ -249,7 +249,7 @@ fromListHelp list nodeList nodeListSize =
         else
             fromListHelp
                 remainingItems
-                ((Leaf jsArray) :: nodeList)
+                (Leaf jsArray :: nodeList)
                 (nodeListSize + 1)
 
 
@@ -262,27 +262,27 @@ range.
     get -1 (fromList [0,1,2]) == Nothing
 -}
 get : Int -> Array a -> Maybe a
-get idx (Array length startShift tree tail) =
-    if idx < 0 || idx >= length then
+get index (Array_elm_builtin len startShift tree tail) =
+    if index < 0 || index >= len then
         Nothing
-    else if idx >= tailIndex length then
-        Just <| JsArray.unsafeGet (Bitwise.and bitMask idx) tail
+    else if index >= tailIndex len then
+        Just <| JsArray.unsafeGet (Bitwise.and bitMask index) tail
     else
-        Just <| getHelp startShift idx tree
+        Just <| getHelp startShift index tree
 
 
 getHelp : Int -> Int -> Tree a -> a
-getHelp shift idx tree =
+getHelp shift index tree =
     let
         pos =
-            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift idx
+            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift index
     in
         case JsArray.unsafeGet pos tree of
             SubTree subTree ->
-                getHelp (shift - shiftStep) idx subTree
+                getHelp (shift - shiftStep) index subTree
 
             Leaf values ->
-                JsArray.unsafeGet (Bitwise.and bitMask idx) values
+                JsArray.unsafeGet (Bitwise.and bitMask index) values
 
 
 {-| Given an array length, return the index of the first element in the tail.
@@ -301,38 +301,38 @@ If the index is out of range, the array is unaltered.
     set 1 7 (fromList [1,2,3]) == fromList [1,7,3]
 -}
 set : Int -> a -> Array a -> Array a
-set idx val ((Array length startShift tree tail) as arr) =
-    if idx < 0 || idx >= length then
-        arr
-    else if idx >= tailIndex length then
-        Array length startShift tree <|
-            JsArray.unsafeSet (Bitwise.and bitMask idx) val tail
+set index value ((Array_elm_builtin len startShift tree tail) as array) =
+    if index < 0 || index >= len then
+        array
+    else if index >= tailIndex len then
+        Array_elm_builtin len startShift tree <|
+            JsArray.unsafeSet (Bitwise.and bitMask index) value tail
     else
-        Array
-            length
+        Array_elm_builtin
+            len
             startShift
-            (setHelp startShift idx val tree)
+            (setHelp startShift index value tree)
             tail
 
 
 setHelp : Int -> Int -> a -> Tree a -> Tree a
-setHelp shift idx val tree =
+setHelp shift index value tree =
     let
         pos =
-            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift idx
+            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift index
     in
         case JsArray.unsafeGet pos tree of
             SubTree subTree ->
                 let
                     newSub =
-                        setHelp (shift - shiftStep) idx val subTree
+                        setHelp (shift - shiftStep) index value subTree
                 in
                     JsArray.unsafeSet pos (SubTree newSub) tree
 
             Leaf values ->
                 let
                     newLeaf =
-                        JsArray.unsafeSet (Bitwise.and bitMask idx) val values
+                        JsArray.unsafeSet (Bitwise.and bitMask index) value values
                 in
                     JsArray.unsafeSet pos (Leaf newLeaf) tree
 
@@ -342,8 +342,8 @@ setHelp shift idx val tree =
     push 3 (fromList [1,2]) == fromList [1,2,3]
 -}
 push : a -> Array a -> Array a
-push a ((Array _ _ _ tail) as arr) =
-    unsafeReplaceTail (JsArray.push a tail) arr
+push a ((Array_elm_builtin _ _ _ tail) as array) =
+    unsafeReplaceTail (JsArray.push a tail) array
 
 
 {-| Replaces the tail of an array. If the length of the tail equals the
@@ -354,7 +354,7 @@ has a length equal to or beneath the `branchFactor`. Make sure this is the case
 before using this function.
 -}
 unsafeReplaceTail : JsArray a -> Array a -> Array a
-unsafeReplaceTail newTail (Array length startShift tree tail) =
+unsafeReplaceTail newTail (Array_elm_builtin len startShift tree tail) =
     let
         originalTailLen =
             JsArray.length tail
@@ -363,7 +363,7 @@ unsafeReplaceTail newTail (Array length startShift tree tail) =
             JsArray.length newTail
 
         newArrayLen =
-            length + (newTailLen - originalTailLen)
+            len + (newTailLen - originalTailLen)
     in
         if newTailLen == branchFactor then
             let
@@ -377,21 +377,21 @@ unsafeReplaceTail newTail (Array length startShift tree tail) =
 
                         newTree =
                             JsArray.singleton (SubTree tree)
-                                |> insertTailInTree newShift length newTail
+                                |> insertTailInTree newShift len newTail
                     in
-                        Array
+                        Array_elm_builtin
                             newArrayLen
                             newShift
                             newTree
                             JsArray.empty
                 else
-                    Array
+                    Array_elm_builtin
                         newArrayLen
                         startShift
-                        (insertTailInTree startShift length newTail tree)
+                        (insertTailInTree startShift len newTail tree)
                         JsArray.empty
         else
-            Array
+            Array_elm_builtin
                 newArrayLen
                 startShift
                 tree
@@ -399,10 +399,10 @@ unsafeReplaceTail newTail (Array length startShift tree tail) =
 
 
 insertTailInTree : Int -> Int -> JsArray a -> Tree a -> Tree a
-insertTailInTree shift idx tail tree =
+insertTailInTree shift index tail tree =
     let
         pos =
-            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift idx
+            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift index
     in
         if pos >= JsArray.length tree then
             if shift == 5 then
@@ -411,21 +411,21 @@ insertTailInTree shift idx tail tree =
                 let
                     newSub =
                         JsArray.empty
-                            |> insertTailInTree (shift - shiftStep) idx tail
+                            |> insertTailInTree (shift - shiftStep) index tail
                             |> SubTree
                 in
                     JsArray.push newSub tree
         else
             let
-                val =
+                value =
                     JsArray.unsafeGet pos tree
             in
-                case val of
+                case value of
                     SubTree subTree ->
                         let
                             newSub =
                                 subTree
-                                    |> insertTailInTree (shift - shiftStep) idx tail
+                                    |> insertTailInTree (shift - shiftStep) index tail
                                     |> SubTree
                         in
                             JsArray.unsafeSet pos newSub tree
@@ -433,8 +433,8 @@ insertTailInTree shift idx tail tree =
                     Leaf _ ->
                         let
                             newSub =
-                                JsArray.singleton val
-                                    |> insertTailInTree (shift - shiftStep) idx tail
+                                JsArray.singleton value
+                                    |> insertTailInTree (shift - shiftStep) index tail
                                     |> SubTree
                         in
                             JsArray.unsafeSet pos newSub tree
@@ -445,8 +445,8 @@ insertTailInTree shift idx tail tree =
     toList (fromList [3,5,8]) == [3,5,8]
 -}
 toList : Array a -> List a
-toList arr =
-    foldr (::) [] arr
+toList array =
+    foldr (::) [] array
 
 
 {-| Create an indexed list from an array. Each element of the array will be
@@ -455,13 +455,12 @@ paired with its index.
     toIndexedList (fromList ["cat","dog"]) == [(0,"cat"), (1,"dog")]
 -}
 toIndexedList : Array a -> List ( Int, a )
-toIndexedList ((Array length _ _ _) as arr) =
+toIndexedList ((Array_elm_builtin len _ _ _) as array) =
     let
-        helper n ( idx, ls ) =
-            ( idx - 1, ( idx, n ) :: ls )
+        helper entry ( index, list ) =
+            ( index - 1, (index,entry) :: list )
     in
-        foldr helper ( length - 1, [] ) arr
-            |> Tuple.second
+        Tuple.second (foldr helper ( len - 1, [] ) array)
 
 
 {-| Reduce an array from the right. Read `foldr` as fold from the right.
@@ -469,20 +468,17 @@ toIndexedList ((Array length _ _ _) as arr) =
     foldr (+) 0 (repeat 3 5) == 15
 -}
 foldr : (a -> b -> b) -> b -> Array a -> b
-foldr f init (Array _ _ tree tail) =
+foldr func baseCase (Array_elm_builtin _ _ tree tail) =
     let
-        helper i acc =
-            case i of
+        helper node acc =
+            case node of
                 SubTree subTree ->
                     JsArray.foldr helper acc subTree
 
                 Leaf values ->
-                    JsArray.foldr f acc values
-
-        acc =
-            JsArray.foldr f init tail
+                    JsArray.foldr func acc values
     in
-        JsArray.foldr helper acc tree
+        JsArray.foldr helper (JsArray.foldr func baseCase tail) tree
 
 
 {-| Reduce an array from the left. Read `foldl` as fold from the left.
@@ -490,20 +486,17 @@ foldr f init (Array _ _ tree tail) =
     foldl (::) [] (fromList [1,2,3]) == [3,2,1]
 -}
 foldl : (a -> b -> b) -> b -> Array a -> b
-foldl f init (Array _ _ tree tail) =
+foldl func baseCase (Array_elm_builtin _ _ tree tail) =
     let
-        helper i acc =
-            case i of
+        helper node acc =
+            case node of
                 SubTree subTree ->
                     JsArray.foldl helper acc subTree
 
                 Leaf values ->
-                    JsArray.foldl f acc values
-
-        acc =
-            JsArray.foldl helper init tree
+                    JsArray.foldl func acc values
     in
-        JsArray.foldl f acc tail
+        JsArray.foldl func (JsArray.foldl helper baseCase tree) tail
 
 
 {-| Keep only elements that satisfy the predicate.
@@ -511,16 +504,15 @@ foldl f init (Array _ _ tree tail) =
     filter isEven (fromList [1,2,3]) == (fromList [2])
 -}
 filter : (a -> Bool) -> Array a -> Array a
-filter f arr =
+filter isGood array =
     let
-        helper n acc =
-            if f n then
-                n :: acc
+        keepGoodItems item list =
+            if isGood item then
+                item :: list
             else
-                acc
+                list
     in
-        foldr helper [] arr
-            |> fromList
+        fromList (foldr keepGoodItems [] array)
 
 
 {-| Apply a function on every element in an array.
@@ -528,21 +520,21 @@ filter f arr =
     map sqrt (fromList [1,4,9]) == fromList [1,2,3]
 -}
 map : (a -> b) -> Array a -> Array b
-map f (Array length startShift tree tail) =
+map func (Array_elm_builtin len startShift tree tail) =
     let
-        helper i =
-            case i of
+        helper node =
+            case node of
                 SubTree subTree ->
                     SubTree <| JsArray.map helper subTree
 
                 Leaf values ->
-                    Leaf <| JsArray.map f values
+                    Leaf <| JsArray.map func values
     in
-        Array
-            length
+        Array_elm_builtin
+            len
             startShift
             (JsArray.map helper tree)
-            (JsArray.map f tail)
+            (JsArray.map func tail)
 
 
 {-| Apply a function on every element with its index as first argument.
@@ -550,7 +542,7 @@ map f (Array length startShift tree tail) =
     indexedMap (*) (fromList [5,5,5]) == fromList [0,5,10]
 -}
 indexedMap : (Int -> a -> b) -> Array a -> Array b
-indexedMap f ((Array length _ tree tail) as arr) =
+indexedMap func (Array_elm_builtin len _ tree tail) =
     let
         helper node builder =
             case node of
@@ -563,7 +555,7 @@ indexedMap f ((Array length _ tree tail) as arr) =
                             builder.nodeListSize * branchFactor
 
                         mappedLeaf =
-                            Leaf <| JsArray.indexedMap f offset leaf
+                            Leaf <| JsArray.indexedMap func offset leaf
                     in
                         { tail = builder.tail
                         , nodeList = mappedLeaf :: builder.nodeList
@@ -571,13 +563,12 @@ indexedMap f ((Array length _ tree tail) as arr) =
                         }
 
         initialBuilder =
-            { tail = JsArray.indexedMap f (tailIndex length) tail
+            { tail = JsArray.indexedMap func (tailIndex len) tail
             , nodeList = []
             , nodeListSize = 0
             }
     in
-        JsArray.foldl helper initialBuilder tree
-            |> builderToArray True
+        builderToArray True (JsArray.foldl helper initialBuilder tree)
 
 
 {-| Append two arrays to a new one.
@@ -585,25 +576,22 @@ indexedMap f ((Array length _ tree tail) as arr) =
     append (repeat 2 42) (repeat 3 81) == fromList [42,42,81,81,81]
 -}
 append : Array a -> Array a -> Array a
-append ((Array _ _ _ aTail) as a) (Array bLen _ bTree bTail) =
+append ((Array_elm_builtin _ _ _ aTail) as a) (Array_elm_builtin bLen _ bTree bTail) =
     -- The magic number 4 has been found with benchmarks
     if bLen <= (branchFactor * 4) then
         let
-            foldHelper node arr =
+            foldHelper node array =
                 case node of
                     SubTree tree ->
-                        JsArray.foldl foldHelper arr tree
+                        JsArray.foldl foldHelper array tree
 
                     Leaf leaf ->
-                        appendHelpTree leaf arr
+                        appendHelpTree leaf array
         in
             JsArray.foldl foldHelper a bTree
                 |> appendHelpTree bTail
     else
         let
-            builder =
-                builderFromArray a
-
             foldHelper node builder =
                 case node of
                     SubTree tree ->
@@ -612,13 +600,13 @@ append ((Array _ _ _ aTail) as a) (Array bLen _ bTree bTail) =
                     Leaf leaf ->
                         appendHelpBuilder leaf builder
         in
-            JsArray.foldl foldHelper builder bTree
+            JsArray.foldl foldHelper (builderFromArray a) bTree
                 |> appendHelpBuilder bTail
                 |> builderToArray True
 
 
 appendHelpTree : JsArray a -> Array a -> Array a
-appendHelpTree toAppend ((Array length shiftStep tree tail) as arr) =
+appendHelpTree toAppend ((Array_elm_builtin len _ tree tail) as array) =
     let
         appended =
             JsArray.appendN branchFactor tail toAppend
@@ -630,7 +618,7 @@ appendHelpTree toAppend ((Array length shiftStep tree tail) as arr) =
             branchFactor - (JsArray.length tail) - itemsToAppend
 
         newArray =
-            unsafeReplaceTail appended arr
+            unsafeReplaceTail appended array
     in
         if notAppended < 0 then
             let
@@ -656,12 +644,12 @@ appendHelpBuilder tail builder =
     in
         if notAppended < 0 then
             { tail = JsArray.slice notAppended tailLen tail
-            , nodeList = (Leaf appended) :: builder.nodeList
+            , nodeList = Leaf appended :: builder.nodeList
             , nodeListSize = builder.nodeListSize + 1
             }
         else if notAppended == 0 then
             { tail = JsArray.empty
-            , nodeList = (Leaf appended) :: builder.nodeList
+            , nodeList = Leaf appended :: builder.nodeList
             , nodeListSize = builder.nodeListSize + 1
             }
         else
@@ -689,18 +677,18 @@ This makes it pretty easy to `pop` the last element off of an array:
 `slice 0 -1 array`
 -}
 slice : Int -> Int -> Array a -> Array a
-slice from to arr =
+slice from to array =
     let
         correctFrom =
-            translateIndex from arr
+            translateIndex from array
 
         correctTo =
-            translateIndex to arr
+            translateIndex to array
     in
         if correctFrom > correctTo then
             empty
         else
-            arr
+            array
                 |> sliceRight correctTo
                 |> sliceLeft correctFrom
 
@@ -712,18 +700,18 @@ slice from to arr =
     translateIndex 5 someArray == 5
 -}
 translateIndex : Int -> Array a -> Int
-translateIndex idx (Array length _ _ _) =
+translateIndex index (Array_elm_builtin len _ _ _) =
     let
         posIndex =
-            if idx < 0 then
-                length + idx
+            if index < 0 then
+                len + index
             else
-                idx
+                index
     in
         if posIndex < 0 then
             0
-        else if posIndex > length then
-            length
+        else if posIndex > len then
+            len
         else
             posIndex
 
@@ -741,11 +729,11 @@ slice it.
 3. Promote subTrees until the tree has the correct height.
 -}
 sliceRight : Int -> Array a -> Array a
-sliceRight end ((Array length startShift tree tail) as arr) =
-    if end == length then
-        arr
-    else if end >= tailIndex length then
-        Array end startShift tree <|
+sliceRight end ((Array_elm_builtin len startShift tree tail) as array) =
+    if end == len then
+        array
+    else if end >= tailIndex len then
+        Array_elm_builtin end startShift tree <|
             JsArray.slice 0 (Bitwise.and bitMask end) tail
     else
         let
@@ -762,7 +750,7 @@ sliceRight end ((Array length startShift tree tail) as arr) =
             newShift =
                 max 5 <| depth * shiftStep
         in
-            Array
+            Array_elm_builtin
                 end
                 newShift
                 (tree
@@ -854,12 +842,12 @@ Otherwise, we do the following:
 5. Append the remaining nodes into this builder, and create the array.
 -}
 sliceLeft : Int -> Array a -> Array a
-sliceLeft from ((Array length _ tree tail) as arr) =
+sliceLeft from ((Array_elm_builtin len _ tree tail) as array) =
     if from == 0 then
-        arr
-    else if from >= tailIndex length then
-        Array (length - from) shiftStep JsArray.empty <|
-            JsArray.slice (from - tailIndex length) (JsArray.length tail) tail
+        array
+    else if from >= tailIndex len then
+        Array_elm_builtin (len - from) shiftStep JsArray.empty <|
+            JsArray.slice (from - tailIndex len) (JsArray.length tail) tail
     else
         let
             helper node acc =
@@ -926,19 +914,19 @@ emptyBuilder =
 {-| Converts an array to a builder.
 -}
 builderFromArray : Array a -> Builder a
-builderFromArray (Array length _ tree tail) =
+builderFromArray (Array_elm_builtin len _ tree tail) =
     let
         helper node acc =
             case node of
-                SubTree tree ->
-                    JsArray.foldl helper acc tree
+                SubTree subTree ->
+                    JsArray.foldl helper acc subTree
 
                 Leaf _ ->
                     node :: acc
     in
         { tail = tail
         , nodeList = JsArray.foldl helper [] tree
-        , nodeListSize = length // branchFactor
+        , nodeListSize = len // branchFactor
         }
 
 
@@ -952,7 +940,7 @@ specify if the node list should be reversed before building the array.
 builderToArray : Bool -> Builder a -> Array a
 builderToArray reverseNodeList builder =
     if builder.nodeListSize == 0 then
-        Array
+        Array_elm_builtin
             (JsArray.length builder.tail)
             shiftStep
             JsArray.empty
@@ -977,7 +965,7 @@ builderToArray reverseNodeList builder =
             tree =
                 treeFromBuilder correctNodeList builder.nodeListSize
         in
-            Array
+            Array_elm_builtin
                 (JsArray.length builder.tail + treeLen)
                 (max 5 <| depth * shiftStep)
                 tree
