@@ -44,7 +44,7 @@ errors.
 
 
 import Array exposing (Array)
-import Basics exposing (Bool, Int, (+), (++), (&&))
+import Basics exposing (..)
 import Char
 import Dict exposing (Dict)
 import Json.Encode
@@ -449,24 +449,25 @@ errorToString error =
 errorToStringHelp : Error -> List String -> String
 errorToStringHelp error context =
   case error of
-    Field field err ->
+    Field f err ->
       let
         isSimple =
-          case String.uncons field of
+          case String.uncons f of
             Nothing ->
               False
+
             Just (char, rest) ->
               Char.isAlpha char && String.all Char.isAlphaNum rest
 
         fieldName =
-          if isSimple then "." ++ field else "['" ++ field ++ "']"
+          if isSimple then "." ++ f else "['" ++ f ++ "']"
       in
         errorToStringHelp err (fieldName :: context)
 
-    Index index err ->
+    Index i err ->
       let
         indexName =
-          "[" ++ String.fromInt index ++ "]"
+          "[" ++ String.fromInt i ++ "]"
       in
         errorToStringHelp err (indexName :: context)
 
@@ -497,7 +498,7 @@ errorToStringHelp error context =
           in
             String.join "\n\n" (introduction :: List.indexedMap errorOneOf errors)
 
-    Failure msg value ->
+    Failure msg json ->
       let
         introduction =
           case context of
@@ -506,12 +507,12 @@ errorToStringHelp error context =
             _ ->
               "Problem with the value at json" ++ String.join "" (List.reverse context) ++ ":\n\n    "
       in
-        introduction ++ indent (Json.Encode.encode 4 value) ++ "\n\n" ++ msg
+        introduction ++ indent (Json.Encode.encode 4 json) ++ "\n\n" ++ msg
 
 
 errorOneOf : Int -> Error -> String
-errorOneOf index error =
-  "\n\n(" ++ String.fromInt (index + 1) ++ ") " ++ indent (errorToString error)
+errorOneOf i error =
+  "\n\n(" ++ String.fromInt (i + 1) ++ ") " ++ indent (errorToString error)
 
 
 indent : String -> String

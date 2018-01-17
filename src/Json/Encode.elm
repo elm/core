@@ -22,7 +22,7 @@ module Json.Encode exposing
 -}
 
 import Array exposing (Array)
-import Basics exposing (Bool, Int)
+import Basics exposing (Bool, Int, Float)
 import Dict exposing (Dict)
 import List
 import Set exposing (Set)
@@ -219,7 +219,7 @@ dict : (k -> String) -> (v -> Value) -> Dict k v -> Value
 dict toKey toValue dictionary =
     Elm.Kernel.Json.wrap (
         Dict.foldl
-            (\key value object -> Elm.Kernel.Json.addField (toKey key) (toValue value) object)
+            (\key value obj -> Elm.Kernel.Json.addField (toKey key) (toValue value) obj)
             (Elm.Kernel.Json.emptyObject ())
             dictionary
     )
@@ -241,7 +241,7 @@ keyValuePairs : (k -> String) -> (v -> Value) -> List ( k, v ) -> Value
 keyValuePairs toKey toValue pairs =
     Elm.Kernel.Json.wrap (
         List.foldl
-            (\(key,value) object -> Elm.Kernel.Json.addField (toKey key) (toValue value) object)
+            (\(key,value) obj -> Elm.Kernel.Json.addField (toKey key) (toValue value) obj)
             (Elm.Kernel.Json.emptyObject ())
             pairs
     )
