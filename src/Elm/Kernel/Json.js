@@ -3,7 +3,7 @@
 import Array exposing (initialize)
 import Elm.Kernel.List exposing (Cons, Nil, fromArray)
 import Elm.Kernel.Utils exposing (Tuple2)
-import Json.Decoder as Json exposing (Field, Index, OneOf, Failure)
+import Json.Decode as Json exposing (Field, Index, OneOf, Failure)
 import List exposing (reverse)
 import Maybe exposing (Just, Nothing)
 import Result exposing (Ok, Err, isOk)
