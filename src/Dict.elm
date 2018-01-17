@@ -149,7 +149,12 @@ sizeHelp n dict =
 -}
 isEmpty : Dict k v -> Bool
 isEmpty dict =
-  dict == empty
+  case dict of
+    RBEmpty_elm_builtin _ ->
+      True
+
+    RBNode_elm_builtin _ _ _ _ _ ->
+      False
 
 
 {- The actual pattern match here is somewhat lax. If it is given invalid input,
