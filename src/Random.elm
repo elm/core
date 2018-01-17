@@ -240,7 +240,7 @@ entities?
 -}
 pair : Generator a -> Generator b -> Generator (a,b)
 pair genA genB =
-  map2 (,) genA genB
+  map2 (\a b -> (a,b)) genA genB
 
 
 {-| Generate a list of random values.
@@ -267,23 +267,23 @@ This generator gets a random integer between five and ten **and then**
 uses that to generate a random list of digits.
 -}
 list : Int -> Generator a -> Generator (List a)
-list n (Generator generate) =
+list n (Generator gen) =
   Generator (\seed ->
-    listHelp [] n generate seed
+    listHelp [] n gen seed
   )
 
 
 listHelp : List a -> Int -> (Seed -> (a,Seed)) -> Seed -> (List a, Seed)
-listHelp list n generate seed =
+listHelp revList n gen seed =
   if n < 1 then
-    (list, seed)
+    (revList, seed)
 
   else
     let
       (value, newSeed) =
-        generate seed
+        gen seed
     in
-      listHelp (value :: list) (n-1) generate newSeed
+      listHelp (value :: revList) (n-1) gen newSeed
 
 
 
@@ -516,14 +516,11 @@ may be helpful to look through the implementation there for more examples.
 [extra]: /packages/elm-community/random-extra/latest
 -}
 andThen : (a -> Generator b) -> Generator a -> Generator b
-andThen callback (Generator generate) =
+andThen callback (Generator genA) =
   Generator (\seed ->
     let
-      (result, newSeed) =
-        generate seed
-
-      (Generator genB) =
-        callback result
+      (result, newSeed) = genA seed
+      (Generator genB) = callback result
     in
       genB newSeed
   )
