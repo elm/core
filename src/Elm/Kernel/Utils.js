@@ -14,13 +14,13 @@ import Set exposing (toList)
 
 function _Utils_eq(x, y)
 {
-	var stack = [];
-	var isEqual = _Utils_eqHelp(x, y, 0, stack);
-	var pair;
-	while (isEqual && (pair = stack.pop()))
-	{
-		isEqual = _Utils_eqHelp(pair.x, pair.y, 0, stack);
-	}
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
 	return isEqual;
 }
 
@@ -28,7 +28,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 {
 	if (depth > 100)
 	{
-		stack.push({ x: x, y: y });
+		stack.push(_Utils_Tuple2(x,y));
 		return true;
 	}
 
@@ -37,48 +37,32 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return true;
 	}
 
-	if (typeof x !== 'object')
+	if (typeof x !== 'object' || (x === null || y === null))
 	{
-		if (typeof x === 'function')
-		{
-			__Error_throw(5);
-		}
+		typeof x === 'function' && __Error_throw(5);
 		return false;
 	}
 
-	if (x === null || y === null)
-	{
-		return false
-	}
-
-	// convert Dicts and Sets to lists
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = __Dict_toList(x);
-		y = __Dict_toList(y);
-	}
+	/**__DEBUG/
 	if (x.$ === 'Set_elm_builtin')
 	{
 		x = __Set_toList(x);
 		y = __Set_toList(y);
 	}
-
-	// check if lists are equal without recursion
-	if (x.$ === '::')
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
 	{
-		var a = x;
-		var b = y;
-		while (a.$ === '::' && b.$ === '::')
-		{
-			if (!_Utils_eqHelp(a.a, b.a, depth + 1, stack))
-			{
-				return false;
-			}
-			a = a.b;
-			b = b.b;
-		}
-		return a.$ === b.$;
+		x = __Dict_toList(x);
+		y = __Dict_toList(y);
 	}
+	//*/
+
+	/**__PROD/
+	if (x.$ < 0)
+	{
+		x = __Dict_toList(x);
+		y = __Dict_toList(y);
+	}
+	//*/
 
 	for (var key in x)
 	{
@@ -94,50 +78,34 @@ var _Utils_equal = F2(_Utils_eq);
 var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
 
 
+
 // COMPARISONS
 
 // Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
 // the particular integer values assigned to LT, EQ, and GT.
 
-function _Utils_cmp__PROD(x, y, ord)
+function _Utils_cmp(x, y, ord)
 {
 	if (typeof x !== 'object')
 	{
 		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
 	}
 
-	if (!x.$)
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	while (x.$ === '::' && y.$ === '::' && !(ord = _Utils_cmp(x.a, y.a)))
-	{
-		x = x.b;
-		y = y.b;
-	}
-	return ord || (x.$ === y.$ ? /*EQ*/ 0 : x.$ === '[]' ? /*LT*/ -1 : /*GT*/ 1);
-}
-
-function _Utils_cmp__DEBUG(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
+	/**__DEBUG/
 	if (x instanceof String)
 	{
 		var a = x.valueOf();
 		var b = y.valueOf();
-		return a === b ? /*EQ*/ 0 : a < b ? /*LT*/ -1 : /*GT*/ 1;
+		return a === b ? 0 : a < b ? -1 : 1;
 	}
+	//*/
 
+	/**__PROD/
+	if (!x.$)
+	//*/
+	/**__DEBUG/
 	if (x.$[0] === '#')
+	//*/
 	{
 		return (ord = _Utils_cmp(x.a, y.a))
 			? ord
@@ -146,12 +114,9 @@ function _Utils_cmp__DEBUG(x, y, ord)
 				: _Utils_cmp(x.c, y.c);
 	}
 
-	while (x.$ === '::' && y.$ === '::' && !(ord = _Utils_cmp(x.a, y.a)))
-	{
-		x = x.b;
-		y = y.b;
-	}
-	return ord || (x.$ === y.$ ? /*EQ*/ 0 : x.$ === '[]' ? /*LT*/ -1 : /*GT*/ 1);
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
 }
 
 var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) === /*LT*/ -1; });
@@ -213,19 +178,14 @@ function _Utils_ap(xs, ys)
 	}
 
 	// append Lists
-	if (xs.$ === '[]')
+	if (!xs.b)
 	{
 		return ys;
 	}
-	var root = __List_Cons(xs.a, __List_Nil);
-	var curr = root;
-	xs = xs.b;
-	while (xs.$ !== '[]')
+	var root = __List_Cons(xs.a, ys);
+	for (var curr = root; xs = xs.b; ) // WHILE_CONS
 	{
-		curr.b = __List_Cons(xs.a, __List_Nil);
-		xs = xs.b;
-		curr = curr.b;
+		curr = curr.b = __List_Cons(xs.a, ys);
 	}
-	curr.b = ys;
 	return root;
 }
