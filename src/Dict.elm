@@ -197,7 +197,7 @@ type Flag = Insert | Remove | Same
 
 {-| Update the value of a dictionary for a specific key with a given function. -}
 update : comparable -> (Maybe v -> Maybe v) -> Dict comparable v -> Dict comparable v
-update k alter dictionary =
+update targetKey alter dictionary =
   let
     up dict =
       case dict of
@@ -208,41 +208,41 @@ update k alter dictionary =
               (Same, empty)
 
             Just v ->
-              (Insert, RBNode_elm_builtin Red k v empty empty)
+              (Insert, RBNode_elm_builtin Red targetKey v empty empty)
 
-        RBNode_elm_builtin clr key value left right ->
-          case compare k key of
+        RBNode_elm_builtin color key value left right ->
+          case compare targetKey key of
             EQ ->
               case alter (Just value) of
                 Nothing ->
-                  (Remove, rem clr left right)
+                  (Remove, rem color left right)
 
                 Just newValue ->
-                  (Same, RBNode_elm_builtin clr key newValue left right)
+                  (Same, RBNode_elm_builtin color key newValue left right)
 
             LT ->
               let (flag, newLeft) = up left in
               case flag of
                 Same ->
-                  (Same, RBNode_elm_builtin clr key value newLeft right)
+                  (Same, RBNode_elm_builtin color key value newLeft right)
 
                 Insert ->
-                  (Insert, balance clr key value newLeft right)
+                  (Insert, balance color key value newLeft right)
 
                 Remove ->
-                  (Remove, bubble clr key value newLeft right)
+                  (Remove, bubble color key value newLeft right)
 
             GT ->
               let (flag, newRight) = up right in
               case flag of
                 Same ->
-                  (Same, RBNode_elm_builtin clr key value left newRight)
+                  (Same, RBNode_elm_builtin color key value left newRight)
 
                 Insert ->
-                  (Insert, balance clr key value left newRight)
+                  (Insert, balance color key value left newRight)
 
                 Remove ->
-                  (Remove, bubble clr key value left newRight)
+                  (Remove, bubble color key value left newRight)
 
     (finalFlag, updatedDict) =
       up dictionary
@@ -376,44 +376,44 @@ rem color left right =
 
 -- Kills a BBlack or moves it upward, may leave behind NBlack
 bubble : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-bubble c k v l r =
-  if isBBlack l || isBBlack r then
-    balance (moreBlack c) k v (lessBlackTree l) (lessBlackTree r)
+bubble color key value left right =
+  if isBBlack left || isBBlack right then
+    balance (moreBlack color) key value (lessBlackTree left) (lessBlackTree right)
 
   else
-    RBNode_elm_builtin c k v l r
+    RBNode_elm_builtin color key value left right
 
 
 -- Removes rightmost node, may leave root as BBlack
 removeMax : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-removeMax c k v l r =
-  case r of
+removeMax color key value left right =
+  case right of
     RBEmpty_elm_builtin _ ->
-      rem c l r
+      rem color left right
 
     RBNode_elm_builtin cr kr vr lr rr ->
-      bubble c k v l (removeMax cr kr vr lr rr)
+      bubble color key value left (removeMax cr kr vr lr rr)
 
 
 -- generalized tree balancing act
 balance : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
-balance c k v l r =
+balance color key value left right =
   let
-    tree =
-      RBNode_elm_builtin c k v l r
+    dict =
+      RBNode_elm_builtin color key value left right
   in
-    if blackish tree then
-      balanceHelp tree
+    if blackish dict then
+      balanceHelp dict
 
     else
-      tree
+      dict
 
 
 blackish : Dict k v -> Bool
-blackish t =
-  case t of
-    RBNode_elm_builtin c _ _ _ _ ->
-      c == Black || c == BBlack
+blackish dict =
+  case dict of
+    RBNode_elm_builtin color _ _ _ _ ->
+      color == Black || color == BBlack
 
     RBEmpty_elm_builtin _ ->
       True
@@ -556,39 +556,39 @@ merge leftStep bothStep rightStep leftDict rightDict initialResult =
 {-| Apply a function to all values in a dictionary.
 -}
 map : (k -> a -> b) -> Dict k a -> Dict k b
-map f dict =
+map func dict =
   case dict of
     RBEmpty_elm_builtin _ ->
       RBEmpty_elm_builtin LBlack
 
-    RBNode_elm_builtin clr key value left right ->
-      RBNode_elm_builtin clr key (f key value) (map f left) (map f right)
+    RBNode_elm_builtin color key value left right ->
+      RBNode_elm_builtin color key (func key value) (map func left) (map func right)
 
 
 {-| Fold over the key-value pairs in a dictionary, in order from lowest
 key to highest key.
 -}
 foldl : (k -> v -> b -> b) -> b -> Dict k v -> b
-foldl f acc dict =
+foldl func acc dict =
   case dict of
     RBEmpty_elm_builtin _ ->
       acc
 
     RBNode_elm_builtin _ key value left right ->
-      foldl f (f key value (foldl f acc left)) right
+      foldl func (func key value (foldl func acc left)) right
 
 
 {-| Fold over the key-value pairs in a dictionary, in order from highest
 key to lowest key.
 -}
 foldr : (k -> v -> b -> b) -> b -> Dict k v -> b
-foldr f acc t =
+foldr func acc t =
   case t of
     RBEmpty_elm_builtin _ ->
       acc
 
     RBNode_elm_builtin _ key value left right ->
-      foldr f (f key value (foldr f acc right)) left
+      foldr func (func key value (foldr func acc right)) left
 
 
 {-| Keep a key-value pair when it satisfies a predicate. -}
