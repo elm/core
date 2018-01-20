@@ -1,6 +1,6 @@
 module Json.Decode exposing
   ( Decoder, string, bool, int, float
-  , nullable, list, array, dict, keyValuePairs
+  , nullable, list, array, dict, keyValuePairs, enum
   , field, at, index
   , maybe, oneOf
   , decodeString, decodeValue, Value, Error, errorToString
@@ -17,7 +17,7 @@ JSON decoders][guide] to get a feel for how this library works!
 @docs Decoder, string, bool, int, float
 
 # Data Structures
-@docs nullable, list, array, dict, keyValuePairs
+@docs nullable, list, array, dict, keyValuePairs, enum
 
 # Object Primitives
 @docs field, at, index
@@ -174,6 +174,38 @@ keyValuePairs : Decoder a -> Decoder (List (String, a))
 keyValuePairs =
   Elm.Kernel.Json.decodeKeyValuePairs
 
+
+{-| Decode a mapping of strings to values.
+
+    funnyBool : Decoder Bool
+    funnyBool =
+      enum <|
+        Dict.fromList
+          [ ("yes", True)
+          , ("no", False)
+          ]
+
+Then this works:
+
+    decodeString funnyBool "\"yes\"" == Ok True
+    decodeString funnyBool "\"no\""  == Ok False
+
+For more complex types, you should write your own decoder with
+[`andThen`](#andThen).
+-}
+enum : Dict String a -> Decoder a
+enum mapping =
+  let
+      decode key =
+        case Dict.get key mapping of
+          Just a ->
+            succeed a
+
+          Nothing ->
+            fail <|
+              "I'm looking for one of " ++ String.join ", " (Dict.keys mapping) ++ ", but got " ++ key ++ "."
+  in
+    string |> andThen decode
 
 
 -- OBJECT PRIMITIVES
