@@ -32,7 +32,6 @@ tests =
         , CodeGen.tests
         , Dict.tests
         , Equality.tests
-        , Json.tests
         , List.tests
         , Result.tests
         , Set.tests
