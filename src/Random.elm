@@ -218,7 +218,7 @@ tons of nice helpers.
 [extra]: /packages/elm-community/random-extra/latest
 -}
 constant : a -> Generator a
-constant =
+constant value =
   Generator (\seed -> (value, seed))
 
 
@@ -743,7 +743,7 @@ cmdMap func (Generate generator) =
 
 init : Task Never Seed
 init =
-    Task.andThen (\t -> Task.succeed (initialSeed (round t))) Time.now
+  Task.andThen (\time -> Task.succeed (initialSeed (Time.posixToMillis time))) Time.now
 
 
 onEffects : Platform.Router msg Never -> List (MyCmd msg) -> Seed -> Task Never Seed
