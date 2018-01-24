@@ -4,31 +4,37 @@
 	"summary": "Elm's standard libraries",
 	"license": "BSD-3-Clause",
 	"version": "6.0.0",
-	"exposed-modules": [
-		"Array",
-		"Basics",
-		"Bitwise",
-		"Char",
-		"Debug",
-		"Dict",
-		"Json.Decode",
-		"Json.Encode",
-		"List",
-		"Maybe",
-		"Platform",
-		"Platform.Cmd",
-		"Platform.Sub",
-		"Process",
-		"Random",
-		"Result",
-		"Set",
-		"String",
-		"Task",
-		"Time",
-		"Tuple"
-	],
+	"exposed-modules": {
+		"Primitives": [
+			"Basics",
+			"String",
+			"Char",
+			"Time",
+			"Bitwise"
+		],
+		"Collections": [
+			"List",
+			"Dict",
+			"Set",
+			"Array",
+			"Tuple"
+		],
+		"Error Handling": [
+			"Maybe",
+			"Result"
+		],
+		"Debug": [
+			"Debug"
+		],
+		"Effects": [
+			"Platform",
+			"Platform.Cmd",
+			"Platform.Sub",
+			"Task",
+			"Process"
+		]
+	},
 	"elm-version": "0.19.0 <= v < 0.20.0",
 	"dependencies": {},
-	"test-dependencies": {},
-	"effect-modules": true
+	"test-dependencies": {}
 }
