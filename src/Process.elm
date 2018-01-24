@@ -44,12 +44,11 @@ the Elm community will be supportive of being more ambitious, even if it takes
 longer. That’s kind of what Elm is all about.
 -}
 
-import Basics exposing (Never)
+import Basics exposing (Float, Never)
 import Elm.Kernel.Scheduler
 import Elm.Kernel.Time
 import Platform
 import Task exposing (Task)
-import Time exposing (Time)
 
 
 {-| A light-weight process that runs concurrently. You can use `spawn` to
@@ -85,13 +84,13 @@ spawn =
   Elm.Kernel.Scheduler.spawn
 
 
-{-| Block progress on the current process for a given amount of time. The
-JavaScript equivalent of this is [`setTimeout`][setTimeout] which lets you
+{-| Block progress on the current process for the given number of milliseconds.
+The JavaScript equivalent of this is [`setTimeout`][setTimeout] which lets you
 delay work until later.
 
 [setTimeout]: https://developer.mozilla.org/en-US/docs/Web/API/WindowTimers/setTimeout
 -}
-sleep : Time -> Task x ()
+sleep : Float -> Task x ()
 sleep =
   Elm.Kernel.Time.sleep
 
