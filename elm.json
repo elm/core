@@ -9,15 +9,14 @@
 			"Basics",
 			"String",
 			"Char",
-			"Time",
-			"Bitwise"
+			"Bitwise",
+			"Tuple"
 		],
 		"Collections": [
 			"List",
 			"Dict",
 			"Set",
-			"Array",
-			"Tuple"
+			"Array"
 		],
 		"Error Handling": [
 			"Maybe",
