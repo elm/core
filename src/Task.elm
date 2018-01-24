@@ -209,9 +209,9 @@ So we describe some complex behavior with a `Task` and then command the runtime
 to `perform` that task. For example, getting the current time looks like this:
 
     import Task
-    import Time exposing (Time)
+    import Time
 
-    type Msg = Click | NewTime Time
+    type Msg = Click | NewTime Time.Posix
 
     update : Msg -> Model -> ( Model, Cmd Msg )
     update msg model =
