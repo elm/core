@@ -36,7 +36,7 @@ function _List_toArray(xs)
 
 var _List_map2 = F3(function(f, xs, ys)
 {
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHLIE_CONSES
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
 	{
 		arr.push(A2(f, xs.a, ys.a));
 	}
