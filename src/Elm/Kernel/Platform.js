@@ -27,6 +27,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
 			function() { return function() {} }
 		);
 	};
+	return object;
 });
 
 
