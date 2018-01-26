@@ -421,7 +421,7 @@ function _Platform_setupIncomingPort(name, sendToApp)
 		__Result_isOk(result) || __Error_throw(4, name, result.a);
 
 		var value = result.a;
-		while (var temp = subs; temp.b; temp = temp.b) // WHILE_CONS
+		for (var temp = subs; temp.b; temp = temp.b) // WHILE_CONS
 		{
 			sendToApp(temp.a(value));
 		}

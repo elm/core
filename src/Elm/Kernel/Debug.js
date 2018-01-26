@@ -113,9 +113,9 @@ function _Debug_toString__DEBUG(v)
 		{
 			var output = '[';
 
-			v.b && (output += _Debug_toString(v.a), v = v.b)
+			v.b && (output += _Debug_toString(v.a))
 
-			for (v.b; v = v.b) // WHILE_CONS
+			for (; v = v.b;) // WHILE_CONS
 			{
 				output += ',' + _Debug_toString(v.a);
 			}
