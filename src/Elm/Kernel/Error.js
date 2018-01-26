@@ -66,7 +66,7 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 
 function _Error_regionToString(region)
 {
-	if (region.__$start.__$line == region.__$end.__$line)
+	if (region.__$start.__$line === region.__$end.__$line)
 	{
 		return 'on line ' + region.__$start.__$line;
 	}
