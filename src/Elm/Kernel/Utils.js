@@ -183,7 +183,8 @@ function _Utils_ap(xs, ys)
 		return ys;
 	}
 	var root = __List_Cons(xs.a, ys);
-	for (var curr = root; xs = xs.b; ) // WHILE_CONS
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
 	{
 		curr = curr.b = __List_Cons(xs.a, ys);
 	}
