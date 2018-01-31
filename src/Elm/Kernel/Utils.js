@@ -119,10 +119,10 @@ function _Utils_cmp(x, y, ord)
 	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
 }
 
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) === /*LT*/ -1; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) !== /*GT*/ 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) === /*GT*/ 1; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) !== /*LT*/ -1; });
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
 
 var _Utils_compare = F2(function(x, y)
 {
