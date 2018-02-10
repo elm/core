@@ -1,7 +1,6 @@
 module Tuple exposing
   ( first, second
   , mapFirst, mapSecond, mapBoth
-  , apply
   )
 
 {-| Elm has built-in syntax for tuples, so you can define 2D points like this:
@@ -31,7 +30,7 @@ info on this. (Picking appropriate data structures is super important in Elm!)
 @docs first, second
 
 # Mapping
-@docs mapFirst, mapSecond, mapBoth, apply
+@docs mapFirst, mapSecond, mapBoth
 
 -}
 
@@ -96,22 +95,3 @@ mapSecond func (x,y) =
 mapBoth : (a -> x) -> (b -> y) -> (a, b) -> (x, y)
 mapBoth funcA funcB (x,y) =
   ( funcA x, funcB y )
-
-
-{-| Sometimes you have a normal function that takes *two* arguments, but the
-arguments happen to be in a tuple for some reason.
-
-    apply max  (3,4) == 4
-    apply (==) (3,4) == False
-
-These examples are pretty silly! It is occasionally useful in practice though.
-Maybe you have some `view` code like this:
-
-  - A list `books : List (String, Int)` of titles and page counts.
-  - A `viewBook : String -> Int -> Html msg` to display that info.
-
-You could say `List.map (Tuple.apply viewBook) books` and have it all work out!
--}
-apply : (a -> b -> result) -> (a, b) -> result
-apply func (x, y) =
-  func x y
