@@ -63,6 +63,84 @@ Initializing a headless program from JavaScript looks like this:
 ```javascript
 var app = Elm.MyThing.worker();
 ```
+
+### init
+
+The first argument, `init` is a [Tuple](Tuple) that lets you specify how your program should start.
+Its first value is the initial state of your program's model.
+The second value is an initial command. Often that command is [Cmd.none](Platform-Cmd#none).
+
+### update
+
+The second argument, `update` is a function that takes these two arguments:
+
+1. A message from the outside world that has the information your code will act upon.
+Usually this is a [Msg type](https://www.elm-tutorial.org/en/02-elm-arch/03-messages.html)
+that you specify, which takes a record type matching the data coming from an incoming port.
+Unpack that data with `case` ... `of`.
+
+2. The current state of your program's model.
+
+The `update` function must return a [Tuple](Tuple) containing the modified form
+of your program's model, and a command.
+
+It is common to generate that command by passing data to an outbound port.
+Then the data type this command holds is determined by Elm, and probably
+will __not__ match any type you have defined in your code.
+
+### subscriptions
+
+The third argument, `subscriptions` is called when your program initializes, and after each call to `update`.
+As explained in [the effects section of the Elm language guide](https://guide.elm-lang.org/architecture/effects/),
+it _"declares any event sources you need to subscribe to given the current model."_
+
+A common use is to call an input port function and pass it a message type you have defined
+which accepts a certain data structure from outside of Elm. To specify multiple subscriptions, use [Sub.batch](Platform-Sub#batch).
+
+A code example may help. Here we have program that greets visitors by name, keeps a head count,
+and shuts down its subscription after greeting more than three visitors:
+
+```elm
+port module Greet exposing (..)
+
+import Json.Decode
+
+port greet : String -> Cmd a
+
+port inputName : ( String -> msg ) -> Sub msg
+
+type Msg = Name String
+
+type alias Model = { visitors : Int }
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
+    Name name ->
+      let
+        newModel =
+          model.visitors + 1 |> Model
+        greeting =
+          "Hi " ++ name ++ ", you're visitor " ++ toString newModel.visitors
+      in
+        ( newModel, greet greeting )
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  if model.visitors > 3 then
+    Sub.none
+  else
+    inputName Name
+
+main : Program Never Model Msg
+main =
+  Platform.program {
+    init = ( Model 0, Cmd.none ),
+    update = update,
+    subscriptions = subscriptions
+  }
+```
+
 -}
 worker
   : { init : flags -> ( model, Cmd msg )
