@@ -154,7 +154,7 @@ can do things like this:
 
 You _cannot_ add an `Int` and a `Float` directly though. Use functions like
 [toFloat](#toFloat) or [round](#round) to convert both values to the same type.
-So if you needed to add a list length to a `Float` for some crazy reason, you
+So if you needed to add a list length to a `Float` for some reason, you
 could say one of these:
 
     3.14 + toFloat (List.length [1,2,3]) == 6.14
