@@ -19,7 +19,7 @@ function _Char_fromCode(code)
 {
 	if (code <= 0xFFFF)
 	{
-		return __Utils_chr(String.fromCharCode(c));
+		return __Utils_chr(String.fromCharCode(code));
 	}
 	var n = code - 0x10000;
 	var hi = String.fromCharCode(Math.floor(n / 0x400) + 0xD800);
