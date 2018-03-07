@@ -614,6 +614,8 @@ e =
 
 
 {-| Convert radians to standard Elm angles (radians).
+
+    radians pi == 3.141592653589793
 -}
 radians : Float -> Float
 radians angleInRadians =
@@ -621,14 +623,17 @@ radians angleInRadians =
 
 
 {-| Convert degrees to standard Elm angles (radians).
+
+    degrees 180 == 3.141592653589793
 -}
 degrees : Float -> Float
 degrees angleInDegrees =
   fdiv (mul angleInDegrees pi) 180
 
 
-{-| Convert turns to standard Elm angles (radians). One turn is equal to
-360&deg;.
+{-| Convert turns to standard Elm angles (radians). One turn is equal to 360°.
+
+    turns (1/2) == 3.141592653589793
 -}
 turns : Float -> Float
 turns angleInTurns =
@@ -646,51 +651,96 @@ pi =
   Elm.Kernel.Basics.pi
 
 
-{-|-}
+{-| Figure out the cosine given an angle in radians.
+
+    cos (degrees 60)     == 0.5000000000000001
+    cos (turns (1/6))    == 0.5000000000000001
+    cos (radians (pi/3)) == 0.5000000000000001
+    cos (pi/3)           == 0.5000000000000001
+
+-}
 cos : Float -> Float
 cos =
   Elm.Kernel.Basics.cos
 
 
-{-|-}
+{-| Figure out the sine given an angle in radians.
+
+    sin (degrees 30)     == 0.49999999999999994
+    sin (turns (1/12))   == 0.49999999999999994
+    sin (radians (pi/6)) == 0.49999999999999994
+    sin (pi/6)           == 0.49999999999999994
+
+-}
 sin : Float -> Float
 sin =
   Elm.Kernel.Basics.sin
 
 
-{-|-}
+{-| Figure out the tangent given an angle in radians.
+
+    tan (degrees 45)     == 0.9999999999999999
+    tan (turns (1/8))    == 0.9999999999999999
+    tan (radians (pi/4)) == 0.9999999999999999
+    tan (pi/4)           == 0.9999999999999999
+-}
 tan : Float -> Float
 tan =
   Elm.Kernel.Basics.tan
 
 
-{-|-}
+{-| Figure out the arccosine for `adjacent / hypotenuse` in radians:
+
+    acos (1/2) == 1.0471975511965979 -- 60° or pi/3 radians
+
+-}
 acos : Float -> Float
 acos =
   Elm.Kernel.Basics.acos
 
 
-{-|-}
+{-| Figure out the arcsine for `opposite / hypotenuse` in radians:
+
+    asin (1/2) == 0.5235987755982989 -- 30° or pi/6 radians
+
+-}
 asin : Float -> Float
 asin =
   Elm.Kernel.Basics.asin
 
 
-{-| You probably do not want to use this. It takes `(y/x)` as the
-argument, so there is no way to know whether the negative signs comes from
-the `y` or `x`. Thus, the resulting angle is always between &pi;/2 and -&pi;/2
-(in quadrants I and IV). You probably want to use `atan2` instead.
+{-| This helps you find the angle (in radians) to an `(x,y)` coordinate, but
+in a way that is rarely useful in programming. **You probably want
+[`atan2`](#atan2) instead!**
+
+This version takes `y/x` as its argument, so there is no way to know whether
+the negative signs comes from the `y` or `x` value. So as we go counter-clockwise
+around the origin from point `(1,1)` to `(1,-1)` to `(-1,-1)` to `(-1,1)` we do
+not get angles that go in the full circle:
+
+    atan (  1 /  1 ) ==  0.7853981633974483 --  45° or   pi/4 radians
+    atan (  1 / -1 ) == -0.7853981633974483 -- 315° or 7*pi/4 radians
+    atan ( -1 / -1 ) ==  0.7853981633974483 --  45° or   pi/4 radians
+    atan ( -1 /  1 ) == -0.7853981633974483 -- 315° or 7*pi/4 radians
+
+Notice that everything is between `pi/2` and `-pi/2`. That is pretty useless
+for figuring out angles in any sort of visualization, so again, check out
+[`atan2`](#atan2) instead!
 -}
 atan : Float -> Float
 atan =
   Elm.Kernel.Basics.atan
 
 
-{-| This helps you find the angle of a Cartesian coordinate.
-You will almost certainly want to use this instead of `atan`.
-So `atan2 y x` computes *atan(y/x)* but also keeps track of which
-quadrant the angle should really be in. The result will be between
-&pi; and -&pi;, giving you the full range of angles.
+{-| This helps you find the angle (in radians) to an `(x,y)` coordinate.
+So rather than saying `atan (y/x)` you say `atan2 y x` and you can get a full
+range of angles:
+
+    atan2  1  1 ==  0.7853981633974483 --  45° or   pi/4 radians
+    atan2  1 -1 ==  2.356194490192345  -- 135° or 3*pi/4 radians
+    atan2 -1 -1 == -2.356194490192345  -- 225° or 5*pi/4 radians
+    atan2 -1  1 == -0.7853981633974483 -- 315° or 7*pi/4 radians
+
 -}
 atan2 : Float -> Float -> Float
 atan2 =
