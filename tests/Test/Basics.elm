@@ -8,8 +8,6 @@ import Set
 import Dict
 import Test exposing (..)
 import Expect
-import List
-import String
 
 
 tests : Test
@@ -193,17 +191,7 @@ tests =
                 , test "|>" <| \() -> Expect.equal 9 (3 + 6 |> identity)
                 , test "<<" <| \() -> Expect.equal True (not << xor True <| True)
                 , test "<<" <| \() -> Expect.equal True (not << xor True <| True)
-                , describe ">>"
-                    [ test "with xor" <|
-                        \() ->
-                            (True |> xor True >> not)
-                                |> Expect.equal True
-                    , test "with a record accessor" <|
-                        \() ->
-                            [ { foo = "NaS", bar = "baz" } ]
-                                |> List.map (.foo >> String.reverse)
-                                |> Expect.equal [ "SaN" ]
-                    ]
+                , test ">>" <| \() -> Expect.equal True (True |> xor True >> not)
                 , test "flip" <| \() -> Expect.equal 10 ((flip (//)) 2 20)
                 , test "curry" <| \() -> Expect.equal 1 ((curry (\( a, b ) -> a + b)) -5 6)
                 , test "uncurry" <| \() -> Expect.equal 1 ((uncurry (+)) ( -5, 6 ))
