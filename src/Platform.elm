@@ -36,25 +36,17 @@ import Platform.Sub exposing (Sub)
 -- PROGRAMS
 
 
-{-| A `Program` describes how to manage your Elm app.
-
-You can create [headless][] programs with the [`program`](#program) and
-[`programWithFlags`](#programWithFlags) functions. Similar functions exist in
-[`Html`][html] that let you specify a view.
-
-[headless]: https://en.wikipedia.org/wiki/Headless_software
-[html]: http://package.elm-lang.org/packages/elm-lang/html/latest/Html
-
-Honestly, it is totally normal if this seems crazy at first. The best way to
-understand is to work through [guide.elm-lang.org](http://guide.elm-lang.org/).
-It makes way more sense in context!
+{-| A `Program` describes an Elm program! How does it react to input? Does it
+show anything on screen? Etc.
 -}
 type Program flags model msg = Program
 
 
-{-| Create a [headless][] program. This is great if you want to use Elm as the
-&ldquo;brain&rdquo; for something else. You can still communicate with JS via
-ports and manage your model, you just do not have to specify a `view`.
+{-| Create a [headless][] program with no user interface.
+
+This is great if you want to use Elm as the &ldquo;brain&rdquo; for something
+else. For example, you could send messages out ports to modify the DOM, but do
+all the complex logic in Elm.
 
 [headless]: https://en.wikipedia.org/wiki/Headless_software
 
@@ -63,6 +55,12 @@ Initializing a headless program from JavaScript looks like this:
 ```javascript
 var app = Elm.MyThing.worker();
 ```
+
+If _do_ want to control the user interface in Elm, the [`Browser`][browser]
+module has a few ways to create that kind of `Program` instead!
+
+[headless]: https://en.wikipedia.org/wiki/Headless_software
+[browser]: http://package.elm-lang.org/packages/elm-lang/browser/latest/Browser
 -}
 worker
   : { init : flags -> ( model, Cmd msg )

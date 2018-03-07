@@ -97,6 +97,64 @@ tests =
                             Expect.equal bExpected
                                 ((Dict.merge Dict.insert insertBoth Dict.insert b1 b2 Dict.empty) |> Dict.toList)
                     ]
+
+        fuzzTests =
+            describe "Fuzz tests"
+                [ fuzz2 fuzzPairs pairRange "Get works" <|
+                    \pairs num ->
+                        Dict.get num (Dict.fromList pairs)
+                            |> Expect.equal (BaseDict.get num (BaseDict.fromList pairs))
+                , fuzz fuzzPairs "Converting to/from list works" <|
+                    \pairs ->
+                        Dict.toList (Dict.fromList pairs)
+                            |> Expect.equal (BaseDict.toList (BaseDict.fromList pairs))
+                , fuzz2 fuzzPairs pairRange "Insert works" <|
+                    \pairs num ->
+                        Dict.toList (Dict.insert num num (Dict.fromList pairs))
+                            |> Expect.equal (BaseDict.toList (BaseDict.insert num num (BaseDict.fromList pairs)))
+                , fuzz2 fuzzPairs pairRange "Removal works" <|
+                    \pairs num ->
+                        Dict.toList (Dict.remove num (Dict.fromList pairs))
+                            |> Expect.equal (BaseDict.toList (BaseDict.remove num (BaseDict.fromList pairs)))
+                , fuzz2 fuzzPairs fuzzPairs "Union works" <|
+                    \pairs pairs2 ->
+                        Dict.toList (Dict.union (Dict.fromList pairs) (Dict.fromList pairs2))
+                            |> Expect.equal (BaseDict.toList (BaseDict.union (BaseDict.fromList pairs) (BaseDict.fromList pairs2)))
+                , fuzz2 fuzzPairs fuzzPairs "Intersect works" <|
+                    \pairs pairs2 ->
+                        Dict.toList (Dict.intersect (Dict.fromList pairs) (Dict.fromList pairs2))
+                            |> Expect.equal (BaseDict.toList (BaseDict.intersect (BaseDict.fromList pairs) (BaseDict.fromList pairs2)))
+                , fuzz2 fuzzPairs fuzzPairs "Diff works" <|
+                    \pairs pairs2 ->
+                        Dict.toList (Dict.diff (Dict.fromList pairs) (Dict.fromList pairs2))
+                            |> Expect.equal (BaseDict.toList (BaseDict.diff (BaseDict.fromList pairs) (BaseDict.fromList pairs2)))
+                ]
+
+        {-
+           invariantTests =
+               describe "Invariant tests"
+                   [ fuzz2 fuzzPairs pairRange "Insert maintains invariant" <|
+                       \pairs num ->
+                           Dict.validateInvariants (Dict.insert num num (Dict.fromList pairs))
+                               |> Expect.equal ""
+                   , fuzz2 fuzzPairs pairRange "Remove maintains invariant" <|
+                       \pairs num ->
+                           Dict.validateInvariants (Dict.remove num (Dict.fromList pairs))
+                               |> Expect.equal ""
+                   , fuzz2 fuzzPairs fuzzPairs "Union maintains invariant" <|
+                       \pairs pairs2 ->
+                           Dict.validateInvariants (Dict.union (Dict.fromList pairs) (Dict.fromList pairs2))
+                               |> Expect.equal ""
+                   , fuzz2 fuzzPairs fuzzPairs "Intersect maintains invariant" <|
+                       \pairs pairs2 ->
+                           Dict.validateInvariants (Dict.intersect (Dict.fromList pairs) (Dict.fromList pairs2))
+                               |> Expect.equal ""
+                   , fuzz2 fuzzPairs fuzzPairs "Diff maintains invariant" <|
+                       \pairs pairs2 ->
+                           Dict.validateInvariants (Dict.diff (Dict.fromList pairs) (Dict.fromList pairs2))
+                               |> Expect.equal ""
+                   ]
+        -}
     in
         describe "Dict Tests"
             [ buildTests
@@ -104,4 +162,7 @@ tests =
             , combineTests
             , transformTests
             , mergeTests
+            , fuzzTests
+
+            --, invariantTests
             ]
