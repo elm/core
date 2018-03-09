@@ -6,7 +6,7 @@ effect module Random where { command = MyCmd } exposing
   , andThen
   , minInt, maxInt
   , generate
-  , step, initialSeed
+  , step, initialSeed, independentSeed
   )
 
 {-| This library helps you generate pseudo-random values.
@@ -51,7 +51,7 @@ it separate feels like a nice balance for now:
 @docs maxInt, minInt
 
 # Generate Values Manually
-@docs Seed, step, initialSeed
+@docs Seed, step, initialSeed, independentSeed
 
 -}
 
@@ -536,10 +536,8 @@ andThen callback (Generator genA) =
     (next) to derive the following state and another (peel) to obtain 32
     psuedo-random bits from the current state.
 
-    Getting the next state is easy: multiply by a magic factor, and then add an
-    increment. In this implementation, we're using a hard-coded, magic
-    increment. This is a simplification from the 3rd party library, which
-    carries the increment in the seed. If two seeds have different increments,
+    Getting the next state is easy: multiply by a magic factor, modulus by 2^32,
+    and then add an increment. If two seeds have different increments,
     their random numbers from the two seeds will never match up; they are
     completely independent. This is very helpful for isolated components or
     multithreading, and elm-test relies on this feature.
@@ -572,19 +570,24 @@ In that case, you can work with a `Seed` of randomness and [`step`](#step) it
 forward by hand.
 -}
 type Seed
-    = Seed Int
+    = Seed Int Int
+    -- the first Int is the state of the RNG and stepped with each random generation
+    -- the second state is the increment which corresponds to an independent RNG
 
 
 -- step the RNG to produce the next seed
+-- this is incredibly simple: multiply the state by a constant factor, modulus it
+-- by 2^32, and add a magic addend. The addend can be varied to produce independent
+-- RNGs, so it is stored as part of the seed. It is given to the new seed unchanged.
 next : Seed -> Seed
-next (Seed state0) =
-    -- The magic constants are from Numerical Recipes and are inlined for perf.
-    Seed (Bitwise.shiftRightZfBy 0 ((state0 * 1664525) + 1013904223))
+next (Seed state0 incr) =
+    -- The magic constant is from Numerical Recipes and is inlined for perf.
+    Seed (Bitwise.shiftRightZfBy 0 ((state0 * 1664525) + incr)) incr
 
 
 -- obtain a psuedorandom 32-bit integer from a seed
 peel : Seed -> Int
-peel (Seed state) =
+peel (Seed state _) =
     -- This is the RXS-M-SH version of PCG, see section 6.3.4 of the paper
     -- and line 184 of pcg_variants.h in the 0.94 (non-minimal) C implementation,
     -- the latter of which is the source of the magic constant.
@@ -689,13 +692,45 @@ seen before. (Flags are described on [this page][flags].)
 initialSeed : Int -> Seed
 initialSeed x =
     let
-        (Seed state1) =
-            next (Seed 0)
+        -- the default increment magic constant is taken from Numerical Recipes
+        (Seed state1 incr) =
+            next (Seed 0 1013904223)
 
         state2 =
             Bitwise.shiftRightZfBy 0 (state1 + x)
     in
-        next (Seed state2)
+        next (Seed state2 incr)
+
+
+{-| A generator that produces a seed that is independent of any other seed in
+the program. These seeds will generate their own unique sequences of random
+values. They are useful when you need an unknown amount of randomness *later*
+but can request only a fixed amount of randomness *now*.
+
+The independent seeds are extremely likely to be distinct for all practical
+purposes. However, it is not proven that there are no pathological cases.
+-}
+independentSeed : Generator Seed
+independentSeed =
+    Generator <|
+        \seed0 ->
+            let
+                gen =
+                    int 0 0xFFFFFFFF
+
+                ( ( state, b, c ), seed1 ) =
+                    step (map3 (,,) gen gen gen) seed0
+
+                {--
+                Although it probably doesn't hold water theoretically, xor two
+                random numbers to make an increment less likely to be
+                pathological. Then make sure that it's odd, which is required.
+                Next make sure it is positive. Finally step it once before use.
+                --}
+                incr =
+                    Bitwise.shiftRightZfBy 0 (Bitwise.or 1 (Bitwise.xor b c))
+            in
+                ( seed1, next (Seed state incr) )
 
 
 
