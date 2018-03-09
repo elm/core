@@ -6,7 +6,7 @@ import Elm.Kernel.Utils exposing (Tuple0)
 */
 
 
-function _Time_sleep(time)
+function _Process_sleep(time)
 {
 	return __Scheduler_binding(function(callback) {
 		var id = setTimeout(function() {
