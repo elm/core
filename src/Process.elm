@@ -46,7 +46,7 @@ longer. That’s kind of what Elm is all about.
 
 import Basics exposing (Float, Never)
 import Elm.Kernel.Scheduler
-import Elm.Kernel.Time
+import Elm.Kernel.Process
 import Platform
 import Task exposing (Task)
 
@@ -92,7 +92,7 @@ delay work until later.
 -}
 sleep : Float -> Task x ()
 sleep =
-  Elm.Kernel.Time.sleep
+  Elm.Kernel.Process.sleep
 
 
 {-| Sometimes you `spawn` a process, but later decide it would be a waste to
