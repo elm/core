@@ -318,9 +318,11 @@ same&rdquo; but detecting this in general is [undecidable][]. In a future
 release, the compiler will detect when `(==)` is used with problematic
 types and provide a helpful error message. This will require quite serious
 infrastructure work that makes sense to batch with another big project, so the
-stopgap is to crash as quickly as possible. Problematic types include functions
-and JavaScript values like `Json.Encode.Value` which could contain functions
-if passed through a port.
+stopgap is to crash as quickly as possible. Problematic types include functions,
+and JavaScript values such as `Json.Encode.Value`. JavaScript values could
+contain functions if passed through a port; even when they do not, two
+JavaScript values can appear equal even if one contains keys that the other
+does not.
 
 [undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
 -}
