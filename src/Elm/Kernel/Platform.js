@@ -350,6 +350,11 @@ function _Platform_setupOutgoingPort(name)
 
 	function subscribe(callback)
 	{
+		if (typeof callback !== 'function')
+		{
+			throw new Error('Trying to subscribe an invalid callback on port `' + name + '`');
+		}
+
 		subs.push(callback);
 	}
 
