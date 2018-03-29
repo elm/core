@@ -442,12 +442,6 @@ function _Platform_setupIncomingPort(name, sendToApp)
 
 function _Platform_export__PROD(exports)
 {
-	(typeof define === 'function' && define['amd'])
-		? define([], function() { return exports; })
-		:
-	(typeof module === 'object')
-		? module['exports'] = exports
-		:
 	scope['Elm']
 		? _Platform_mergeExportsProd(scope['Elm'], exports)
 		: scope['Elm'] = exports;
@@ -469,12 +463,6 @@ function _Platform_mergeExportsProd(obj, exports)
 
 function _Platform_export__DEBUG(exports)
 {
-	(typeof define === 'function' && define['amd'])
-		? define([], function() { return exports; })
-		:
-	(typeof module === 'object')
-		? module['exports'] = exports
-		:
 	scope['Elm']
 		? _Platform_mergeExportsDebug('Elm', scope['Elm'], exports)
 		: scope['Elm'] = exports;
