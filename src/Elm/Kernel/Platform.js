@@ -16,7 +16,7 @@ import Result exposing (isOk)
 
 var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
 {
-	object['init'] = function(flags)
+	object['worker'] = function(flags)
 	{
 		return _Platform_initialize(
 			flagDecoder,
