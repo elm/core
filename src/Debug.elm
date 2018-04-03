@@ -1,14 +1,14 @@
 module Debug exposing
   ( toString
   , log
-  , crash
+  , todo
   )
 
-{-| This library is for investigating bugs or performance problems. It should
-*not* be used in production code.
+{-| This module can be useful while _developing_ an application. It is not
+available for use in packages or production.
 
 # Debugging
-@docs toString, log, crash
+@docs toString, log, todo
 -}
 
 
@@ -27,6 +27,10 @@ Notice that with strings, this is not the `identity` function. It escapes
 characters so if you say `Html.text (toString "he said, \"hi\"")` it will
 show `"he said, \"hi\""` rather than `he said, "hi"`. This makes it nice
 for viewing Elm data structures.
+
+**Note:** This is not available with `elm make --optimized` which filters out
+some runtime metadata, making assets smaller and faster. That means that
+packages cannot use it either, because they may be used in `--optimized` mode.
 -}
 toString : a -> String
 toString =
@@ -38,18 +42,27 @@ toString =
     1 + log "number" 1        -- equals 2, logs "number: 1"
     length (log "start" [])   -- equals 0, logs "start: []"
 
-Notice that `log` is not a pure function! It should *only* be used for
-investigating bugs or performance problems.
+It is often possible to sprinkle this around to see if values are what you
+expect. It is kind of old-school to do it this way, but it works!
+
+**Note:** This is not available with `elm make --optimized` because (1) it
+relies on `toString` which has the same restriction and (2) it is not a pure
+function and would therefore have unpredictable behavior when paired with
+compiler optimizations that move code around.
+
+**Note:** If you want to create a terminal application that prints stuff out,
+use ports for now. That will give you full access to reading and writing in the
+terminal.
 -}
 log : String -> a -> a
 log =
   Elm.Kernel.Debug.log
 
 
-{-| Crash the program with an error message. This is an uncatchable error,
-intended for code that is soon-to-be-implemented. For example, if you are
-working with a large union type and have partially completed a case expression, it may
-make sense to do this:
+{-| This is a placeholder for code that you will write later.
+
+For example, if you are working with a large union type and have partially
+completed a case expression, it may make sense to do this:
 
     type Entity = Ship | Fish | Captain | Seagull
 
@@ -62,21 +75,21 @@ make sense to do this:
           ...
 
         _ ->
-          Debug.crash "TODO"
+          Debug.todo "handle Captain and Seagull"
 
-The Elm compiler recognizes each `Debug.crash` and when you run into it at
-runtime, the error will point to the corresponding module name and line number.
-For `case` expressions that ends with a wildcard pattern and a crash, it will
-also show the value that snuck through. In our example, that'd be `Captain` or
-`Seagull`.
+The Elm compiler recognizes each `Debug.todo` so if you run into it, you get
+an **uncatchable runtime exception** that includes the module name and line
+number.
 
-**Use this if** you want to do some testing while you are partway through
-writing a function.
+**Note:** This is not available with `elm make --optimized` or packages. The
+idea is that a `todo` can be useful during development, but uncatchable runtime
+exceptions should not appear in the resulting applications.
 
-**Do not use this if** you want to do some typical try-catch exception handling.
-Use the [`Maybe`](Maybe) or [`Result`](Result) libraries instead.
+**Note:** For the equivalent of try/catch error handling in Elm, use modules
+like [`Maybe`](#Maybe) and [`Result`](#Result) which guarantee that no error
+goes unhandled!
 -}
-crash : String -> a
-crash =
-  Elm.Kernel.Debug.crash
+todo : String -> a
+todo =
+  Elm.Kernel.Debug.todo
 

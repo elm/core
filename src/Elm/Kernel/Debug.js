@@ -22,16 +22,16 @@ var _Debug_log__DEBUG = F2(function(tag, value)
 });
 
 
-// CRASHES
+// TODOS
 
-function _Debug_crash(moduleName, region)
+function _Debug_todo(moduleName, region)
 {
 	return function(message) {
 		__Error_throw(8, moduleName, region, message);
 	};
 }
 
-function _Debug_crashCase(moduleName, region, value)
+function _Debug_todoCase(moduleName, region, value)
 {
 	return function(message) {
 		__Error_throw(9, moduleName, region, value, message);

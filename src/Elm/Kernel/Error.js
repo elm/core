@@ -47,14 +47,19 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			var moduleName = fact1;
 			var region = fact2;
 			var message = fact3;
-			throw new Error('Ran into a `Debug.crash` in module `' + moduleName + '` ' + _Error_regionToString(region) + '\n' + 'The message provided by the code author is:\n\n    ' + message);
+			throw new Error('TODO in module `' + moduleName + '` ' + _Error_regionToString(region) + '\n\n' + message);
 
 		case 9:
 			var moduleName = fact1;
 			var region = fact2;
 			var value = fact3;
 			var message = fact4;
-			throw new Error('Ran into a `Debug.crash` in module `' + moduleName + '`\n\nThis was caused by the `case` expression ' + _Error_regionToString(region) + '.\nOne of the branches ended with a crash and the following value got through:\n\n    ' + __Debug_toString(value) + '\n\nThe message provided by the code author is:\n\n    ' + message);
+			throw new Error(
+				'TODO in module `' + moduleName + '` from the `case` expression '
+				+ _Error_regionToString(region) + '\n\nIt received the following value:\n\n    '
+				+ __Debug_toString(value).replace('\n', '\n    ')
+				+ '\n\nBut the branch that handles it says:\n\n    ' + message.replace('\n', '\n    ')
+			);
 
 		case 10:
 			throw new Error('Bug in https://github.com/elm-lang/virtual-dom/issues');
@@ -70,7 +75,7 @@ function _Error_regionToString(region)
 	{
 		return 'on line ' + region.__$start.__$line;
 	}
-	return 'between lines ' + region.__$start.__$line + ' and ' + region.__$end.__$line;
+	return 'on lines ' + region.__$start.__$line + ' through ' + region.__$end.__$line;
 }
 
 function _Error_dictBug()
