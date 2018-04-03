@@ -28,9 +28,10 @@ characters so if you say `Html.text (toString "he said, \"hi\"")` it will
 show `"he said, \"hi\""` rather than `he said, "hi"`. This makes it nice
 for viewing Elm data structures.
 
-**Note:** This is not available with `elm make --optimized` which filters out
-some runtime metadata, making assets smaller and faster. That means that
-packages cannot use it either, because they may be used in `--optimized` mode.
+**Note:** This is not available with `elm make --optimized` which gets rid of
+a bunch of runtime metadata. For example, it shortens record field names, and
+we need that info to `toString` the value! As a consequence, packages cannot
+use `toString` because they may be used in `--optimized` mode.
 -}
 toString : a -> String
 toString =
@@ -52,7 +53,8 @@ compiler optimizations that move code around.
 
 **Note:** If you want to create a terminal application that prints stuff out,
 use ports for now. That will give you full access to reading and writing in the
-terminal.
+terminal. We may have a package in Elm for this someday, but browser
+applications are the primary focus of platform development for now.
 -}
 log : String -> a -> a
 log =
