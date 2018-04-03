@@ -28,10 +28,10 @@ characters so if you say `Html.text (toString "he said, \"hi\"")` it will
 show `"he said, \"hi\""` rather than `he said, "hi"`. This makes it nice
 for viewing Elm data structures.
 
-**Note:** This is not available with `elm make --optimized` which gets rid of
+**Note:** This is not available with `elm make --optimize` which gets rid of
 a bunch of runtime metadata. For example, it shortens record field names, and
 we need that info to `toString` the value! As a consequence, packages cannot
-use `toString` because they may be used in `--optimized` mode.
+use `toString` because they may be used in `--optimize` mode.
 -}
 toString : a -> String
 toString =
@@ -46,7 +46,7 @@ toString =
 It is often possible to sprinkle this around to see if values are what you
 expect. It is kind of old-school to do it this way, but it works!
 
-**Note:** This is not available with `elm make --optimized` because (1) it
+**Note:** This is not available with `elm make --optimize` because (1) it
 relies on `toString` which has the same restriction and (2) it is not a pure
 function and would therefore have unpredictable behavior when paired with
 compiler optimizations that move code around.
@@ -83,7 +83,7 @@ The Elm compiler recognizes each `Debug.todo` so if you run into it, you get
 an **uncatchable runtime exception** that includes the module name and line
 number.
 
-**Note:** This is not available with `elm make --optimized` or packages. The
+**Note:** This is not available with `elm make --optimize` or packages. The
 idea is that a `todo` can be useful during development, but uncatchable runtime
 exceptions should not appear in the resulting applications.
 
