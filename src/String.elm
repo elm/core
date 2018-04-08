@@ -137,7 +137,7 @@ repeatHelp n chunk result =
   if n <= 0 then
     result
   else
-    repeatHelp (Bitwise.shiftRightBy n 1) (chunk ++ chunk) <|
+    repeatHelp (Bitwise.shiftRightBy 1 n) (chunk ++ chunk) <|
       if Bitwise.and n 1 == 0 then result else result ++ chunk
 
 
