@@ -76,7 +76,7 @@ cons =
 head : List a -> Maybe a
 head list =
   case list of
-    x :: xs ->
+    x :: _ ->
       Just x
 
     [] ->
@@ -91,7 +91,7 @@ head list =
 tail : List a -> Maybe (List a)
 tail list =
   case list of
-    x :: xs ->
+    _ :: xs ->
       Just xs
 
     [] ->
