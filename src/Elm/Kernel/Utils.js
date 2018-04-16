@@ -37,7 +37,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return true;
 	}
 
-	if (typeof x !== 'object' || (x === null || y === null))
+	if (typeof x !== 'object' || x === null || y === null)
 	{
 		typeof x === 'function' && __Error_throw(5);
 		return false;
