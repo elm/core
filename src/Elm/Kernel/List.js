@@ -6,10 +6,10 @@ import Basics exposing (EQ, LT)
 */
 
 
-var _List_Nil__PROD = {};
+var _List_Nil__PROD = { $: 0 };
 var _List_Nil__DEBUG = { $: '[]' };
 
-function _List_Cons__PROD(hd, tl) { return { a: hd, b: tl }; }
+function _List_Cons__PROD(hd, tl) { return { $: 1, a: hd, b: tl }; }
 function _List_Cons__DEBUG(hd, tl) { return { $: '::', a: hd, b: tl }; }
 
 
