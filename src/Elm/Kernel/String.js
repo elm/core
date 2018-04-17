@@ -41,7 +41,7 @@ var _String_map = F2(function(func, string)
 	var i = 0;
 	while (i < len)
 	{
-		var word = str.charCodeAt(i);
+		var word = string.charCodeAt(i);
 		if (0xD800 <= word && word <= 0xDBFF)
 		{
 			array[i] = func(__Utils_chr(string[i] + string[i+1]));
