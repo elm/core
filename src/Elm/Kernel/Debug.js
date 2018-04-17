@@ -139,13 +139,11 @@ function _Debug_toString__DEBUG(v)
 		var output = [];
 		for (var k in v)
 		{
-			output.push(k + ' = ' + _Debug_toString(v[k]));
+			output.push((k[0] === '_' ? k.slice(1) : k) + ' = ' + _Debug_toString(v[k]));
 		}
-		if (output.length === 0)
-		{
-			return '{}';
-		}
-		return '{ ' + output.join(', ') + ' }';
+		return output.length === 0
+			? '{}'
+			: '{ ' + output.join(', ') + ' }';
 	}
 
 	return '<internals>';
