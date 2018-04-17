@@ -41,112 +41,125 @@ function _Debug_todoCase(moduleName, region, value)
 
 // TO STRING
 
-function _Debug_toString__PROD(v)
+function _Debug_toString__PROD(value)
 {
 	return '<internals>';
 }
 
-function _Debug_toString__DEBUG(v)
+function _Debug_toString__DEBUG(value)
 {
-	var type = typeof v;
-	if (type === 'function')
+	return _Debug_toAnsiString(false, value);
+}
+
+function _Debug_toAnsiString(ansi, value)
+{
+	if (typeof value === 'function')
 	{
-		return '<function>';
+		return _Debug_internalColor(ansi, '<function>');
 	}
 
-	if (type === 'boolean')
+	if (typeof value === 'boolean')
 	{
-		return v ? 'True' : 'False';
+		return _Debug_ctorColor(ansi, value ? 'True' : 'False');
 	}
 
-	if (type === 'number')
+	if (typeof value === 'number')
 	{
-		return v + '';
+		return _Debug_numberColor(ansi, value + '');
 	}
 
-	if (v instanceof String)
+	if (value instanceof String)
 	{
-		return "'" + _Debug_addSlashes(v, true) + "'";
+		return _Debug_charColor(ansi, "'" + _Debug_addSlashes(value, true) + "'");
 	}
 
-	if (type === 'string')
+	if (typeof value === 'string')
 	{
-		return '"' + _Debug_addSlashes(v, false) + '"';
+		return _Debug_stringColor(ansi, '"' + _Debug_addSlashes(value, false) + '"');
 	}
 
-	if (type === 'object' && '$' in v)
+	if (typeof value === 'object' && '$' in value)
 	{
-		var tag = v.$;
+		var tag = value.$;
 
 		if (typeof tag === 'number')
 		{
-			return '<internals>';
+			return _Debug_internalColor(ansi, '<internals>');
 		}
 
 		if (tag[0] === '#')
 		{
 			var output = [];
-			for (var k in v)
+			for (var k in value)
 			{
 				if (k === '$') continue;
-				output.push(_Debug_toString(v[k]));
+				output.push(_Debug_toAnsiString(ansi, value[k]));
 			}
 			return '(' + output.join(',') + ')';
 		}
 
 		if (tag === 'Set_elm_builtin')
 		{
-			return 'Set.fromList ' + _Debug_toString(__Set_toList(v));
+			return _Debug_ctorColor(ansi, 'Set')
+				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ _Debug_toAnsiString(ansi, __Set_toList(value));
 		}
 
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
-			return 'Dict.fromList ' + _Debug_toString(__Dict_toList(v));
+			return _Debug_ctorColor(ansi, 'Dict')
+				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ _Debug_toAnsiString(ansi, __Dict_toList(value));
 		}
 
 		if (tag === 'Array_elm_builtin')
 		{
-			return 'Array.fromList ' + _Debug_toString(__Array_toList(v));
+			return _Debug_ctorColor(ansi, 'Array')
+				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ _Debug_toAnsiString(ansi, __Array_toList(value));
 		}
 
 		if (tag === '::' || tag === '[]')
 		{
 			var output = '[';
 
-			v.b && (output += _Debug_toString(v.a), v = v.b)
+			value.b && (output += _Debug_toAnsiString(ansi, value.a), value = value.b)
 
-			for (; v.b; v = v.b) // WHILE_CONS
+			for (; value.b; value = value.b) // WHILE_CONS
 			{
-				output += ',' + _Debug_toString(v.a);
+				output += ',' + _Debug_toAnsiString(ansi, value.a);
 			}
 			return output + ']';
 		}
 
 		var output = '';
-		for (var i in v)
+		for (var i in value)
 		{
 			if (i === '$') continue;
-			var str = _Debug_toString(v[i]);
+			var str = _Debug_toAnsiString(ansi, value[i]);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
 		}
-		return tag + output;
+		return _Debug_ctorColor(ansi, tag) + output;
 	}
 
-	if (type === 'object')
+	if (typeof value === 'object')
 	{
 		var output = [];
-		for (var k in v)
+		for (var key in value)
 		{
-			output.push((k[0] === '_' ? k.slice(1) : k) + ' = ' + _Debug_toString(v[k]));
+			var field = key[0] === '_' ? key.slice(1) : key;
+			output.push(_Debug_fadeColor(ansi, field) + ' = ' + _Debug_toAnsiString(ansi, value[key]));
 		}
-		return output.length === 0
-			? '{}'
-			: '{ ' + output.join(', ') + ' }';
+		if (output.length === 0)
+		{
+			return '{}';
+		}
+		return '{ ' + output.join(', ') + ' }';
 	}
 
-	return '<internals>';
+	return _Debug_internalColor(ansi, '<internals>');
 }
 
 function _Debug_addSlashes(str, isChar)
@@ -167,4 +180,34 @@ function _Debug_addSlashes(str, isChar)
 	{
 		return s.replace(/\"/g, '\\"');
 	}
+}
+
+function _Debug_ctorColor(ansi, string)
+{
+	return ansi ? '\x1b[1;36m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_numberColor(ansi, string)
+{
+	return ansi ? '\x1b[0;35m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_stringColor(ansi, string)
+{
+	return ansi ? '\x1b[1;33m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_charColor(ansi, string)
+{
+	return ansi ? '\x1b[1;32m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_fadeColor(ansi, string)
+{
+	return ansi ? '\x1b[0;37m' + string + '\x1b[0m' : string;
+}
+
+function _Debug_internalColor(ansi, string)
+{
+	return ansi ? '\x1b[1;34m' + string + '\x1b[0m' : string;
 }
