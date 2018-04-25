@@ -1,7 +1,7 @@
 /*
 
 import Elm.Kernel.Error exposing (throw)
-import Elm.Kernel.Json exposing (run, wrap)
+import Elm.Kernel.Json exposing (run, wrap, unwrap)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
 import Elm.Kernel.Utils exposing (Tuple0)
@@ -334,7 +334,7 @@ function _Platform_setupOutgoingPort(name)
 		{
 			// grab a separate reference to subs in case unsubscribe is called
 			var currentSubs = subs;
-			var value = converter(cmdList.a);
+			var value = __Json_unwrap(converter(cmdList.a));
 			for (var i = 0; i < currentSubs.length; i++)
 			{
 				currentSubs[i](value);
