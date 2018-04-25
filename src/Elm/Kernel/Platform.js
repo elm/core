@@ -222,13 +222,10 @@ function _Platform_dispatchEffects(managers, cmdBag, subBag)
 	{
 		__Scheduler_rawSend(managers[home], {
 			$: 'fx',
-			a: effectsDict[home] || _Platform_noFx
+			a: effectsDict[home] || { __cmds: __List_Nil, __subs: __List_Nil }
 		});
 	}
 }
-
-
-var _Platform_noFx = { __cmds: __List_Nil, __subs: __List_Nil };
 
 
 function _Platform_gatherEffects(isCmd, bag, effectsDict, taggers)
