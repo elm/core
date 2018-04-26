@@ -254,16 +254,11 @@ filter pred xs =
 {-| Apply a function that may succeed to all values in the list, but only keep
 the successes.
 
-    onlyTeens =
-      filterMap isTeen [3, 15, 12, 18, 24] == [15, 18]
+    filterMap head [[1,2,3],[],[4,5,6],[],[]] == [1,4]
 
-    isTeen : Int -> Maybe Int
-    isTeen n =
-      if 13 <= n && n <= 19 then
-        Just n
+`filterMap` can be combined with `identity` to clean a list of `Maybe` values:
 
-      else
-        Nothing
+    filterMap identity [Just 1, Nothing, Nothing, Just 2, Just 3] == [1,2,3]
 -}
 filterMap : (a -> Maybe b) -> List a -> List b
 filterMap f xs =
