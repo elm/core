@@ -41,6 +41,60 @@ import Maybe exposing ( Maybe(..) )
 infix right 5 (::) = cons
 
 
+
+-- CREATE
+
+
+
+{-| Create a list with only one element:
+
+    singleton 1234 == [1234]
+    singleton "hi" == ["hi"]
+-}
+singleton : a -> List a
+singleton value =
+  [value]
+
+
+{-| Create a list with *n* copies of a value:
+
+    repeat 3 (0,0) == [(0,0),(0,0),(0,0)]
+-}
+repeat : Int -> a -> List a
+repeat n value =
+  repeatHelp [] n value
+
+
+repeatHelp : List a -> Int -> a -> List a
+repeatHelp result n value =
+  if n <= 0 then
+    result
+
+  else
+    repeatHelp (cons value result) (n-1) value
+
+
+{-| Create a list of numbers, every element increasing by one.
+You give the lowest and highest number that should be in the list.
+
+    range 3 6 == [3, 4, 5, 6]
+    range 3 3 == [3]
+    range 6 3 == []
+-}
+range : Int -> Int -> List Int
+range lo hi =
+  rangeHelp lo hi []
+
+
+rangeHelp : Int -> Int -> List Int -> List Int
+rangeHelp lo hi list =
+  if lo <= hi then
+    rangeHelp lo (hi - 1) (cons hi list)
+
+  else
+    list
+
+
 {-| Add an element to the front of a list.
 
     1 :: [2,3] == [1,2,3]
@@ -54,67 +108,8 @@ cons =
   Elm.Kernel.List.cons
 
 
-{-| Extract the first element of a list.
 
-    head [1,2,3] == Just 1
-    head [] == Nothing
-
-**Note:** It is usually preferable to use a `case` to deconstruct a `List`
-because it gives you `(x :: xs)` and you can work with both subparts.
--}
-head : List a -> Maybe a
-head list =
-  case list of
-    x :: xs ->
-      Just x
-
-    [] ->
-      Nothing
-
-
-{-| Extract the rest of the list.
-
-    tail [1,2,3] == Just [2,3]
-    tail [] == Nothing
-
-**Note:** It is usually preferable to use a `case` to deconstruct a `List`
-because it gives you `(x :: xs)` and you can work with both subparts.
--}
-tail : List a -> Maybe (List a)
-tail list =
-  case list of
-    x :: xs ->
-      Just xs
-
-    [] ->
-      Nothing
-
-
-{-| Determine if a list is empty.
-
-    isEmpty [] == True
-
-**Note:** It is usually preferable to use a `case` to test this so you do not
-forget to handle the `(x :: xs)` case as well!
--}
-isEmpty : List a -> Bool
-isEmpty xs =
-  case xs of
-    [] ->
-      True
-
-    _ ->
-      False
-
-
-{-| Figure out whether a list contains a value.
-
-    member 9 [1,2,3,4] == False
-    member 4 [1,2,3,4] == True
--}
-member : a -> List a -> Bool
-member x xs =
-  any (\a -> a == x) xs
+-- TRANSFORM
 
 
 {-| Apply a function to every element of a list.
@@ -253,6 +248,9 @@ maybeCons f mx xs =
       xs
 
 
+-- UTILITIES
+
+
 {-| Determine the length of a list.
 
     length [1,2,3] == 3
@@ -269,6 +267,16 @@ length xs =
 reverse : List a -> List a
 reverse list =
   foldl cons [] list
+
+
+{-| Figure out whether a list contains a value.
+
+    member 9 [1,2,3,4] == False
+    member 4 [1,2,3,4] == True
+-}
+member : a -> List a -> Bool
+member x xs =
+  any (\a -> a == x) xs
 
 
 {-| Determine if all elements satisfy the predicate.
@@ -301,6 +309,58 @@ any isOkay list =
 
       else
         any isOkay xs
+
+
+{-| Find the maximum element in a non-empty list.
+
+    maximum [1,4,2] == Just 4
+    maximum []      == Nothing
+-}
+maximum : List comparable -> Maybe comparable
+maximum list =
+  case list of
+    x :: xs ->
+      Just (foldl max x xs)
+
+    _ ->
+      Nothing
+
+
+{-| Find the minimum element in a non-empty list.
+
+    minimum [3,2,1] == Just 1
+    minimum []      == Nothing
+-}
+minimum : List comparable -> Maybe comparable
+minimum list =
+  case list of
+    x :: xs ->
+      Just (foldl min x xs)
+
+    _ ->
+      Nothing
+
+
+{-| Get the sum of the list elements.
+
+    sum [1,2,3,4] == 10
+-}
+sum : List number -> number
+sum numbers =
+  foldl (+) 0 numbers
+
+
+{-| Get the product of the list elements.
+
+    product [1,2,3,4] == 24
+-}
+product : List number -> number
+product numbers =
+  foldl (*) 1 numbers
+
+
+
+-- COMBINE
 
 
 {-| Put two lists together.
@@ -338,72 +398,25 @@ concatMap f list =
   concat (map f list)
 
 
-{-| Get the sum of the list elements.
+{-| Places the given value between all members of the given list.
 
-    sum [1,2,3,4] == 10
+    intersperse "on" ["turtles","turtles","turtles"] == ["turtles","on","turtles","on","turtles"]
 -}
-sum : List number -> number
-sum numbers =
-  foldl (+) 0 numbers
+intersperse : a -> List a -> List a
+intersperse sep xs =
+  case xs of
+    [] ->
+      []
 
+    hd :: tl ->
+      let
+        step x rest =
+          cons sep (cons x rest)
 
-{-| Get the product of the list elements.
-
-    product [1,2,3,4] == 24
--}
-product : List number -> number
-product numbers =
-  foldl (*) 1 numbers
-
-
-{-| Find the maximum element in a non-empty list.
-
-    maximum [1,4,2] == Just 4
-    maximum []      == Nothing
--}
-maximum : List comparable -> Maybe comparable
-maximum list =
-  case list of
-    x :: xs ->
-      Just (foldl max x xs)
-
-    _ ->
-      Nothing
-
-
-{-| Find the minimum element in a non-empty list.
-
-    minimum [3,2,1] == Just 1
-    minimum []      == Nothing
--}
-minimum : List comparable -> Maybe comparable
-minimum list =
-  case list of
-    x :: xs ->
-      Just (foldl min x xs)
-
-    _ ->
-      Nothing
-
-
-{-| Partition a list based on a predicate. The first list contains all values
-that satisfy the predicate, and the second list contains all the value that do
-not.
-
-    partition (\x -> x < 3) [0,1,2,3,4,5] == ([0,1,2], [3,4,5])
-    partition isEven        [0,1,2,3,4,5] == ([0,2,4], [1,3,5])
--}
-partition : (a -> Bool) -> List a -> (List a, List a)
-partition pred list =
-  let
-    step x (trues, falses) =
-      if pred x then
-        (cons x trues, falses)
-
-      else
-        (trues, cons x falses)
-  in
-    foldr step ([],[]) list
+        spersed =
+          foldr step [] tl
+      in
+        cons hd spersed
 
 
 {-| Combine two lists, combining them with the given function.
@@ -446,159 +459,8 @@ map5 =
   Elm.Kernel.List.map5
 
 
-{-| Decompose a list of tuples into a tuple of lists.
 
-    unzip [(0, True), (17, False), (1337, True)] == ([0,17,1337], [True,False,True])
--}
-unzip : List (a,b) -> (List a, List b)
-unzip pairs =
-  let
-    step (x,y) (xs,ys) =
-      (cons x xs, cons y ys)
-  in
-    foldr step ([], []) pairs
-
-
-{-| Places the given value between all members of the given list.
-
-    intersperse "on" ["turtles","turtles","turtles"] == ["turtles","on","turtles","on","turtles"]
--}
-intersperse : a -> List a -> List a
-intersperse sep xs =
-  case xs of
-    [] ->
-      []
-
-    hd :: tl ->
-      let
-        step x rest =
-          cons sep (cons x rest)
-
-        spersed =
-          foldr step [] tl
-      in
-        cons hd spersed
-
-
-{-| Take the first *n* members of a list.
-
-    keep 2 [1,2,3,4] == [1,2]
--}
-keep : Int -> List a -> List a
-keep n list =
-  takeFast 0 n list
-
-
-takeFast : Int -> Int -> List a -> List a
-takeFast ctr n list =
-  if n <= 0 then
-    []
-  else
-    case ( n, list ) of
-      ( _, [] ) ->
-        list
-
-      ( 1, x :: _ ) ->
-        [ x ]
-
-      ( 2, x :: y :: _ ) ->
-        [ x, y ]
-
-      ( 3, x :: y :: z :: _ ) ->
-        [ x, y, z ]
-
-      ( _, x :: y :: z :: w :: tl ) ->
-        if ctr > 1000 then
-          cons x (cons y (cons z (cons w (takeTailRec (n - 4) tl))))
-        else
-          cons x (cons y (cons z (cons w (takeFast (ctr + 1) (n - 4) tl))))
-
-      _ ->
-        list
-
-takeTailRec : Int -> List a -> List a
-takeTailRec n list =
-  reverse (takeReverse n list [])
-
-
-takeReverse : Int -> List a -> List a -> List a
-takeReverse n list taken =
-  if n <= 0 then
-    taken
-  else
-    case list of
-      [] ->
-        taken
-
-      x :: xs ->
-        takeReverse (n - 1) xs (cons x taken)
-
-
-{-| Drop the first *n* members of a list.
-
-    drop 2 [1,2,3,4] == [3,4]
--}
-drop : Int -> List a -> List a
-drop n list =
-  if n <= 0 then
-    list
-
-  else
-    case list of
-      [] ->
-        list
-
-      x :: xs ->
-        drop (n-1) xs
-
-
-{-| Create a list with only one element:
-
-    singleton 1234 == [1234]
-    singleton "hi" == ["hi"]
--}
-singleton : a -> List a
-singleton value =
-  [value]
-
-
-{-| Create a list with *n* copies of a value:
-
-    repeat 3 (0,0) == [(0,0),(0,0),(0,0)]
--}
-repeat : Int -> a -> List a
-repeat n value =
-  repeatHelp [] n value
-
-
-repeatHelp : List a -> Int -> a -> List a
-repeatHelp result n value =
-  if n <= 0 then
-    result
-
-  else
-    repeatHelp (cons value result) (n-1) value
-
-
-{-| Create a list of numbers, every element increasing by one.
-You give the lowest and highest number that should be in the list.
-
-    range 3 6 == [3, 4, 5, 6]
-    range 3 3 == [3]
-    range 6 3 == []
--}
-range : Int -> Int -> List Int
-range lo hi =
-  rangeHelp lo hi []
-
-
-rangeHelp : Int -> Int -> List Int -> List Int
-rangeHelp lo hi list =
-  if lo <= hi then
-    rangeHelp lo (hi - 1) (cons hi list)
-
-  else
-    list
+-- SORT
 
 
 {-| Sort values from lowest to highest
@@ -642,3 +504,165 @@ to define any other: `sort == sortWith compare`
 sortWith : (a -> a -> Order) ->  List a -> List a
 sortWith =
   Elm.Kernel.List.sortWith
+
+
+
+-- DECONSTRUCT
+
+
+{-| Determine if a list is empty.
+
+    isEmpty [] == True
+
+**Note:** It is usually preferable to use a `case` to test this so you do not
+forget to handle the `(x :: xs)` case as well!
+-}
+isEmpty : List a -> Bool
+isEmpty xs =
+  case xs of
+    [] ->
+      True
+
+    _ ->
+      False
+
+
+{-| Extract the first element of a list.
+
+    head [1,2,3] == Just 1
+    head [] == Nothing
+
+**Note:** It is usually preferable to use a `case` to deconstruct a `List`
+because it gives you `(x :: xs)` and you can work with both subparts.
+-}
+head : List a -> Maybe a
+head list =
+  case list of
+    x :: xs ->
+      Just x
+
+    [] ->
+      Nothing
+
+
+{-| Extract the rest of the list.
+
+    tail [1,2,3] == Just [2,3]
+    tail [] == Nothing
+
+**Note:** It is usually preferable to use a `case` to deconstruct a `List`
+because it gives you `(x :: xs)` and you can work with both subparts.
+-}
+tail : List a -> Maybe (List a)
+tail list =
+  case list of
+    x :: xs ->
+      Just xs
+
+    [] ->
+      Nothing
+
+
+{-| Take the first *n* members of a list.
+
+    keep 2 [1,2,3,4] == [1,2]
+-}
+keep : Int -> List a -> List a
+keep n list =
+  keepFast 0 n list
+
+
+keepFast : Int -> Int -> List a -> List a
+keepFast ctr n list =
+  if n <= 0 then
+    []
+  else
+    case ( n, list ) of
+      ( _, [] ) ->
+        list
+
+      ( 1, x :: _ ) ->
+        [ x ]
+
+      ( 2, x :: y :: _ ) ->
+        [ x, y ]
+
+      ( 3, x :: y :: z :: _ ) ->
+        [ x, y, z ]
+
+      ( _, x :: y :: z :: w :: tl ) ->
+        if ctr > 1000 then
+          cons x (cons y (cons z (cons w (keepTailRec (n - 4) tl))))
+        else
+          cons x (cons y (cons z (cons w (keepFast (ctr + 1) (n - 4) tl))))
+
+      _ ->
+        list
+
+keepTailRec : Int -> List a -> List a
+keepTailRec n list =
+  reverse (keepReverse n list [])
+
+
+keepReverse : Int -> List a -> List a -> List a
+keepReverse n list kept =
+  if n <= 0 then
+    kept
+  else
+    case list of
+      [] ->
+        kept
+
+      x :: xs ->
+        keepReverse (n - 1) xs (cons x kept)
+
+
+{-| Drop the first *n* members of a list.
+
+    drop 2 [1,2,3,4] == [3,4]
+-}
+drop : Int -> List a -> List a
+drop n list =
+  if n <= 0 then
+    list
+
+  else
+    case list of
+      [] ->
+        list
+
+      x :: xs ->
+        drop (n-1) xs
+
+
+{-| Partition a list based on a predicate. The first list contains all values
+that satisfy the predicate, and the second list contains all the value that do
+not.
+
+    partition (\x -> x < 3) [0,1,2,3,4,5] == ([0,1,2], [3,4,5])
+    partition isEven        [0,1,2,3,4,5] == ([0,2,4], [1,3,5])
+-}
+partition : (a -> Bool) -> List a -> (List a, List a)
+partition pred list =
+  let
+    step x (trues, falses) =
+      if pred x then
+        (cons x trues, falses)
+
+      else
+        (trues, cons x falses)
+  in
+    foldr step ([],[]) list
+
+
+{-| Decompose a list of tuples into a tuple of lists.
+
+    unzip [(0, True), (17, False), (1337, True)] == ([0,17,1337], [True,False,True])
+-}
+unzip : List (a,b) -> (List a, List b)
+unzip pairs =
+  let
+    step (x,y) (xs,ys) =
+      (cons x xs, cons y ys)
+  in
+    foldr step ([], []) pairs
