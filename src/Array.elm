@@ -14,7 +14,8 @@ module Array
         , toIndexedList
         , foldr
         , foldl
-        , filter
+        , keepIf
+        , dropIf
         , map
         , indexedMap
         , append
@@ -39,7 +40,7 @@ module Array
 @docs toList, toIndexedList
 
 # Transform
-@docs foldl, foldr, filter, map, indexedMap
+@docs map, indexedMap, foldl, foldr, keepIf, dropIf
 -}
 
 
@@ -499,20 +500,22 @@ foldl func baseCase (Array_elm_builtin _ _ tree tail) =
         JsArray.foldl func (JsArray.foldl helper baseCase tree) tail
 
 
-{-| Keep only elements that satisfy the predicate.
+{-| Keep elements that pass the test.
 
-    filter isEven (fromList [1,2,3]) == (fromList [2])
+    keepIf isEven (fromList [1,2,3,4,5,6]) == (fromList [2,4,6])
 -}
-filter : (a -> Bool) -> Array a -> Array a
-filter isGood array =
-    let
-        keepGoodItems item list =
-            if isGood item then
-                item :: list
-            else
-                list
-    in
-        fromList (foldr keepGoodItems [] array)
+keepIf : (a -> Bool) -> Array a -> Array a
+keepIf isGood array =
+    fromList (foldr (\x xs -> if isGood x then x :: xs else xs) [] array)
+
+
+{-| Drop any elements that pass the test.
+
+    dropIf isEven (fromList [1,2,3,4,5,6]) == (fromList [1,3,5])
+-}
+dropIf : (a -> Bool) -> Array a -> Array a
+dropIf isBad array =
+    fromList (foldr (\x xs -> if isBad x then xs else x :: xs) [] array)
 
 
 {-| Apply a function on every element in an array.
