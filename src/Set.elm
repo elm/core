@@ -4,7 +4,7 @@ module Set exposing
   , isEmpty, member, size
   , union, intersect, diff
   , toList, fromList
-  , map, foldl, foldr, keepIf, dropIf, partition
+  , map, foldl, foldr, filter, keepIf, dropIf, partition
   )
 
 {-| A set of unique values. The values can be any comparable type. This
@@ -29,13 +29,14 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs toList, fromList
 
 # Transform
-@docs map, foldl, foldr, keepIf, dropIf, partition
+@docs map, foldl, foldr, filter, keepIf, dropIf, partition
 
 -}
 
 import Basics exposing (Bool, Int)
-import Dict as Dict
-import List as List
+import Dict
+import List exposing ((::))
+import Maybe exposing (Maybe(..))
 
 
 {-| Represents a set of unique values. So `(Set Int)` is a set of integers and
@@ -148,10 +149,54 @@ foldr func initialState (Set_elm_builtin dict) =
 -}
 map : (comparable -> comparable2) -> Set comparable -> Set comparable2
 map func set =
-  fromList (List.map func (toList set))
+  fromList (foldl (\x xs -> func x :: xs) [] set)
+
+
+{-| Filter based on some function. Maybe you have a set of strings that needs
+to be a set of numbers:
+
+    import Set exposing (Set)
+
+    strings : Set String
+    strings =
+      Set.fromList ["000100","090","1","one"]
+
+    numbers : Set Int
+    numbers =
+      Set.filter String.toInt strings
+
+    -- numbers == Set.fromList [1,90,100]
+
+**Note:** See [`keepIf`](#keepIf) and [`dropIf`](#dropIf) to filter based on a
+test like `(\x -> x < 0)` where it just gives a `Bool`.
+-}
+filter : (comparable1 -> Maybe comparable2) -> Set comparable1 -> Set comparable2
+filter func set =
+  let
+    maybeAdd x ys =
+      case func x of
+        Nothing ->
+          ys
+
+        Just y ->
+          y :: ys
+  in
+  fromList (foldl maybeAdd [] set)
 
 
 {-| Only keep elements that pass the given test.
+
+    import Set exposing (Set)
+
+    numbers : Set Int
+    numbers =
+      Set.fromList [-2,-1,0,1,2]
+
+    positives : Set Int
+    positives =
+      Set.keepIf (\x -> x > 0) numbers
+
+    -- positives == Set.fromList [1,2]
 -}
 keepIf : (comparable -> Bool) -> Set comparable -> Set comparable
 keepIf isGood (Set_elm_builtin dict) =
@@ -159,6 +204,18 @@ keepIf isGood (Set_elm_builtin dict) =
 
 
 {-| Drop any elements that pass the given test.
+
+    import Set exposing (Set)
+
+    numbers : Set Int
+    numbers =
+      Set.fromList [-2,-1,0,1,2]
+
+    positives : Set Int
+    positives =
+      Set.dropIf (\x -> x <= 0) numbers
+
+    -- positives == Set.fromList [1,2]
 -}
 dropIf : (comparable -> Bool) -> Set comparable -> Set comparable
 dropIf isBad (Set_elm_builtin dict) =

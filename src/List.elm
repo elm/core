@@ -232,6 +232,9 @@ from an untrusted source and you want to turn them into numbers:
       filter String.toInt ["3", "hi", "12", "4th", "May"]
 
     -- numbers == [3, 12]
+
+**Note:** See [`keepIf`](#keepIf) and [`dropIf`](#dropIf) to filter based on a
+test like `(\x -> x < 0)` where it just gives a `Bool`.
 -}
 filter : (a -> Maybe b) -> List a -> List b
 filter f xs =

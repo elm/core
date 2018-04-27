@@ -3,7 +3,7 @@ module Dict exposing
   , empty, singleton, insert, update, remove
   , isEmpty, member, get, size
   , keys, values, toList, fromList
-  , map, foldl, foldr, keepIf, dropIf, partition
+  , map, foldl, foldr, filter, keepIf, dropIf, partition
   , union, intersect, diff, merge
   )
 
@@ -26,7 +26,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs keys, values, toList, fromList
 
 # Transform
-@docs map, foldl, foldr, keepIf, dropIf, partition
+@docs map, foldl, foldr, filter, keepIf, dropIf, partition
 
 # Combine
 @docs union, intersect, diff, merge
@@ -63,9 +63,9 @@ type LeafColor
 that lets you look up a `String` (such as user names) and find the associated
 `User`.
 
-    import Dict
+    import Dict exposing (Dict)
 
-    users : Dict.Dict. String User
+    users : Dict String User
     users =
       Dict.fromList
         [ ("Alice", User "Alice" 28 1.65)
@@ -578,8 +578,19 @@ map func dict =
       RBNode_elm_builtin color key (func key value) (map func left) (map func right)
 
 
-{-| Fold over the key-value pairs in a dictionary, in order from lowest
-key to highest key.
+{-| Fold over the key-value pairs in a dictionary from lowest key to highest key.
+
+    import Dict exposing (Dict)
+
+    getAges : Dict String User -> List String
+    getAges users =
+      Dict.foldl addAge [] users
+
+    addAge : String -> User -> List String -> List String
+    addAge _ user ages =
+      user.age :: ages
+
+    -- getAges users == [33,19,28]
 -}
 foldl : (k -> v -> b -> b) -> b -> Dict k v -> b
 foldl func acc dict =
@@ -591,8 +602,19 @@ foldl func acc dict =
       foldl func (func key value (foldl func acc left)) right
 
 
-{-| Fold over the key-value pairs in a dictionary, in order from highest
-key to lowest key.
+{-| Fold over the key-value pairs in a dictionary from highest key to lowest key.
+
+    import Dict exposing (Dict)
+
+    getAges : Dict String User -> List String
+    getAges users =
+      Dict.foldr addAge [] users
+
+    addAge : String -> User -> List String -> List String
+    addAge _ user ages =
+      user.age :: ages
+
+    -- getAges users == [28,19,33]
 -}
 foldr : (k -> v -> b -> b) -> b -> Dict k v -> b
 foldr func acc t =
@@ -602,6 +624,25 @@ foldr func acc t =
 
     RBNode_elm_builtin _ key value left right ->
       foldr func (func key value (foldr func acc right)) left
+
+
+{-| Filter a dictionary.
+
+**Note:** See [`keepIf`](#keepIf) and [`dropIf`](#dropIf) to filter based on a
+test like `(\x -> x < 0)` where it just gives a `Bool`.
+-}
+filter : (comparable -> a -> Maybe b) -> Dict comparable a -> Dict comparable b
+filter func dict =
+  let
+    maybeAdd k x ys =
+      case func k x of
+        Nothing ->
+          ys
+
+        Just y ->
+          insert k y ys
+  in
+  foldl maybeAdd empty dict
 
 
 {-| Keep only the key-value pairs that pass the given test. -}
