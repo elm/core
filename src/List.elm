@@ -1,49 +1,33 @@
 module List exposing
-  ( isEmpty, length, reverse, member
-  , head, tail, filter, take, drop
-  , singleton, repeat, range, (::), append, concat, intersperse
-  , partition, unzip
-  , map, map2, map3, map4, map5
-  , filterMap, concatMap, indexedMap
-  , foldr, foldl
-  , sum, product, maximum, minimum, all, any, scanl
+  ( singleton, repeat, range, (::)
+  , map, indexedMap, foldl, foldr, keepIf, dropIf, filter
+  , length, reverse, member, all, any, maximum, minimum, sum, product
+  , append, concat, concatMap, intersperse, map2, map3, map4, map5
   , sort, sortBy, sortWith
+  , isEmpty, head, tail, keep, drop, partition, unzip
   )
 
-{-| A library for manipulating lists of values. Every value in a
-list must have the same type.
+{-| You can create a `List` in Elm with the `[1,2,3]` syntax, so lists are
+used all over the place. This module has a bunch of functions to help you work
+with them!
 
-# Basics
-@docs isEmpty, length, reverse, member
+# Create
+@docs singleton, repeat, range, (::)
 
-# Sub-lists
-@docs head, tail, filter, take, drop
+# Transform
+@docs map, indexedMap, foldl, foldr, keepIf, dropIf, filter
 
-# Putting Lists Together
-@docs singleton, repeat, range, (::), append, concat, intersperse
+# Utilities
+@docs length, reverse, member, all, any, maximum, minimum, sum, product
 
-# Taking Lists Apart
-@docs partition, unzip
+# Combine
+@docs append, concat, concatMap, intersperse, map2, map3, map4, map5
 
-# Mapping
-@docs map, map2, map3, map4, map5
-
-If you can think of a legitimate use of `mapN` where `N` is 6 or more, please
-let us know on [the list](https://groups.google.com/forum/#!forum/elm-discuss).
-The current sentiment is that it is already quite error prone once you get to
-4 and possibly should be approached another way.
-
-# Special Maps
-@docs filterMap, concatMap, indexedMap
-
-# Folding
-@docs foldl, foldr
-
-# Special Folds
-@docs sum, product, maximum, minimum, all, any, scanl
-
-# Sorting
+# Sort
 @docs sort, sortBy, sortWith
+
+# Deconstruct
+@docs isEmpty, head, tail, keep, drop, partition, unzip
 
 -}
 
@@ -57,11 +41,13 @@ import Maybe exposing ( Maybe(..) )
 infix right 5 (::) = cons
 
 
-
-{-| Add an element to the front of a list. Pronounced *cons*.
+{-| Add an element to the front of a list.
 
     1 :: [2,3] == [1,2,3]
     1 :: [] == [1]
+
+This operator is pronounced *cons* for historical reasons, but you can think
+of it like pushing an entry onto a stack.
 -}
 cons : a -> List a -> List a
 cons =
@@ -72,6 +58,9 @@ cons =
 
     head [1,2,3] == Just 1
     head [] == Nothing
+
+**Note:** It is usually preferable to use a `case` to deconstruct a `List`
+because it gives you `(x :: xs)` and you can work with both subparts.
 -}
 head : List a -> Maybe a
 head list =
@@ -87,6 +76,9 @@ head list =
 
     tail [1,2,3] == Just [2,3]
     tail [] == Nothing
+
+**Note:** It is usually preferable to use a `case` to deconstruct a `List`
+because it gives you `(x :: xs)` and you can work with both subparts.
 -}
 tail : List a -> Maybe (List a)
 tail list =
@@ -101,6 +93,9 @@ tail list =
 {-| Determine if a list is empty.
 
     isEmpty [] == True
+
+**Note:** It is usually preferable to use a `case` to test this so you do not
+forget to handle the `(x :: xs)` case as well!
 -}
 isEmpty : List a -> Bool
 isEmpty xs =
@@ -138,7 +133,7 @@ map f xs =
 {-| Same as `map` but the function is also applied to the index of each
 element (starting at zero).
 
-    indexedMap (,) ["Tom","Sue","Bob"] == [ (0,"Tom"), (1,"Sue"), (2,"Bob") ]
+    indexedMap Tuple.pair ["Tom","Sue","Bob"] == [ (0,"Tom"), (1,"Sue"), (2,"Bob") ]
 -}
 indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
@@ -216,57 +211,35 @@ foldrHelper fn acc ctr ls =
                                         fn a (fn b (fn c (fn d res)))
 
 
-{-| Reduce a list from the left, building up all of the intermediate results into a list.
+{-| Keep elements that satisfy the test.
 
-    scanl (+) 0 [1,2,3,4] == [0,1,3,6,10]
+    keepIf isEven [1,2,3,4,5,6] == [2,4,6]
 -}
-scanl : (a -> b -> b) -> b -> List a -> List b
-scanl f b xs =
-  let
-    scan1 x accAcc =
-      case accAcc of
-        acc :: _ ->
-          cons (f x acc) accAcc
-
-        [] ->
-          [] -- impossible
-  in
-    reverse (foldl scan1 [b] xs)
+keepIf : (a -> Bool) -> List a -> List a
+keepIf isGood list =
+  foldr (\x xs -> if isGood x then cons x xs else xs) [] list
 
 
-{-| Keep only elements that satisfy the predicate.
+{-| Drop elements that satisfy the test.
 
-    filter isEven [1,2,3,4,5,6] == [2,4,6]
+    dropIf isEven [1,2,3,4,5,6] == [1,3,5]
 -}
-filter : (a -> Bool) -> List a -> List a
-filter pred xs =
-  let
-    conditionalCons front back =
-      if pred front then
-        cons front back
-
-      else
-        back
-  in
-    foldr conditionalCons [] xs
+dropIf : (a -> Bool) -> List a -> List a
+dropIf isBad list =
+  foldr (\x xs -> if isBad x then xs else cons x xs) [] list
 
 
-{-| Apply a function that may succeed to all values in the list, but only keep
-the successes.
+{-| Filter out certain values. For example, maybe you have a bunch of strings
+from an untrusted source and you want to turn them into numbers:
 
-    onlyTeens =
-      filterMap isTeen [3, 15, 12, 18, 24] == [15, 18]
+    numbers : List Int
+    numbers =
+      filter String.toInt ["3", "hi", "12", "4th", "May"]
 
-    isTeen : Int -> Maybe Int
-    isTeen n =
-      if 13 <= n && n <= 19 then
-        Just n
-
-      else
-        Nothing
+    -- numbers == [3, 12]
 -}
-filterMap : (a -> Maybe b) -> List a -> List b
-filterMap f xs =
+filter : (a -> Maybe b) -> List a -> List b
+filter f xs =
   foldr (maybeCons f) [] xs
 
 
@@ -436,13 +409,19 @@ partition pred list =
 {-| Combine two lists, combining them with the given function.
 If one list is longer, the extra elements are dropped.
 
-    map2 (+) [1,2,3] [1,2,3,4] == [2,4,6]
+    totals : List Int -> List Int -> List Int
+    totals xs ys =
+      List.map2 (+) xs ys
 
-    map2 (,) [1,2,3] ['a','b'] == [ (1,'a'), (2,'b') ]
+    -- totals [1,2,3] [4,5,6] == [5,7,9]
 
     pairs : List a -> List b -> List (a,b)
-    pairs lefts rights =
-        map2 (,) lefts rights
+    pairs xs ys =
+      List.map2 Tuple.pair xs ys
+
+    -- pairs ["alice","bob","chuck"] [2,5,7,8]
+    --   == [("alice",2),("bob",5),("chuck",7)]
+
 -}
 map2 : (a -> b -> result) -> List a -> List b -> List result
 map2 =
@@ -503,10 +482,10 @@ intersperse sep xs =
 
 {-| Take the first *n* members of a list.
 
-    take 2 [1,2,3,4] == [1,2]
+    keep 2 [1,2,3,4] == [1,2]
 -}
-take : Int -> List a -> List a
-take n list =
+keep : Int -> List a -> List a
+keep n list =
   takeFast 0 n list
 
 
