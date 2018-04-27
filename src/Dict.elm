@@ -2,7 +2,7 @@ module Dict exposing
   ( Dict
   , empty, singleton, insert, update
   , isEmpty, get, remove, member, size
-  , filter
+  , keepIf, dropIf
   , partition
   , foldl, foldr, map
   , union, intersect, diff, merge
@@ -29,7 +29,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs keys, values, toList, fromList
 
 # Transform
-@docs map, foldl, foldr, filter, partition
+@docs map, foldl, foldr, keepIf, dropIf, partition
 
 # Combine
 @docs union, intersect, diff, merge
@@ -498,7 +498,7 @@ Preference is given to values in the first dictionary.
 -}
 intersect : Dict comparable v -> Dict comparable v -> Dict comparable v
 intersect t1 t2 =
-  filter (\k _ -> member k t2) t1
+  keepIf (\k _ -> member k t2) t1
 
 
 {-| Keep a key-value pair when its key does not appear in the second dictionary.
@@ -591,29 +591,27 @@ foldr func acc t =
       foldr func (func key value (foldr func acc right)) left
 
 
-{-| Keep a key-value pair when it satisfies a predicate. -}
-filter : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
-filter predicate dictionary =
-  let
-    add key value dict =
-      if predicate key value then
-        insert key value dict
-
-      else
-        dict
-  in
-    foldl add empty dictionary
+{-| Keep only the key-value pairs that pass the given test. -}
+keepIf : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+keepIf isGood dict =
+  foldl (\k v d -> if isGood k v then insert k v d else d) empty dict
 
 
-{-| Partition a dictionary according to a predicate. The first dictionary
-contains all key-value pairs which satisfy the predicate, and the second
-contains the rest.
+{-| Drop key-value pairs based on the given test. -}
+dropIf : (comparable -> v -> Bool) -> Dict comparable v -> Dict comparable v
+dropIf isBad dict =
+  foldl (\k v d -> if isBad k v then d else insert k v d) empty dict
+
+
+{-| Partition a dictionary according to some test. The first dictionary
+contains all key-value pairs which passed the test, and the second contains
+the pairs that did not.
 -}
 partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
-partition predicate dict =
+partition isGood dict =
   let
     add key value (t1, t2) =
-      if predicate key value then
+      if isGood key value then
         (insert key value t1, t2)
 
       else
