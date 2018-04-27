@@ -33,7 +33,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 
 -}
 
-import Basics exposing (Bool, Int, (<|))
+import Basics exposing (Bool, Int)
 import Dict as Dict
 import List as List
 
@@ -56,24 +56,21 @@ empty =
 -}
 singleton : comparable -> Set comparable
 singleton key =
-  Set_elm_builtin <|
-    Dict.singleton key ()
+  Set_elm_builtin (Dict.singleton key ())
 
 
 {-| Insert a value into a set.
 -}
 insert : comparable -> Set comparable -> Set comparable
 insert key (Set_elm_builtin dict) =
-  Set_elm_builtin <|
-    Dict.insert key () dict
+  Set_elm_builtin (Dict.insert key () dict)
 
 
 {-| Remove a value from a set. If the value is not found, no changes are made.
 -}
 remove : comparable -> Set comparable -> Set comparable
 remove key (Set_elm_builtin dict) =
-  Set_elm_builtin <|
-    Dict.remove key dict
+  Set_elm_builtin (Dict.remove key dict)
 
 
 {-| Determine if a set is empty.
@@ -101,16 +98,14 @@ size (Set_elm_builtin dict) =
 -}
 union : Set comparable -> Set comparable -> Set comparable
 union (Set_elm_builtin dict1) (Set_elm_builtin dict2) =
-  Set_elm_builtin <|
-    Dict.union dict1 dict2
+  Set_elm_builtin (Dict.union dict1 dict2)
 
 
 {-| Get the intersection of two sets. Keeps values that appear in both sets.
 -}
 intersect : Set comparable -> Set comparable -> Set comparable
 intersect (Set_elm_builtin dict1) (Set_elm_builtin dict2) =
-  Set_elm_builtin <|
-    Dict.intersect dict1 dict2
+  Set_elm_builtin (Dict.intersect dict1 dict2)
 
 
 {-| Get the difference between the first set and the second. Keeps values
@@ -118,8 +113,7 @@ that do not appear in the second set.
 -}
 diff : Set comparable -> Set comparable -> Set comparable
 diff (Set_elm_builtin dict1) (Set_elm_builtin dict2) =
-  Set_elm_builtin <|
-    Dict.diff dict1 dict2
+  Set_elm_builtin (Dict.diff dict1 dict2)
 
 
 {-| Convert a set into a list, sorted from lowest to highest.
@@ -157,24 +151,22 @@ map func set =
   fromList (List.map func (toList set))
 
 
-{-| Create a new set consisting only of elements which satisfy a predicate.
+{-| Only keep elements that pass the given test.
 -}
 keepIf : (comparable -> Bool) -> Set comparable -> Set comparable
 keepIf isGood (Set_elm_builtin dict) =
-  Set_elm_builtin <|
-    Dict.keepIf (\key _ -> isGood key) dict
+  Set_elm_builtin (Dict.keepIf (\key _ -> isGood key) dict)
 
 
-{-| Create a new set consisting only of elements which satisfy a predicate.
+{-| Drop any elements that pass the given test.
 -}
 dropIf : (comparable -> Bool) -> Set comparable -> Set comparable
-dropIf isGood (Set_elm_builtin dict) =
-  Set_elm_builtin <|
-    Dict.dropIf (\key _ -> isGood key) dict
+dropIf isBad (Set_elm_builtin dict) =
+  Set_elm_builtin (Dict.dropIf (\key _ -> isBad key) dict)
 
 
-{-| Create two new sets; the first consisting of elements which satisfy a
-predicate, the second consisting of elements which do not.
+{-| Create two new sets. The first contains all the elements that passed the
+given test, and the second contains all the elements that did not.
 -}
 partition : (comparable -> Bool) -> Set comparable -> (Set comparable, Set comparable)
 partition isGood (Set_elm_builtin dict) =
