@@ -516,7 +516,7 @@ intersect t1 t2 =
 
 {-| Keep a key-value pair when its key does not appear in the second dictionary.
 -}
-diff : Dict comparable v -> Dict comparable v -> Dict comparable v
+diff : Dict comparable a -> Dict comparable b -> Dict comparable a
 diff t1 t2 =
   foldl (\k v t -> remove k t) t1 t2
 
