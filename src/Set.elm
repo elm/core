@@ -2,10 +2,9 @@ module Set exposing
   ( Set
   , empty, singleton, insert, remove
   , isEmpty, member, size
-  , foldl, foldr, map
-  , filter, partition
   , union, intersect, diff
   , toList, fromList
+  , map, foldl, foldr, keepIf, dropIf, partition
   )
 
 {-| A set of unique values. The values can be any comparable type. This
@@ -30,7 +29,7 @@ Insert, remove, and query operations all take *O(log n)* time.
 @docs toList, fromList
 
 # Transform
-@docs map, foldl, foldr, filter, partition
+@docs map, foldl, foldr, keepIf, dropIf, partition
 
 -}
 
@@ -160,10 +159,18 @@ map func set =
 
 {-| Create a new set consisting only of elements which satisfy a predicate.
 -}
-filter : (comparable -> Bool) -> Set comparable -> Set comparable
-filter isGood (Set_elm_builtin dict) =
+keepIf : (comparable -> Bool) -> Set comparable -> Set comparable
+keepIf isGood (Set_elm_builtin dict) =
   Set_elm_builtin <|
-    Dict.filter (\key _ -> isGood key) dict
+    Dict.keepIf (\key _ -> isGood key) dict
+
+
+{-| Create a new set consisting only of elements which satisfy a predicate.
+-}
+dropIf : (comparable -> Bool) -> Set comparable -> Set comparable
+dropIf isGood (Set_elm_builtin dict) =
+  Set_elm_builtin <|
+    Dict.dropIf (\key _ -> isGood key) dict
 
 
 {-| Create two new sets; the first consisting of elements which satisfy a
