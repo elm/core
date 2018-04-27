@@ -834,8 +834,6 @@ example, the following code checks if the square root of a number is odd:
 
     sqrt >> isEven >> not
 
-This direction of function composition seems less pleasant than `(<<)` which
-reads nicely in expressions like: `filter (not << isRegistered) students`
 -}
 composeR : (a -> b) -> (b -> c) -> (a -> c)
 composeR f g x =
