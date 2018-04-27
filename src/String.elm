@@ -9,7 +9,7 @@ module String exposing
   , fromChar, cons, uncons
   , toList, fromList
   , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
-  , map, filter, foldl, foldr, any, all
+  , map, keepIf, dropIf, foldl, foldr, any, all
   )
 
 {-| A built-in representation for efficient string manipulation. String literals
@@ -45,7 +45,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 @docs toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
 
 # Higher-Order Functions
-@docs map, filter, foldl, foldr, any, all
+@docs map, keepIf, dropIf, foldl, foldr, any, all
 -}
 
 import Basics exposing (..)
@@ -565,13 +565,22 @@ map =
   Elm.Kernel.String.map
 
 
-{-| Keep only the characters that satisfy the predicate.
+{-| Keep only the characters that pass the test.
 
-    filter isDigit "R2-D2" == "22"
+    keepIf isDigit "R2-D2" == "22"
 -}
-filter : (Char -> Bool) -> String -> String
-filter =
-  Elm.Kernel.String.filter
+keepIf : (Char -> Bool) -> String -> String
+keepIf =
+  Elm.Kernel.String.keepIf
+
+
+{-| Drop any characters that pass the test.
+
+    dropIf isDigit "R2-D2" == "R-D"
+-}
+dropIf : (Char -> Bool) -> String -> String
+dropIf isBad string =
+  Elm.Kernel.String.keepIf (\c -> not (isBad c)) string
 
 
 {-| Reduce a string from the left.
@@ -592,7 +601,7 @@ foldr =
   Elm.Kernel.String.foldr
 
 
-{-| Determine whether *any* characters satisfy a predicate.
+{-| Determine whether *any* characters pass the test.
 
     any isDigit "90210" == True
     any isDigit "R2-D2" == True
@@ -603,7 +612,7 @@ any =
   Elm.Kernel.String.any
 
 
-{-| Determine whether *all* characters satisfy a predicate.
+{-| Determine whether *all* characters pass the test.
 
     all isDigit "90210" == True
     all isDigit "R2-D2" == False

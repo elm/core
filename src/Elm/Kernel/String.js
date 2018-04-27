@@ -54,7 +54,7 @@ var _String_map = F2(function(func, string)
 	return array.join('');
 });
 
-var _String_filter = F2(function(pred, str)
+var _String_keepIf = F2(function(isGood, str)
 {
 	var arr = [];
 	var len = str.length;
@@ -70,7 +70,7 @@ var _String_filter = F2(function(pred, str)
 			i++;
 		}
 
-		if (pred(__Utils_chr(char)))
+		if (isGood(__Utils_chr(char)))
 		{
 			arr.push(char);
 		}
