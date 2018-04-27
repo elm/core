@@ -1,13 +1,10 @@
 module Dict exposing
   ( Dict
-  , empty, singleton, insert, update
-  , isEmpty, get, remove, member, size
-  , keepIf, dropIf
-  , partition
-  , foldl, foldr, map
+  , empty, singleton, insert, update, remove
+  , isEmpty, member, get, size
+  , keys, values, toList, fromList
+  , map, foldl, foldr, keepIf, dropIf, partition
   , union, intersect, diff, merge
-  , keys, values
-  , toList, fromList
   )
 
 {-| A dictionary mapping unique keys to values. The keys can be any comparable
@@ -62,9 +59,25 @@ type LeafColor
     | LBBlack -- Double Black, counts as 2
 
 
-{-| A dictionary of keys and values. So a `(Dict String User)` is a dictionary
+{-| A dictionary of keys and values. So a `Dict String User` is a dictionary
 that lets you look up a `String` (such as user names) and find the associated
 `User`.
+
+    import Dict
+
+    users : Dict.Dict. String User
+    users =
+      Dict.fromList
+        [ ("Alice", User "Alice" 28 1.65)
+        , ("Bob"  , User "Bob"   19 1.82)
+        , ("Chuck", User "Chuck" 33 1.75)
+        ]
+
+    type alias User =
+      { name : String
+      , age : Int
+      , height : Float
+      }
 -}
 type Dict k v
     = RBNode_elm_builtin NColor k v (Dict k v) (Dict k v)
