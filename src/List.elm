@@ -279,7 +279,7 @@ member x xs =
   any (\a -> a == x) xs
 
 
-{-| Determine if all elements satisfy the predicate.
+{-| Determine if all elements satisfy some test.
 
     all isEven [2,4] == True
     all isEven [2,3] == False
@@ -290,7 +290,7 @@ all isOkay list =
   not (any (not << isOkay) list)
 
 
-{-| Determine if any elements satisfy the predicate.
+{-| Determine if any elements satisfy some test.
 
     any isEven [2,3] == True
     any isEven [1,3] == False
@@ -635,9 +635,8 @@ drop n list =
         drop (n-1) xs
 
 
-{-| Partition a list based on a predicate. The first list contains all values
-that satisfy the predicate, and the second list contains all the value that do
-not.
+{-| Partition a list based on some test. The first list contains all values
+that satisfy the test, and the second list contains all the value that do not.
 
     partition (\x -> x < 3) [0,1,2,3,4,5] == ([0,1,2], [3,4,5])
     partition isEven        [0,1,2,3,4,5] == ([0,2,4], [1,3,5])
