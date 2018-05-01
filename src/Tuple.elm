@@ -1,5 +1,6 @@
 module Tuple exposing
-  ( first, second
+  ( pair
+  , first, second
   , mapFirst, mapSecond, mapBoth
   )
 
@@ -26,17 +27,37 @@ info on this. (Picking appropriate data structures is super important in Elm!)
 
 [ut]: https://robots.thoughtbot.com/modeling-with-union-types
 
-# Accessors
+# Create
+@docs pair
+
+# Access
 @docs first, second
 
-# Mapping
+# Map
 @docs mapFirst, mapSecond, mapBoth
 
 -}
 
 
 
--- ACCESSORS
+-- CREATE
+
+
+{-| Create a 2-tuple.
+
+    -- pair 3 4 == (3, 4)
+
+    zip : List a -> List b -> List (a, b)
+    zip xs ys =
+      List.map2 Tuple.pair xs ys
+-}
+pair : a -> b -> (a, b)
+pair a b =
+  (a, b)
+
+
+
+-- ACCESS
 
 
 {-| Extract the first value from a tuple.
@@ -60,7 +81,7 @@ second (_,y) =
 
 
 
--- MAPPING
+-- MAP
 
 
 {-| Transform the first value in a tuple.
