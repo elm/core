@@ -1,6 +1,6 @@
 module List exposing
   ( singleton, repeat, range, (::)
-  , map, indexedMap, foldl, foldr, keepIf, dropIf, filter
+  , map, indexedMap, foldl, foldr, filter
   , length, reverse, member, all, any, maximum, minimum, sum, product
   , append, concat, concatMap, intersperse, map2, map3, map4, map5
   , sort, sortBy, sortWith
@@ -15,7 +15,7 @@ with them!
 @docs singleton, repeat, range, (::)
 
 # Transform
-@docs map, indexedMap, foldl, foldr, keepIf, dropIf, filter
+@docs map, indexedMap, foldl, foldr, filter
 
 # Utilities
 @docs length, reverse, member, all, any, maximum, minimum, sum, product
@@ -208,20 +208,11 @@ foldrHelper fn acc ctr ls =
 
 {-| Keep elements that satisfy the test.
 
-    keepIf isEven [1,2,3,4,5,6] == [2,4,6]
+    filter isEven [1,2,3,4,5,6] == [2,4,6]
 -}
-keepIf : (a -> Bool) -> List a -> List a
-keepIf isGood list =
+filter : (a -> Bool) -> List a -> List a
+filter isGood list =
   foldr (\x xs -> if isGood x then cons x xs else xs) [] list
-
-
-{-| Drop elements that satisfy the test.
-
-    dropIf isEven [1,2,3,4,5,6] == [1,3,5]
--}
-dropIf : (a -> Bool) -> List a -> List a
-dropIf isBad list =
-  foldr (\x xs -> if isBad x then xs else cons x xs) [] list
 
 
 {-| Filter out certain values. For example, maybe you have a bunch of strings
@@ -229,15 +220,13 @@ from an untrusted source and you want to turn them into numbers:
 
     numbers : List Int
     numbers =
-      filter String.toInt ["3", "hi", "12", "4th", "May"]
+      filterMap String.toInt ["3", "hi", "12", "4th", "May"]
 
     -- numbers == [3, 12]
 
-**Note:** See [`keepIf`](#keepIf) and [`dropIf`](#dropIf) to filter based on a
-test like `(\x -> x < 0)` where it just gives a `Bool`.
 -}
-filter : (a -> Maybe b) -> List a -> List b
-filter f xs =
+filterMap : (a -> Maybe b) -> List a -> List b
+filterMap f xs =
   foldr (maybeCons f) [] xs
 
 

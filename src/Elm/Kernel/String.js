@@ -54,7 +54,7 @@ var _String_map = F2(function(func, string)
 	return array.join('');
 });
 
-var _String_keepIf = F2(function(isGood, str)
+var _String_filter = F2(function(isGood, str)
 {
 	var arr = [];
 	var len = str.length;

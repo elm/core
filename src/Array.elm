@@ -14,8 +14,7 @@ module Array
         , toIndexedList
         , foldr
         , foldl
-        , keepIf
-        , dropIf
+        , filter
         , map
         , indexedMap
         , append
@@ -40,7 +39,7 @@ module Array
 @docs toList, toIndexedList
 
 # Transform
-@docs map, indexedMap, foldl, foldr, keepIf, dropIf
+@docs map, indexedMap, foldl, foldr, filter
 -}
 
 
@@ -500,43 +499,13 @@ foldl func baseCase (Array_elm_builtin _ _ tree tail) =
         JsArray.foldl func (JsArray.foldl helper baseCase tree) tail
 
 
-{-| Filter the elements based on some function.
-
-    filter String.toInt (fromList ["1","tom","2"]) == (fromList [1,2])
-
-**Note:** See [`keepIf`](#keepIf) and [`dropIf`](#dropIf) to filter based on a
-test like `(\x -> x < 0)` where it just gives a `Bool`.
--}
-filter : (a -> Maybe b) -> Array a -> Array b
-filter func array =
-    let
-        maybeAdd x ys =
-            case func x of
-                Nothing ->
-                    ys
-
-                Just y ->
-                    y :: ys
-    in
-    fromList (foldr maybeAdd [] array)
-
-
 {-| Keep elements that pass the test.
 
-    keepIf isEven (fromList [1,2,3,4,5,6]) == (fromList [2,4,6])
+    filter isEven (fromList [1,2,3,4,5,6]) == (fromList [2,4,6])
 -}
-keepIf : (a -> Bool) -> Array a -> Array a
-keepIf isGood array =
+filter : (a -> Bool) -> Array a -> Array a
+filter isGood array =
     fromList (foldr (\x xs -> if isGood x then x :: xs else xs) [] array)
-
-
-{-| Drop any elements that pass the test.
-
-    dropIf isEven (fromList [1,2,3,4,5,6]) == (fromList [1,3,5])
--}
-dropIf : (a -> Bool) -> Array a -> Array a
-dropIf isBad array =
-    fromList (foldr (\x xs -> if isBad x then xs else x :: xs) [] array)
 
 
 {-| Apply a function on every element in an array.

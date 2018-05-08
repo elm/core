@@ -9,7 +9,7 @@ module String exposing
   , fromChar, cons, uncons
   , toList, fromList
   , toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
-  , map, keepIf, dropIf, foldl, foldr, any, all
+  , map, filter, foldl, foldr, any, all
   )
 
 {-| A built-in representation for efficient string manipulation. String literals
@@ -45,7 +45,7 @@ Cosmetic operations such as padding with extra characters or trimming whitespace
 @docs toUpper, toLower, pad, padLeft, padRight, trim, trimLeft, trimRight
 
 # Higher-Order Functions
-@docs map, keepIf, dropIf, foldl, foldr, any, all
+@docs map, filter, foldl, foldr, any, all
 -}
 
 import Basics exposing (..)
@@ -567,20 +567,11 @@ map =
 
 {-| Keep only the characters that pass the test.
 
-    keepIf isDigit "R2-D2" == "22"
+    filter isDigit "R2-D2" == "22"
 -}
-keepIf : (Char -> Bool) -> String -> String
-keepIf =
-  Elm.Kernel.String.keepIf
-
-
-{-| Drop any characters that pass the test.
-
-    dropIf isDigit "R2-D2" == "R-D"
--}
-dropIf : (Char -> Bool) -> String -> String
-dropIf isBad string =
-  Elm.Kernel.String.keepIf (\c -> not (isBad c)) string
+filter : (Char -> Bool) -> String -> String
+filter =
+  Elm.Kernel.String.filter
 
 
 {-| Reduce a string from the left.
