@@ -1,6 +1,6 @@
 module List exposing
   ( singleton, repeat, range, (::)
-  , map, indexedMap, foldl, foldr, filter
+  , map, indexedMap, foldl, foldr, filter, filterMap
   , length, reverse, member, all, any, maximum, minimum, sum, product
   , append, concat, concatMap, intersperse, map2, map3, map4, map5
   , sort, sortBy, sortWith
@@ -15,7 +15,7 @@ with them!
 @docs singleton, repeat, range, (::)
 
 # Transform
-@docs map, indexedMap, foldl, foldr, filter
+@docs map, indexedMap, foldl, foldr, filter, filterMap
 
 # Utilities
 @docs length, reverse, member, all, any, maximum, minimum, sum, product
