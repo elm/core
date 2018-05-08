@@ -239,13 +239,18 @@ toCode =
 
 {-| Convert a Unicode [code point][cp] to a character.
 
-[cp]: https://en.wikipedia.org/wiki/Code_point
-
     fromCode 65      == 'A'
     fromCode 66      == 'B'
     fromCode 0x6728  == '木'
     fromCode 0x1D306 == '𝌆'
     fromCode 0x1F603 == '😃'
+    fromCode -1      == '�'
+
+The full range of unicode is from `0` to `0x10FFFF`. With numbers outside that
+range, you get [the replacement character][fffd].
+
+[cp]: https://en.wikipedia.org/wiki/Code_point
+[fffd]: https://en.wikipedia.org/wiki/Specials_(Unicode_block)#Replacement_character
 -}
 fromCode : Int -> Char
 fromCode =
