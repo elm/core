@@ -184,22 +184,22 @@ function _Debug_addSlashes(str, isChar)
 
 function _Debug_ctorColor(ansi, string)
 {
-	return ansi ? '\x1b[36m' + string + '\x1b[0m' : string;
+	return ansi ? '\x1b[96m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_numberColor(ansi, string)
 {
-	return ansi ? '\x1b[35m' + string + '\x1b[0m' : string;
+	return ansi ? '\x1b[95m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_stringColor(ansi, string)
 {
-	return ansi ? '\x1b[33m' + string + '\x1b[0m' : string;
+	return ansi ? '\x1b[93m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_charColor(ansi, string)
 {
-	return ansi ? '\x1b[32m' + string + '\x1b[0m' : string;
+	return ansi ? '\x1b[92m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_fadeColor(ansi, string)
