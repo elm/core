@@ -209,5 +209,5 @@ function _Debug_fadeColor(ansi, string)
 
 function _Debug_internalColor(ansi, string)
 {
-	return ansi ? '\x1b[34m' + string + '\x1b[0m' : string;
+	return ansi ? '\x1b[94m' + string + '\x1b[0m' : string;
 }
