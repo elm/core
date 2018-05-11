@@ -386,9 +386,9 @@ max x y =
   if gt x y then x else y
 
 
-{-| Compare any two comparable values. Comparable values include `String`, `Char`,
-`Int`, `Float`, `Time`, or a list or tuple containing comparable values.
-These are also the only values that work as `Dict` keys or `Set` members.
+{-| Compare any two comparable values. Comparable values include `String`,
+`Char`, `Int`, `Float`, or a list or tuple containing comparable values. These
+are also the only values that work as `Dict` keys or `Set` members.
 
     compare 3 4 == LT
     compare 4 4 == EQ
