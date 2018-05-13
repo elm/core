@@ -414,7 +414,7 @@ function _Platform_setupIncomingPort(name, sendToApp)
 
 	function send(incomingValue)
 	{
-		var result = A2(__Json_run, converter, incomingValue);
+		var result = A2(__Json_run, converter, __Json_wrap(incomingValue));
 
 		__Result_isOk(result) || __Error_throw(4, name, result.a);
 
