@@ -9,23 +9,19 @@ effect module Task where { command = MyCmd } exposing
   )
 
 {-| Tasks make it easy to describe asynchronous operations that may fail, like
-HTTP requests or writing to a database. For more information, see the [Elm
-documentation on Tasks](http://guide.elm-lang.org/error_handling/task.html).
+HTTP requests or writing to a database.
 
-# Basics
-@docs Task, succeed, fail
+# Tasks
+@docs Task, perform, attempt
 
-# Mapping
+# Chains
+@docs andThen, succeed, fail, sequence
+
+# Maps
 @docs map, map2, map3, map4, map5
-
-# Chaining
-@docs andThen, sequence
 
 # Errors
 @docs onError, mapError
-
-# Commands
-@docs perform, attempt
 
 -}
 
@@ -39,34 +35,59 @@ import Result exposing (Result(..))
 
 
 
-{-| Represents asynchronous effects that may fail. It is useful for stuff like
-HTTP.
+{-| Here are some common tasks:
 
-For example, maybe we have a task with the type (`Task String User`). This means
-that when we perform the task, it will either fail with a `String` message or
-succeed with a `User`. So this could represent a task that is asking a server
-for a certain user.
+- [`Time.now : Task x Posix`][now]
+- [`Browser.focus : String -> Task DomError ()`][focus]
+- [`Process.sleep : Float -> Task x ()`][sleep]
+
+[now]: /packages/elm-lang/time/latest/Time#now
+[focus]: /packages/elm-lang/browser/latest/Browser#focus
+[sleep]: /packages/elm-lang/core/latest/Process#sleep
+
+In each case we have a `Task` that will resolve successfully with an `a` value
+or unsuccessfully with an `x` value. So `Browser.focus` we may fail with a
+`DomError` if the given ID does not exist. Whereas `Time.now` never fails so
+I cannot be more specific than `x`. No such value will ever exist! Instead it
+always succeeds with the current POSIX time.
+
+More generally a task is a _description_ of what you need to do. Like a todo
+list. Or like a grocery list. Or like GitHub issues. So saying "the task is
+to tell me the current POSIX time" does not complete the task! You need
+[`perform`](#perform) tasks or [`attempt`](#attempt) tasks.
 -}
-type alias Task err ok =
-  Platform.Task err ok
+type alias Task x a =
+  Platform.Task x a
 
 
 
 -- BASICS
 
 
-{-| A task that succeeds immediately when run.
+{-| A task that succeeds immediately when run. It is usually used with
+[`andThen`](#andThen). You can use it like `map` if you want:
 
-    succeed 42    -- results in 42
+    import Time -- elm install elm-lang/time
+
+    timeInMillis : Task x Int
+    timeInMillis =
+      Time.now
+        |> andThen (\t -> succeed (Time.posixToMillis t))
+
 -}
 succeed : a -> Task x a
 succeed =
   Elm.Kernel.Scheduler.succeed
 
 
-{-| A task that fails immediately when run.
+{-| A task that fails immediately when run. Like with `succeed`, this can be
+used with `andThen` to check on the outcome of another task.
 
-    fail "file not found" : Task String a
+    type Error = NotFound
+
+    notFound : Task Error a
+    notFound =
+      fail NotFound
 -}
 fail : x -> Task x a
 fail =
@@ -77,9 +98,21 @@ fail =
 -- MAPPING
 
 
-{-| Transform a task.
+{-| Transform a task. Maybe you want to use [`elm-lang/time`][time] to figure
+out what time it will be in one hour:
 
-    map sqrt (succeed 9) -- succeed 3
+    import Task exposing (Task)
+    import Time -- elm install elm-lang/time
+
+    timeInOneHour : Task x Time.Posix
+    timeInOneHour =
+      Task.map addAnHour Time.now
+
+    addAnHour : Time.Posix -> Time.Posix
+    addAnHour time =
+      Time.millisToPosix (Time.posixToMillis time + 60 * 60 * 1000)
+
+[time]: /packages/elm-lang/time/latest/
 -}
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
@@ -87,11 +120,21 @@ map func taskA =
     |> andThen (\a -> succeed (func a))
 
 
-{-| Put the results of two tasks together. If either task fails, the whole
-thing fails. It also runs in order so the first task will be completely
-finished before the second task starts.
+{-| Put the results of two tasks together. For example, if we wanted to know
+the current month, we could use [`elm-lang/time`][time] to ask:
 
-    map2 (+) (succeed 9) (succeed 3) -- succeed 12
+    import Task exposing (Task)
+    import Time -- elm install elm-lang/time
+
+    getMonth : Task x Int
+    getMonth =
+      Task.map2 Time.toMonth Time.here Time.now
+
+**Note:** Say we were doing HTTP requests instead. `map2` does each task in
+order, so it would try the first request and only continue after it succeeds.
+If it fails, the whole thing fails!
+
+[time]: /packages/elm-lang/time/latest/
 -}
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
@@ -134,9 +177,8 @@ map5 func taskA taskB taskC taskD taskE =
 list. The tasks will be run in order one-by-one and if any task fails the whole
 sequence fails.
 
-    sequence [ succeed 1, succeed 2 ] -- succeed [ 1, 2 ]
+    sequence [ succeed 1, succeed 2 ] == succeed [ 1, 2 ]
 
-This can be useful if you need to make a bunch of HTTP requests one-by-one.
 -}
 sequence : List (Task x a) -> Task x (List a)
 sequence tasks =
@@ -149,21 +191,27 @@ sequence tasks =
 
 {-| Chain together a task and a callback. The first task will run, and if it is
 successful, you give the result to the callback resulting in another task. This
-task then gets run.
+task then gets run. We could use this to make a task that resolves an hour from
+now:
 
-    succeed 2
-      |> andThen (\n -> succeed (n + 2))
-      -- succeed 4
+    import Time -- elm install elm-lang/time
+    import Process
 
-This is useful for chaining tasks together. Maybe you need to get a user from
-your servers *and then* lookup their picture once you know their name.
+    timeInOneHour : Task x Time.Posix
+    timeInOneHour =
+      Process.sleep (60 * 60 * 1000)
+        |> andThen (\_ -> Time.now)
+
+First the process sleeps for an hour **and then** it tells us what time it is.
 -}
 andThen : (a -> Task x b) -> Task x a -> Task x b
 andThen =
   Elm.Kernel.Scheduler.andThen
 
 
+
 -- ERRORS
+
 
 {-| Recover from a failure in a task. If the given task fails, we use the
 callback to recover.
@@ -184,11 +232,16 @@ onError =
 {-| Transform the error value. This can be useful if you need a bunch of error
 types to match up.
 
-    type Error = Http Http.Error | WebGL WebGL.Error
+    type Error
+      = Http Http.Error
+      | WebGL WebGL.Error
 
     getResources : Task Error Resource
     getResources =
-      sequence [ mapError Http serverTask, mapError WebGL textureTask ]
+      sequence
+        [ mapError Http serverTask
+        , mapError WebGL textureTask
+        ]
 -}
 mapError : (x -> y) -> Task x a -> Task y a
 mapError convert task =
@@ -204,30 +257,56 @@ type MyCmd msg =
   Perform (Task Never msg)
 
 
-{-| The only way to *do* things in Elm is to give commands to the Elm runtime.
-So we describe some complex behavior with a `Task` and then command the runtime
-to `perform` that task. For example, getting the current time looks like this:
+{-| Like I was saying in the [`Task`](#Task) documentation, just having a
+`Task` does not mean it is done. We must command Elm to `perform` the task:
 
+    import Time  -- elm install elm-lang/time
     import Task
-    import Time
 
-    type Msg = Click | NewTime Time.Posix
+    type Msg
+      = Click
+      | Search String
+      | NewTime Time.Posix
 
-    update : Msg -> Model -> ( Model, Cmd Msg )
-    update msg model =
-      case msg of
-        Click ->
-          ( model, Task.perform NewTime Time.now )
+    getNewTime : Cmd Msg
+    getNewTime =
+      Task.perform NewTime Time.now
 
-        NewTime time ->
-          ...
+If you have worked through [`guide.elm-lang.org`][guide] (highly recommended!)
+you will recognize `Cmd` from the section on The Elm Architecture. So we have
+changed a task like "make delicious lasagna" into a command like "Hey Elm, make
+delicious lasagna and give it to my `update` function as a `Msg` value."
+
+[guide]: https://guide.elm-lang.org/
 -}
 perform : (a -> msg) -> Task Never a -> Cmd msg
 perform toMessage task =
   command (Perform (map toMessage task))
 
 
-{-| Command the Elm runtime to attempt a task that might fail!
+{-| This is very similar to [`perform`](#perform) except it can handle failures!
+So we could _attempt_ to focus on a certain DOM node like this:
+
+    import Browser  -- elm install elm-lang/browser
+    import Task
+
+    type Msg
+      = Click
+      | Search String
+      | Focus (Result Browser.DomError ())
+
+    focus : Cmd Msg
+    focus =
+      Task.attempt Focus (Browser.focus "my-app-search-box")
+
+So the task is "focus on this DOM node" and we are turning it into the command
+"Hey Elm, attempt to focus on this DOM node and give me a `Msg` about whether
+you succeeded or failed."
+
+**Note:** Definitely work through [`guide.elm-lang.org`][guide] to get a
+feeling for how commands fit into The Elm Architecture.
+
+[guide]: https://guide.elm-lang.org/
 -}
 attempt : (Result x a -> msg) -> Task x a -> Cmd msg
 attempt resultToMessage task =
