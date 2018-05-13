@@ -4,7 +4,7 @@ module List exposing
   , length, reverse, member, all, any, maximum, minimum, sum, product
   , append, concat, concatMap, intersperse, map2, map3, map4, map5
   , sort, sortBy, sortWith
-  , isEmpty, head, tail, keep, drop, partition, unzip
+  , isEmpty, head, tail, take, drop, partition, unzip
   )
 
 {-| You can create a `List` in Elm with the `[1,2,3]` syntax, so lists are
@@ -27,7 +27,7 @@ with them!
 @docs sort, sortBy, sortWith
 
 # Deconstruct
-@docs isEmpty, head, tail, keep, drop, partition, unzip
+@docs isEmpty, head, tail, take, drop, partition, unzip
 
 -}
 
@@ -557,15 +557,15 @@ tail list =
 
 {-| Take the first *n* members of a list.
 
-    keep 2 [1,2,3,4] == [1,2]
+    take 2 [1,2,3,4] == [1,2]
 -}
-keep : Int -> List a -> List a
-keep n list =
-  keepFast 0 n list
+take : Int -> List a -> List a
+take n list =
+  takeFast 0 n list
 
 
-keepFast : Int -> Int -> List a -> List a
-keepFast ctr n list =
+takeFast : Int -> Int -> List a -> List a
+takeFast ctr n list =
   if n <= 0 then
     []
   else
@@ -584,20 +584,20 @@ keepFast ctr n list =
 
       ( _, x :: y :: z :: w :: tl ) ->
         if ctr > 1000 then
-          cons x (cons y (cons z (cons w (keepTailRec (n - 4) tl))))
+          cons x (cons y (cons z (cons w (takeTailRec (n - 4) tl))))
         else
-          cons x (cons y (cons z (cons w (keepFast (ctr + 1) (n - 4) tl))))
+          cons x (cons y (cons z (cons w (takeFast (ctr + 1) (n - 4) tl))))
 
       _ ->
         list
 
-keepTailRec : Int -> List a -> List a
-keepTailRec n list =
-  reverse (keepReverse n list [])
+takeTailRec : Int -> List a -> List a
+takeTailRec n list =
+  reverse (takeReverse n list [])
 
 
-keepReverse : Int -> List a -> List a -> List a
-keepReverse n list kept =
+takeReverse : Int -> List a -> List a -> List a
+takeReverse n list kept =
   if n <= 0 then
     kept
   else
@@ -606,7 +606,7 @@ keepReverse n list kept =
         kept
 
       x :: xs ->
-        keepReverse (n - 1) xs (cons x kept)
+        takeReverse (n - 1) xs (cons x kept)
 
 
 {-| Drop the first *n* members of a list.
