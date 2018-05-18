@@ -599,7 +599,7 @@ logBase : Float -> Float -> Float
 logBase base number =
   fdiv
     (Elm.Kernel.Basics.log number)
-    (Elm.Kernel.Basics.log Elm.Kernel.Basics.e)
+    (Elm.Kernel.Basics.log base)
 
 
 {-| An approximation of e.
