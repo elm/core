@@ -37,7 +37,7 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			throw new Error('Trying to send an unexpected type of value through port `' + portName + '`:\n' + problem);
 
 		case 5:
-			throw new Error('Trying to use `(==)` on functions.\nThere is no way to know if functions are "the same" in the Elm sense.\nRead more about this at http://package.elm-lang.org/packages/elm-lang/core/latest/Basics#== which describes why it is this way and what the better version will look like.');
+			throw new Error('Trying to use `(==)` on functions.\nThere is no way to know if functions are "the same" in the Elm sense.\nRead more about this at https://package.elm-lang.org/packages/elm-lang/core/latest/Basics#== which describes why it is this way and what the better version will look like.');
 
 		case 6:
 			var moduleName = fact1;

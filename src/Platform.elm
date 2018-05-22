@@ -60,7 +60,7 @@ If _do_ want to control the user interface in Elm, the [`Browser`][browser]
 module has a few ways to create that kind of `Program` instead!
 
 [headless]: https://en.wikipedia.org/wiki/Headless_software
-[browser]: http://package.elm-lang.org/packages/elm-lang/browser/latest/Browser
+[browser]: /packages/elm-lang/browser/latest/Browser
 -}
 worker
   : { init : flags -> ( model, Cmd msg )
