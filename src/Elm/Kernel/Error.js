@@ -21,7 +21,7 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 
 		case 1:
 			var url = fact1;
-			throw new Error('Cannot navigate to the following URL. It seems to be invalid:\n' + url);
+			throw new Error('Browser.fullscreen programs cannot handle URLs like this:\n\n    ' + url + '\n\nWhat is the root? The root of your file system? Try looking at this program with `elm reactor` or some other server.');
 
 		case 2:
 			var message = fact1;
