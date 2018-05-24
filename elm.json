@@ -1,9 +1,9 @@
 {
 	"type": "package",
-	"name": "elm-lang/core",
+	"name": "elm/core",
 	"summary": "Elm's standard libraries",
 	"license": "BSD-3-Clause",
-	"version": "6.0.0",
+	"version": "1.0.0",
 	"exposed-modules": {
 		"Primitives": [
 			"Basics",

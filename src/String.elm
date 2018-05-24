@@ -147,7 +147,10 @@ repeatHelp n chunk result =
     replace "," "/" "a,b,c,d,e"           == "a/b/c/d/e"
 
 **Note:** If you need more advanced replacements, check out the
-`elm-lang/parser` or `elm-lang/regexp` package.
+[`elm/parser`][parser] or [`elm/regex`][regex] package.
+
+[parser]: /packages/elm/parser/latest
+[regex]: /packages/elm/regex/latest
 -}
 replace : String -> String -> String -> String
 replace before after string =

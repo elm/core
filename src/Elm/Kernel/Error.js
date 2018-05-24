@@ -8,7 +8,7 @@ import Elm.Kernel.Debug exposing (toString)
 
 function _Error_throw__PROD(identifier)
 {
-	throw new Error('https://github.com/elm-lang/core/blob/master/hints/' + identifier + '.md');
+	throw new Error('https://github.com/elm/core/blob/master/hints/' + identifier + '.md');
 }
 
 
@@ -37,7 +37,7 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			throw new Error('Trying to send an unexpected type of value through port `' + portName + '`:\n' + problem);
 
 		case 5:
-			throw new Error('Trying to use `(==)` on functions.\nThere is no way to know if functions are "the same" in the Elm sense.\nRead more about this at https://package.elm-lang.org/packages/elm-lang/core/latest/Basics#== which describes why it is this way and what the better version will look like.');
+			throw new Error('Trying to use `(==)` on functions.\nThere is no way to know if functions are "the same" in the Elm sense.\nRead more about this at https://package.elm-lang.org/packages/elm/core/latest/Basics#== which describes why it is this way and what the better version will look like.');
 
 		case 6:
 			var moduleName = fact1;
@@ -62,7 +62,7 @@ function _Error_throw__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			);
 
 		case 10:
-			throw new Error('Bug in https://github.com/elm-lang/virtual-dom/issues');
+			throw new Error('Bug in https://github.com/elm/virtual-dom/issues');
 
 		case 11:
 			throw new Error('Cannot perform mod 0. Division by zero error.');

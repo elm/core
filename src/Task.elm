@@ -41,9 +41,9 @@ import Result exposing (Result(..))
 - [`Browser.focus : String -> Task DomError ()`][focus]
 - [`Process.sleep : Float -> Task x ()`][sleep]
 
-[now]: /packages/elm-lang/time/latest/Time#now
-[focus]: /packages/elm-lang/browser/latest/Browser#focus
-[sleep]: /packages/elm-lang/core/latest/Process#sleep
+[now]: /packages/elm/time/latest/Time#now
+[focus]: /packages/elm/browser/latest/Browser#focus
+[sleep]: /packages/elm/core/latest/Process#sleep
 
 In each case we have a `Task` that will resolve successfully with an `a` value
 or unsuccessfully with an `x` value. So `Browser.focus` we may fail with a
@@ -67,7 +67,7 @@ type alias Task x a =
 {-| A task that succeeds immediately when run. It is usually used with
 [`andThen`](#andThen). You can use it like `map` if you want:
 
-    import Time -- elm install elm-lang/time
+    import Time -- elm install elm/time
 
     timeInMillis : Task x Int
     timeInMillis =
@@ -98,11 +98,11 @@ fail =
 -- MAPPING
 
 
-{-| Transform a task. Maybe you want to use [`elm-lang/time`][time] to figure
+{-| Transform a task. Maybe you want to use [`elm/time`][time] to figure
 out what time it will be in one hour:
 
     import Task exposing (Task)
-    import Time -- elm install elm-lang/time
+    import Time -- elm install elm/time
 
     timeInOneHour : Task x Time.Posix
     timeInOneHour =
@@ -112,7 +112,7 @@ out what time it will be in one hour:
     addAnHour time =
       Time.millisToPosix (Time.posixToMillis time + 60 * 60 * 1000)
 
-[time]: /packages/elm-lang/time/latest/
+[time]: /packages/elm/time/latest/
 -}
 map : (a -> b) -> Task x a -> Task x b
 map func taskA =
@@ -121,10 +121,10 @@ map func taskA =
 
 
 {-| Put the results of two tasks together. For example, if we wanted to know
-the current month, we could use [`elm-lang/time`][time] to ask:
+the current month, we could use [`elm/time`][time] to ask:
 
     import Task exposing (Task)
-    import Time -- elm install elm-lang/time
+    import Time -- elm install elm/time
 
     getMonth : Task x Int
     getMonth =
@@ -134,7 +134,7 @@ the current month, we could use [`elm-lang/time`][time] to ask:
 order, so it would try the first request and only continue after it succeeds.
 If it fails, the whole thing fails!
 
-[time]: /packages/elm-lang/time/latest/
+[time]: /packages/elm/time/latest/
 -}
 map2 : (a -> b -> result) -> Task x a -> Task x b -> Task x result
 map2 func taskA taskB =
@@ -194,7 +194,7 @@ successful, you give the result to the callback resulting in another task. This
 task then gets run. We could use this to make a task that resolves an hour from
 now:
 
-    import Time -- elm install elm-lang/time
+    import Time -- elm install elm/time
     import Process
 
     timeInOneHour : Task x Time.Posix
@@ -260,7 +260,7 @@ type MyCmd msg =
 {-| Like I was saying in the [`Task`](#Task) documentation, just having a
 `Task` does not mean it is done. We must command Elm to `perform` the task:
 
-    import Time  -- elm install elm-lang/time
+    import Time  -- elm install elm/time
     import Task
 
     type Msg
@@ -287,7 +287,7 @@ perform toMessage task =
 {-| This is very similar to [`perform`](#perform) except it can handle failures!
 So we could _attempt_ to focus on a certain DOM node like this:
 
-    import Browser  -- elm install elm-lang/browser
+    import Browser  -- elm install elm/browser
     import Task
 
     type Msg

@@ -61,7 +61,7 @@ function _Platform_initialize(flagDecoder, flags, init, update, subscriptions, s
 
 // TRACK PRELOADS
 //
-// This is used by code in elm-lang/browser and elm-lang/http
+// This is used by code in elm/browser and elm/http
 // to register any HTTP requests that are triggered by init.
 //
 

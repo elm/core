@@ -73,7 +73,7 @@ batch =
 
 
 {-| Transform the messages produced by a command.
-Very similar to [`Html.map`](/packages/elm-lang/html/latest/Html#map).
+Very similar to [`Html.map`](/packages/elm/html/latest/Html#map).
 
 This is very rarely useful in well-structured Elm code, so definitely read the
 sections on [reuse][] and [modularity][] in the guide before reaching for this!
