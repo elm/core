@@ -495,7 +495,7 @@ append =
 -- FANCIER MATH
 
 
-{-| Perform [modular arithmetic](http://en.wikipedia.org/wiki/Modular_arithmetic).
+{-| Perform [modular arithmetic](https://en.wikipedia.org/wiki/Modular_arithmetic).
 A common trick is to use (n mod 2) to detect even and odd numbers:
 
     modBy 2 0 == 0
@@ -780,7 +780,7 @@ toPolar ( x, y ) =
 
 {-| Determine whether a float is an undefined or unrepresentable number.
 NaN stands for *not a number* and it is [a standardized part of floating point
-numbers](http://en.wikipedia.org/wiki/NaN).
+numbers](https://en.wikipedia.org/wiki/NaN).
 
     isNaN (0/0)     == True
     isNaN (sqrt -1) == True
@@ -894,7 +894,7 @@ apL f x =
 
 
 {-| Given a value, returns exactly the same value. This is called
-[the identity function](http://en.wikipedia.org/wiki/Identity_function).
+[the identity function](https://en.wikipedia.org/wiki/Identity_function).
 -}
 identity : a -> a
 identity x =

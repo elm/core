@@ -3,7 +3,7 @@ module Bitwise exposing
   , shiftLeftBy, shiftRightBy, shiftRightZfBy
   )
 
-{-| Library for [bitwise operations](http://en.wikipedia.org/wiki/Bitwise_operation).
+{-| Library for [bitwise operations](https://en.wikipedia.org/wiki/Bitwise_operation).
 
 # Basic Operations
 @docs and, or, xor, complement
@@ -68,7 +68,7 @@ This is called an [arithmetic right shift][ars], often written `>>`, and
 sometimes called a sign-propagating right shift because it fills empty spots
 with copies of the highest bit.
 
-[ars]: http://en.wikipedia.org/wiki/Bitwise_operation#Arithmetic_shift
+[ars]: https://en.wikipedia.org/wiki/Bitwise_operation#Arithmetic_shift
 -}
 shiftRightBy : Int -> Int -> Int
 shiftRightBy =
@@ -85,7 +85,7 @@ This is called an [logical right shift][lrs], often written `>>>`, and
 sometimes called a zero-fill right shift because it fills empty spots with
 zeros.
 
-[lrs]: http://en.wikipedia.org/wiki/Bitwise_operation#Logical_shift
+[lrs]: https://en.wikipedia.org/wiki/Bitwise_operation#Logical_shift
 -}
 shiftRightZfBy : Int -> Int -> Int
 shiftRightZfBy =
