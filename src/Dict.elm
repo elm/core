@@ -94,7 +94,7 @@ dictionary.
 get : comparable -> Dict comparable v -> Maybe v
 get targetKey dict =
   case dict of
-    RBEmpty_elm_builtin _ ->
+    RBEmpty_elm_builtin ->
       Nothing
 
     RBNode_elm_builtin _ key value left right ->
@@ -129,7 +129,7 @@ size dict =
 sizeHelp : Int -> Dict k v -> Int
 sizeHelp n dict =
   case dict of
-    RBEmpty_elm_builtin _ ->
+    RBEmpty_elm_builtin ->
       n
 
     RBNode_elm_builtin _ _ _ left right ->
@@ -183,7 +183,7 @@ insertHelp key value dict =
           balance nColor nKey nValue nLeft (insertHelp key value nRight)
 
 
-balance : Color -> k -> v -> Dict k v -> Dict k v -> Dict k v
+balance : NColor -> k -> v -> Dict k v -> Dict k v -> Dict k v
 balance color key value left right =
   case right of
     RBNode_elm_builtin Red rK rV rLeft rRight ->
@@ -218,7 +218,7 @@ no changes are made. -}
 remove : comparable -> Dict comparable v -> Dict comparable v
 remove key dict =
   -- Root node is always Black
-  case removeHelp targetKey dict of
+  case removeHelp key dict of
     RBNode_elm_builtin Red k v l r ->
       RBNode_elm_builtin Black k v l r
 
@@ -260,7 +260,7 @@ removeHelp targetKey dict =
         removeHelpEQGT targetKey (removeHelpPrepEQGT targetKey dict color key value left right)
 
 
-removeHelpPrepEQGT : comparable -> Dict comparable v -> Color -> comparable -> v -> Dict comparable v -> Dict comparable v -> Dict comparable v
+removeHelpPrepEQGT : comparable -> Dict comparable v -> NColor -> comparable -> v -> Dict comparable v -> Dict comparable v -> Dict comparable v
 removeHelpPrepEQGT targetKey dict color key value left right =
   case left of
     RBNode_elm_builtin Red lK lV lLeft lRight ->
