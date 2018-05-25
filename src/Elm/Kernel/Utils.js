@@ -3,7 +3,7 @@
 import Array exposing (toList)
 import Basics exposing (LT, EQ, GT)
 import Dict exposing (toList)
-import Elm.Kernel.Error exposing (throw)
+import Elm.Kernel.Debug exposing (crash)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Set exposing (toList)
 
@@ -39,7 +39,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 
 	if (typeof x !== 'object' || x === null || y === null)
 	{
-		typeof x === 'function' && __Error_throw(5);
+		typeof x === 'function' && __Debug_crash(5);
 		return false;
 	}
 

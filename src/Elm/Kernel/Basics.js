@@ -1,6 +1,6 @@
 /*
 
-import Elm.Kernel.Error exposing (throw)
+import Elm.Kernel.Debug exposing (crash)
 
 */
 
@@ -21,7 +21,7 @@ var _Basics_modBy = F2(function(modulus, x)
 {
 	var answer = x % modulus;
 	return modulus === 0
-		? __Error_throw(11)
+		? __Debug_crash(11)
 		:
 	((answer > 0 && modulus < 0) || (answer < 0 && modulus > 0))
 		? answer + modulus

@@ -1,6 +1,6 @@
 /*
 
-import Elm.Kernel.Error exposing (throw)
+import Elm.Kernel.Debug exposing (crash)
 import Elm.Kernel.Json exposing (run, wrap, unwrap)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
@@ -38,7 +38,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
 function _Platform_initialize(flagDecoder, flags, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(__Json_run, flagDecoder, __Json_wrap(flags));
-	__Result_isOk(result) || __Error_throw(2, result.a);
+	__Result_isOk(result) || __Debug_crash(2, result.a);
 	var managers = {};
 	result = init(result.a);
 	var model = result.a;
@@ -294,7 +294,7 @@ function _Platform_checkPortName(name)
 {
 	if (_Platform_effectManagers[name])
 	{
-		__Error_throw(3, name)
+		__Debug_crash(3, name)
 	}
 }
 
@@ -416,7 +416,7 @@ function _Platform_setupIncomingPort(name, sendToApp)
 	{
 		var result = A2(__Json_run, converter, __Json_wrap(incomingValue));
 
-		__Result_isOk(result) || __Error_throw(4, name, result.a);
+		__Result_isOk(result) || __Debug_crash(4, name, result.a);
 
 		var value = result.a;
 		for (var temp = subs; temp.b; temp = temp.b) // WHILE_CONS
@@ -451,7 +451,7 @@ function _Platform_mergeExportsProd(obj, exports)
 	{
 		(name in obj)
 			? (typeof name === 'function')
-				? __Error_throw(6)
+				? __Debug_crash(6)
 				: _Platform_mergeExportsProd(obj[name], exports[name])
 			: (obj[name] = exports[name]);
 	}
@@ -472,7 +472,7 @@ function _Platform_mergeExportsDebug(moduleName, obj, exports)
 	{
 		(name in obj)
 			? (typeof name === 'function')
-				? __Error_throw(6, moduleName)
+				? __Debug_crash(6, moduleName)
 				: _Platform_mergeExportsDebug(moduleName + '.' + name, obj[name], exports[name])
 			: (obj[name] = exports[name]);
 	}
