@@ -214,8 +214,9 @@ idiv =
 
     3^2 == 9
     3^3 == 27
+    2 ^ -1 = 0.5
 -}
-pow : number -> number -> number
+pow : number -> number -> Float
 pow =
   Elm.Kernel.Basics.pow
 
