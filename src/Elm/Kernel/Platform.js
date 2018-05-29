@@ -3,6 +3,7 @@
 import Elm.Kernel.Debug exposing (crash)
 import Elm.Kernel.Json exposing (run, wrap, unwrap)
 import Elm.Kernel.List exposing (Cons, Nil)
+import Elm.Kernel.Process exposing (sleep)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
 import Elm.Kernel.Utils exposing (Tuple0)
 import Result exposing (isOk)
@@ -325,7 +326,7 @@ function _Platform_setupOutgoingPort(name)
 
 	// CREATE MANAGER
 
-	var init = __Scheduler_succeed(null);
+	var init = __Process_sleep(0);
 
 	_Platform_effectManagers[name].__init = init;
 	_Platform_effectManagers[name].__onEffects = F3(function(router, cmdList, state)
