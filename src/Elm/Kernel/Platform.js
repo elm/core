@@ -15,20 +15,16 @@ import Result exposing (isOk)
 // PROGRAMS
 
 
-var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
+var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 {
-	object['worker'] = function(flags)
-	{
-		return _Platform_initialize(
-			flagDecoder,
-			flags,
-			impl.__$init,
-			impl.__$update,
-			impl.__$subscriptions,
-			function() { return function() {} }
-		);
-	};
-	return object;
+	return _Platform_initialize(
+		flagDecoder,
+		args,
+		impl.__$init,
+		impl.__$update,
+		impl.__$subscriptions,
+		function() { return function() {} }
+	);
 });
 
 
@@ -36,9 +32,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, object)
 // INITIALIZE A PROGRAM
 
 
-function _Platform_initialize(flagDecoder, flags, init, update, subscriptions, stepperBuilder)
+function _Platform_initialize(flagDecoder, args, init, update, subscriptions, stepperBuilder)
 {
-	var result = A2(__Json_run, flagDecoder, __Json_wrap(flags));
+	var result = A2(__Json_run, flagDecoder, __Json_wrap(args ? args['flags'] : undefined));
 	__Result_isOk(result) || __Debug_crash(2, result.a);
 	var managers = {};
 	result = init(result.a);
@@ -451,7 +447,7 @@ function _Platform_mergeExportsProd(obj, exports)
 	for (var name in exports)
 	{
 		(name in obj)
-			? (typeof name === 'function')
+			? (name == 'init')
 				? __Debug_crash(6)
 				: _Platform_mergeExportsProd(obj[name], exports[name])
 			: (obj[name] = exports[name]);
@@ -472,7 +468,7 @@ function _Platform_mergeExportsDebug(moduleName, obj, exports)
 	for (var name in exports)
 	{
 		(name in obj)
-			? (typeof name === 'function')
+			? (name == 'init')
 				? __Debug_crash(6, moduleName)
 				: _Platform_mergeExportsDebug(moduleName + '.' + name, obj[name], exports[name])
 			: (obj[name] = exports[name]);
