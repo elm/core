@@ -277,36 +277,9 @@ function _String_fromNumber(number)
 
 function _String_toInt(s)
 {
-	var len = s.length;
+	var start = s[0] == '-' || s[0] == '+' ? 1 : 0;
 
-	// if empty
-	if (len === 0)
-	{
-		return __Maybe_Nothing;
-	}
-
-	// if hex
-	var c = s[0];
-	if (c === '0' && s[1] === 'x')
-	{
-		for (var i = 2; i < len; ++i)
-		{
-			var c = s[i];
-			if (('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'))
-			{
-				continue;
-			}
-			return __Maybe_Nothing;
-		}
-		return __Maybe_Just(parseInt(s, 16));
-	}
-
-	// is decimal
-	if (c > '9' || (c < '0' && ((c !== '-' && c !== '+') || len === 1)))
-	{
-		return __Maybe_Nothing;
-	}
-	for (var i = 1; i < len; ++i)
+	for (var i = start; i < s.length; ++i)
 	{
 		var c = s[i];
 		if (c < '0' || '9' < c)
@@ -315,7 +288,9 @@ function _String_toInt(s)
 		}
 	}
 
-	return __Maybe_Just(parseInt(s, 10));
+	return i === start
+		? __Maybe_Nothing
+		: __Maybe_Just(parseInt(s, 10));
 }
 
 
