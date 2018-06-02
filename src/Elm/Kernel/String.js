@@ -275,22 +275,25 @@ function _String_fromNumber(number)
 
 // INT CONVERSIONS
 
-function _String_toInt(s)
+function _String_toInt(str)
 {
-	var start = s[0] == '-' || s[0] == '+' ? 1 : 0;
+	var total = 0;
+	var code0 = str.charCodeAt(0);
+	var start = code0 == 0x2B /* + */ || code0 == 0x2D /* - */ ? 1 : 0;
 
-	for (var i = start; i < s.length; ++i)
+	for (var i = start; i < str.length; ++i)
 	{
-		var c = s[i];
-		if (c < '0' || '9' < c)
+		var code = str.charCodeAt(i);
+		if (code < 0x30 || 0x39 < code)
 		{
 			return __Maybe_Nothing;
 		}
+		total = 10 * total + code - 0x30;
 	}
 
-	return i === start
+	return i == start
 		? __Maybe_Nothing
-		: __Maybe_Just(parseInt(s, 10));
+		: __Maybe_Just(code0 == 0x2D ? -total : total);
 }
 
 
