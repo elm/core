@@ -135,7 +135,7 @@ type Int = Int -- NOTE: The compiler provides the real implementation.
 
 **Historical Note:** The particular details of floats (e.g. `NaN`) are
 specified by [IEEE 754][ieee] which is literally hard-coded into almost all
-CPUs in the world. That means if you think `NaN` is wierd, you must
+CPUs in the world. That means if you think `NaN` is weird, you must
 successfully overtake Intel and AMD with a chip that is not backwards
 compatible with any widely-used assembly language.
 
