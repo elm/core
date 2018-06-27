@@ -163,11 +163,6 @@ function badPrimitive(type, value)
 	return { tag: 'primitive', type: type, value: value };
 }
 
-function badIndex(index, nestedProblems)
-{
-	return { tag: 'index', index: index, rest: nestedProblems };
-}
-
 function badField(field, nestedProblems)
 {
 	return { tag: 'field', field: field, rest: nestedProblems };
