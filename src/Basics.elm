@@ -29,8 +29,7 @@ module Basics exposing
 
 These functions only work on `comparable` types. This includes numbers,
 characters, strings, lists of comparable things, and tuples of comparable
-things. Note that tuples with 7 or more elements are not comparable. Why
-are your tuples so big?
+things.
 
 @docs (<), (>), (<=), (>=), max, min, compare, Order
 
