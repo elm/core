@@ -842,32 +842,31 @@ composeR f g x =
 {-| Saying `x |> f` is exactly the same as `f x`.
 
 It is called the “pipe” operator because it lets you write “pipelined” code.
-For example, say we have a `toRadians` function for turning user input in
-degrees into radians. We can rewrite it like this:
+For example, say we have a `sanitize` function for turning user input in
+degrees into integers. We can rewrite it like this:
 
     import Maybe
-    import String
 
     -- BEFORE
-    toRadians : String -> Float
-    toRadians input =
-      degrees (toFloat (Maybe.withDefault 0 (String.toInt input))
+    sanitize : String -> Maybe Int
+    sanitize input =
+      String.toInt (String.trim input)
 
     -- AFTER
-    toRadians : String -> Float
-    toRadians input =
+    sanitize : String -> Maybe Int
+    sanitize input =
       input
+        |> String.trim
         |> String.toInt
-        |> Maybe.withDefault 0
-        |> toFloat
-        |> degrees
 
-Once you get the hang of it, it can be quite nice! To get a better intuition,
-I recommend trying to rewrite code that uses `x |> f` into code like `f x`
-until there are no pipes left.
+To get a better intuition, I recommend trying to rewrite code that uses `x |> f`
+into code like `f x` until there are no pipes left.
 
-**Note:** The compiler rewrites this to normal function application, so `(|>)`
-has no runtime overhead.
+**Note:** This can be overused! I think folks find it quite neat, but when you
+have three or four steps, the code often gets clearer if you break out a
+top-level helper function. Now the transformation has a name. The arguments are
+named. It has a type annotation. It is much more self-documenting that way!
+Testing the logic gets easier too. Nice side benefit!
 -}
 apR : a -> (a -> b) -> b
 apR x f =
@@ -876,16 +875,8 @@ apR x f =
 
 {-| Saying `f <| x` is exactly the same as `f x`.
 
-It can help you avoid parentheses, which can be nice sometimes. For example:
-
-    Maybe.withDefault 0 (String.toInt "123")
-
-Can be written as:
-
-    Maybe.withDefault 0 <| String.toInt "123"
-
-**Note:** The compiler rewrites this to normal function application, so `(<|)`
-has no runtime overhead.
+It can help you avoid parentheses, which can be nice sometimes. Maybe you want
+to apply a function to a `case` expression? That sort of thing.
 -}
 apL : (a -> b) -> a -> b
 apL f x =
