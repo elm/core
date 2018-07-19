@@ -842,15 +842,15 @@ composeR f g x =
 {-| Saying `x |> f` is exactly the same as `f x`.
 
 It is called the “pipe” operator because it lets you write “pipelined” code.
-For example, say we have a `sanitize` function for turning user input in
-degrees into integers. We can rewrite it like this:
-
-    import Maybe
+For example, say we have a `sanitize` function for turning user input into
+integers:
 
     -- BEFORE
     sanitize : String -> Maybe Int
     sanitize input =
       String.toInt (String.trim input)
+
+We can rewrite it like this:
 
     -- AFTER
     sanitize : String -> Maybe Int
@@ -859,8 +859,9 @@ degrees into integers. We can rewrite it like this:
         |> String.trim
         |> String.toInt
 
-To get a better intuition, I recommend trying to rewrite code that uses `x |> f`
-into code like `f x` until there are no pipes left.
+Totally equivalent! I recommend trying to rewrite code that uses `x |> f`
+into code like `f x` until there are no pipes left. That can help you build
+your intuition.
 
 **Note:** This can be overused! I think folks find it quite neat, but when you
 have three or four steps, the code often gets clearer if you break out a
