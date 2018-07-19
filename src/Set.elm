@@ -140,7 +140,7 @@ foldl func initialState (Set_elm_builtin dict) =
 
 {-| Fold over the values in a set, in order from highest to lowest.
 -}
-foldr : (comparable -> b -> b) -> b -> Set comparable -> b
+foldr : (a -> b -> b) -> b -> Set a -> b
 foldr func initialState (Set_elm_builtin dict) =
   Dict.foldr (\key _ state -> func key state) initialState dict
 
