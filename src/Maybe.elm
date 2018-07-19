@@ -50,6 +50,11 @@ value.  This comes in handy when paired with functions like
 
     withDefault "unknown" (Dict.get "Tom" Dict.empty)   -- "unknown"
 
+**Note:** This can be overused! Many cases are better handled by a `case`
+expression. And if you end up using `withDefault` a lot, it can be a good sign
+that a [custom type][ct] will clean your code up quite a bit!
+
+[ct]: https://guide.elm-lang.org/types/custom_types.html
 -}
 withDefault : a -> Maybe a -> a
 withDefault default maybe =
