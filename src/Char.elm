@@ -66,46 +66,42 @@ type Char = Char -- NOTE: The compiler provides the real implementation.
 -- CLASSIFICATION
 
 
-{-| Detect upper case ASCII characters.
+{-| Detect upper case Unicode characters.
 
     isUpper 'A' == True
     isUpper 'B' == True
     ...
     isUpper 'Z' == True
+    
+    isUpper 'Σ' == True
 
     isUpper '0' == False
     isUpper 'a' == False
     isUpper '-' == False
-    isUpper 'Σ' == False
 -}
 isUpper : Char -> Bool
 isUpper char =
-  let
-    code =
-      toCode char
-  in
-    code <= 0x5A && 0x41 <= code
+  (char == Char.toUpper char)
+    && (char /= Char.toLower char)
 
 
-{-| Detect lower case ASCII characters.
+{-| Detect lower case Unicode characters.
 
     isLower 'a' == True
     isLower 'b' == True
     ...
     isLower 'z' == True
+    
+    isLower 'π' == True
 
     isLower '0' == False
     isLower 'A' == False
     isLower '-' == False
-    isLower 'π' == False
 -}
 isLower : Char -> Bool
 isLower char =
-  let
-    code =
-      toCode char
-  in
-    0x61 <= code && code <= 0x7A
+  (char == Char.toLower char)
+    && (char /= Char.toUpper char)
 
 
 {-| Detect upper case and lower case ASCII characters.
