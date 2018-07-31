@@ -53,7 +53,7 @@ all the complex logic in Elm.
 Initializing a headless program from JavaScript looks like this:
 
 ```javascript
-var app = Elm.MyThing.worker();
+var app = Elm.MyThing.init();
 ```
 
 If _do_ want to control the user interface in Elm, the [`Browser`][browser]
