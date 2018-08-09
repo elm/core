@@ -3,6 +3,7 @@
 import Array exposing (toList)
 import Dict exposing (toList)
 import Set exposing (toList)
+import Elm.Kernel.Json exposing (errorToString)
 
 */
 
@@ -233,8 +234,8 @@ function _Debug_crash__DEBUG(identifier, fact1, fact2, fact3, fact4)
 			throw new Error('Browser.application programs cannot handle URLs like this:\n\n    ' + document.location.href + '\n\nWhat is the root? The root of your file system? Try looking at this program with `elm reactor` or some other server.');
 
 		case 2:
-			var message = fact1;
-			throw new Error('Problem with the flags given to your Elm program on initialization.\n\n' + message);
+			var jsonError = fact1;
+			throw new Error('Problem with the flags given to your Elm program on initialization.\n\n' + __Json_errorToString(jsonError));
 
 		case 3:
 			var portName = fact1;
