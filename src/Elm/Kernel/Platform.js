@@ -1,7 +1,7 @@
 /*
 
 import Elm.Kernel.Debug exposing (crash)
-import Elm.Kernel.Json exposing (run, wrap, unwrap)
+import Elm.Kernel.Json exposing (run, wrap, unwrap, errorToString)
 import Elm.Kernel.List exposing (Cons, Nil)
 import Elm.Kernel.Process exposing (sleep)
 import Elm.Kernel.Scheduler exposing (andThen, binding, rawSend, rawSpawn, receive, send, succeed)
@@ -35,7 +35,7 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 function _Platform_initialize(flagDecoder, args, init, update, subscriptions, stepperBuilder)
 {
 	var result = A2(__Json_run, flagDecoder, __Json_wrap(args ? args['flags'] : undefined));
-	__Result_isOk(result) || __Debug_crash(2, result.a);
+	__Result_isOk(result) || __Debug_crash(2 /**__DEBUG/, __Json_errorToString(result.a) /**/);
 	var managers = {};
 	result = init(result.a);
 	var model = result.a;
