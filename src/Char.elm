@@ -181,7 +181,7 @@ isOctDigit char =
     code <= 0x37 && 0x30 <= code
 
 
-{-| Detect hexidecimal digits `0123456789abcdefABCDEF`
+{-| Detect hexadecimal digits `0123456789abcdefABCDEF`
 -}
 isHexDigit : Char -> Bool
 isHexDigit char =

@@ -98,8 +98,8 @@ infix right 9 (>>) = composeR
     0
     42
     9000
-    0xFF   -- 255 in hexidecimal
-    0x000A --  10 in hexidecimal
+    0xFF   -- 255 in hexadecimal
+    0x000A --  10 in hexadecimal
 
 **Note:** `Int` math is well-defined in the range `-2^31` to `2^31 - 1`. Outside
 of that range, the behavior is determined by the compilation target. When
