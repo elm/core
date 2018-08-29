@@ -101,7 +101,7 @@ function _Utils_cmp(x, y, ord)
 	//*/
 
 	/**__PROD/
-	if (!x.$)
+	if (typeof x.$ === 'undefined'))
 	//*/
 	/**__DEBUG/
 	if (x.$[0] === '#')
