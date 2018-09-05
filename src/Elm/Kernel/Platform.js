@@ -208,20 +208,40 @@ var _Platform_map = F2(function(tagger, bag)
 
 // PIPE BAGS INTO EFFECT MANAGERS
 
+var _Platform_dispatchQueue = [];
+var _Platform_dispatching = false;
 
 function _Platform_dispatchEffects(managers, cmdBag, subBag)
 {
-	var effectsDict = {};
-	_Platform_gatherEffects(true, cmdBag, effectsDict, null);
-	_Platform_gatherEffects(false, subBag, effectsDict, null);
+  _Platform_dispatchQueue.push({
+    __managers: managers,
+    __cmds: cmdBag,
+    __subs: subBag
+  });
 
-	for (var home in managers)
-	{
-		__Scheduler_rawSend(managers[home], {
-			$: 'fx',
-			a: effectsDict[home] || { __cmds: __List_Nil, __subs: __List_Nil }
-		});
-	}
+  if (_Platform_dispatching)
+  {
+    return;
+  }
+  _Platform_dispatching = true;
+
+  var effect;
+  while (effect = _Platform_dispatchQueue.shift())
+  {
+    var effectsDict = {};
+    _Platform_gatherEffects(true, effect.__cmds, effectsDict, null);
+    _Platform_gatherEffects(false, effect.__subs, effectsDict, null);
+
+    for (var home in effect.__managers)
+    {
+      __Scheduler_rawSend(managers[home], {
+        $: 'fx',
+        a: effectsDict[home] || { __cmds: __List_Nil, __subs: __List_Nil }
+      });
+    }
+  }
+
+  _Platform_dispatching = false;
 }
 
 
