@@ -143,6 +143,17 @@ function _Debug_toAnsiString(ansi, value)
 		return _Debug_ctorColor(ansi, tag) + output;
 	}
 
+	if (typeof DataView === 'function' && value instanceof DataView)
+	{
+		var output = '<';
+		for (var i = 0; i < value.byteLength; i++)
+		{
+			var byte = value.getUint8(i);
+			output += _Debug_toHexDigit(byte >> 4) + _Debug_toHexDigit(byte & 15 /* 0b1111 */);
+		}
+		return _Debug_stringColor(ansi, output + '>');
+	}
+
 	if (typeof value === 'object')
 	{
 		var output = [];
@@ -211,6 +222,10 @@ function _Debug_internalColor(ansi, string)
 	return ansi ? '\x1b[94m' + string + '\x1b[0m' : string;
 }
 
+function _Debug_toHexDigit(n)
+{
+	return String.fromCharCode(n < 10 ? 48 + n : 55 + n);
+}
 
 
 // CRASH
