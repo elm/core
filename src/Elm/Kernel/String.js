@@ -38,16 +38,18 @@ var _String_map = F2(function(func, string)
 {
 	var len = string.length;
 	var array = new Array(len);
-	var i = len;
-	while (i--)
+	var i = 0;
+	while (len-i)
 	{
 		var word = string.charCodeAt(i);
-		if (0xDC00 <= word && word <= 0xDFFF)
+		if (0xD800 <= word && word <= 0xDBFF)
 		{
-			array[i] = func(__Utils_chr(string[i] + string[--i]));
+			array[i] = func(_Utils_chr(string[i] + string[i+1]));
+			i += 2;
 			continue;
 		}
 		array[i] = func(__Utils_chr(string[i]));
+		i++;
 	}
 	return array.join('');
 });
@@ -80,19 +82,21 @@ function _String_reverse(str)
 {
 	var len = str.length;
 	var arr = new Array(len);
-	var i = len;
-	while (i--)
+	var i = 0;
+	while (len-i)
 	{
 		var word = str.charCodeAt(i);
-		if (0xDC00 <= word && word <= 0xDFFF)
+		if (0xD800 <= word && word <= 0xDBFF)
 		{
-			arr[len - i - 1] = str[i - 1];
-			i--;
-			arr[len - i - 1] = str[i + 1];
+			arr[len - i] = str[i + 1];
+			i++;
+			arr[len - i] = str[i - 1];
+			i++;
 		}
 		else
 		{
-			arr[len - i - 1] = str[i];
+			arr[len - i] = str[i];
+			i++;
 		}
 	}
 	return arr.join('');
