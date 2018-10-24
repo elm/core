@@ -44,11 +44,11 @@ var _String_map = F2(function(func, string)
 		var word = string.charCodeAt(i);
 		if (0xDC00 <= word && word <= 0xDFFF)
 		{
-			array[i] = func(_Utils_chr(string[i] + string[i-1]));
+			array[i] = func(__Utils_chr(string[i] + string[i-1]));
 			i--;
 			continue;
 		}
-		array[i] = func(_Utils_chr(string[i]));
+		array[i] = func(__Utils_chr(string[i]));
 	}
 	return array.join('');
 });
