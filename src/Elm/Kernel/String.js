@@ -82,21 +82,19 @@ function _String_reverse(str)
 {
 	var len = str.length;
 	var arr = new Array(len);
-	var i = 0;
-	while (i < len)
+	var i = len;
+	while (i--)
 	{
 		var word = str.charCodeAt(i);
-		if (0xD800 <= word && word <= 0xDBFF)
+		if (0xDC00 <= word && word <= 0xDFFF)
 		{
-			arr[len - i] = str[i + 1];
-			i++;
-			arr[len - i] = str[i - 1];
-			i++;
+			arr[len - i - 1] = str[i - 1];
+			i--;
+			arr[len - i - 1] = str[i + 1];
 		}
 		else
 		{
-			arr[len - i] = str[i];
-			i++;
+			arr[len - i - 1] = str[i];
 		}
 	}
 	return arr.join('');
