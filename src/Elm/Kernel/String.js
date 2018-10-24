@@ -59,7 +59,7 @@ var _String_filter = F2(function(isGood, str)
 	var arr = [];
 	var len = str.length;
 	var i = 0;
-	while (i < len)
+	while (len-i)
 	{
 		var char = str[i];
 		var word = str.charCodeAt(i);
@@ -106,7 +106,7 @@ var _String_foldl = F3(function(func, state, string)
 {
 	var len = string.length;
 	var i = 0;
-	while (i < len)
+	while (len-i)
 	{
 		var char = string[i];
 		var word = string.charCodeAt(i);
