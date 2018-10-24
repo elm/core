@@ -38,18 +38,17 @@ var _String_map = F2(function(func, string)
 {
 	var len = string.length;
 	var array = new Array(len);
-	var i = 0;
-	while (i < len)
+	var i = len;
+	while (i--)
 	{
 		var word = string.charCodeAt(i);
-		if (0xD800 <= word && word <= 0xDBFF)
+		if (0xDC00 <= word && word <= 0xDFFF)
 		{
-			array[i] = func(__Utils_chr(string[i] + string[i+1]));
-			i += 2;
+			array[i] = func(_Utils_chr(string[i] + string[i-1]));
+			i--;
 			continue;
 		}
-		array[i] = func(__Utils_chr(string[i]));
-		i++;
+		array[i] = func(_Utils_chr(string[i]));
 	}
 	return array.join('');
 });
