@@ -280,8 +280,9 @@ function _String_toInt(str)
 	var total = 0;
 	var code0 = str.charCodeAt(0);
 	var start = code0 == 0x2B /* + */ || code0 == 0x2D /* - */ ? 1 : 0;
+	var len = str.length;
 
-	for (var i = start; i < str.length; ++i)
+	for (var i = start; len - i; ++i)
 	{
 		var code = str.charCodeAt(i);
 		if (code < 0x30 || 0x39 < code)
