@@ -21,7 +21,7 @@ var _JsArray_initialize = F3(function(size, offset, func)
 {
     var result = new Array(size);
 
-    for (var i = 0; i < size; i++)
+    for (var i = 0; size - i; i++)
     {
         result[i] = func(offset + i);
     }
@@ -33,7 +33,7 @@ var _JsArray_initializeFromList = F2(function (max, ls)
 {
     var result = new Array(max);
 
-    for (var i = 0; i < max && ls.b; i++)
+    for (var i = 0; max - i && ls.b; i++)
     {
         result[i] = ls.a;
         ls = ls.b;
@@ -53,7 +53,7 @@ var _JsArray_unsafeSet = F3(function(index, value, array)
     var length = array.length;
     var result = new Array(length);
 
-    for (var i = 0; i < length; i++)
+    for (var i = 0; length - i; i++)
     {
         result[i] = array[i];
     }
@@ -67,7 +67,7 @@ var _JsArray_push = F2(function(value, array)
     var length = array.length;
     var result = new Array(length + 1);
 
-    for (var i = 0; i < length; i++)
+    for (var i = 0; length - i; i++)
     {
         result[i] = array[i];
     }
@@ -80,7 +80,7 @@ var _JsArray_foldl = F3(function(func, acc, array)
 {
     var length = array.length;
 
-    for (var i = 0; i < length; i++)
+    for (var i = 0; length - i; i++)
     {
         acc = A2(func, array[i], acc);
     }
@@ -90,7 +90,7 @@ var _JsArray_foldl = F3(function(func, acc, array)
 
 var _JsArray_foldr = F3(function(func, acc, array)
 {
-    for (var i = array.length - 1; i >= 0; i--)
+    for (var i = array.length; i--;)
     {
         acc = A2(func, array[i], acc);
     }
@@ -103,7 +103,7 @@ var _JsArray_map = F2(function(func, array)
     var length = array.length;
     var result = new Array(length);
 
-    for (var i = 0; i < length; i++)
+    for (var i = 0; length - i; i++)
     {
         result[i] = func(array[i]);
     }
@@ -116,7 +116,7 @@ var _JsArray_indexedMap = F3(function(func, offset, array)
     var length = array.length;
     var result = new Array(length);
 
-    for (var i = 0; i < length; i++)
+    for (var i = 0; length - i; i++)
     {
         result[i] = A2(func, offset + i, array[i]);
     }
@@ -142,12 +142,12 @@ var _JsArray_appendN = F3(function(n, dest, source)
     var size = destLen + itemsToCopy;
     var result = new Array(size);
 
-    for (var i = 0; i < destLen; i++)
+    for (var i = 0; destLen - i; i++)
     {
         result[i] = dest[i];
     }
 
-    for (var i = 0; i < itemsToCopy; i++)
+    for (var i = 0; itemsToCopy - i; i++)
     {
         result[i + destLen] = source[i];
     }
