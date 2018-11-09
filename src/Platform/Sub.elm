@@ -75,10 +75,9 @@ batch =
 Very similar to [`Html.map`](/packages/elm/html/latest/Html#map).
 
 This is very rarely useful in well-structured Elm code, so definitely read the
-sections on [reuse][] and [modularity][] in the guide before reaching for this!
+section on [structure][] in the guide before reaching for this!
 
-[reuse]: https://guide.elm-lang.org/reuse/
-[modularity]: https://guide.elm-lang.org/modularity/
+[structure]: https://guide.elm-lang.org/webapps/structure.html
 -}
 map : (a -> msg) -> Sub a -> Sub msg
 map =
