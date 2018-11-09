@@ -154,6 +154,11 @@ function _Debug_toAnsiString(ansi, value)
 		return _Debug_stringColor(ansi, output + '>');
 	}
 
+	if (value instanceof File)
+	{
+		return _Debug_internalColor(ansi, '<' + value.name + '>');
+	}
+
 	if (typeof value === 'object')
 	{
 		var output = [];
