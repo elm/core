@@ -37,17 +37,17 @@ import Result exposing (Result(..))
 
 {-| Here are some common tasks:
 
-- [`Time.now : Task x Posix`][now]
-- [`Browser.focus : String -> Task DomError ()`][focus]
-- [`Process.sleep : Float -> Task x ()`][sleep]
+- [`now : Task x Posix`][now]
+- [`focus : String -> Task Error ()`][focus]
+- [`sleep : Float -> Task x ()`][sleep]
 
 [now]: /packages/elm/time/latest/Time#now
-[focus]: /packages/elm/browser/latest/Browser#focus
+[focus]: /packages/elm/browser/latest/Browser-Dom#focus
 [sleep]: /packages/elm/core/latest/Process#sleep
 
 In each case we have a `Task` that will resolve successfully with an `a` value
-or unsuccessfully with an `x` value. So `Browser.focus` we may fail with a
-`DomError` if the given ID does not exist. Whereas `Time.now` never fails so
+or unsuccessfully with an `x` value. So `Browser.Dom.focus` we may fail with an
+`Error` if the given ID does not exist. Whereas `Time.now` never fails so
 I cannot be more specific than `x`. No such value will ever exist! Instead it
 always succeeds with the current POSIX time.
 
@@ -287,7 +287,7 @@ perform toMessage task =
 {-| This is very similar to [`perform`](#perform) except it can handle failures!
 So we could _attempt_ to focus on a certain DOM node like this:
 
-    import Browser  -- elm install elm/browser
+    import Browser.Dom  -- elm install elm/browser
     import Task
 
     type Msg
@@ -297,7 +297,7 @@ So we could _attempt_ to focus on a certain DOM node like this:
 
     focus : Cmd Msg
     focus =
-      Task.attempt Focus (Browser.focus "my-app-search-box")
+      Task.attempt Focus (Browser.Dom.focus "my-app-search-box")
 
 So the task is "focus on this DOM node" and we are turning it into the command
 "Hey Elm, attempt to focus on this DOM node and give me a `Msg` about whether
