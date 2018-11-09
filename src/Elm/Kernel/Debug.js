@@ -145,13 +145,7 @@ function _Debug_toAnsiString(ansi, value)
 
 	if (typeof DataView === 'function' && value instanceof DataView)
 	{
-		var output = '<';
-		for (var i = 0; i < value.byteLength; i++)
-		{
-			var byte = value.getUint8(i);
-			output += _Debug_toHexDigit(byte >> 4) + _Debug_toHexDigit(byte & 15 /* 0b1111 */);
-		}
-		return _Debug_stringColor(ansi, output + '>');
+		return _Debug_stringColor(ansi, '<' + value.byteLength + ' bytes>');
 	}
 
 	if (value instanceof File)
