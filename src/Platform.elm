@@ -56,7 +56,7 @@ Initializing a headless program from JavaScript looks like this:
 var app = Elm.MyThing.init();
 ```
 
-If _do_ want to control the user interface in Elm, the [`Browser`][browser]
+If you _do_ want to control the user interface in Elm, the [`Browser`][browser]
 module has a few ways to create that kind of `Program` instead!
 
 [headless]: https://en.wikipedia.org/wiki/Headless_software
