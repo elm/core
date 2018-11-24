@@ -72,8 +72,8 @@ var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
 
 var _List_sortBy = F2(function(f, xs)
 {
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return __Utils_cmp(f(a), f(b));
+	return _List_fromArray(_List_toArray(xs).map(f).sort(function(a, b) {
+		return __Utils_cmp(a, b);
 	}));
 });
 
