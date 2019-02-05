@@ -1,4 +1,4 @@
-port module Main exposing (..)
+module Main exposing (..)
 
 import Basics exposing (..)
 import Task exposing (..)
@@ -39,11 +39,3 @@ tests =
         , Maybe.tests
         , Tuple.tests
         ]
-
-
-main : TestProgram
-main =
-    run emit tests
-
-
-port emit : ( String, Value ) -> Cmd msg
