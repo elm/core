@@ -3,7 +3,7 @@ module Test.List exposing (tests)
 import Test exposing (..)
 import Expect
 import Basics exposing (..)
-import Maybe exposing (Maybe(Nothing, Just))
+import Maybe exposing (Maybe(..))
 import List exposing (..)
 
 
@@ -42,7 +42,7 @@ testListOfN n =
         mid =
             n // 2
     in
-        describe (toString n ++ " elements")
+        describe (String.fromInt n ++ " elements")
             [ describe "foldl"
                 [ test "order" <| \() -> Expect.equal (n) (foldl (\x acc -> x) 0 xs)
                 , test "total" <| \() -> Expect.equal (xsSum) (foldl (+) 0 xs)
@@ -110,7 +110,7 @@ testListOfN n =
                 , test "all" <| \() -> Expect.equal (xsNeg) (filterMap (\x -> Just -x) xs)
                 , let
                     halve x =
-                        if x % 2 == 0 then
+                        if modBy 2 x == 0 then
                             Just (x // 2)
                         else
                             Nothing
@@ -121,7 +121,7 @@ testListOfN n =
                 [ test "none" <| \() -> Expect.equal ([]) (concatMap (\x -> []) xs)
                 , test "all" <| \() -> Expect.equal (xsNeg) (concatMap (\x -> [ -x ]) xs)
                 ]
-            , test "indexedMap" <| \() -> Expect.equal (map2 (,) zs xsNeg) (indexedMap (\i x -> ( i, -x )) xs)
+            , test "indexedMap" <| \() -> Expect.equal (map2 Tuple.pair zs xsNeg) (indexedMap (\i x -> ( i, -x )) xs)
             , test "sum" <| \() -> Expect.equal (xsSum) (sum xs)
             , test "product" <| \() -> Expect.equal (0) (product zs)
             , test "maximum" <|
@@ -153,8 +153,7 @@ testListOfN n =
                 , test "unsorted" <| \() -> Expect.equal (xsNeg) (sortBy negate xsOpp)
                 ]
             , describe "sortWith"
-                [ test "sorted" <| \() -> Expect.equal (xsNeg) (sortWith (flip compare) xsNeg)
-                , test "unsorted" <| \() -> Expect.equal (xsNeg) (sortWith (flip compare) xsOpp)
+                [ test "sorted" <| \() -> Expect.equal (xsNeg) (sortWith (\x -> \y -> compare y x) xsNeg)
+                , test "unsorted" <| \() -> Expect.equal (xsNeg) (sortWith (\x -> \y -> compare y x) xsOpp)
                 ]
-            , test "scanl" <| \() -> Expect.equal (0 :: map sumSeq xs) (scanl (+) 0 xs)
             ]
