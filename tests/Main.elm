@@ -14,7 +14,6 @@ import Test.CodeGen as CodeGen
 import Test.Dict as Dict
 import Test.Maybe as Maybe
 import Test.Equality as Equality
-import Test.Json as Json
 import Test.List as List
 import Test.Result as Result
 import Test.Set as Set
