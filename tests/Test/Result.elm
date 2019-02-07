@@ -9,11 +9,18 @@ import Expect
 
 
 isEven n =
-    if n % 2 == 0 then
+    if modBy 2 n == 0 then
         Ok n
     else
         Err "number is odd"
 
+toIntResult : String -> Result String Int
+toIntResult s =
+    case String.toInt s of
+        Just i ->
+            Ok i
+        Nothing ->
+            Err <| "could not convert string '" ++ s ++ "' to an Int"
 
 add3 a b c =
     a + b + c
@@ -50,17 +57,17 @@ tests =
 
         andThenTests =
             describe "andThen Tests"
-                [ test "andThen Ok" <| \() -> Expect.equal (Ok 42) ((String.toInt "42") |> Result.andThen isEven)
+                [ test "andThen Ok" <| \() -> Expect.equal (Ok 42) ((toIntResult "42") |> Result.andThen isEven)
                 , test "andThen first Err" <|
                     \() ->
                         Expect.equal
                             (Err "could not convert string '4.2' to an Int")
-                            (String.toInt "4.2" |> Result.andThen isEven)
+                            (toIntResult "4.2" |> Result.andThen isEven)
                 , test "andThen second Err" <|
                     \() ->
                         Expect.equal
                             (Err "number is odd")
-                            (String.toInt "41" |> Result.andThen isEven)
+                            (toIntResult "41" |> Result.andThen isEven)
                 ]
     in
         describe "Result Tests"
