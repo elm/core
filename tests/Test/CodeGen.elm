@@ -50,15 +50,6 @@ caseQualified =
             0
 
 
-caseScope : String
-caseScope =
-    case "Not this one!" of
-        string ->
-            case "Hi" of
-                string ->
-                    string
-
-
 tests : Test
 tests =
     let
@@ -78,11 +69,6 @@ tests =
                 [ test "let" <| \() -> Expect.equal 42 letQualified
                 , test "case" <| \() -> Expect.equal 42 caseQualified
                 ]
-
-        scope : Test
-        scope =
-            describe "Scoping"
-                [ test "case" <| \() -> Expect.equal "Hi" caseScope ]
 
         hex : Test
         hex =
@@ -104,6 +90,5 @@ tests =
         describe "CodeGen"
             [ underscores
             , qualifiedPatterns
-            , scope
             , hex
             ]
