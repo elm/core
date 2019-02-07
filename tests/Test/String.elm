@@ -51,9 +51,9 @@ tests =
                 , badInt "1e31"
                 , badInt "123a"
                 , goodInt "0123" 123
-                , goodInt "0x001A" 26
-                , goodInt "0x001a" 26
-                , goodInt "0xBEEF" 48879
+                , badInt "0x001A"
+                , badInt "0x001a"
+                , badInt "0xBEEF"
                 , badInt "0x12.0"
                 , badInt "0x12an"
                 ]
@@ -101,26 +101,26 @@ tests =
 goodInt : String -> Int -> Test
 goodInt str int =
     test str <| \_ ->
-        Expect.equal (Ok int) (String.toInt str)
+        Expect.equal (Just int) (String.toInt str)
 
 
 badInt : String -> Test
 badInt str =
     test str <| \_ ->
         Expect.equal
-            (Err ("could not convert string '" ++ str ++ "' to an Int"))
+            Nothing
             (String.toInt str)
 
 
 goodFloat : String -> Float -> Test
 goodFloat str float =
     test str <| \_ ->
-        Expect.equal (Ok float) (String.toFloat str)
+        Expect.equal (Just float) (String.toFloat str)
 
 
 badFloat : String -> Test
 badFloat str =
     test str <| \_ ->
         Expect.equal
-            (Err ("could not convert string '" ++ str ++ "' to a Float"))
+            Nothing
             (String.toFloat str)
