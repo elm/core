@@ -5,8 +5,7 @@ set -o nounset;
 
 #let the caller supply an ELM_TEST binary if desired
 if [ ! -v ELM_TEST ]; then
-    npm install elm-test;
-    ELM_TEST=node_modules/elm-test/bin/elm-test;
+    ELM_TEST=elm-test;
 fi
 
 # since elm/core is treated specially by the compiler (it's always
@@ -49,9 +48,9 @@ VERSION_DIR="$(ls ${ELM_HOME}/0.19.0/package/elm/core/)"
 CORE_PACKAGE_DIR="${ELM_HOME}/0.19.0/package/elm/core/$VERSION_DIR"
 CORE_GIT_DIR="$(dirname $PWD)"
 
-echo; 
+echo;
 echo "Linking $CORE_PACKAGE_DIR to $CORE_GIT_DIR"
-echo; 
+echo;
 rm -rf "$CORE_PACKAGE_DIR"
 ln -sv "$CORE_GIT_DIR" "$CORE_PACKAGE_DIR"
 rm -vf "${CORE_GIT_DIR}"/*.dat "${CORE_GIT_DIR}"/doc*.json
