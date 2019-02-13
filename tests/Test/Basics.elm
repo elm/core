@@ -3,13 +3,13 @@ module Test.Basics exposing (tests)
 import Array
 import Tuple exposing (first, second)
 import Basics exposing (..)
-import Date
 import Set
 import Dict
 import Test exposing (..)
-import Expect
+import Expect exposing (FloatingPointTolerance(..))
 import List
 import String
+import Debug exposing (toString)
 
 
 tests : Test
@@ -33,14 +33,12 @@ tests =
                 , test "6 <= 6" <| \() -> Expect.equal True (6 <= 6)
                 , test "compare \"A\" \"B\"" <| \() -> Expect.equal LT (compare "A" "B")
                 , test "compare 'f' 'f'" <| \() -> Expect.equal EQ (compare 'f' 'f')
-                , test "compare (1, 2, 3, 4, 5, 6) (0, 1, 2, 3, 4, 5)" <| \() -> Expect.equal GT (compare ( 1, 2, 3, 4, 5, 6 ) ( 0, 1, 2, 3, 4, 5 ))
+                , test "compare (1, 2, 3) (0, 1, 2)" <| \() -> Expect.equal GT (compare ( 1, 2, 3 ) ( 0, 1, 2 ))
                 , test "compare ['a'] ['b']" <| \() -> Expect.equal LT (compare [ 'a' ] [ 'b' ])
                 , test "array equality" <| \() -> Expect.equal (Array.fromList [ 1, 1, 1, 1 ]) (Array.repeat 4 1)
                 , test "set equality" <| \() -> Expect.equal (Set.fromList [ 1, 2 ]) (Set.fromList [ 2, 1 ])
                 , test "dict equality" <| \() -> Expect.equal (Dict.fromList [ ( 1, 1 ), ( 2, 2 ) ]) (Dict.fromList [ ( 2, 2 ), ( 1, 1 ) ])
                 , test "char equality" <| \() -> Expect.notEqual '0' '饑'
-                , test "date equality" <| \() -> Expect.equal (Date.fromString "2/7/1992") (Date.fromString "2/7/1992")
-                , test "date equality" <| \() -> Expect.notEqual (Date.fromString "11/16/1995") (Date.fromString "2/7/1992")
                 ]
 
         toStringTests =
@@ -118,16 +116,16 @@ tests =
             describe "Basic Math Tests"
                 [ test "add float" <| \() -> Expect.equal 159 (155.6 + 3.4)
                 , test "add int" <| \() -> Expect.equal 17 ((round 10) + (round 7))
-                , test "subtract float" <| \() -> Expect.equal -6.3 (1 - 7.3)
+                , test "subtract float" <| \() -> Expect.within (Absolute 0.00000001) -6.3 (1 - 7.3)
                 , test "subtract int" <| \() -> Expect.equal 1130 ((round 9432) - (round 8302))
-                , test "multiply float" <| \() -> Expect.equal 432 (96 * 4.5)
+                , test "multiply float" <| \() -> Expect.within (Relative 0.00000001) 432 (96 * 4.5)
                 , test "multiply int" <| \() -> Expect.equal 90 ((round 10) * (round 9))
-                , test "divide float" <| \() -> Expect.equal 13.175 (527 / 40)
+                , test "divide float" <| \() -> Expect.within (Relative 0.00000001) 13.175 (527 / 40)
                 , test "divide int" <| \() -> Expect.equal 23 (70 // 3)
-                , test "2 |> rem 7" <| \() -> Expect.equal 1 (2 |> rem 7)
-                , test "4 |> rem -1" <| \() -> Expect.equal -1 (4 |> rem -1)
-                , test "7 % 2" <| \() -> Expect.equal 1 (7 % 2)
-                , test "-1 % 4" <| \() -> Expect.equal 3 (-1 % 4)
+                , test "7 |> remainderBy 2" <| \() -> Expect.equal 1 (7 |> remainderBy 2)
+                , test "-1 |> remainderBy 4" <| \() -> Expect.equal -1 (-1 |> remainderBy 4)
+                , test "modBy 2 7" <| \() -> Expect.equal 1 (modBy 2 7)
+                , test "modBy 4 -1" <| \() -> Expect.equal 3 (modBy 4 -1)
                 , test "3^2" <| \() -> Expect.equal 9 (3 ^ 2)
                 , test "sqrt" <| \() -> Expect.equal 9 (sqrt 81)
                 , test "negate 42" <| \() -> Expect.equal -42 (negate 42)
@@ -192,7 +190,6 @@ tests =
                 , test "<|" <| \() -> Expect.equal 9 (identity <| 3 + 6)
                 , test "|>" <| \() -> Expect.equal 9 (3 + 6 |> identity)
                 , test "<<" <| \() -> Expect.equal True (not << xor True <| True)
-                , test "<<" <| \() -> Expect.equal True (not << xor True <| True)
                 , describe ">>"
                     [ test "with xor" <|
                         \() ->
@@ -204,9 +201,6 @@ tests =
                                 |> List.map (.foo >> String.reverse)
                                 |> Expect.equal [ "SaN" ]
                     ]
-                , test "flip" <| \() -> Expect.equal 10 ((flip (//)) 2 20)
-                , test "curry" <| \() -> Expect.equal 1 ((curry (\( a, b ) -> a + b)) -5 6)
-                , test "uncurry" <| \() -> Expect.equal 1 ((uncurry (+)) ( -5, 6 ))
                 ]
     in
         describe "Basics"

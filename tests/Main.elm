@@ -1,4 +1,4 @@
-port module Main exposing (..)
+module Main exposing (..)
 
 import Basics exposing (..)
 import Task exposing (..)
@@ -14,7 +14,6 @@ import Test.CodeGen as CodeGen
 import Test.Dict as Dict
 import Test.Maybe as Maybe
 import Test.Equality as Equality
-import Test.Json as Json
 import Test.List as List
 import Test.Result as Result
 import Test.Set as Set
@@ -39,11 +38,3 @@ tests =
         , Maybe.tests
         , Tuple.tests
         ]
-
-
-main : TestProgram
-main =
-    run emit tests
-
-
-port emit : ( String, Value ) -> Cmd msg

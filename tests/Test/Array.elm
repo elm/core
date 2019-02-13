@@ -1,9 +1,9 @@
 module Test.Array exposing (tests)
 
-import Array
+import Array exposing (..)
 import Basics exposing (..)
 import List exposing ((::))
-import Maybe exposing (..)
+import Maybe
 import Test exposing (..)
 import Fuzz exposing (Fuzzer, intRange)
 import Expect
@@ -193,8 +193,8 @@ transformTests =
                     |> Expect.equal (List.range 0 (size - 1))
         , fuzz defaultSizeRange "filter" <|
             \size ->
-                toList (filter (\a -> a % 2 == 0) (initialize size identity))
-                    |> Expect.equal (List.filter (\a -> a % 2 == 0) (List.range 0 (size - 1)))
+                toList (filter (\a -> modBy 2 a == 0) (initialize size identity))
+                    |> Expect.equal (List.filter (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
         , fuzz defaultSizeRange "map" <|
             \size ->
                 map ((+) 1) (initialize size identity)
@@ -215,14 +215,6 @@ transformTests =
             \s1 s2 ->
                 append (initialize s1 identity) (initialize s2 ((+) s1))
                     |> Expect.equal (initialize (s1 + s2) identity)
-        , fuzz (defaultSizeRange) "toString" <|
-            \size ->
-                let
-                    ls =
-                        List.range 0 size
-                in
-                    Array.toString (fromList ls)
-                        |> Expect.equal ("Array " ++ Basics.toString ls)
         ]
 
 

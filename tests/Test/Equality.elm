@@ -19,7 +19,7 @@ tests =
                 [ test "As eq" <| \() -> Expect.equal True (A "a" == A "a")
                 , test "Bs eq" <| \() -> Expect.equal True (B [ 1 ] == B [ 1 ])
                 , test "A left neq" <| \() -> Expect.equal True (A "a" /= B [ 1 ])
-                , test "A left neq" <| \() -> Expect.equal True (B [ 1 ] /= A "a")
+                , test "A right neq" <| \() -> Expect.equal True (B [ 1 ] /= A "a")
                 ]
 
         recordTests =

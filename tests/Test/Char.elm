@@ -48,8 +48,8 @@ decCodes =
 
 
 oneOf : List a -> a -> Bool
-oneOf =
-    flip List.member
+oneOf list e =
+    List.member e list
 
 
 tests : Test
