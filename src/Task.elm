@@ -293,7 +293,7 @@ So we could _attempt_ to focus on a certain DOM node like this:
     type Msg
       = Click
       | Search String
-      | Focus (Result Browser.DomError ())
+      | Focus (Result Browser.Dom.Error ())
 
     focus : Cmd Msg
     focus =
