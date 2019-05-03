@@ -208,7 +208,7 @@ foldrHelper fn acc ctr ls =
                                 d :: r4 ->
                                     let
                                         res =
-                                            if ctr > 500 then
+                                            if ctr > 1000 then
                                                 foldl fn acc (reverse r4)
                                             else
                                                 foldrHelper fn acc (ctr + 1) r4
