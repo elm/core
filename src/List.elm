@@ -132,7 +132,17 @@ element (starting at zero).
 -}
 indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
-  map2 f (range 0 (length xs - 1)) xs
+  reverse (indexedMapHelper 0 f xs [])
+
+
+indexedMapHelper :  (Int -> a -> b)->Int -> List a -> List b -> List b
+indexedMapHelper fn index list result =
+  case list of
+    [] ->
+      result
+
+    x :: xs ->
+      indexedMapHelper fn (index + 1) xs (cons (fn index x) result)
 
 
 {-| Reduce a list from the left.
@@ -227,17 +237,16 @@ from an untrusted source and you want to turn them into numbers:
 -}
 filterMap : (a -> Maybe b) -> List a -> List b
 filterMap f xs =
-  foldr (maybeCons f) [] xs
+  let
+    helper mx acc =
+      case f mx of
+        Just x ->
+          cons x acc
 
-
-maybeCons : (a -> Maybe b) -> a -> List b -> List b
-maybeCons f mx xs =
-  case f mx of
-    Just x ->
-      cons x xs
-
-    Nothing ->
-      xs
+        Nothing ->
+          acc
+  in
+    foldr helper [] xs
 
 
 -- UTILITIES
@@ -387,7 +396,12 @@ concat lists =
 -}
 concatMap : (a -> List b) -> List a -> List b
 concatMap f list =
-  concat (map f list)
+  let
+    helper val acc =
+      append (f val) acc
+  in
+    foldr helper [] list
+
 
 
 {-| Places the given value between all members of the given list.
