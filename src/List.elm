@@ -372,13 +372,8 @@ product numbers =
 You can also use [the `(++)` operator](Basics#++) to append lists.
 -}
 append : List a -> List a -> List a
-append xs ys =
-  case ys of
-    [] ->
-      xs
-
-    _ ->
-      foldr cons ys xs
+append =
+  Elm.Kernel.List.append
 
 
 {-| Concatenate a bunch of lists into a single list:
