@@ -132,10 +132,10 @@ element (starting at zero).
 -}
 indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
-  reverse (indexedMapHelper 0 f xs [])
+  reverse (indexedMapHelper f 0 xs [])
 
 
-indexedMapHelper :  (Int -> a -> b)->Int -> List a -> List b -> List b
+indexedMapHelper :  (Int -> a -> b) -> Int -> List a -> List b -> List b
 indexedMapHelper fn index list result =
   case list of
     [] ->

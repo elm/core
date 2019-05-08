@@ -4,7 +4,7 @@ import Array exposing (toList)
 import Basics exposing (LT, EQ, GT)
 import Dict exposing (toList)
 import Elm.Kernel.Debug exposing (crash)
-import Elm.Kernel.List exposing (Cons, Nil)
+import Elm.Kernel.List exposing (Cons, Nil, ap)
 import Set exposing (toList)
 
 */
