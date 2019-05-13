@@ -20,6 +20,10 @@ module Array
         , indexedMap
         , append
         , slice
+        , left
+        , right
+        , dropLeft
+        , dropRight
         , sort
         , sortBy
         , sortWith
@@ -37,7 +41,10 @@ module Array
 @docs isEmpty, length, get
 
 # Manipulate
-@docs set, update, push, append, slice
+@docs set, update, push, append
+
+# Subarrays
+@docs slice, left, right, dropLeft, dropRight
 
 # Lists
 @docs toList, toIndexedList
@@ -719,6 +726,7 @@ appendHelpBuilder tail builder =
             }
 
 
+
 {-| Get a sub-section of an array: `(slice start end array)`. The `start` is a
 zero-based index where we will start our slice. The `end` is a zero-based index
 that indicates the end of the slice. The slice extracts up to but not including
@@ -950,6 +958,54 @@ sliceLeft from ((Array_elm_builtin len _ tree tail) as array) =
                             |> builderToArray True
 
 
+{-| Take *n* elements from the left side of an array.
+
+    left 2 (fromList [1,2,3,4,5]) == (fromList [1,2])
+-}
+left : Int -> Array a -> Array a
+left n array =
+  if n < 1 then
+    empty
+  else
+    slice 0 n array
+
+
+{-| Take *n* elements from the right side of an array.
+
+    right 2 (fromList [1,2,3,4,5]) == (fromList [4,5])
+-}
+right : Int -> Array a -> Array a
+right n array =
+  if n < 1 then
+    empty
+  else
+    slice -n (length array) array
+
+
+{-| Drop *n* elements from the left side of an array.
+
+    dropLeft 2 (fromList [1,2,3,4,5]) == (fromList [3,4,5])
+-}
+dropLeft : Int -> Array a -> Array a
+dropLeft n array =
+  if n < 1 then
+    array
+  else
+    slice n (length array) array
+
+
+{-| Drop *n* elements from the right side of an array.
+
+    dropRight 2 (fromList [1,2,3,4,5]) == (fromList [1,2,3])
+-}
+dropRight : Int -> Array a -> Array a
+dropRight n array =
+  if n < 1 then
+    array
+  else
+    slice 0 -n array
+
+
 {-| Sort values from lowest to highest
 
     sort (fromList [3,1,5]) == (fromList [1,3,5])
@@ -968,7 +1024,7 @@ sort array =
     sortBy .name   (fromList [chuck,alice,bob]) == (fromList [alice,bob,chuck])
     sortBy .height (fromList [chuck,alice,bob]) == (fromList [alice,chuck,bob])
 
-    sortBy String.length (fromList ["mouse","cat"]) == (fromList ["cat","mouse"])
+    sortBy Array a.length (fromList ["mouse","cat"]) == (fromList ["cat","mouse"])
 -}
 sortBy : (a -> comparable) -> Array a -> Array a
 sortBy by array =
