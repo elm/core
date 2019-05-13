@@ -176,7 +176,7 @@ empty =
 -}
 singleton : a -> Array a
 singleton value =
-  push value empty
+    push value empty
 
 
 {-| Determine if an array is empty.
@@ -794,7 +794,7 @@ appendHelpBuilder tail builder =
 -}
 concat : Array (Array a) -> Array a
 concat arrays =
-  foldr append empty arrays
+    foldr append empty arrays
 
 
 {-| Map a given function onto an array and flatten the resulting arrays.
@@ -803,7 +803,7 @@ concat arrays =
 -}
 concatMap : (a -> Array b) -> Array a -> Array b
 concatMap f array =
-  concat (map f array)
+    concat (map f array)
 
 
 {-| Get a sub-section of an array: `(slice start end array)`. The `start` is a
@@ -1043,10 +1043,11 @@ sliceLeft from ((Array_elm_builtin len _ tree tail) as array) =
 -}
 left : Int -> Array a -> Array a
 left n array =
-  if n < 1 then
-    empty
-  else
-    slice 0 n array
+    if n < 1 then
+        empty
+
+    else
+        slice 0 n array
 
 
 {-| Take *n* elements from the right side of an array.
@@ -1055,10 +1056,11 @@ left n array =
 -}
 right : Int -> Array a -> Array a
 right n array =
-  if n < 1 then
-    empty
-  else
-    slice -n (length array) array
+    if n < 1 then
+        empty
+
+    else
+        slice -n (length array) array
 
 
 {-| Drop *n* elements from the left side of an array.
@@ -1067,10 +1069,11 @@ right n array =
 -}
 dropLeft : Int -> Array a -> Array a
 dropLeft n array =
-  if n < 1 then
-    array
-  else
-    slice n (length array) array
+    if n < 1 then
+        array
+
+    else
+        slice n (length array) array
 
 
 {-| Drop *n* elements from the right side of an array.
@@ -1079,10 +1082,11 @@ dropLeft n array =
 -}
 dropRight : Int -> Array a -> Array a
 dropRight n array =
-  if n < 1 then
-    array
-  else
-    slice 0 -n array
+    if n < 1 then
+        array
+
+    else
+        slice 0 -n array
 
 
 {-| Returns the array without the last element.
@@ -1100,7 +1104,7 @@ pop array =
 -}
 sort : Array comparable -> Array comparable
 sort array =
-  sortBy identity array
+    sortBy identity array
 
 
 {-| Sort values by a derived property.
@@ -1116,7 +1120,7 @@ sort array =
 -}
 sortBy : (a -> comparable) -> Array a -> Array a
 sortBy by array =
-  initializeFromJsArray (JsArray.sortByFromFold foldl by array)
+    initializeFromJsArray (JsArray.sortByFromFold foldl by array)
 
 
 {-| Sort values with a custom comparison function.
@@ -1134,7 +1138,7 @@ to define any other: `sort == sortWith compare`
 -}
 sortWith : (a -> a -> Order) -> Array a -> Array a
 sortWith with array =
-  initializeFromJsArray (JsArray.sortWithFromFold foldl with array)
+    initializeFromJsArray (JsArray.sortWithFromFold foldl with array)
 
 
 {-| A builder contains all information necessary to build an array. Adding
