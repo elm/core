@@ -2,6 +2,7 @@ module Array
     exposing
         ( Array
         , empty
+        , singleton
         , isEmpty
         , length
         , initialize
@@ -16,14 +17,19 @@ module Array
         , foldr
         , foldl
         , filter
+        , filterMap
+        , partition
         , map
         , indexedMap
         , append
+        , concat
+        , concatMap
         , slice
         , left
         , right
         , dropLeft
         , dropRight
+        , pop
         , sort
         , sortBy
         , sortWith
@@ -35,22 +41,25 @@ module Array
 @docs Array
 
 # Creation
-@docs empty, initialize, repeat, fromList
+@docs empty, singleton, initialize, repeat, fromList
 
 # Query
 @docs isEmpty, length, get
 
 # Manipulate
-@docs set, update, push, append
+@docs set, update, push
+
+# Combine
+@docs append, concat, concatMap
 
 # Subarrays
-@docs slice, left, right, dropLeft, dropRight
+@docs slice, left, right, dropLeft, dropRight, pop
 
 # Lists
 @docs toList, toIndexedList
 
 # Transform
-@docs map, indexedMap, foldl, foldr, filter
+@docs map, indexedMap, foldl, foldr, filter, filterMap, partition
 
 # Sort
 @docs sort, sortBy, sortWith
@@ -158,6 +167,16 @@ empty =
        `tree`. The minimal value is therefore equal to the `shiftStep`.
     -}
     Array_elm_builtin 0 shiftStep JsArray.empty JsArray.empty
+
+
+{-| Create an array with only one element:
+
+    singleton 1234 == (fromList [1234])
+    singleton "hi" == (fromList ["hi"])
+-}
+singleton : a -> Array a
+singleton value =
+  push value empty
 
 
 {-| Determine if an array is empty.
@@ -582,6 +601,49 @@ filter isGood array =
     fromList (foldr (\x xs -> if isGood x then x :: xs else xs) [] array)
 
 
+{-| Filter out certain values. For example, maybe you have a bunch of strings
+from an untrusted source and you want to turn them into numbers:
+
+    numbers : List Int
+    numbers =
+      filterMap String.toInt (fromList ["3", "hi", "12", "4th", "May"])
+
+    -- numbers == [3, 12]
+
+-}
+filterMap : (a -> Maybe b) -> Array a -> Array b
+filterMap f array =
+    let
+        helper x xs =
+            case f x of
+                Just val ->
+                    val :: xs
+
+                Nothing ->
+                    xs
+    in
+        fromList (foldr helper [] array)
+
+
+{-| Partition an array based on a test. The first array contains all values
+that satisfy the test, and the second array contains all the values that do not.
+
+    partition (\x -> x < 3) (fromList [0,1,2,3,4,5]) == ((fromList [0,1,2]), (fromList [3,4,5]))
+    partition isEven        (fromList [0,1,2,3,4,5]) == ((fromList [0,2,4]), (fromList [1,3,5]))
+-}
+partition : (a -> Bool) -> Array a -> (Array a, Array a)
+partition pred array =
+    let
+        step x (trues, falses) =
+            if pred x then
+                (x :: trues, falses)
+
+            else
+                (trues, x :: falses)
+    in
+        Tuple.mapBoth fromList fromList (foldr step ([],[]) array)
+
+
 {-| Apply a function on every element in an array.
 
     map sqrt (fromList [1,4,9]) == fromList [1,2,3]
@@ -725,6 +787,23 @@ appendHelpBuilder tail builder =
             , nodeListSize = builder.nodeListSize
             }
 
+
+{-| Concatenate a bunch of arrays into a single array:
+
+    concat [(fromList [1,2]), (fromList [3]), (fromList [4,5])] == (fromList [1,2,3,4,5])
+-}
+concat : Array (Array a) -> Array a
+concat arrays =
+  foldr append empty arrays
+
+
+{-| Map a given function onto an array and flatten the resulting arrays.
+
+    concatMap f arrays == concat (map f arrays)
+-}
+concatMap : (a -> Array b) -> Array a -> Array b
+concatMap f array =
+  concat (map f array)
 
 
 {-| Get a sub-section of an array: `(slice start end array)`. The `start` is a
@@ -1004,6 +1083,15 @@ dropRight n array =
     array
   else
     slice 0 -n array
+
+
+{-| Returns the array without the last element.
+
+    pop (fromList [1,2,3]) == (fromList [1,2])
+-}
+pop : Array a -> Array a
+pop array =
+    slice 0 -1 array
 
 
 {-| Sort values from lowest to highest
