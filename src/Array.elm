@@ -9,6 +9,7 @@ module Array
         , fromList
         , get
         , set
+        , update
         , push
         , toList
         , toIndexedList
@@ -33,7 +34,7 @@ module Array
 @docs isEmpty, length, get
 
 # Manipulate
-@docs set, push, append, slice
+@docs set, update, push, append, slice
 
 # Lists
 @docs toList, toIndexedList
@@ -333,6 +334,60 @@ setHelp shift index value tree =
                 let
                     newLeaf =
                         JsArray.unsafeSet (Bitwise.and bitMask index) value values
+                in
+                    JsArray.unsafeSet pos (Leaf newLeaf) tree
+
+{-| Modify the element at a particular index using the provided function. Returns an updated array.
+If the index is out of range, the array is unaltered.
+
+    update 1 (\val -> val + 2) (fromList [1,2,3]) == fromList [1,4,3]
+-}
+update : Int -> (a->a) -> Array a -> Array a
+update index fn ((Array_elm_builtin len startShift tree tail) as array) =
+    if index < 0 || index >= len then
+        array
+    else if index >= tailIndex len then
+        let
+            pos =
+                Bitwise.and bitMask index
+
+            newValue =
+                fn (JsArray.unsafeGet pos tail)
+        in
+            Array_elm_builtin len startShift tree <|
+                JsArray.unsafeSet pos newValue tail
+    else
+        Array_elm_builtin
+            len
+            startShift
+            (updateHelp startShift index fn tree)
+            tail
+
+
+updateHelp : Int -> Int -> (a -> a) -> Tree a -> Tree a
+updateHelp shift index fn tree =
+    let
+        pos =
+            Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift index
+    in
+        case JsArray.unsafeGet pos tree of
+            SubTree subTree ->
+                let
+                    newSub =
+                        updateHelp (shift - shiftStep) index fn subTree
+                in
+                    JsArray.unsafeSet pos (SubTree newSub) tree
+
+            Leaf values ->
+                let
+                    leafPos =
+                        Bitwise.and bitMask index
+
+                    newValue =
+                        fn (JsArray.unsafeGet leafPos values)
+
+                    newLeaf =
+                        JsArray.unsafeSet leafPos newValue values
                 in
                     JsArray.unsafeSet pos (Leaf newLeaf) tree
 
