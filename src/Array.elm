@@ -44,7 +44,7 @@ module Array
 @docs empty, singleton, initialize, repeat, fromList
 
 # Query
-@docs isEmpty, length, get
+@docs isEmpty, length, get, member, all, any
 
 # Manipulate
 @docs set, update, push
@@ -554,6 +554,72 @@ toIndexedList ((Array_elm_builtin len _ _ _) as array) =
             ( index - 1, (index,entry) :: list )
     in
         Tuple.second (foldr helper ( len - 1, [] ) array)
+
+
+{-| Figure out whether an array contains a value.
+
+    member 9 (fromList [1,2,3,4]) == False
+    member 4 (fromList [1,2,3,4]) == True
+-}
+member : a -> Array a -> Bool
+member x xs =
+    any (\a -> a == x) xs
+
+
+{-| Determine if all elements satisfy some test.
+
+    all isEven (fromList [2,4]) == True
+    all isEven (fromList [2,3]) == False
+    all isEven (fromList []) == True
+-}
+all : (a -> Bool) -> Array a -> Bool
+all isOkay list =
+    not (any (not << isOkay) list)
+
+
+{-| Determine if any elements satisfy some test.
+
+    any isEven (fromList [2,3]) == True
+    any isEven (fromList [1,3]) == False
+    any isEven (fromList []) == False
+-}
+any : (a -> Bool) -> Array a -> Bool
+any isOkay array =
+    case find isOkay array of
+        Nothing ->
+            False
+
+        Just _ ->
+            True
+
+{-| Returns the first element which satisifes the test.
+
+    find isEven (fromList [1,2,3,4]) == Just True
+-}
+find : (a -> Bool) -> Array a -> Maybe a
+find pred (Array_elm_builtin _ _ tree tail) =
+    let
+        valueMapper value =
+            if pred value then
+                Just value
+
+            else
+                Nothing
+
+        helper node =
+            case node of
+                SubTree subTree ->
+                    JsArray.find helper subTree
+
+                Leaf values ->
+                    JsArray.find valueMapper values
+    in
+        case JsArray.find helper tree of
+            Nothing ->
+                JsArray.find valueMapper tail
+
+            result ->
+                result
 
 
 {-| Reduce an array from the right. Read `foldr` as fold from the right.

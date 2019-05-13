@@ -18,6 +18,7 @@ module Elm.JsArray
         , appendN
         , sortByFromFold
         , sortWithFromFold
+        , find
         )
 
 {-| This library provides an immutable version of native javascript arrays.
@@ -32,7 +33,7 @@ For general purpose use, try the `Array` module instead.
 @docs empty, singleton, initialize, listInitialize, fromFold
 
 # Basics
-@docs length, unsafeGet, unsafeSet, push
+@docs length, unsafeGet, unsafeSet, push, find
 
 # Transformation
 @docs foldl, foldr, map, slice, merge
@@ -43,6 +44,7 @@ For general purpose use, try the `Array` module instead.
 
 
 import Basics exposing (Int, Order)
+import Maybe exposing (Maybe)
 import Elm.Kernel.JsArray
 
 
@@ -209,3 +211,10 @@ using the provided comparison function.
 sortWithFromFold : ((a -> JsArray a -> JsArray a) -> JsArray a -> c -> JsArray a) -> (a -> a -> Order) -> c -> JsArray a
 sortWithFromFold =
     Elm.Kernel.JsArray.sortWithFromFold
+
+{-| Returns the first element which passes the provided predicate function. Returns `Nothing` if no element
+passes the predicate function.
+-}
+find : (a -> Maybe b) -> JsArray a -> Maybe b
+find =
+    Elm.Kernel.JsArray.find

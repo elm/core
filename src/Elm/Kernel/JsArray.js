@@ -1,6 +1,6 @@
 /*
 
-import Basics exposing (EQ, LT)
+import Basics exposing (EQ, LT, Nothing, Just)
 import Elm.Kernel.Utils exposing (Tuple2, cmp)
 
 */
@@ -179,4 +179,15 @@ var _JsArray_sortWithFromFold = F3(function(fold, f, container) {
 	return ord === __Basics_EQ ? 0 : ord === __Basics_LT ? -1 : 1;
     });
     return arr;
+});
+
+var _JsArray_find = F2(function(pred, arr) {
+    for (var i = 0, length = arr.length; i < length; i++) {
+        var result = pred(arr[i]);
+        if (result !== __Basics_Nothing) {
+            return result;
+        }
+    }
+
+    return __Basics_Nothing;
 });
