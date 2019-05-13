@@ -291,8 +291,8 @@ Commonly used to check if a given index references something in the tail.
 tailIndex : Int -> Int
 tailIndex len =
     len
-        |> Bitwise.shiftRightZfBy 5
-        |> Bitwise.shiftLeftBy 5
+        |> Bitwise.shiftRightZfBy shiftStep
+        |> Bitwise.shiftLeftBy shiftStep
 
 
 {-| Set the element at a particular index. Returns an updated array.
@@ -741,7 +741,7 @@ sliceRight end ((Array_elm_builtin len startShift tree tail) as array) =
                     |> floor
 
             newShift =
-                max 5 <| depth * shiftStep
+                max shiftStep <| depth * shiftStep
         in
             Array_elm_builtin
                 end
@@ -960,7 +960,7 @@ builderToArray reverseNodeList builder =
         in
             Array_elm_builtin
                 (JsArray.length builder.tail + treeLen)
-                (max 5 <| depth * shiftStep)
+                (max shiftStep <| depth * shiftStep)
                 tree
                 builder.tail
 
@@ -972,12 +972,10 @@ treeFromBuilder : List (Node a) -> Int -> Tree a
 treeFromBuilder nodeList nodeListSize =
     let
         newNodeSize =
-            ((toFloat nodeListSize) / (toFloat branchFactor))
-                |> ceiling
+            ceiling ((toFloat nodeListSize) / (toFloat branchFactor))
     in
         if newNodeSize == 1 then
-            JsArray.initializeFromList branchFactor nodeList
-                |> Tuple.first
+            Tuple.first (JsArray.initializeFromList branchFactor nodeList)
         else
             treeFromBuilder
                 (compressNodes nodeList [])
