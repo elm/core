@@ -6,6 +6,7 @@ module Elm.JsArray
         , length
         , initialize
         , initializeFromList
+        , fromFold
         , unsafeGet
         , unsafeSet
         , push
@@ -15,6 +16,8 @@ module Elm.JsArray
         , indexedMap
         , slice
         , appendN
+        , sortByFromFold
+        , sortWithFromFold
         )
 
 {-| This library provides an immutable version of native javascript arrays.
@@ -26,7 +29,7 @@ For general purpose use, try the `Array` module instead.
 @docs JsArray
 
 # Creation
-@docs empty, singleton, initialize, listInitialize
+@docs empty, singleton, initialize, listInitialize, fromFold
 
 # Basics
 @docs length, unsafeGet, unsafeSet, push
@@ -34,10 +37,12 @@ For general purpose use, try the `Array` module instead.
 # Transformation
 @docs foldl, foldr, map, slice, merge
 
+# Sort
+@docs sortByFromFold, sortWithFromFold
 -}
 
 
-import Basics exposing (Int)
+import Basics exposing (Int, Order)
 import Elm.Kernel.JsArray
 
 
@@ -95,6 +100,15 @@ reasonably small value.
 initializeFromList : Int -> List a -> ( JsArray a, List a )
 initializeFromList =
     Elm.Kernel.JsArray.initializeFromList
+
+{-| Creates an array based on a fold function. This allows creating an array from
+any kind of data structure, as long as it's foldable.
+
+    fromFold List.foldl someList == (fromList someList)
+-}
+fromFold : ((a -> b -> b) -> b -> c -> b) -> c -> b
+fromFold =
+    Elm.Kernel.JsArray.fromFold
 
 
 {-| Returns the element at the given index.
@@ -179,3 +193,19 @@ create `JsArray`s above a certain size, even when appending.
 appendN : Int -> JsArray a -> JsArray a -> JsArray a
 appendN =
     Elm.Kernel.JsArray.appendN
+
+
+{-| Creates an array based on a fold function. The resulting array will be sorted
+by a derived property.
+-}
+sortByFromFold : ((a -> JsArray a -> JsArray a) -> JsArray a -> c -> JsArray a) -> (a -> comparable) -> c -> JsArray a
+sortByFromFold =
+    Elm.Kernel.JsArray.sortByFromFold
+
+
+{-| Creates an array based on a fold function. The resulting array will be sorted
+using the provided comparison function.
+-}
+sortWithFromFold : ((a -> JsArray a -> JsArray a) -> JsArray a -> c -> JsArray a) -> (a -> a -> Order) -> c -> JsArray a
+sortWithFromFold =
+    Elm.Kernel.JsArray.sortWithFromFold

@@ -20,6 +20,9 @@ module Array
         , indexedMap
         , append
         , slice
+        , sort
+        , sortBy
+        , sortWith
         )
 
 {-| Fast immutable arrays. The elements in an array must have the same type.
@@ -41,6 +44,9 @@ module Array
 
 # Transform
 @docs map, indexedMap, foldl, foldr, filter
+
+# Sort
+@docs sort, sortBy, sortWith
 -}
 
 
@@ -209,6 +215,12 @@ initializeHelp fn fromIndex len nodeList tail =
                 len
                 (leaf :: nodeList)
                 tail
+
+
+initializeFromJsArray : JsArray a -> Array a
+initializeFromJsArray jsArray =
+    initialize (JsArray.length jsArray)
+        (\idx -> JsArray.unsafeGet idx jsArray)
 
 
 {-| Creates an array with a given length, filled with a default element.
@@ -936,6 +948,49 @@ sliceLeft from ((Array_elm_builtin len _ tree tail) as array) =
                     in
                         List.foldl appendHelpBuilder initialBuilder rest
                             |> builderToArray True
+
+
+{-| Sort values from lowest to highest
+
+    sort (fromList [3,1,5]) == (fromList [1,3,5])
+-}
+sort : Array comparable -> Array comparable
+sort array =
+  sortBy identity array
+
+
+{-| Sort values by a derived property.
+
+    alice = { name="Alice", height=1.62 }
+    bob   = { name="Bob"  , height=1.85 }
+    chuck = { name="Chuck", height=1.76 }
+
+    sortBy .name   (fromList [chuck,alice,bob]) == (fromList [alice,bob,chuck])
+    sortBy .height (fromList [chuck,alice,bob]) == (fromList [alice,chuck,bob])
+
+    sortBy String.length (fromList ["mouse","cat"]) == (fromList ["cat","mouse"])
+-}
+sortBy : (a -> comparable) -> Array a -> Array a
+sortBy by array =
+  initializeFromJsArray (JsArray.sortByFromFold foldl by array)
+
+
+{-| Sort values with a custom comparison function.
+
+    sortWith flippedComparison (fromList [1,2,3,4,5]) == (fromList [5,4,3,2,1])
+
+    flippedComparison a b =
+        case compare a b of
+          LT -> GT
+          EQ -> EQ
+          GT -> LT
+
+This is also the most general sort function, allowing you
+to define any other: `sort == sortWith compare`
+-}
+sortWith : (a -> a -> Order) -> Array a -> Array a
+sortWith with array =
+  initializeFromJsArray (JsArray.sortWithFromFold foldl with array)
 
 
 {-| A builder contains all information necessary to build an array. Adding

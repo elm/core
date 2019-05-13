@@ -1,6 +1,7 @@
 /*
 
-import Elm.Kernel.Utils exposing (Tuple2)
+import Basics exposing (EQ, LT)
+import Elm.Kernel.Utils exposing (Tuple2, cmp)
 
 */
 
@@ -153,4 +154,29 @@ var _JsArray_appendN = F3(function(n, dest, source)
     }
 
     return result;
+});
+
+var _JsArray_fromFold = F2(function(fold, container) {
+    return A3(fold, foldHelper, [], container);
+});
+
+var _JsArray_foldHelper = F2(function(val, arr) {
+    return arr.push(val);
+});
+
+var _JsArray_sortByFromFold = F3(function(fold, f, container) {
+    var arr = A3(fold, foldHelper, [], container);
+    arr.sort(function(a, b) {
+        return __Utils_cmp(f(a), f(b));
+    });
+    return arr;
+});
+
+var _JsArray_sortWithFromFold = F3(function(fold, f, container) {
+    var arr = A3(fold, foldHelper, [], container);
+    arr.sort(function(a, b) {
+	var ord = A2(f, a, b);
+	return ord === __Basics_EQ ? 0 : ord === __Basics_LT ? -1 : 1;
+    });
+    return arr;
 });
