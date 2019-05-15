@@ -4,7 +4,7 @@ set -o errexit;
 set -o nounset;
 
 #let the caller supply an ELM_TEST binary if desired
-if [ ! -v ELM_TEST ]; then
+if [ -z "${ELM_TEST:-}" ]; then
     ELM_TEST=elm-test;
 fi
 
