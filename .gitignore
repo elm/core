@@ -1,3 +1,7 @@
 elm-stuff
 tests/test.js
 node_modules/
+*.dat
+doc*.json
+tests/.elm
+*~
