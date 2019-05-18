@@ -179,7 +179,7 @@ empty =
 -}
 singleton : a -> Array a
 singleton value =
-    push value empty
+    Array_elm_builtin 1 shiftStep JsArray.empty (JsArray.singleton value)
 
 
 {-| Determine if an array is empty.
