@@ -870,7 +870,11 @@ appendHelpBuilder tail builder =
 -}
 concat : Array (Array a) -> Array a
 concat arrays =
-    foldr append empty arrays
+    let
+        helper next acc =
+            append acc next
+    in
+        foldl helper empty arrays
 
 
 {-| Map a given function onto an array and flatten the resulting arrays.
@@ -878,8 +882,12 @@ concat arrays =
     concatMap f arrays == concat (map f arrays)
 -}
 concatMap : (a -> Array b) -> Array a -> Array b
-concatMap f array =
-    concat (map f array)
+concatMap fn array =
+    let
+        helper next acc =
+            append acc (fn next)
+    in
+        foldl helper empty array
 
 
 {-| Get a sub-section of an array: `(slice start end array)`. The `start` is a

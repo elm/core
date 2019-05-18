@@ -4,7 +4,7 @@ import Array exposing (..)
 import Basics exposing (..)
 import List exposing ((::))
 import Maybe
-import Test exposing (..)
+import Test exposing (Test, describe, test, fuzz, fuzz2)
 import Fuzz exposing (Fuzzer, intRange)
 import Expect
 
@@ -245,6 +245,17 @@ transformTests =
             \s1 s2 ->
                 append (initialize s1 identity) (initialize s2 ((+) s1))
                     |> Expect.equal (initialize (s1 + s2) identity)
+        , fuzz (intRange 1 10) "concat" <|
+            \size ->
+                Expect.equalLists
+                    (List.concat <| List.map List.singleton <| List.range 0 size)
+                    (toList <| concat <| map singleton <| initialize (size + 1) identity)
+        , fuzz (intRange 1 10) "concatMap" <|
+            \size ->
+                Expect.equalLists
+                    (List.concatMap List.singleton <| List.range 0 size)
+                    (toList <| concatMap singleton <| initialize (size + 1) identity)
+
         ]
 
 
