@@ -151,11 +151,12 @@ var _JsArray_appendN = F3(function(n, dest, source)
 });
 
 var _JsArray_fromFold = F2(function(fold, container) {
-    return A3(fold, foldHelper, [], container);
+    return A3(fold, _JsArray_foldHelper, [], container);
 });
 
 var _JsArray_foldHelper = F2(function(val, arr) {
-    return arr.push(val);
+    arr.push(val);
+    return arr;
 });
 
 var _JsArray_sortByFromFold = F3(function(fold, f, container) {
