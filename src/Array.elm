@@ -9,6 +9,9 @@ module Array
         , repeat
         , fromList
         , get
+        , member
+        , all
+        , any
         , set
         , update
         , push
