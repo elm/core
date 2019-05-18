@@ -19,6 +19,7 @@ tests =
         , conversionTests
         , transformTests
         , sliceTests
+        , sortTests
         , runtimeCrashTests
         ]
 
@@ -195,6 +196,10 @@ transformTests =
             \size ->
                 toList (filter (\a -> modBy 2 a == 0) (initialize size identity))
                     |> Expect.equal (List.filter (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
+        , fuzz defaultSizeRange "filterMap" <|
+            \size ->
+                toList (filterMap (\a -> if modBy 2 a == 0 then Just a else Nothing) (initialize size identity))
+                    |> Expect.equal (List.filter (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
         , fuzz defaultSizeRange "map" <|
             \size ->
                 map ((+) 1) (initialize size identity)
@@ -269,6 +274,40 @@ sliceTests =
                         |> Array.slice 0 1
                         |> Expect.equal (Array.repeat 1 1)
             ]
+
+
+sortTests : Test
+sortTests =
+    describe "Sort"
+        [ fuzz (Fuzz.list Fuzz.int) "Should do the same as List.sort" <|
+              \list ->
+                  list
+                      |> Array.fromList
+                      |> Array.sort
+                      |> Array.toList
+                      |> Expect.equal (List.sort list)
+        , fuzz (Fuzz.list Fuzz.int) "Should do the same as List.sortBy" <|
+              \list ->
+                  list
+                      |> Array.fromList
+                      |> Array.sortBy (\num -> num * -1)
+                      |> Array.toList
+                      |> Expect.equal (List.sortBy (\num -> num * -1) list)
+        , fuzz (Fuzz.list Fuzz.int) "Should do the same as List.sortWith" <|
+            \list ->
+                let
+                    reverseCompare num1 num2 =
+                        case compare num1 num2 of
+                            LT -> GT
+                            EQ -> EQ
+                            GT -> LT
+                in
+                    list
+                        |> Array.fromList
+                        |> Array.sortWith reverseCompare
+                        |> Array.toList
+                        |> Expect.equal (List.sortWith reverseCompare list)
+        ]
 
 
 runtimeCrashTests : Test

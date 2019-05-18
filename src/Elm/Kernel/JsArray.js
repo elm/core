@@ -160,7 +160,7 @@ var _JsArray_foldHelper = F2(function(val, arr) {
 });
 
 var _JsArray_sortByFromFold = F3(function(fold, f, container) {
-    var arr = A3(fold, foldHelper, [], container);
+    var arr = A3(fold, _JsArray_foldHelper, [], container);
     arr.sort(function(a, b) {
         return __Utils_cmp(f(a), f(b));
     });
@@ -168,7 +168,7 @@ var _JsArray_sortByFromFold = F3(function(fold, f, container) {
 });
 
 var _JsArray_sortWithFromFold = F3(function(fold, f, container) {
-    var arr = A3(fold, foldHelper, [], container);
+    var arr = A3(fold, _JsArray_foldHelper, [], container);
     arr.sort(function(a, b) {
 	var ord = A2(f, a, b);
 	return ord === __Basics_EQ ? 0 : ord === __Basics_LT ? -1 : 1;
