@@ -782,8 +782,8 @@ indexedMap func (Array_elm_builtin len _ tree tail) =
 -}
 append : Array a -> Array a -> Array a
 append ((Array_elm_builtin _ _ _ aTail) as a) (Array_elm_builtin bLen _ bTree bTail) =
-    -- The magic number 4 has been found with benchmarks
-    if bLen <= (branchFactor * 4) then
+    -- The magic number 2 has been found with benchmarks
+    if bLen <= (branchFactor * 2) then
         let
             foldHelper node array =
                 case node of
