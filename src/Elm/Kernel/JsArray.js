@@ -1,7 +1,8 @@
 /*
 
-import Basics exposing (EQ, LT, Nothing, Just)
+import Basics exposing (EQ, LT)
 import Elm.Kernel.Utils exposing (Tuple2, cmp)
+import Maybe exposing (Just, Nothing)
 
 */
 
@@ -184,10 +185,10 @@ var _JsArray_sortWithFromFold = F3(function(fold, f, container) {
 var _JsArray_find = F2(function(pred, arr) {
     for (var i = 0, length = arr.length; i < length; i++) {
         var result = pred(arr[i]);
-        if (result !== __Basics_Nothing) {
+        if (result !== __Maybe_Nothing) {
             return result;
         }
     }
 
-    return __Basics_Nothing;
+    return __Maybe_Nothing;
 });
