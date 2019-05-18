@@ -52,14 +52,7 @@ var _JsArray_unsafeGet = F2(function(index, array)
 
 var _JsArray_unsafeSet = F3(function(index, value, array)
 {
-    var length = array.length;
-    var result = new Array(length);
-
-    for (var i = 0; i < length; i++)
-    {
-        result[i] = array[i];
-    }
-
+    var result = array.slice(0);
     result[index] = value;
     return result;
 });
@@ -134,15 +127,15 @@ var _JsArray_slice = F3(function(from, to, array)
 var _JsArray_appendN = F3(function(n, dest, source)
 {
     var destLen = dest.length;
-    var itemsToCopy = n - destLen;
+    var sourceLen = source.length;
 
-    if (itemsToCopy > source.length)
+    var itemsToCopy = n - destLen;
+    if (itemsToCopy > sourceLen)
     {
-        itemsToCopy = source.length;
+        itemsToCopy = sourceLen;
     }
 
-    var size = destLen + itemsToCopy;
-    var result = new Array(size);
+    var result = new Array(destLen + itemsToCopy);
 
     for (var i = 0; i < destLen; i++)
     {
