@@ -745,28 +745,35 @@ indexedMap func (Array_elm_builtin len _ tree tail) =
         helper node builder =
             case node of
                 SubTree subTree ->
-                    JsArray.foldl helper builder subTree
+                    JsArray.foldr helper builder subTree
 
                 Leaf leaf ->
                     let
                         offset =
-                            builder.nodeListSize * branchFactor
+                            (builder.nodeListSize - 1) * branchFactor
 
                         mappedLeaf =
                             Leaf <| JsArray.indexedMap func offset leaf
                     in
                         { tail = builder.tail
                         , nodeList = mappedLeaf :: builder.nodeList
-                        , nodeListSize = builder.nodeListSize + 1
+                        , nodeListSize = builder.nodeListSize - 1
                         }
 
         initialBuilder =
             { tail = JsArray.indexedMap func (tailIndex len) tail
             , nodeList = []
-            , nodeListSize = 0
+            , nodeListSize = (len // 32)
             }
+
+        firstPass =
+            JsArray.foldr helper initialBuilder tree
     in
-        builderToArray True (JsArray.foldl helper initialBuilder tree)
+        builderToArray False
+            { tail = firstPass.tail
+            , nodeList = firstPass.nodeList
+            , nodeListSize = (len // 32)
+            }
 
 
 {-| Append two arrays to a new one.
