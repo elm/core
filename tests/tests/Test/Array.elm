@@ -16,6 +16,7 @@ tests =
         , isEmptyTests
         , lengthTests
         , getSetTests
+        , queryTests
         , conversionTests
         , transformTests
         , sliceTests
@@ -163,6 +164,26 @@ getSetTests =
         ]
 
 
+queryTests : Test
+queryTests =
+    describe "Query"
+        [ fuzz (Fuzz.list Fuzz.int) "member" <|
+              \list ->
+                  Expect.equal
+                      (List.member 3 list)
+                      (Array.member 3 (Array.fromList list))
+        , fuzz (Fuzz.list Fuzz.int) "any" <|
+              \list ->
+                  Expect.equal
+                      (List.any ((==) 3) list)
+                      (Array.any ((==) 3) (Array.fromList list))
+        , fuzz (Fuzz.list Fuzz.int) "all" <|
+              \list ->
+                  Expect.equal
+                      (List.all ((<) 3) list)
+                      (Array.all ((<) 3) (Array.fromList list))
+        ]
+
 conversionTests : Test
 conversionTests =
     describe "Conversion"
@@ -200,6 +221,10 @@ transformTests =
             \size ->
                 toList (filterMap (\a -> if modBy 2 a == 0 then Just a else Nothing) (initialize size identity))
                     |> Expect.equal (List.filter (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
+        , fuzz defaultSizeRange "partition" <|
+            \size ->
+                Tuple.mapBoth toList toList (partition (\a -> modBy 2 a == 0) (initialize size identity))
+                    |> Expect.equal (List.partition (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
         , fuzz defaultSizeRange "map" <|
             \size ->
                 map ((+) 1) (initialize size identity)
