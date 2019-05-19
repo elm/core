@@ -501,7 +501,7 @@ insertTailInTree shift index tail tree =
             Bitwise.and bitMask <| Bitwise.shiftRightZfBy shift index
     in
         if pos >= JsArray.length tree then
-            if shift == 5 then
+            if shift == shiftStep then
                 JsArray.push (Leaf tail) tree
             else
                 let
