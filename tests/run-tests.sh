@@ -67,4 +67,4 @@ echo;
 echo "running tests ...";
 echo;
 
-"${ELM_TEST}" tests/Main.elm $@;
+"${ELM_TEST}" tests/Main.elm "$@";
