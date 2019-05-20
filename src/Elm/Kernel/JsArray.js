@@ -3,6 +3,7 @@
 import Basics exposing (EQ, LT)
 import Elm.Kernel.Utils exposing (Tuple2, cmp)
 import Maybe exposing (Just, Nothing)
+import Array exposing (foldLeaves)
 
 */
 
@@ -150,30 +151,36 @@ var _JsArray_appendN = F3(function(n, dest, source)
     return result;
 });
 
-var _JsArray_fromFold = F2(function(fold, container) {
-    return A3(fold, _JsArray_foldHelper, [], container);
-});
+var _JsArray_sortBy = F2(function(f, container) {
+    var arr = A3(__Array_foldLeaves, _JsArray_foldHelper, [], container);
 
-var _JsArray_foldHelper = F2(function(val, arr) {
-    arr.push(val);
-    return arr;
-});
-
-var _JsArray_sortByFromFold = F3(function(fold, f, container) {
-    var arr = A3(fold, _JsArray_foldHelper, [], container);
     arr.sort(function(a, b) {
         return __Utils_cmp(f(a), f(b));
     });
+
     return arr;
 });
 
-var _JsArray_sortWithFromFold = F3(function(fold, f, container) {
-    var arr = A3(fold, _JsArray_foldHelper, [], container);
+var _JsArray_sortWith = F2(function(f, container) {
+    var arr = A3(__Array_foldLeaves, _JsArray_foldHelper, [], container);
+
     arr.sort(function(a, b) {
 	var ord = A2(f, a, b);
 	return ord === __Basics_EQ ? 0 : ord === __Basics_LT ? -1 : 1;
     });
+
     return arr;
+});
+
+var _JsArray_foldHelper = F2(function(leaf, acc) {
+    var leafLength = leaf.length;
+    var accLength = acc.length;
+
+    for (var i = 0; i < leafLength; i++) {
+        acc[accLength + i] = leaf[i];
+    }
+
+    return acc;
 });
 
 var _JsArray_find = F2(function(pred, arr) {

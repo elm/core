@@ -1289,7 +1289,7 @@ sort array =
 -}
 sortBy : (a -> comparable) -> Array a -> Array a
 sortBy by array =
-    initializeFromJsArray (JsArray.sortByFromFold foldl by array)
+    initializeFromJsArray (JsArray.sortBy by array)
 
 
 {-| Sort values with a custom comparison function.
@@ -1307,7 +1307,23 @@ to define any other: `sort == sortWith compare`
 -}
 sortWith : (a -> a -> Order) -> Array a -> Array a
 sortWith with array =
-    initializeFromJsArray (JsArray.sortWithFromFold foldl with array)
+    initializeFromJsArray (JsArray.sortWith with array)
+
+
+{-| Helper function for JsArray.{sortBy, sortWith}
+-}
+foldLeaves : (JsArray a -> JsArray a -> JsArray a) -> JsArray a -> Array a -> JsArray a
+foldLeaves fn jsArray (Array_elm_builtin len _ tree tail) =
+    let
+        helper node acc =
+            case node of
+                SubTree subTree ->
+                    JsArray.foldl helper acc subTree
+
+                Leaf leaf ->
+                    fn leaf acc
+    in
+        fn tail (JsArray.foldl helper jsArray tree)
 
 
 {-| A builder contains all information necessary to build an array. Adding

@@ -6,7 +6,6 @@ module Elm.JsArray
         , length
         , initialize
         , initializeFromList
-        , fromFold
         , unsafeGet
         , unsafeSet
         , push
@@ -16,8 +15,8 @@ module Elm.JsArray
         , indexedMap
         , slice
         , appendN
-        , sortByFromFold
-        , sortWithFromFold
+        , sortBy
+        , sortWith
         , find
         )
 
@@ -102,16 +101,6 @@ reasonably small value.
 initializeFromList : Int -> List a -> ( JsArray a, List a )
 initializeFromList =
     Elm.Kernel.JsArray.initializeFromList
-
-
-{-| Creates an array based on a fold function. This allows creating an array from
-any kind of data structure, as long as it's foldable.
-
-    fromFold List.foldl someList == (fromList someList)
--}
-fromFold : ((a -> b -> b) -> b -> c -> b) -> c -> b
-fromFold =
-    Elm.Kernel.JsArray.fromFold
 
 
 {-| Returns the element at the given index.
@@ -201,17 +190,18 @@ appendN =
 {-| Creates an array based on a fold function. The resulting array will be sorted
 by a derived property.
 -}
-sortByFromFold : ((a -> JsArray a -> JsArray a) -> JsArray a -> c -> JsArray a) -> (a -> comparable) -> c -> JsArray a
-sortByFromFold =
-    Elm.Kernel.JsArray.sortByFromFold
+sortBy : (a -> comparable) -> c -> JsArray a
+sortBy =
+    Elm.Kernel.JsArray.sortBy
 
 
 {-| Creates an array based on a fold function. The resulting array will be sorted
 using the provided comparison function.
 -}
-sortWithFromFold : ((a -> JsArray a -> JsArray a) -> JsArray a -> c -> JsArray a) -> (a -> a -> Order) -> c -> JsArray a
-sortWithFromFold =
-    Elm.Kernel.JsArray.sortWithFromFold
+sortWith : (a -> a -> Order) -> c -> JsArray a
+sortWith =
+    Elm.Kernel.JsArray.sortWith
+
 
 {-| Returns the first element which passes the provided predicate function. Returns `Nothing` if no element
 passes the predicate function.
