@@ -1233,12 +1233,12 @@ left n array =
     right 2 (fromList [1,2,3,4,5]) == (fromList [4,5])
 -}
 right : Int -> Array a -> Array a
-right n array =
+right n ((Array_elm_builtin len _ _ _) as array) =
     if n < 1 then
         empty
 
     else
-        slice -n (length array) array
+        slice -n len array
 
 
 {-| Drop *n* elements from the left side of an array.
@@ -1246,12 +1246,12 @@ right n array =
     dropLeft 2 (fromList [1,2,3,4,5]) == (fromList [3,4,5])
 -}
 dropLeft : Int -> Array a -> Array a
-dropLeft n array =
+dropLeft n ((Array_elm_builtin len _ _ _) as array) =
     if n < 1 then
         array
 
     else
-        slice n (length array) array
+        slice n len array
 
 
 {-| Drop *n* elements from the right side of an array.
