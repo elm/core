@@ -43,6 +43,9 @@ initTests =
             \size ->
                 List.foldl push empty (List.range 0 (size - 1))
                     |> Expect.equal (initialize size identity)
+        , test "singleton" <|
+            \() ->
+                Expect.equal (singleton 1) (push 1 empty)
         , test "initialize non-identity" <|
             \() ->
                 toList (initialize 4 (\n -> n * n))
@@ -75,6 +78,10 @@ isEmptyTests =
         , test "non-empty array" <|
             \() ->
                 isEmpty (fromList [ 1 ])
+                    |> Expect.equal False
+        , test "singleton" <|
+            \() ->
+                isEmpty (singleton 1)
                     |> Expect.equal False
         ]
 
