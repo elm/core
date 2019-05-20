@@ -287,11 +287,11 @@ sliceTests =
             fromList (List.range 1 8)
     in
         describe "Slice"
-            [ fuzz2 (intRange -50 -1) (intRange 100 33000) "both" <|
+            [ fuzz2 (intRange -50 -1) (intRange 100 33000) "both sides" <|
                 \n size ->
                     slice (abs n) n (initialize size identity)
                         |> Expect.equal (initialize (size + n + n) (\idx -> idx - n))
-            , fuzz2 (intRange -50 -1) (intRange 100 33000) "left" <|
+            , fuzz2 (intRange -50 -1) (intRange 100 33000) "from left" <|
                 \n size ->
                     let
                         arr =
@@ -299,7 +299,7 @@ sliceTests =
                     in
                         slice (abs n) (length arr) arr
                             |> Expect.equal (initialize (size + n) (\idx -> idx - n))
-            , fuzz2 (intRange -50 -1) (intRange 100 33000) "right" <|
+            , fuzz2 (intRange -50 -1) (intRange 100 33000) "from right" <|
                 \n size ->
                     slice 0 n (initialize size identity)
                         |> Expect.equal (initialize (size + n) identity)
@@ -321,6 +321,26 @@ sliceTests =
                 \() ->
                     toList (slice -5 -2 smallSample)
                         |> Expect.equal (List.range 4 6)
+            , test "left" <|
+                \() ->
+                    Expect.equal
+                        (fromList [1,2])
+                        (left 2 (fromList [1,2,3,4,5]))
+            , test "right" <|
+                \() ->
+                    Expect.equal
+                        (fromList [4,5])
+                        (right 2 (fromList [1,2,3,4,5]))
+            , test "dropLeft" <|
+                \() ->
+                    Expect.equal
+                        (fromList [3,4,5])
+                        (dropLeft 2 (fromList [1,2,3,4,5]))
+            , test "dropRight" <|
+                \() ->
+                    Expect.equal
+                        (fromList [1,2,3])
+                        (dropRight 2 (fromList [1,2,3,4,5]))
             , test "impossible" <|
                 \() ->
                     toList (slice -1 -2 smallSample)
