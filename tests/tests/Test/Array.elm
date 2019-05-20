@@ -4,8 +4,8 @@ import Array exposing (..)
 import Basics exposing (..)
 import List exposing ((::))
 import Maybe
-import Test exposing (Test, describe, test, fuzz, fuzz2)
-import Fuzz exposing (Fuzzer, intRange)
+import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
+import Fuzz exposing (Fuzzer, int, intRange)
 import Expect
 
 
@@ -167,17 +167,17 @@ getSetTests =
 queryTests : Test
 queryTests =
     describe "Query"
-        [ fuzz (Fuzz.list Fuzz.int) "member" <|
+        [ fuzz (Fuzz.list int) "member" <|
               \list ->
                   Expect.equal
                       (List.member 3 list)
                       (Array.member 3 (Array.fromList list))
-        , fuzz (Fuzz.list Fuzz.int) "any" <|
+        , fuzz (Fuzz.list int) "any" <|
               \list ->
                   Expect.equal
                       (List.any ((==) 3) list)
                       (Array.any ((==) 3) (Array.fromList list))
-        , fuzz (Fuzz.list Fuzz.int) "all" <|
+        , fuzz (Fuzz.list int) "all" <|
               \list ->
                   Expect.equal
                       (List.all ((<) 3) list)
@@ -255,7 +255,21 @@ transformTests =
                 Expect.equalLists
                     (List.concatMap List.singleton <| List.range 0 size)
                     (toList <| concatMap singleton <| initialize (size + 1) identity)
-
+        , fuzz2 (Fuzz.list int) (Fuzz.list int) "map2" <|
+              \list1 list2 ->
+                  Expect.equalLists
+                      (List.map2 Tuple.pair list1 list2)
+                      (toList (map2 Tuple.pair (fromList list1) (fromList list2)))
+        , fuzz3 (Fuzz.list int) (Fuzz.list int) (Fuzz.list int) "map3" <|
+              \list1 list2 list3 ->
+                  Expect.equalLists
+                      (List.map3 (\a b c -> (a,b,c)) list1 list2 list3)
+                      (toList (map3 (\a b c -> (a,b,c)) (fromList list1) (fromList list2) (fromList list3)))
+        , fuzz (Fuzz.list int) "intersperse" <|
+              \list ->
+                  Expect.equalLists
+                      (List.intersperse 0 list)
+                      (toList (intersperse 0 (fromList list)))
         ]
 
 

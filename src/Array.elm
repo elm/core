@@ -27,6 +27,9 @@ module Array
         , append
         , concat
         , concatMap
+        , map2
+        , map3
+        , intersperse
         , slice
         , left
         , right
@@ -53,7 +56,7 @@ module Array
 @docs set, update, push
 
 # Combine
-@docs append, concat, concatMap
+@docs append, concat, concatMap, map2, map3, intersperse
 
 # Subarrays
 @docs slice, left, right, dropLeft, dropRight, pop
@@ -733,6 +736,100 @@ map func (Array_elm_builtin len startShift tree tail) =
             startShift
             (JsArray.map helper tree)
             (JsArray.map func tail)
+
+
+{-| Combine two arrays using the given function.
+If one array is longer, the extra elements are dropped.
+
+    totals : Array Int -> Array Int -> Array Int
+    totals xs ys =
+      Array.map2 (+) xs ys
+
+    -- totals (fromList [1,2,3]) (fromList [4,5,6]) == (fromList [5,7,9])
+
+    pairs : Array a -> Array b -> Array (a,b)
+    pairs xs ys =
+      Array.map2 Tuple.pair xs ys
+
+    -- pairs (fromList ["alice","bob","chuck"]) (fromList [2,5,7,8])
+    --   == (fromList [("alice",2),("bob",5),("chuck",7)])
+
+-}
+map2 : (a -> b -> result) -> Array a -> Array b -> Array result
+map2 fn arrayA arrayB =
+    let
+        aLength =
+            length arrayA
+
+        bLength =
+            length arrayB
+
+        minLength =
+            min aLength bLength
+
+        sizedA =
+            if aLength /= minLength then
+                slice 0 minLength arrayA
+            else
+                arrayA
+
+        sizedB =
+            if bLength /= minLength then
+                slice 0 minLength arrayB
+            else
+                arrayB
+    in
+        fromList (List.map2 fn (toList sizedA) (toList sizedB))
+
+
+{-|-}
+map3 : (a -> b -> c -> result) -> Array a -> Array b -> Array c -> Array result
+map3 fn arrayA arrayB arrayC =
+    let
+        aLength =
+            length arrayA
+
+        bLength =
+            length arrayB
+
+        cLength =
+            length arrayC
+
+        minLength =
+            min aLength (min bLength cLength)
+
+        sizedA =
+            if aLength /= minLength then
+                slice 0 minLength arrayA
+            else
+                arrayA
+
+        sizedB =
+            if bLength /= minLength then
+                slice 0 minLength arrayB
+            else
+                arrayB
+
+        sizedC =
+            if cLength /= minLength then
+                slice 0 minLength arrayC
+            else
+                arrayC
+    in
+        fromList (List.map3 fn (toList sizedA) (toList sizedB) (toList sizedC))
+
+
+{-| Places the given value between all members of the given array.
+
+    intersperse "on" (fromArray ["turtles","turtles","turtles"]) == (fromList ["turtles","on","turtles","on","turtles"])
+-}
+intersperse : a -> Array a -> Array a
+intersperse sep array =
+    let
+        helper val ls =
+            val :: sep :: ls
+    in
+        dropRight 1 (fromList (foldr helper [] array))
 
 
 {-| Apply a function on every element with its index as first argument.
