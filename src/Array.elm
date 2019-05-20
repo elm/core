@@ -35,7 +35,6 @@ module Array
         , right
         , dropLeft
         , dropRight
-        , pop
         , sort
         , sortBy
         , sortWith
@@ -59,7 +58,7 @@ module Array
 @docs append, concat, concatMap, map2, map3, intersperse
 
 # Subarrays
-@docs slice, left, right, dropLeft, dropRight, pop
+@docs slice, left, right, dropLeft, dropRight
 
 # Lists
 @docs toList, toIndexedList
@@ -1001,8 +1000,6 @@ the end of the array.
     slice  1 -1 (fromList [0,1,2,3,4]) == fromList [1,2,3]
     slice -2  5 (fromList [0,1,2,3,4]) == fromList [3,4]
 
-This makes it pretty easy to `pop` the last element off of an array:
-`slice 0 -1 array`
 -}
 slice : Int -> Int -> Array a -> Array a
 slice from to array =
@@ -1268,15 +1265,6 @@ dropRight n array =
 
     else
         slice 0 -n array
-
-
-{-| Returns the array without the last element.
-
-    pop (fromList [1,2,3]) == (fromList [1,2])
--}
-pop : Array a -> Array a
-pop array =
-    slice 0 -1 array
 
 
 {-| Sort values from lowest to highest
