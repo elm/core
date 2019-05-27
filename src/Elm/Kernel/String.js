@@ -37,26 +37,26 @@ function _String_length(str)
 var _String_map = F2(function(func, string)
 {
 	var len = string.length;
-	var array = new Array(len);
+	var result = '';
 	var i = 0;
 	while (i < len)
 	{
 		var word = string.charCodeAt(i);
 		if (0xD800 <= word && word <= 0xDBFF)
 		{
-			array[i] = func(__Utils_chr(string[i] + string[i+1]));
+			result += func(__Utils_chr(string[i] + string[i+1]));
 			i += 2;
 			continue;
 		}
-		array[i] = func(__Utils_chr(string[i]));
+		result += func(__Utils_chr(string[i]));
 		i++;
 	}
-	return array.join('');
+	return result;
 });
 
 var _String_filter = F2(function(isGood, str)
 {
-	var arr = [];
+	var result = '';
 	var len = str.length;
 	var i = 0;
 	while (i < len)
@@ -72,10 +72,10 @@ var _String_filter = F2(function(isGood, str)
 
 		if (isGood(__Utils_chr(char)))
 		{
-			arr.push(char);
+			result += char;
 		}
 	}
-	return arr.join('');
+	return result;
 });
 
 function _String_reverse(str)
