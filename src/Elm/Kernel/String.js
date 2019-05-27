@@ -80,26 +80,20 @@ var _String_filter = F2(function(isGood, str)
 
 function _String_reverse(str)
 {
-	var len = str.length;
-	var arr = new Array(len);
-	var i = 0;
-	while (i < len)
+	var result = '';
+	var i = str.length;
+	while (i--)
 	{
+		var char = str[i];
 		var word = str.charCodeAt(i);
-		if (0xD800 <= word && word <= 0xDBFF)
+		if (0xDC00 <= word && word <= 0xDFFF)
 		{
-			arr[len - i] = str[i + 1];
-			i++;
-			arr[len - i] = str[i - 1];
-			i++;
+			i--;
+			char = str[i] + char;
 		}
-		else
-		{
-			arr[len - i] = str[i];
-			i++;
-		}
+		result += char;
 	}
-	return arr.join('');
+	return result;
 }
 
 var _String_foldl = F3(function(func, state, string)
