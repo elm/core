@@ -612,9 +612,21 @@ e =
 -- ANGLES
 
 
-{-| Convert radians to standard Elm angles (radians).
+{-| Represent radians as standard Elm angles (radians).
 
     radians pi == 3.141592653589793
+
+    **Note:** Unlike the other angle functions, [`radians`](#radians) does not
+perform a conversion since the output, a `Float` representing radians, is the
+same as the input. Despite merely returning its input, the [`radians`](#radians)
+function is still useful: it adds semantics to angle values. For example:
+
+    angle = radians 3.14
+    angle = degrees 180
+
+is more meaningful than:
+
+    angle = 3.14
 -}
 radians : Float -> Float
 radians angleInRadians =
