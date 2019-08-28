@@ -480,7 +480,7 @@ xor =
 -- APPEND
 
 
-{-| Put two appendable things together. This includes strings, lists, and text.
+{-| Put two appendable things together. This includes strings and lists.
 
     "hello" ++ "world" == "helloworld"
     [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
