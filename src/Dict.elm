@@ -510,11 +510,11 @@ map func dict =
 
     import Dict exposing (Dict)
 
-    getAges : Dict String User -> List String
+    getAges : Dict String User -> List Int
     getAges users =
       Dict.foldl addAge [] users
 
-    addAge : String -> User -> List String -> List String
+    addAge : String -> User -> List Int -> List Int
     addAge _ user ages =
       user.age :: ages
 
@@ -534,11 +534,11 @@ foldl func acc dict =
 
     import Dict exposing (Dict)
 
-    getAges : Dict String User -> List String
+    getAges : Dict String User -> List Int
     getAges users =
       Dict.foldr addAge [] users
 
-    addAge : String -> User -> List String -> List String
+    addAge : String -> User -> List Int -> List Int
     addAge _ user ages =
       user.age :: ages
 
