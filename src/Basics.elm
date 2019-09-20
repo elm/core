@@ -190,7 +190,14 @@ mul =
 
 {-| Floating-point division:
 
-    3.14 / 2 == 1.57
+    10 / 4 == 2.5
+    11 / 4 == 2.75
+    12 / 4 == 3
+    13 / 4 == 3.25
+    14 / 4 == 3.5
+
+    -1 / 4 == -0.25
+    -5 / 4 == -1.25
 
 -}
 fdiv : Float -> Float -> Float
@@ -200,9 +207,20 @@ fdiv =
 
 {-| Integer division:
 
-    3 // 2 == 1
+    10 // 4 == 2
+    11 // 4 == 2
+    12 // 4 == 3
+    13 // 4 == 3
+    14 // 4 == 3
 
-Notice that the remainder is discarded.
+    -1 // 4 == 0
+    -5 // 4 == -1
+
+Notice that the remainder is discarded, so `3 // 4` is giving output
+similar to `truncate (3 / 4)`.
+
+It may sometimes be useful to pair this with the [`remainderBy`](#remainderBy)
+function.
 -}
 idiv : Int -> Int -> Int
 idiv =
