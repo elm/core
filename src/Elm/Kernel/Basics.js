@@ -53,6 +53,7 @@ var _Basics_floor = Math.floor;
 var _Basics_round = Math.round;
 var _Basics_sqrt = Math.sqrt;
 var _Basics_log = Math.log;
+var _Basics_log10 = Math.log10;
 var _Basics_isNaN = isNaN;
 
 
