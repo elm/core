@@ -31,16 +31,16 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return true;
 	}
 
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
 	if (typeof x !== 'object' || x === null || y === null)
 	{
 		typeof x === 'function' && __Debug_crash(5);
 		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
 	}
 
 	/**__DEBUG/
