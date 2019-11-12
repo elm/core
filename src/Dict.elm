@@ -5,6 +5,7 @@ module Dict exposing
   , keys, values, toList, fromList
   , map, foldl, foldr, filter, partition
   , union, intersect, diff, merge
+  , divideAndConquer
   )
 
 {-| A dictionary mapping unique keys to values. The keys can be any comparable
@@ -31,6 +32,8 @@ Insert, remove, and query operations all take *O(log n)* time.
 # Combine
 @docs union, intersect, diff, merge
 
+# Advanced
+@docs divideAndConquer
 -}
 
 
@@ -608,3 +611,32 @@ toList dict =
 fromList : List (comparable,v) -> Dict comparable v
 fromList assocs =
   List.foldl (\(key,value) dict -> insert key value dict) empty assocs
+
+
+{-| Advanced function:
+
+This helper is for advanced use cases.  In particular, it can
+help you write divide-and-conquer algorithms for Dicts, when normally
+you might have to traverse the entire dictionary just to find a
+contiguous subset of keys.
+
+Obviously, this is not a replacement for simple things like `get`
+that already provided by the library.
+
+For a non-empty dict, this returns a (k, v) pair
+and then a tuple of two dictionaries (left, right):
+
+- left: all keys < k
+- right: all keys > k
+
+For empty dictionaries, it returns `( Nothing, (empty, empty) )`).
+-}
+
+divideAndConquer : Dict comparable v -> ( Maybe (comparable, v), ( Dict comparable v,  Dict comparable v ) )
+divideAndConquer dict =
+    case dict of
+        RBEmpty_elm_builtin ->
+            ( Nothing, (empty, empty) )
+
+        RBNode_elm_builtin _ k v left right ->
+            ( Just (k, v), (left, right) )
