@@ -1,9 +1,10 @@
 module Test.Equality exposing (tests)
 
 import Basics exposing (..)
+import Expect
+import Fuzz
 import Maybe exposing (..)
 import Test exposing (..)
-import Expect
 
 
 type Different
@@ -30,5 +31,14 @@ tests =
                 , test "ctor diff" <| \() -> Expect.equal True ({ field = Just 3 } /= { field = Nothing })
                 , test "ctor diff, special case" <| \() -> Expect.equal True ({ ctor = Just 3 } /= { ctor = Nothing })
                 ]
+
+        listTests =
+            describe "List equality"
+                [ fuzz2 (Fuzz.intRange 100 10000) (Fuzz.intRange 100 10000) "Simple comparison" <|
+                    \size1 size2 ->
+                        Expect.equal
+                            (size1 == size2)
+                            (List.range 0 size1 == List.range 0 size2)
+                ]
     in
-        describe "Equality Tests" [ diffTests, recordTests ]
+        describe "Equality Tests" [ diffTests, recordTests, listTests ]

@@ -26,12 +26,6 @@ function _Utils_eq(x, y)
 
 function _Utils_eqHelp(x, y, depth, stack)
 {
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
 	if (x === y)
 	{
 		return true;
@@ -41,6 +35,12 @@ function _Utils_eqHelp(x, y, depth, stack)
 	{
 		typeof x === 'function' && __Debug_crash(5);
 		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
 	}
 
 	/**__DEBUG/
