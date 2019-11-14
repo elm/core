@@ -44,8 +44,8 @@ echo "seeding framework for test dependencies ...";
 # clear out the copy of elm-core fetched by the above and replace it
 # with the local source code we want to actually test
 
-VERSION_DIR="$(ls ${ELM_HOME}/0.19.0/package/elm/core/)"
-CORE_PACKAGE_DIR="${ELM_HOME}/0.19.0/package/elm/core/$VERSION_DIR"
+VERSION_DIR="$(ls ${ELM_HOME}/0.19.1/packages/elm/core/)"
+CORE_PACKAGE_DIR="${ELM_HOME}/0.19.1/packages/elm/core/$VERSION_DIR"
 CORE_GIT_DIR="$(dirname $PWD)"
 
 echo;
@@ -67,4 +67,4 @@ echo;
 echo "running tests ...";
 echo;
 
-"${ELM_TEST}" tests/Main.elm $@;
+"${ELM_TEST}" tests/Main.elm "$@";
