@@ -334,7 +334,7 @@ minimum list =
 
 
 {-| Get the sum of the list elements.
-
+    sum [] == 0
     sum [1,2,3,4] == 10
 -}
 sum : List number -> number
@@ -344,6 +344,7 @@ sum numbers =
 
 {-| Get the product of the list elements.
 
+    product [] == 1
     product [1,2,3,4] == 24
 -}
 product : List number -> number
