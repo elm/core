@@ -507,7 +507,7 @@ sortWith =
     isEmpty [] == True
 
 **Note:** It is usually preferable to use a `case` to test this so you do not
-forget to handle the `(x :: xs)` case as well!
+forget to handle the `(x :: xs)` (non-empty list) case as well!
 -}
 isEmpty : List a -> Bool
 isEmpty xs =
