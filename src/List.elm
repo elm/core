@@ -129,6 +129,10 @@ map f xs =
 element (starting at zero).
 
     indexedMap Tuple.pair ["Tom","Sue","Bob"] == [ (0,"Tom"), (1,"Sue"), (2,"Bob") ]
+    
+ -| Here is another example:
+ 
+    List.indexedMap ( \index_no element -> index_no * element ) [0,1,2,3,4,5] == [0,1,4,9,16,25]
 -}
 indexedMap : (Int -> a -> b) -> List a -> List b
 indexedMap f xs =
