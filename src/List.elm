@@ -475,7 +475,7 @@ sort xs =
 
     sortBy String.length ["mouse","cat"] == ["cat","mouse"]
 -}
-sortBy : (a -> comparable) ->  List a -> List a
+sortBy : (a -> comparable) -> List a -> List a
 sortBy =
   Elm.Kernel.List.sortBy
 
@@ -493,7 +493,7 @@ sortBy =
 This is also the most general sort function, allowing you
 to define any other: `sort == sortWith compare`
 -}
-sortWith : (a -> a -> Order) ->  List a -> List a
+sortWith : (a -> a -> Order) -> List a -> List a
 sortWith =
   Elm.Kernel.List.sortWith
 
