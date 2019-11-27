@@ -11,7 +11,7 @@ module Dict exposing
 type. This includes `Int`, `Float`, `Time`, `Char`, `String`, and tuples or
 lists of comparable types.
 
-Insert, remove, and query operations all take *O(log n)* time.
+Insert, update, remove, member, and get operations all take *O(log n)* time.
 
 # Dictionaries
 @docs Dict
