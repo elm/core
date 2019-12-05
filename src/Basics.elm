@@ -329,15 +329,14 @@ union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
 This is not true in languages like JavaScript that use reference equality on
 objects.
 
-**Note:** Equality (in the Elm sense) is not possible for certain types. For
-example, the functions `(\n -> n + 1)` and `(\n -> 1 + n)` are &ldquo;the
-same&rdquo; but detecting this in general is [undecidable][]. In a future
-release, the compiler will detect when `(==)` is used with problematic
-types and provide a helpful error message. This will require quite serious
-infrastructure work that makes sense to batch with another big project, so the
-stopgap is to crash as quickly as possible. Problematic types include functions
-and JavaScript values like `Json.Encode.Value` which could contain functions
-if passed through a port.
+**Note:** This function does not work with functions, JSON values from
+`elm/json`, or regular expressions from `elm/regex`. In most cases, this is
+because equality (in the Elm sense) is prohibatively difficult to compute.
+E.g. proving function equality is [undecidable][] and JSON values may come in
+through ports and have cycles. In a future release, the compiler will detect
+when `(==)` is used with problematic types and provide a helpful error message.
+This will require quite serious infrastructure work that makes sense to batch
+with another big project, so the stopgap is to crash as quickly as possible.
 
 [undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
 -}
