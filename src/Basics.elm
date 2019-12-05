@@ -329,14 +329,19 @@ union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
 This is not true in languages like JavaScript that use reference equality on
 objects.
 
-**Note:** This function does not work with functions, JSON values from
-`elm/json`, or regular expressions from `elm/regex`. In most cases, this is
-because equality (in the Elm sense) is prohibatively difficult to compute.
-E.g. proving function equality is [undecidable][] and JSON values may come in
-through ports and have cycles. In a future release, the compiler will detect
-when `(==)` is used with problematic types and provide a helpful error message.
-This will require quite serious infrastructure work that makes sense to batch
-with another big project, so the stopgap is to crash as quickly as possible.
+**Note:** Do not use `(==)` with functions, JSON values from `elm/json`, or
+regular expressions from `elm/regex`. It does not work. It will crash if
+possible. With JSON values, decode to Elm values before doing any equality
+checks!
+
+Why is it like this? Equality in the Elm sense can be difficult or impossible
+to compute. Proving that functions are the same is [undecidable][], and JSON
+values can come in through ports and have functions, cycles, and new JS data
+types that interact weirdly with our equality implementation. In a future
+release, the compiler will detect when `(==)` is used with problematic types
+and provide a helpful error message at compile time. This will require some
+pretty serious infrastructure work, so the stopgap is to crash as quickly as
+possible.
 
 [undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
 -}
