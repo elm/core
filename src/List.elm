@@ -335,7 +335,10 @@ minimum list =
 
 {-| Get the sum of the list elements.
 
-    sum [1,2,3,4] == 10
+    sum [1,2,3] == 6
+    sum [1,1,1] == 3
+    sum []      == 0
+
 -}
 sum : List number -> number
 sum numbers =
@@ -344,7 +347,10 @@ sum numbers =
 
 {-| Get the product of the list elements.
 
-    product [1,2,3,4] == 24
+    product [2,2,2] == 8
+    product [3,3,3] == 27
+    product []      == 1
+
 -}
 product : List number -> number
 product numbers =
