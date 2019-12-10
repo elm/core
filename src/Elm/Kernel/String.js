@@ -15,7 +15,7 @@ var _String_cons = F2(function(chr, str)
 function _String_uncons(string)
 {
 	var word = string.charCodeAt(0);
-	return word >= 0
+	return !isNaN(word)
 		? __Maybe_Just(
 			0xD800 <= word && word <= 0xDBFF
 				? __Utils_Tuple2(__Utils_chr(string[0] + string[1]), string.slice(2))
