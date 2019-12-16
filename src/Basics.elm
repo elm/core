@@ -230,7 +230,7 @@ similar to `truncate (3 / 4)`.
 It may sometimes be useful to pair this with the [`remainderBy`](#remainderBy)
 function.
 
-Be careful:
+**Be careful:**
 
     4 // 0 == 0
 
@@ -551,7 +551,7 @@ information.
 
 [dm]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
 
-Be careful:
+**Be careful:**
 
     modBy 0 5
 
@@ -576,7 +576,7 @@ information.
 
 [dm]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
 
-Be careful:
+**Be careful:**
 
     remainderBy 0 5 == NaN : Int
 
