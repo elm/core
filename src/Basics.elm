@@ -211,7 +211,7 @@ You'll have to check beforehand wheter the divisor is 0
 fdiv : Float -> Float -> Maybe Float
 fdiv x divisor = case divisor of
     0 -> Nothing
-    y -> Elm.Kernel.Basics.fdiv x y
+    y -> Just <| Elm.Kernel.Basics.fdiv x y
 
 
 {-| Integer division:
@@ -241,7 +241,7 @@ if your divisor is 0.
 idiv : Int -> Int -> Maybe Int
 idiv x divisor = case divisor of
     0 -> Nothing
-    y -> Elm.Kernel.Basics.idiv x y
+    y -> Just <| Elm.Kernel.Basics.idiv x y
 
 
 {-| Exponentiation
@@ -565,7 +565,7 @@ Needless to say, this is a bug!
 modBy : Int -> Int -> Maybe Int
 modBy x divisor = case divisor of
   0 -> Nothing
-  y -> Elm.Kernel.Basics.modBy x y
+  y -> Just <| Elm.Kernel.Basics.modBy x y
 
 
 {-| Get the remainder after division. Here are bunch of examples of dividing by four:
@@ -586,9 +586,10 @@ information.
 This is a bug in Elm and `NaN` isn't a legitimate value.
 You'll have to check beforehand, that the first argument isn't 0.
 -}
-remainderBy : Int -> Int -> Int
-remainderBy =
-  Elm.Kernel.Basics.remainderBy
+remainderBy : Int -> Int -> Maybe Int
+remainderBy x divisor = case divisor of
+    0 -> Nothing
+    y -> Just <| Elm.Kernel.Basics.remainderBy x y
 
 
 {-| Negate a number.
