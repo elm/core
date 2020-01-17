@@ -238,9 +238,10 @@ function.
 This is a bug and you'll have to check before computing the result,
 if your divisor is 0.
 -}
-idiv : Int -> Int -> Int
-idiv =
-  Elm.Kernel.Basics.idiv
+idiv : Int -> Int -> Maybe Int
+idiv x divisor = case divisor of
+    0 -> Nothing
+    y -> Elm.Kernel.Basics.idiv x y
 
 
 {-| Exponentiation
