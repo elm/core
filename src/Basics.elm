@@ -208,9 +208,10 @@ This is a bug and Infinity is not a legitimate value
 in Elm, thus you can't match for it.
 You'll have to check beforehand wheter the divisor is 0
 -}
-fdiv : Float -> Float -> Float
-fdiv =
-  Elm.Kernel.Basics.fdiv
+fdiv : Float -> Float -> Maybe Float
+fdiv x divisor = case divisor of
+    0 -> Nothing
+    y -> Elm.Kernel.Basics.fdiv x y
 
 
 {-| Integer division:
