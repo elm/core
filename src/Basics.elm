@@ -562,9 +562,10 @@ results in a crash, a **runtime exception** of the sort:
 You'll have to check, that the first argument isn't 0.
 Needless to say, this is a bug!
 -}
-modBy : Int -> Int -> Int
-modBy =
-  Elm.Kernel.Basics.modBy
+modBy : Int -> Int -> Maybe Int
+modBy x divisor = case divisor of
+  0 -> Nothing
+  y -> Elm.Kernel.Basics.modBy x y
 
 
 {-| Get the remainder after division. Here are bunch of examples of dividing by four:
