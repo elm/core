@@ -44,9 +44,9 @@ function _Platform_initialize(flagDecoder, args, init, update, subscriptions, st
 
 	function sendToApp(msg, viewMetadata)
 	{
-		var result = A2(update, msg, model);
-		stepper(model = result.a, viewMetadata);
-		_Platform_enqueueEffects(managers, result.b, subscriptions(model));
+		var pair = A2(update, msg, model);
+		stepper(model = pair.a, viewMetadata);
+		_Platform_enqueueEffects(managers, pair.b, subscriptions(model));
 	}
 
 	_Platform_enqueueEffects(managers, result.b, subscriptions(model));
