@@ -184,6 +184,7 @@ concat strings =
 
     split "," "cat,dog,cow"        == ["cat","dog","cow"]
     split "/" "home/evan/Desktop/" == ["home","evan","Desktop", ""]
+    split "," ""                   == [""]
 
 -}
 split : String -> String -> List String
