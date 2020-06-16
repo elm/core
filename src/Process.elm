@@ -13,8 +13,10 @@ module Process exposing
 ## Future Plans
 
 Right now, this library is pretty sparse. For example, there is no public API
-for processes to communicate with each other. This is a really important
-ability, but it is also something that is extraordinarily easy to get wrong!
+for processes to communicate with each other. (To be clear, this means that 
+spawned process can't return a message to the main processs, even upon 
+completion.) This is a really important ability, but it is also something that is
+extraordinarily easy to get wrong!
 
 I think the trend will be towards an Erlang style of concurrency, where every
 process has an “event queue” that anyone can send messages to. I currently
@@ -76,8 +78,8 @@ there.
       |> Task.andThen (\_ -> spawn task2)
 
 **Note:** This creates a relatively restricted kind of `Process` because it
-cannot receive any messages. More flexibility for user-defined processes will
-come in a later release!
+cannot receive any messages, *nor send any back to the main process*. More
+utility for user-defined processes will come in a later release!
 -}
 spawn : Task x a -> Task y Id
 spawn =
@@ -98,7 +100,7 @@ sleep =
 {-| Sometimes you `spawn` a process, but later decide it would be a waste to
 have it keep running and doing stuff. The `kill` function will force a process
 to bail on whatever task it is running. So if there is an HTTP request in
-flight, it will also abort the request.
+flight, it will also abort the request. 
 -}
 kill : Id -> Task x ()
 kill =
