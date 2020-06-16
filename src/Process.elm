@@ -13,8 +13,8 @@ module Process exposing
 ## Future Plans
 
 Right now, this library is pretty sparse. For example, there is no public API
-for processes to communicate with each other. (To be clear, this means that 
-spawned process can't return a message to the main processs, even upon 
+for processes to communicate with each other. (To be clear, this means that a
+spawned process can't ever return a message to the main processs, even upon 
 completion.) This is a really important ability, but it is also something that is
 extraordinarily easy to get wrong!
 
