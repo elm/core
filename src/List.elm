@@ -249,7 +249,17 @@ maybeCons f mx xs =
 -}
 length : List a -> Int
 length xs =
-  foldl (\_ i -> i + 1) 0 xs
+  lengthHelp xs 0
+
+
+lengthHelp : List a -> Int -> Int
+lengthHelp list acc =
+  case list of
+    [] ->
+      acc
+
+    _ :: xs ->
+      lengthHelp xs (acc + 1)
 
 
 {-| Reverse a list.
