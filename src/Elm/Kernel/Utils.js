@@ -63,15 +63,15 @@ function _Utils_eqHelp(x, y, depth, stack)
 		y = __Dict_toList(y);
 	}
 	//*/
-	
+
 	if (typeof DataView === "function" && x instanceof DataView) {
-		let length = x.byteLength;
-		
+		var length = x.byteLength;
+
 		if (y.byteLength !== length) {
 			return false;
 		}
 
-		for (let i = 0; i < length; ++i) {
+		for (var i = 0; i < length; ++i) {
 			if (x.getUint8(i) !== y.getUint8(i)) {
 				return false;
 			}
