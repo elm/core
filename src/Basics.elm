@@ -103,7 +103,7 @@ infix right 9 (>>) = composeR
 
 **Note:** `Int` math is well-defined in the range `-2^31` to `2^31 - 1`. Outside
 of that range, the behavior is determined by the compilation target. When
-generating JavaScript, the safe range expands to `-2^53` to `2^53 - 1` for some
+generating JavaScript, the safe range expands to `-(2^53 - 1)` to `2^53 - 1` for some
 operations, but if we generate WebAssembly some day, we would do the traditional
 [integer overflow][io]. This quirk is necessary to get good performance on
 quirky compilation targets.
