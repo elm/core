@@ -563,6 +563,14 @@ filter isGood dict =
 {-| Partition a dictionary according to some test. The first dictionary
 contains all key-value pairs which passed the test, and the second contains
 the pairs that did not.
+
+    import Dict exposing (Dict)
+    
+    isTeenager : String -> Int -> Bool
+    isTeenager name age = age < 20
+
+    people = Dict.fromList [ ("John", 19), ("Tom", 10), ("Ann", 20) ]
+    Dict.partition isTeenager people == (Dict.fromList [ ("John", 19), ("Tom", 10) ], Dict.fromList [ ("Ann", 20) ])
 -}
 partition : (comparable -> v -> Bool) -> Dict comparable v -> (Dict comparable v, Dict comparable v)
 partition isGood dict =
