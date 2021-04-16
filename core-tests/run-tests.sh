@@ -31,7 +31,7 @@ ln -sv "${CORE_GIT_DIR}" "${CORE_LINK}"
 rm -vf "${CORE_GIT_DIR}"/*.dat "${CORE_GIT_DIR}"/doc*.json
 
 # Now we can run the tests against the symlinked source code for real.
-mkdir -p src/ # needed for compilation
+
 echo;
 echo "running tests ...";
 echo;
