@@ -4,7 +4,7 @@ import Array exposing (toList)
 import Basics exposing (LT, EQ, GT)
 import Dict exposing (toList)
 import Elm.Kernel.Debug exposing (crash)
-import Elm.Kernel.List exposing (Cons, Nil)
+import Elm.Kernel.List exposing (Cons, Nil, ap)
 import Set exposing (toList)
 
 */
@@ -178,16 +178,6 @@ function _Utils_ap(xs, ys)
 		return xs + ys;
 	}
 
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = __List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = __List_Cons(xs.a, ys);
-	}
-	return root;
+        // append Lists
+        return __List_ap(xs, ys);
 }

@@ -70,6 +70,23 @@ var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
 	return _List_fromArray(arr);
 });
 
+var _List_append = F2(_List_ap);
+
+function _List_ap(xs, ys)
+{
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
 var _List_sortBy = F2(function(f, xs)
 {
 	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
