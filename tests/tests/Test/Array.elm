@@ -4,8 +4,8 @@ import Array exposing (..)
 import Basics exposing (..)
 import List exposing ((::))
 import Maybe
-import Test exposing (..)
-import Fuzz exposing (Fuzzer, intRange)
+import Test exposing (Test, describe, test, fuzz, fuzz2, fuzz3)
+import Fuzz exposing (Fuzzer, int, intRange)
 import Expect
 
 
@@ -16,9 +16,11 @@ tests =
         , isEmptyTests
         , lengthTests
         , getSetTests
+        , queryTests
         , conversionTests
         , transformTests
         , sliceTests
+        , sortTests
         , runtimeCrashTests
         ]
 
@@ -41,6 +43,9 @@ initTests =
             \size ->
                 List.foldl push empty (List.range 0 (size - 1))
                     |> Expect.equal (initialize size identity)
+        , test "singleton" <|
+            \() ->
+                Expect.equal (singleton 1) (push 1 empty)
         , test "initialize non-identity" <|
             \() ->
                 toList (initialize 4 (\n -> n * n))
@@ -73,6 +78,10 @@ isEmptyTests =
         , test "non-empty array" <|
             \() ->
                 isEmpty (fromList [ 1 ])
+                    |> Expect.equal False
+        , test "singleton" <|
+            \() ->
+                isEmpty (singleton 1)
                     |> Expect.equal False
         ]
 
@@ -162,6 +171,26 @@ getSetTests =
         ]
 
 
+queryTests : Test
+queryTests =
+    describe "Query"
+        [ fuzz (Fuzz.list int) "member" <|
+              \list ->
+                  Expect.equal
+                      (List.member 3 list)
+                      (Array.member 3 (Array.fromList list))
+        , fuzz (Fuzz.list int) "any" <|
+              \list ->
+                  Expect.equal
+                      (List.any ((==) 3) list)
+                      (Array.any ((==) 3) (Array.fromList list))
+        , fuzz (Fuzz.list int) "all" <|
+              \list ->
+                  Expect.equal
+                      (List.all ((<) 3) list)
+                      (Array.all ((<) 3) (Array.fromList list))
+        ]
+
 conversionTests : Test
 conversionTests =
     describe "Conversion"
@@ -195,6 +224,14 @@ transformTests =
             \size ->
                 toList (filter (\a -> modBy 2 a == 0) (initialize size identity))
                     |> Expect.equal (List.filter (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
+        , fuzz defaultSizeRange "filterMap" <|
+            \size ->
+                toList (filterMap (\a -> if modBy 2 a == 0 then Just a else Nothing) (initialize size identity))
+                    |> Expect.equal (List.filter (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
+        , fuzz defaultSizeRange "partition" <|
+            \size ->
+                Tuple.mapBoth toList toList (partition (\a -> modBy 2 a == 0) (initialize size identity))
+                    |> Expect.equal (List.partition (\a -> modBy 2 a == 0) (List.range 0 (size - 1)))
         , fuzz defaultSizeRange "map" <|
             \size ->
                 map ((+) 1) (initialize size identity)
@@ -215,6 +252,31 @@ transformTests =
             \s1 s2 ->
                 append (initialize s1 identity) (initialize s2 ((+) s1))
                     |> Expect.equal (initialize (s1 + s2) identity)
+        , fuzz (intRange 1 10) "concat" <|
+            \size ->
+                Expect.equalLists
+                    (List.concat <| List.map List.singleton <| List.range 0 size)
+                    (toList <| concat <| map singleton <| initialize (size + 1) identity)
+        , fuzz (intRange 1 10) "concatMap" <|
+            \size ->
+                Expect.equalLists
+                    (List.concatMap List.singleton <| List.range 0 size)
+                    (toList <| concatMap singleton <| initialize (size + 1) identity)
+        , fuzz2 (Fuzz.list int) (Fuzz.list int) "map2" <|
+              \list1 list2 ->
+                  Expect.equalLists
+                      (List.map2 Tuple.pair list1 list2)
+                      (toList (map2 Tuple.pair (fromList list1) (fromList list2)))
+        , fuzz3 (Fuzz.list int) (Fuzz.list int) (Fuzz.list int) "map3" <|
+              \list1 list2 list3 ->
+                  Expect.equalLists
+                      (List.map3 (\a b c -> (a,b,c)) list1 list2 list3)
+                      (toList (map3 (\a b c -> (a,b,c)) (fromList list1) (fromList list2) (fromList list3)))
+        , fuzz (Fuzz.list int) "intersperse" <|
+              \list ->
+                  Expect.equalLists
+                      (List.intersperse 0 list)
+                      (toList (intersperse 0 (fromList list)))
         ]
 
 
@@ -225,11 +287,11 @@ sliceTests =
             fromList (List.range 1 8)
     in
         describe "Slice"
-            [ fuzz2 (intRange -50 -1) (intRange 100 33000) "both" <|
+            [ fuzz2 (intRange -50 -1) (intRange 100 33000) "both sides" <|
                 \n size ->
                     slice (abs n) n (initialize size identity)
                         |> Expect.equal (initialize (size + n + n) (\idx -> idx - n))
-            , fuzz2 (intRange -50 -1) (intRange 100 33000) "left" <|
+            , fuzz2 (intRange -50 -1) (intRange 100 33000) "from left" <|
                 \n size ->
                     let
                         arr =
@@ -237,7 +299,7 @@ sliceTests =
                     in
                         slice (abs n) (length arr) arr
                             |> Expect.equal (initialize (size + n) (\idx -> idx - n))
-            , fuzz2 (intRange -50 -1) (intRange 100 33000) "right" <|
+            , fuzz2 (intRange -50 -1) (intRange 100 33000) "from right" <|
                 \n size ->
                     slice 0 n (initialize size identity)
                         |> Expect.equal (initialize (size + n) identity)
@@ -259,6 +321,26 @@ sliceTests =
                 \() ->
                     toList (slice -5 -2 smallSample)
                         |> Expect.equal (List.range 4 6)
+            , test "left" <|
+                \() ->
+                    Expect.equal
+                        (fromList [1,2])
+                        (left 2 (fromList [1,2,3,4,5]))
+            , test "right" <|
+                \() ->
+                    Expect.equal
+                        (fromList [4,5])
+                        (right 2 (fromList [1,2,3,4,5]))
+            , test "dropLeft" <|
+                \() ->
+                    Expect.equal
+                        (fromList [3,4,5])
+                        (dropLeft 2 (fromList [1,2,3,4,5]))
+            , test "dropRight" <|
+                \() ->
+                    Expect.equal
+                        (fromList [1,2,3])
+                        (dropRight 2 (fromList [1,2,3,4,5]))
             , test "impossible" <|
                 \() ->
                     toList (slice -1 -2 smallSample)
@@ -269,6 +351,40 @@ sliceTests =
                         |> Array.slice 0 1
                         |> Expect.equal (Array.repeat 1 1)
             ]
+
+
+sortTests : Test
+sortTests =
+    describe "Sort"
+        [ fuzz (Fuzz.list Fuzz.int) "Should do the same as List.sort" <|
+              \list ->
+                  list
+                      |> Array.fromList
+                      |> Array.sort
+                      |> Array.toList
+                      |> Expect.equal (List.sort list)
+        , fuzz (Fuzz.list Fuzz.int) "Should do the same as List.sortBy" <|
+              \list ->
+                  list
+                      |> Array.fromList
+                      |> Array.sortBy (\num -> num * -1)
+                      |> Array.toList
+                      |> Expect.equal (List.sortBy (\num -> num * -1) list)
+        , fuzz (Fuzz.list Fuzz.int) "Should do the same as List.sortWith" <|
+            \list ->
+                let
+                    reverseCompare num1 num2 =
+                        case compare num1 num2 of
+                            LT -> GT
+                            EQ -> EQ
+                            GT -> LT
+                in
+                    list
+                        |> Array.fromList
+                        |> Array.sortWith reverseCompare
+                        |> Array.toList
+                        |> Expect.equal (List.sortWith reverseCompare list)
+        ]
 
 
 runtimeCrashTests : Test

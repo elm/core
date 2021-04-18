@@ -15,6 +15,9 @@ module Elm.JsArray
         , indexedMap
         , slice
         , appendN
+        , sortBy
+        , sortWith
+        , find
         )
 
 {-| This library provides an immutable version of native javascript arrays.
@@ -26,18 +29,21 @@ For general purpose use, try the `Array` module instead.
 @docs JsArray
 
 # Creation
-@docs empty, singleton, initialize, listInitialize
+@docs empty, singleton, initialize, listInitialize, fromFold
 
 # Basics
-@docs length, unsafeGet, unsafeSet, push
+@docs length, unsafeGet, unsafeSet, push, find
 
 # Transformation
 @docs foldl, foldr, map, slice, merge
 
+# Sort
+@docs sortByFromFold, sortWithFromFold
 -}
 
 
-import Basics exposing (Int)
+import Basics exposing (Int, Order)
+import Maybe exposing (Maybe)
 import Elm.Kernel.JsArray
 
 
@@ -179,3 +185,27 @@ create `JsArray`s above a certain size, even when appending.
 appendN : Int -> JsArray a -> JsArray a -> JsArray a
 appendN =
     Elm.Kernel.JsArray.appendN
+
+
+{-| Creates an array based on a fold function. The resulting array will be sorted
+by a derived property.
+-}
+sortBy : (a -> comparable) -> c -> JsArray a
+sortBy =
+    Elm.Kernel.JsArray.sortBy
+
+
+{-| Creates an array based on a fold function. The resulting array will be sorted
+using the provided comparison function.
+-}
+sortWith : (a -> a -> Order) -> c -> JsArray a
+sortWith =
+    Elm.Kernel.JsArray.sortWith
+
+
+{-| Returns the first element which passes the provided predicate function. Returns `Nothing` if no element
+passes the predicate function.
+-}
+find : (a -> Maybe b) -> JsArray a -> Maybe b
+find =
+    Elm.Kernel.JsArray.find
