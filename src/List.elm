@@ -100,8 +100,10 @@ rangeHelp lo hi list =
     1 :: [2,3] == [1,2,3]
     1 :: [] == [1]
 
-This operator is pronounced *cons* for historical reasons, but you can think
+This operator is pronounced *cons* (from constructor) for [historical reasons], but you can think
 of it like pushing an entry onto a stack.
+
+[historical reasons]: https://en.wikipedia.org/wiki/Cons
 -}
 cons : a -> List a -> List a
 cons =
