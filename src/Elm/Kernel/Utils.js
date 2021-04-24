@@ -37,7 +37,7 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return false;
 	}
 
-	if (depth > 100)
+	if (depth > 100) /* keep in sync with Test.Equality.nestingThreshold */
 	{
 		stack.push(_Utils_Tuple2(x,y));
 		return true;
