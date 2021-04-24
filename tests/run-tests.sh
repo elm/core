@@ -25,7 +25,8 @@ rm -rf "$ELM_HOME" && mkdir -p "$ELM_HOME";
 rm -rf elm-stuff;
 
 # Create a link to the git package
-CORE_LINK="${ELM_HOME}/0.19.1/packages/elm/core/1.0.5"
+VERSION=$(node -e "console.log(require('../elm.json').version)")
+CORE_LINK="${ELM_HOME}/0.19.1/packages/elm/core/${VERSION}"
 CORE_GIT_DIR="$(dirname $PWD)"
 echo;
 echo "Linking $CORE_LINK to $CORE_GIT_DIR"
