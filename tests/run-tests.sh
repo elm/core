@@ -16,6 +16,10 @@ fi
 # Create a local directory where the compiler will look for the
 # elm/core source code:
 
+DIR="$(dirname $0)";
+
+cd "$DIR";
+
 export ELM_HOME="$PWD/.elm";
 rm -rf "$ELM_HOME" && mkdir -p "$ELM_HOME";
 rm -rf elm-stuff;
