@@ -124,7 +124,7 @@ isAlpha char =
   isLower char || isUpper char
 
 
-{-| Detect upper case and lower case ASCII characters.
+{-| Detect upper case and lower case ASCII characters, as well as digits `0123456789`.
 
     isAlphaNum 'a' == True
     isAlphaNum 'b' == True
