@@ -618,9 +618,12 @@ sqrt =
 -}
 logBase : Float -> Float -> Float
 logBase base number =
-  fdiv
-    (Elm.Kernel.Basics.log number)
-    (Elm.Kernel.Basics.log base)
+  if base == 10 then
+    Elm.Kernel.Basics.log10 number
+  else
+    fdiv
+      (Elm.Kernel.Basics.log number)
+      (Elm.Kernel.Basics.log base)
 
 
 {-| An approximation of e.

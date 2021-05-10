@@ -134,6 +134,7 @@ tests =
                 , test "abs -25" <| \() -> Expect.equal 25 (abs -25)
                 , test "abs 76" <| \() -> Expect.equal 76 (abs 76)
                 , test "logBase 10 100" <| \() -> Expect.equal 2 (logBase 10 100)
+                , test "logBase 10 1000" <| \() -> Expect.equal 3 (logBase 10 1000)
                 , test "logBase 2 256" <| \() -> Expect.equal 8 (logBase 2 256)
                 , test "e" <| \() -> Expect.lessThan 0.01 (abs (2.72 - e))
                 ]
