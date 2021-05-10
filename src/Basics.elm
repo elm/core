@@ -199,10 +199,19 @@ mul =
     -1 / 4 == -0.25
     -5 / 4 == -1.25
 
+**Be careful:**
+
+    4 / 0 == Infinity : Float
+    3 / 0 == Infinity : Float
+
+This is a bug and Infinity is not a legitimate value
+in Elm, thus you can't match for it.
+You'll have to check beforehand wheter the divisor is 0
 -}
-fdiv : Float -> Float -> Float
-fdiv =
-  Elm.Kernel.Basics.fdiv
+fdiv : Float -> Float -> Maybe Float
+fdiv x divisor = case divisor of
+    0 -> Nothing
+    y -> Just <| Elm.Kernel.Basics.fdiv x y
 
 
 {-| Integer division:
@@ -221,10 +230,18 @@ similar to `truncate (3 / 4)`.
 
 It may sometimes be useful to pair this with the [`remainderBy`](#remainderBy)
 function.
+
+**Be careful:**
+
+    4 // 0 == 0
+
+This is a bug and you'll have to check before computing the result,
+if your divisor is 0.
 -}
-idiv : Int -> Int -> Int
-idiv =
-  Elm.Kernel.Basics.idiv
+idiv : Int -> Int -> Maybe Int
+idiv x divisor = case divisor of
+    0 -> Nothing
+    y -> Just <| Elm.Kernel.Basics.idiv x y
 
 
 {-| Exponentiation
@@ -535,10 +552,20 @@ or read Daan Leijen’s [Division and Modulus for Computer Scientists][dm] for m
 information.
 
 [dm]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
+
+**Be careful:**
+
+    modBy 0 5
+
+results in a crash, a **runtime exception** of the sort:
+"Error: Cannot perform mod 0. Division by zero error."
+You'll have to check, that the first argument isn't 0.
+Needless to say, this is a bug!
 -}
-modBy : Int -> Int -> Int
-modBy =
-  Elm.Kernel.Basics.modBy
+modBy : Int -> Int -> Maybe Int
+modBy x divisor = case divisor of
+  0 -> Nothing
+  y -> Just <| Elm.Kernel.Basics.modBy x y
 
 
 {-| Get the remainder after division. Here are bunch of examples of dividing by four:
@@ -551,10 +578,18 @@ or read Daan Leijen’s [Division and Modulus for Computer Scientists][dm] for m
 information.
 
 [dm]: https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf
+
+**Be careful:**
+
+    remainderBy 0 5 == NaN : Int
+
+This is a bug in Elm and `NaN` isn't a legitimate value.
+You'll have to check beforehand, that the first argument isn't 0.
 -}
-remainderBy : Int -> Int -> Int
-remainderBy =
-  Elm.Kernel.Basics.remainderBy
+remainderBy : Int -> Int -> Maybe Int
+remainderBy x divisor = case divisor of
+    0 -> Nothing
+    y -> Just <| Elm.Kernel.Basics.remainderBy x y
 
 
 {-| Negate a number.
