@@ -300,3 +300,19 @@ function _Debug_regionToString(region)
 	}
 	return 'on lines ' + region.__$start.__$line + ' through ' + region.__$end.__$line;
 }
+
+// LOG TIME
+
+var _Debug_logTime__PROD = F3(function(name, fn, arg)
+{
+	return fn(arg);
+});
+
+var _Debug_logTime__DEBUG = F3(function(name, fn, arg)
+{
+	console.time(name);
+	var returnValue = fn(arg);
+	console.timeEnd(name);
+
+	return returnValue;
+});

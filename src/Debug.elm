@@ -2,13 +2,14 @@ module Debug exposing
   ( toString
   , log
   , todo
+  , logTime
   )
 
 {-| This module can be useful while _developing_ an application. It is not
 available for use in packages or production.
 
 # Debugging
-@docs toString, log, todo
+@docs toString, log, todo, logTime
 -}
 
 
@@ -94,4 +95,33 @@ goes unhandled!
 todo : String -> a
 todo =
   Elm.Kernel.Debug.todo
+
+
+{-| Log the execution time of a function.
+
+This will help you track down performance issues by logging the execution
+time of any function to the console. Most browsers also displays the time in
+their [performance debugging] tools.
+The first argument is a label which will be displayed in the console. This helps
+when tracking multiple functions at the same time.
+
+This will call `fn` with `arg` and log the execution time in the console. The
+return value will be whatever `fn` returns.
+
+    logTime "name in console" fn arg
+
+If a function takes more than one argument you need to apply all but the last
+one, effectively creating a one argument function.
+
+    logTime "render header" (renderHeader arg1 arg2) arg3
+
+**Note:** This is not available with `elm make --optimize` or in packages. The
+idea is that `logTime` can be useful during development, but you would't want
+to clutter the console with this information in the resulting application.
+
+[performance debugging]: https://developers.google.com/web/tools/chrome-devtools/console/track-executions
+-}
+logTime : String -> (a -> b) -> a -> b
+logTime =
+  Elm.Kernel.Debug.logTime
 
