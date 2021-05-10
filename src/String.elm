@@ -13,7 +13,8 @@ module String exposing
   )
 
 {-| A built-in representation for efficient string manipulation. String literals
-are enclosed in `"double quotes"`. Strings are *not* lists of characters.
+are enclosed in `"double quotes"`. Strings are *not* lists of characters, but
+lists of UTF-16 code units.
 
 # Strings
 @docs String, isEmpty, length, reverse, repeat, replace
@@ -103,7 +104,8 @@ isEmpty string =
   string == ""
 
 
-{-| Get the length of a string.
+{-| Get the length of a string, or more specifically, the number of UTF-16 code
+units
 
     length "innumerable" == 11
     length "" == 0
