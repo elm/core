@@ -103,7 +103,7 @@ infix right 9 (>>) = composeR
 
 **Note:** `Int` math is well-defined in the range `-2^31` to `2^31 - 1`. Outside
 of that range, the behavior is determined by the compilation target. When
-generating JavaScript, the safe range expands to `-2^53` to `2^53 - 1` for some
+generating JavaScript, the safe range expands to `-(2^53 - 1)` to `2^53 - 1` for some
 operations, but if we generate WebAssembly some day, we would do the traditional
 [integer overflow][io]. This quirk is necessary to get good performance on
 quirky compilation targets.
@@ -329,15 +329,19 @@ union types. This means the values `(3, 4)` and `(3, 4)` are definitely equal.
 This is not true in languages like JavaScript that use reference equality on
 objects.
 
-**Note:** Equality (in the Elm sense) is not possible for certain types. For
-example, the functions `(\n -> n + 1)` and `(\n -> 1 + n)` are &ldquo;the
-same&rdquo; but detecting this in general is [undecidable][]. In a future
-release, the compiler will detect when `(==)` is used with problematic
-types and provide a helpful error message. This will require quite serious
-infrastructure work that makes sense to batch with another big project, so the
-stopgap is to crash as quickly as possible. Problematic types include functions
-and JavaScript values like `Json.Encode.Value` which could contain functions
-if passed through a port.
+**Note:** Do not use `(==)` with functions, JSON values from `elm/json`, or
+regular expressions from `elm/regex`. It does not work. It will crash if
+possible. With JSON values, decode to Elm values before doing any equality
+checks!
+
+Why is it like this? Equality in the Elm sense can be difficult or impossible
+to compute. Proving that functions are the same is [undecidable][], and JSON
+values can come in through ports and have functions, cycles, and new JS data
+types that interact weirdly with our equality implementation. In a future
+release, the compiler will detect when `(==)` is used with problematic types
+and provide a helpful error message at compile time. This will require some
+pretty serious infrastructure work, so the stopgap is to crash as quickly as
+possible.
 
 [undecidable]: https://en.wikipedia.org/wiki/Undecidable_problem
 -}
