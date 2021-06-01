@@ -47,6 +47,8 @@ var _Basics_atan2 = F2(Math.atan2);
 function _Basics_toFloat(x) { return x; }
 function _Basics_truncate(n) { return n | 0; }
 function _Basics_isInfinite(n) { return n === Infinity || n === -Infinity; }
+function _Basics_isPositiveInfinity(n) { return n === Infinity; }
+function _Basics_isNegativeInfinity(n) { return n === -Infinity; }
 
 var _Basics_ceiling = Math.ceil;
 var _Basics_floor = Math.floor;
