@@ -10,7 +10,7 @@ module Basics exposing
   , pi, cos, sin, tan, acos, asin, atan, atan2
   , degrees, radians, turns
   , toPolar, fromPolar
-  , isNaN, isInfinite
+  , isNaN, isInfinite, isPositiveInfinity, isNegativeInfinity
   , identity, always, (<|), (|>), (<<), (>>), Never, never
   )
 
@@ -52,7 +52,7 @@ things.
 @docs toPolar, fromPolar
 
 # Floating Point Checks
-@docs isNaN, isInfinite
+@docs isNaN, isInfinite, isPositiveInfinity, isNegativeInfinity
 
 # Function Helpers
 @docs identity, always, (<|), (|>), (<<), (>>), Never, never
@@ -827,6 +827,27 @@ isInfinite : Float -> Bool
 isInfinite =
   Elm.Kernel.Basics.isInfinite
 
+
+{-| Determine whether a float is equal to positive infinity.
+
+    isPositiveInfinity 1      == False
+    isPositiveInfinity (1/0)  == True
+    isPositiveInfinity -(1/0) == False
+-}
+isPositiveInfinity : Float -> Bool
+isPositiveInfinity =
+  Elm.Kernel.Basics.isPositiveInfinity
+
+
+{-| Determine whether a float is equal to positive infinity.
+
+    isNegativeInfinity 1      == False
+    isNegativeInfinity (1/0)  == False
+    isNegativeInfinity -(1/0) == True
+-}
+isNegativeInfinity : Float -> Bool
+isNegativeInfinity =
+  Elm.Kernel.Basics.isNegativeInfinity
 
 
 -- FUNCTION HELPERS
