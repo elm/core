@@ -62,7 +62,7 @@ singleton value =
 -}
 repeat : Int -> a -> List a
 repeat n value =
-  if isInfinite n then
+  if isPositiveInfinity n then
     []
   
   else
