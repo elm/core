@@ -39,7 +39,7 @@ it needs to, so the long-term vision for concurrency in Elm will be rolling out
 slowly as I get more data and experience.
 
 I ask that people bullish on compiling to node.js keep this in mind. I think we
-can do better than the hopelessly bad concurrency model of node.js, and I hope
+can do better than the questionable concurrency model of node.js, and I hope
 the Elm community will be supportive of being more ambitious, even if it takes
 longer. That’s kind of what Elm is all about.
 -}
