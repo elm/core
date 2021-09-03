@@ -88,7 +88,7 @@ idea is that a `todo` can be useful during development, but uncatchable runtime
 exceptions should not appear in the resulting applications.
 
 **Note:** For the equivalent of try/catch error handling in Elm, use modules
-like [`Maybe`](#Maybe) and [`Result`](#Result) which guarantee that no error
+like [`Maybe`](Maybe) and [`Result`](Result) which guarantee that no error
 goes unhandled!
 -}
 todo : String -> a
