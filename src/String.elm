@@ -86,7 +86,7 @@ characters with different widths.
 
 [u]: https://en.wikipedia.org/wiki/Unicode
 
-**Note:** JavaScript lets you use double quotes and single quotes interchangably.
+**Note:** JavaScript lets you use double quotes and single quotes interchangeably.
 This is not true in Elm. You must use double quotes for a `String`, and you must
 use single quotes for a [`Char`](Char#Char).
 -}
