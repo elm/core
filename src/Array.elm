@@ -52,7 +52,7 @@ import Tuple
 
 
 {-| The array in this module is implemented as a tree with a high branching
-factor (number of elements at each level). In comparision, the `Dict` has
+factor (number of elements at each level). In comparison, the `Dict` has
 a branching factor of 2 (left or right).
 
 The higher the branching factor, the more elements are stored at each level.
@@ -86,7 +86,7 @@ any given level of the tree, we need to shift (or move) the correct amount of
 bits so that those bits are at the front. We can then perform a bitwise and to
 read which of the 32 branches to take.
 
-The `shiftStep` specifices how many bits are required to represent the branching
+The `shiftStep` specifies how many bits are required to represent the branching
 factor.
 -}
 shiftStep : Int
