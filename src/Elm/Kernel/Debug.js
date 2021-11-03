@@ -65,7 +65,7 @@ function _Debug_toStringHelper(value)
 
 	if (typeof value === 'number')
 	{
-		return _Debug_numberColor(ansi, value + '');
+		return value + '';
 	}
 
 	if (value instanceof String)
@@ -187,11 +187,6 @@ function _Debug_addSlashes(str, isChar)
 	{
 		return s.replace(/\"/g, '\\"');
 	}
-}
-
-function _Debug_numberColor(ansi, string)
-{
-	return ansi ? '\x1b[95m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_stringColor(ansi, string)
