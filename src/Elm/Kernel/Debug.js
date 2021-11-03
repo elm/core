@@ -188,11 +188,6 @@ function _Debug_addSlashes(str, isChar)
 	}
 }
 
-function _Debug_toHexDigit(n)
-{
-	return String.fromCharCode(n < 10 ? 48 + n : 55 + n);
-}
-
 
 // CRASH
 
