@@ -47,11 +47,12 @@ function _Debug_toString__PROD(value)
 
 function _Debug_toString__DEBUG(value)
 {
-	return _Debug_toStringHelper(false, value);
+	return _Debug_toStringHelper(value);
 }
 
-function _Debug_toStringHelper(ansi, value)
+function _Debug_toStringHelper(value)
 {
+	var ansi = false;
 	if (typeof value === 'function')
 	{
 		return _Debug_internalColor(ansi, '<function>');
@@ -92,7 +93,7 @@ function _Debug_toStringHelper(ansi, value)
 			for (var k in value)
 			{
 				if (k === '$') continue;
-				output.push(_Debug_toStringHelper(ansi, value[k]));
+				output.push(_Debug_toStringHelper(value[k]));
 			}
 			return '(' + output.join(',') + ')';
 		}
@@ -101,32 +102,32 @@ function _Debug_toStringHelper(ansi, value)
 		{
 			return _Debug_ctorColor(ansi, 'Set')
 				+ _Debug_fadeColor(ansi, '.fromList') + ' '
-				+ _Debug_toStringHelper(ansi, __Set_toList(value));
+				+ _Debug_toStringHelper(__Set_toList(value));
 		}
 
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
 			return _Debug_ctorColor(ansi, 'Dict')
 				+ _Debug_fadeColor(ansi, '.fromList') + ' '
-				+ _Debug_toStringHelper(ansi, __Dict_toList(value));
+				+ _Debug_toStringHelper(__Dict_toList(value));
 		}
 
 		if (tag === 'Array_elm_builtin')
 		{
 			return _Debug_ctorColor(ansi, 'Array')
 				+ _Debug_fadeColor(ansi, '.fromList') + ' '
-				+ _Debug_toStringHelper(ansi, __Array_toList(value));
+				+ _Debug_toStringHelper(__Array_toList(value));
 		}
 
 		if (tag === '::' || tag === '[]')
 		{
 			var output = '[';
 
-			value.b && (output += _Debug_toStringHelper(ansi, value.a), value = value.b)
+			value.b && (output += _Debug_toStringHelper(value.a), value = value.b)
 
 			for (; value.b; value = value.b) // WHILE_CONS
 			{
-				output += ',' + _Debug_toStringHelper(ansi, value.a);
+				output += ',' + _Debug_toStringHelper(value.a);
 			}
 			return output + ']';
 		}
@@ -135,7 +136,7 @@ function _Debug_toStringHelper(ansi, value)
 		for (var i in value)
 		{
 			if (i === '$') continue;
-			var str = _Debug_toStringHelper(ansi, value[i]);
+			var str = _Debug_toStringHelper(value[i]);
 			var c0 = str[0];
 			var parenless = c0 === '{' || c0 === '(' || c0 === '[' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
@@ -159,7 +160,7 @@ function _Debug_toStringHelper(ansi, value)
 		for (var key in value)
 		{
 			var field = key[0] === '_' ? key.slice(1) : key;
-			output.push(_Debug_fadeColor(ansi, field) + ' = ' + _Debug_toStringHelper(ansi, value[key]));
+			output.push(_Debug_fadeColor(ansi, field) + ' = ' + _Debug_toStringHelper(value[key]));
 		}
 		if (output.length === 0)
 		{
