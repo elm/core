@@ -75,7 +75,7 @@ function _Debug_toStringHelper(value)
 
 	if (typeof value === 'string')
 	{
-		return _Debug_stringColor(ansi, '"' + _Debug_addSlashes(value, false) + '"');
+		return '"' + _Debug_addSlashes(value, false) + '"';
 	}
 
 	if (typeof value === 'object' && '$' in value)
@@ -143,7 +143,7 @@ function _Debug_toStringHelper(value)
 
 	if (typeof DataView === 'function' && value instanceof DataView)
 	{
-		return _Debug_stringColor(ansi, '<' + value.byteLength + ' bytes>');
+		return '<' + value.byteLength + ' bytes>';
 	}
 
 	if (typeof File !== 'undefined' && value instanceof File)
@@ -187,11 +187,6 @@ function _Debug_addSlashes(str, isChar)
 	{
 		return s.replace(/\"/g, '\\"');
 	}
-}
-
-function _Debug_stringColor(ansi, string)
-{
-	return ansi ? '\x1b[93m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_toHexDigit(n)
