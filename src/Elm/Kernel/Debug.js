@@ -55,7 +55,7 @@ function _Debug_toStringHelper(value)
 	var ansi = false;
 	if (typeof value === 'function')
 	{
-		return _Debug_internalColor(ansi, '<function>');
+		return '<function>';
 	}
 
 	if (typeof value === 'boolean')
@@ -84,7 +84,7 @@ function _Debug_toStringHelper(value)
 
 		if (typeof tag === 'number')
 		{
-			return _Debug_internalColor(ansi, '<internals>');
+			return '<internals>;
 		}
 
 		if (tag[0] === '#')
@@ -151,7 +151,7 @@ function _Debug_toStringHelper(value)
 
 	if (typeof File !== 'undefined' && value instanceof File)
 	{
-		return _Debug_internalColor(ansi, '<' + value.name + '>');
+		return '<' + value.name + '>';
 	}
 
 	if (typeof value === 'object')
@@ -169,7 +169,7 @@ function _Debug_toStringHelper(value)
 		return '{ ' + output.join(', ') + ' }';
 	}
 
-	return _Debug_internalColor(ansi, '<internals>');
+	return '<internals>';
 }
 
 function _Debug_addSlashes(str, isChar)
@@ -215,11 +215,6 @@ function _Debug_charColor(ansi, string)
 function _Debug_fadeColor(ansi, string)
 {
 	return ansi ? '\x1b[37m' + string + '\x1b[0m' : string;
-}
-
-function _Debug_internalColor(ansi, string)
-{
-	return ansi ? '\x1b[36m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_toHexDigit(n)
