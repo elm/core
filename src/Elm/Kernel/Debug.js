@@ -101,21 +101,21 @@ function _Debug_toStringHelper(value)
 		if (tag === 'Set_elm_builtin')
 		{
 			return _Debug_ctorColor(ansi, 'Set')
-				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ '.fromList '
 				+ _Debug_toStringHelper(__Set_toList(value));
 		}
 
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
 			return _Debug_ctorColor(ansi, 'Dict')
-				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ '.fromList '
 				+ _Debug_toStringHelper(__Dict_toList(value));
 		}
 
 		if (tag === 'Array_elm_builtin')
 		{
 			return _Debug_ctorColor(ansi, 'Array')
-				+ _Debug_fadeColor(ansi, '.fromList') + ' '
+				+ '.fromList '
 				+ _Debug_toStringHelper(__Array_toList(value));
 		}
 
@@ -160,7 +160,7 @@ function _Debug_toStringHelper(value)
 		for (var key in value)
 		{
 			var field = key[0] === '_' ? key.slice(1) : key;
-			output.push(_Debug_fadeColor(ansi, field) + ' = ' + _Debug_toStringHelper(value[key]));
+			output.push(field + ' = ' + _Debug_toStringHelper(value[key]));
 		}
 		if (output.length === 0)
 		{
@@ -210,11 +210,6 @@ function _Debug_stringColor(ansi, string)
 function _Debug_charColor(ansi, string)
 {
 	return ansi ? '\x1b[92m' + string + '\x1b[0m' : string;
-}
-
-function _Debug_fadeColor(ansi, string)
-{
-	return ansi ? '\x1b[37m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_toHexDigit(n)
