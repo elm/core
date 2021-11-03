@@ -60,7 +60,7 @@ function _Debug_toStringHelper(value)
 
 	if (typeof value === 'boolean')
 	{
-		return _Debug_ctorColor(ansi, value ? 'True' : 'False');
+		return value ? 'True' : 'False';
 	}
 
 	if (typeof value === 'number')
@@ -100,22 +100,19 @@ function _Debug_toStringHelper(value)
 
 		if (tag === 'Set_elm_builtin')
 		{
-			return _Debug_ctorColor(ansi, 'Set')
-				+ '.fromList '
+			return 'Set.fromList '
 				+ _Debug_toStringHelper(__Set_toList(value));
 		}
 
 		if (tag === 'RBNode_elm_builtin' || tag === 'RBEmpty_elm_builtin')
 		{
-			return _Debug_ctorColor(ansi, 'Dict')
-				+ '.fromList '
+			return 'Dict.fromList '
 				+ _Debug_toStringHelper(__Dict_toList(value));
 		}
 
 		if (tag === 'Array_elm_builtin')
 		{
-			return _Debug_ctorColor(ansi, 'Array')
-				+ '.fromList '
+			return 'Array.fromList '
 				+ _Debug_toStringHelper(__Array_toList(value));
 		}
 
@@ -141,7 +138,7 @@ function _Debug_toStringHelper(value)
 			var parenless = c0 === '{' || c0 === '(' || c0 === '[' || c0 === '<' || c0 === '"' || str.indexOf(' ') < 0;
 			output += ' ' + (parenless ? str : '(' + str + ')');
 		}
-		return _Debug_ctorColor(ansi, tag) + output;
+		return tag + output;
 	}
 
 	if (typeof DataView === 'function' && value instanceof DataView)
@@ -190,11 +187,6 @@ function _Debug_addSlashes(str, isChar)
 	{
 		return s.replace(/\"/g, '\\"');
 	}
-}
-
-function _Debug_ctorColor(ansi, string)
-{
-	return ansi ? '\x1b[96m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_numberColor(ansi, string)
