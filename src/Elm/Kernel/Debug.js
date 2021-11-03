@@ -52,7 +52,6 @@ function _Debug_toString__DEBUG(value)
 
 function _Debug_toStringHelper(value)
 {
-	var ansi = false;
 	if (typeof value === 'function')
 	{
 		return '<function>';
