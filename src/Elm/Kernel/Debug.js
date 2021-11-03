@@ -70,7 +70,7 @@ function _Debug_toStringHelper(value)
 
 	if (value instanceof String)
 	{
-		return _Debug_charColor(ansi, "'" + _Debug_addSlashes(value, true) + "'");
+		return "'" + _Debug_addSlashes(value, true) + "'";
 	}
 
 	if (typeof value === 'string')
@@ -192,11 +192,6 @@ function _Debug_addSlashes(str, isChar)
 function _Debug_stringColor(ansi, string)
 {
 	return ansi ? '\x1b[93m' + string + '\x1b[0m' : string;
-}
-
-function _Debug_charColor(ansi, string)
-{
-	return ansi ? '\x1b[92m' + string + '\x1b[0m' : string;
 }
 
 function _Debug_toHexDigit(n)
