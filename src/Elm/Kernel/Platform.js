@@ -51,7 +51,14 @@ function _Platform_initialize(flagDecoder, args, init, update, subscriptions, st
 
 	_Platform_enqueueEffects(managers, initPair.b, subscriptions(model));
 
-	return ports ? { ports: ports } : {};
+	const shutdown = function() {
+		managers = null
+		model = null
+		stepper = null
+		ports = null
+	}
+
+	return ports ? { ports: ports, shutdown: shutdown } : { shutdown: shutdown };
 }
 
 
