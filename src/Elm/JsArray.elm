@@ -69,7 +69,7 @@ length =
     Elm.Kernel.JsArray.length
 
 
-{-| Initialize an array. `initalize n offset fn` creates an array of length `n`
+{-| Initialize an array. `initialize n offset fn` creates an array of length `n`
 with the element at index `i` initialized to the result of `(f (i + offset))`.
 
 The offset parameter is there so one can avoid creating a closure for this use
