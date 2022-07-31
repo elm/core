@@ -6,6 +6,8 @@ jobs:
   comment-on-issue:
     name: Comment On Issue
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - uses: actions/github@v1.0.0
         env:
