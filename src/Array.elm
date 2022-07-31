@@ -86,7 +86,7 @@ any given level of the tree, we need to shift (or move) the correct amount of
 bits so that those bits are at the front. We can then perform a bitwise and to
 read which of the 32 branches to take.
 
-The `shiftStep` specifices how many bits are required to represent the branching
+The `shiftStep` specifies how many bits are required to represent the branching
 factor.
 -}
 shiftStep : Int
