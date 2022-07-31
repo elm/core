@@ -7,6 +7,8 @@ jobs:
   comment-on-pull:
     name: Comment On Pull
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/github-script@v3
         with:
