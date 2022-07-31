@@ -52,7 +52,7 @@ import Tuple
 
 
 {-| The array in this module is implemented as a tree with a high branching
-factor (number of elements at each level). In comparision, the `Dict` has
+factor (number of elements at each level). In comparison, the `Dict` has
 a branching factor of 2 (left or right).
 
 The higher the branching factor, the more elements are stored at each level.
