@@ -37,6 +37,14 @@ function _Utils_eqHelp(x, y, depth, stack)
 		return false;
 	}
 
+        // Handle Json.Encode.Value
+        if (x.$ === 0) {
+                if (! (y.$ === 0)) {
+                        return false;
+                } else {
+                        return x.a == y.a
+                }
+
 	if (depth > 100)
 	{
 		stack.push(_Utils_Tuple2(x,y));
