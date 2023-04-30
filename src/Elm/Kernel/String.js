@@ -124,7 +124,7 @@ var _String_foldl = F3(function(func, state, string)
 var _String_foldr = F3(function(func, state, string)
 {
 	var i = string.length;
-	while (i--)
+	while (i-- > 0)
 	{
 		var char = string[i];
 		var word = string.charCodeAt(i);
@@ -190,7 +190,7 @@ function _String_toLower(str)
 var _String_any = F2(function(isGood, string)
 {
 	var i = string.length;
-	while (i--)
+	while (i-- > 0)
 	{
 		var char = string[i];
 		var word = string.charCodeAt(i);
@@ -210,7 +210,7 @@ var _String_any = F2(function(isGood, string)
 var _String_all = F2(function(isGood, string)
 {
 	var i = string.length;
-	while (i--)
+	while (i-- > 0)
 	{
 		var char = string[i];
 		var word = string.charCodeAt(i);
