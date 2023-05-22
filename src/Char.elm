@@ -25,7 +25,7 @@ module Char exposing
 @docs toCode, fromCode
 -}
 
-import Basics exposing (Bool, Int, (&&), (||), (>=), (<=))
+import Basics exposing (Bool, Int, (&&), (||), (>=), (<=), (==), (/=))
 import Elm.Kernel.Char
 
 
@@ -66,65 +66,61 @@ type Char = Char -- NOTE: The compiler provides the real implementation.
 -- CLASSIFICATION
 
 
-{-| Detect upper case ASCII characters.
+{-| Detect upper case Unicode characters.
 
     isUpper 'A' == True
     isUpper 'B' == True
     ...
     isUpper 'Z' == True
 
+    isUpper 'Σ' == True
+
     isUpper '0' == False
     isUpper 'a' == False
     isUpper '-' == False
-    isUpper 'Σ' == False
 -}
 isUpper : Char -> Bool
 isUpper char =
-  let
-    code =
-      toCode char
-  in
-    code <= 0x5A && 0x41 <= code
+  (char == toUpper char)
+    && (char /= toLower char)
 
 
-{-| Detect lower case ASCII characters.
+{-| Detect lower case Unicode characters.
 
     isLower 'a' == True
     isLower 'b' == True
     ...
     isLower 'z' == True
 
+    isLower 'π' == True
+
     isLower '0' == False
     isLower 'A' == False
     isLower '-' == False
-    isLower 'π' == False
 -}
 isLower : Char -> Bool
 isLower char =
-  let
-    code =
-      toCode char
-  in
-    0x61 <= code && code <= 0x7A
+  (char == toLower char)
+    && (char /= toUpper char)
 
 
-{-| Detect upper case and lower case ASCII characters.
+{-| Detect upper case and lower case Unicode characters.
 
     isAlpha 'a' == True
     isAlpha 'b' == True
     isAlpha 'E' == True
     isAlpha 'Y' == True
+    isAlpha 'π' == True
 
     isAlpha '0' == False
     isAlpha '-' == False
-    isAlpha 'π' == False
 -}
 isAlpha : Char -> Bool
 isAlpha char =
   isLower char || isUpper char
 
 
-{-| Detect upper case and lower case ASCII characters.
+{-| Detect upper case and lower case Unicode characters.
 
     isAlphaNum 'a' == True
     isAlphaNum 'b' == True
@@ -132,9 +128,9 @@ isAlpha char =
     isAlphaNum 'Y' == True
     isAlphaNum '0' == True
     isAlphaNum '7' == True
+    isAlphaNum 'π' == True
 
     isAlphaNum '-' == False
-    isAlphaNum 'π' == False
 -}
 isAlphaNum : Char -> Bool
 isAlphaNum char =
