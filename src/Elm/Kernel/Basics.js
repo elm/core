@@ -11,7 +11,7 @@ var _Basics_add = F2(function(a, b) { return a + b; });
 var _Basics_sub = F2(function(a, b) { return a - b; });
 var _Basics_mul = F2(function(a, b) { return a * b; });
 var _Basics_fdiv = F2(function(a, b) { return a / b; });
-var _Basics_idiv = F2(function(a, b) { return (a / b) | 0; });
+var _Basics_idiv = F2(function(a, b) { return Math.trunc(a / b); });
 var _Basics_pow = F2(Math.pow);
 
 var _Basics_remainderBy = F2(function(b, a) { return a % b; });
@@ -45,7 +45,7 @@ var _Basics_atan2 = F2(Math.atan2);
 // MORE MATH
 
 function _Basics_toFloat(x) { return x; }
-function _Basics_truncate(n) { return n | 0; }
+function _Basics_truncate(n) { return Math.trunc(n); }
 function _Basics_isInfinite(n) { return n === Infinity || n === -Infinity; }
 
 var _Basics_ceiling = Math.ceil;
