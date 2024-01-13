@@ -666,8 +666,12 @@ the end of the array.
     slice  1 -1 (fromList [0,1,2,3,4]) == fromList [1,2,3]
     slice -2  5 (fromList [0,1,2,3,4]) == fromList [3,4]
 
-This makes it pretty easy to `pop` the last element off of an array:
-`slice 0 -1 array`
+This makes it easy to get a new array without the last element.
+
+    slice  0 -1 (fromList [0,1,2]) == fromList [0,1]
+
+Like `pop()` in JavaScript, but returning the new array
+instead of the popped of element.
 -}
 slice : Int -> Int -> Array a -> Array a
 slice from to array =
