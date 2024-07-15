@@ -846,8 +846,9 @@ So our example expands out to something like this:
     \n -> not (isEven (sqrt n))
 -}
 composeL : (b -> c) -> (a -> b) -> (a -> c)
-composeL g f x =
-  g (f x)
+composeL g f =
+  \x ->
+    g (f x)
 
 
 {-| Function composition, passing results along in the suggested direction. For
@@ -857,8 +858,9 @@ example, the following code checks if the square root of a number is odd:
 
 -}
 composeR : (a -> b) -> (b -> c) -> (a -> c)
-composeR f g x =
-  g (f x)
+composeR f g =
+  \x ->
+    g (f x)
 
 
 {-| Saying `x |> f` is exactly the same as `f x`.
