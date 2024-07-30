@@ -80,11 +80,12 @@ type Char = Char -- NOTE: The compiler provides the real implementation.
 -}
 isUpper : Char -> Bool
 isUpper char =
-  let
-    code =
-      toCode char
-  in
-    code <= 0x5A && 0x41 <= code
+  isUpperCode (toCode char)
+
+
+isUpperCode : Int -> Bool
+isUpperCode code =
+  code <= 0x5A && 0x41 <= code
 
 
 {-| Detect lower case ASCII characters.
@@ -101,11 +102,12 @@ isUpper char =
 -}
 isLower : Char -> Bool
 isLower char =
-  let
-    code =
-      toCode char
-  in
-    0x61 <= code && code <= 0x7A
+  isLowerCode (toCode char)
+
+
+isLowerCode : Int -> Bool
+isLowerCode code =
+  0x61 <= code && code <= 0x7A
 
 
 {-| Detect upper case and lower case ASCII characters.
@@ -121,7 +123,11 @@ isLower char =
 -}
 isAlpha : Char -> Bool
 isAlpha char =
-  isLower char || isUpper char
+  let
+    code =
+      toCode char
+  in
+    isLowerCode code || isUpperCode code
 
 
 {-| Detect upper case and lower case ASCII characters.
@@ -138,7 +144,11 @@ isAlpha char =
 -}
 isAlphaNum : Char -> Bool
 isAlphaNum char =
-  isLower char || isUpper char || isDigit char
+  let
+    code =
+      toCode char
+  in
+    isLowerCode code || isUpperCode code || isDigitCode code
 
 
 {-| Detect digits `0123456789`
@@ -154,11 +164,12 @@ isAlphaNum char =
 -}
 isDigit : Char -> Bool
 isDigit char =
-  let
-    code =
-      toCode char
-  in
-    code <= 0x39 && 0x30 <= code
+  isDigitCode (toCode char)
+
+
+isDigitCode : Int -> Bool
+isDigitCode code =
+  code <= 0x39 && 0x30 <= code
 
 
 {-| Detect octal digits `01234567`
