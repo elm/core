@@ -81,6 +81,19 @@ var _List_sortWith = F2(function(f, xs)
 {
 	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
 		var ord = A2(f, a, b);
+		// In `--optimize` mode, `EQ`, `LT` and `GT` become plain numbers.
+		// In non-optimize mode, they are objects with `.$`.
+		// The prod version works in both cases – until hot reloading happens.
+		// If you hold on to references to `LT`, `GT` or `EQ` in the model –
+		// either directly or indirectly via a function such as `compare` – `List.sortWith` won’t
+		// work with those after a hot reload. The “new” `List.sortWith` has references to new
+		// `LT`, `GT` and `EQ` objects, while the model has references to old such objects,
+		// which are equivalent but not the same object instances.
+		/**__PROD/
 		return ord === __Basics_EQ ? 0 : ord === __Basics_LT ? -1 : 1;
+		//*/
+		/**__DEBUG/
+		return ord.$ === __Basics_EQ.$ ? 0 : ord.$ === __Basics_LT.$ ? -1 : 1;
+		//*/
 	}));
 });

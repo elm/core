@@ -106,6 +106,22 @@ function _Scheduler_kill(proc)
 		if (task.$ === __1_BINDING && task.__kill)
 		{
 			task.__kill();
+			// Here’s how `task.__kill` comes to existence:
+			//
+			// _Scheduler_binding(function (callback) {
+			//     // Do stuff and use callback.
+			//     // The below function is assigned to `task.__kill` by `_Scheduler_step`.
+			//     return function() {
+			//         // Do cleanup. Doesn’t use callback, but technically has it in scope.
+			//     }
+			// });
+			//
+			// Since `task.__kill` has that `callback` in scope, which eventually references
+			// `sendToApp`, which has access to `model` etc., it’s important to remove it
+			// after using it. Otherwise it can prevent a stopped app from being garbage collected.
+			// `null` is the default value for `__kill` as seen in `_Scheduler_binding`.
+			// It also doesn’t make sense to kill the same task twice anyway.
+			task.__kill = null;
 		}
 
 		proc.__root = null;
