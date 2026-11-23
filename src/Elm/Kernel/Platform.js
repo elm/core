@@ -360,6 +360,26 @@ function _Platform_outgoingPort(name, converter)
 var _Platform_outgoingPortMap = F2(function(tagger, value) { return value; });
 
 
+// When subscribing to ports in JavaScript, the user’s callbacks might have
+// mistakes in them and throw errors. This should not stop other subscribers,
+// other commands, or the scheduler (which would get stuck and not run anything
+// again). This function calls the callback in try-catch, and re-throws the
+// eror in a `setTimeout`. That still results in an uncaught error in the
+// console, and triggers `window.onerror` and error tracking tools. But it
+// does not interfere with the rest of the code execution.
+function _Platform_callSubscriber(callback, value)
+{
+	try
+	{
+		callback(value);
+	}
+	catch (error)
+	{
+		setTimeout(function() { throw error; }, 0);
+	}
+}
+
+
 function _Platform_setupOutgoingPort(name)
 {
 	var subs = [];
@@ -379,7 +399,7 @@ function _Platform_setupOutgoingPort(name)
 			var value = __Json_unwrap(converter(cmdList.a));
 			for (var i = 0; i < currentSubs.length; i++)
 			{
-				currentSubs[i](value);
+				_Platform_callSubscriber(currentSubs[i], value);
 			}
 		}
 		return init;
