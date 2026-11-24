@@ -75,12 +75,13 @@ function _Platform_initialize(flagDecoder, args, _init, _update, _subscriptions,
 		}
 		var pair = A2(impl.__$update, msg, model);
 		model = pair.a;
-		_Platform_enqueueEffects(managers, pair.b, impl.__$subscriptions(model));
+		_Platform_pushEffects(managers, pair.b, impl.__$subscriptions(model));
 		stepper(model, viewMetadata);
+		_Platform_drainEffects();
 	}
 
-	// Apply `Cmd`s from `init`, and run `subscriptions` for the first time.
-	_Platform_enqueueEffects(managers, initPair.b, impl.__$subscriptions(model));
+	// Queue `Cmd`s from `init`, and `subscriptions` for the first time. They run after the initial draw.
+	_Platform_pushEffects(managers, initPair.b, impl.__$subscriptions(model));
 
 	// Initial draw. This used to be done as a side effect of calling `stepperBuilder`.
 	// `stepper.__$shutdown` was introduced at the same time as moving the draw call here,
@@ -93,6 +94,8 @@ function _Platform_initialize(flagDecoder, args, _init, _update, _subscriptions,
 	{
 		stepper(model, true);
 	}
+
+	_Platform_drainEffects();
 
 	var detachedDomNode = undefined;
 	var detaching = false;
@@ -165,7 +168,8 @@ function _Platform_initialize(flagDecoder, args, _init, _update, _subscriptions,
 			stopped = true;
 
 			// Stop subscriptions.
-			_Platform_enqueueEffects(managers, _Platform_batch(_List_Nil), _Platform_batch(_List_Nil));
+			_Platform_pushEffects(managers, _Platform_batch(_List_Nil), _Platform_batch(_List_Nil));
+			_Platform_drainEffects();
 		}
 
 		detachView(callback);
@@ -202,7 +206,8 @@ function _Platform_initialize(flagDecoder, args, _init, _update, _subscriptions,
 		}
 
 		// Remove old subscriptions.
-		_Platform_enqueueEffects(managers, _Platform_batch(_List_Nil), _Platform_batch(_List_Nil));
+		_Platform_pushEffects(managers, _Platform_batch(_List_Nil), _Platform_batch(_List_Nil));
+		_Platform_drainEffects();
 
 		// Setup any new effect managers.
 		var newPorts = _Platform_hotReloadEffects(managers, effectManagers, ports, hotReloadData.__$platform_effectManagers, sendToApp);
@@ -219,10 +224,12 @@ function _Platform_initialize(flagDecoder, args, _init, _update, _subscriptions,
 		}
 
 		// Set up new subscriptions.
-		_Platform_enqueueEffects(managers, _Platform_batch(_List_Nil), impl.__$subscriptions(model));
+		_Platform_pushEffects(managers, _Platform_batch(_List_Nil), impl.__$subscriptions(model));
 
 		// Draw synchronously with the new view function.
 		stepper(model, true);
+
+		_Platform_drainEffects();
 	};
 	//*/
 
@@ -483,14 +490,25 @@ var _Platform_effectsQueue = [];
 var _Platform_effectsActive = false;
 
 
-// Note: This is usually called together with `stepper`. We should enqueue effects _first,_
-// since `stepper` (drawing) can cause `update` to be called again (via `connectedCallback`
-// of custom elements), and it’s more expected if the first update’s commands are queued
-// before the next.
-function _Platform_enqueueEffects(managers, cmdBag, subBag)
+// Pushing and draining effects are always done together, but are separated into
+// their own functions. The order things need to happen is: push, draw, drain.
+//
+// Push _before_ drawing, since drawing can cause `update` to be called again
+// (via `connectedCallback` of custom elements), and it’s more expected if the
+// first update’s commands are queued before the next. (The nested update drains the
+// queue, running both in order.)
+//
+// Drain _after_ drawing (or after requesting an animation frame for it), since
+// it’s a common thing to call `requestAnimationFrame` in ports to wait for Elm’s draw.
+// That trick is also used by `Browser.Dom.focus` and similar.
+function _Platform_pushEffects(managers, cmdBag, subBag)
 {
 	_Platform_effectsQueue.push({ __managers: managers, __cmdBag: cmdBag, __subBag: subBag });
+}
 
+
+function _Platform_drainEffects()
+{
 	if (_Platform_effectsActive) return;
 
 	_Platform_effectsActive = true;
