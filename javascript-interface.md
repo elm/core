@@ -155,7 +155,7 @@ app.detachView(function(node) {
 | `Browser.application` |                      | also stops navigation | `<body>`          |
 | `Platform.worker`     |                      | does nothing          | `null`            |
 
-- `Html` and `Browser.sandbox` have no effects, so `app.stop()` does not have anything more to do than stopping the view. (Except one thing: The app won’t be garbage collected unless you call `app.stop()`. This is due to hot reloading, and does not apply for `--optimize`.)
+- `Html` and `Browser.sandbox` have no effects, so `app.stop()` does not have anything more to do than stopping the view. (Except one thing: The app won’t be garbage collected unless you run `app.stop()`. This is due to hot reloading, and does not apply for `--optimize`.)
 - `Platform.worker` programs have no view, so `app.detachView()` doesn’t do anything, and the callbacks to both `app.stop()` and `app.detachView()` receive `null` as there is no DOM node.
 - `Html`, `Browser.sandbox` and `Browser.element` programs all require a DOM node when initializing them: `Elm.MyModule.init({ node: myDomNode })`. Elm takes over `myDomNode` and uses it for rendering. Elm might even replace the DOM node with a new one, for example if you passed a `<div>` and then rendered a `<main>` element instead in your Elm view. The callback to `app.detachView()` receives the root DOM node after the final draw, which may or may not be the same one as the `myDomNode` you passed when initializing. Inside the callback, you can use that DOM node to for example remove it from the page, or pass it to a new Elm app.
 - `Browser.document` and `Browser.application` always use the `<body>` element on the page for rendering. The callbacks to `app.stop()` and `app.detachView()` receive that `<body>` element. Unless you’ve done something very unconventional, it is the same as `document.body`.
@@ -223,12 +223,24 @@ The plugin could fetch new compiled JavaScript, and use it like so:
 var f = new Function(newCompiledElmCodeAsString);
 var newScope = {};
 f.call(newScope);
-Elm.hot.reload(newScope);
+const { incompatible } = Elm.hot.reload(newScope);
+if (incompatible.length > 0) {
+    window.location.reload();
+}
 ```
 
-The above updates all modules on `Elm` (such as `Elm.Main` and `Elm.Blog.Home`), so that calling `.init()` on one of them would initialize an Elm app using the latest code rather than the old.
+The above updates all modules on `Elm` (such as `Elm.Main` and `Elm.Blog.Home`), so that running `.init()` on one of them would initialize an Elm app using the latest code rather than the old.
 
 It also updates all running Elm app instances, without losing any state. It does this by injecting updated versions of `view`, `update`, `subscriptions` etc. into them.
+
+Some apps might not be possible to hot reload safely. They are skipped and returned instead. The return value of `Elm.hot.reload` is an object with an `incompatible` field, which is an array of apps where the type of `main` has changed so that the new version is incompatible with the old. Each object in the array contains:
+
+- `app`: The object that `init()` returned.
+- `moduleName`: The Elm module name, such as `"Blog.Home"` (for `Elm.Blog.Home`).
+
+You can log the `moduleName`s to say which apps caused a full reload. When embedding Elm in a web component or a component from a JavaScript framework, it can sometimes make sense to instead run `app.stop()` and then initialize a new app instance, instead of reloading the page.
+
+To tell whether the type of `main` has changed, `Elm.hot.reload()` compares “fingerprints” of the apps. The “canonical” type of `main` (including custom type variants, not just their type) is turned into a hash – that’s the fingerprint. The Elm compiler puts these fingerprints in the compiled code. (If you use an older compiler version, the fingerprints are missing and `Elm.hot.reload` will attempt to hot reload even if it isn’t safe, which can result in runtime errors.)
 
 (Other properties of `Elm.hot` are private and not supposed to be used.)
 
@@ -247,13 +259,10 @@ if (import.meta.hot) {
 	import.meta.hot.data.Elm ??= Elm;
 
 	import.meta.hot.accept((newModule) => {
-		if (somehowTellIfMainProgramTypeChanged) {
-			import.meta.hot.invalidate('Incompatible Elm type changes.');
-		} else {
-			import.meta.hot.data.Elm.hot.reload(newModule);
+		const { incompatible } = import.meta.hot.data.Elm.hot.reload(newModule);
+		if (incompatible.length > 0) {
+			import.meta.hot.invalidate('The type of `main` changed in: ' + incompatible.map((entry) => entry.moduleName).join(', '));
 		}
 	});
 }
 ```
-
-If the type of `main` has changed (including adding or removing custom type variants or record fields), the page should be reloaded rather than using `Elm.hot.reload()`. The latter could cause runtime errors, since the new functions aren’t compatible with the previous model, for example.

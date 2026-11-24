@@ -772,7 +772,7 @@ function _Platform_mergeExportsProd(obj, exports)
 }
 
 
-function _Platform_export__DEBUG(exports)
+function _Platform_export__DEBUG(exports, fingerprints)
 {
 	// Remember that it is possible to have both `--optimize` and non-optimize scripts on the same page.
 	// Scripts in `--optimize` define `Elm` but not `Elm.hot`.
@@ -786,10 +786,14 @@ function _Platform_export__DEBUG(exports)
 				//     const f = new Function(newCompiledElmCodeAsString);
 				//     const newScope = {};
 				//     f.call(newScope);
-				//     Elm.hot.reload(newScope);
+				//     const { incompatible } = Elm.hot.reload(newScope);
+				//     if (incompatible.length > 0) {
+				//         window.location.reload();
+				//     }
 				reload: function(newScope)
 				{
-					// Update Elm modules.
+					// Update Elm modules. No fingerprints check is needed here.
+					// New `init` calls will give the latest app type.
 					_Platform_mergeExportsHotReload(scope['Elm'], newScope['Elm']);
 
 					// Update hot reload data.
@@ -798,9 +802,9 @@ function _Platform_export__DEBUG(exports)
 						scope['Elm'].hot.__hotReloadData[key] = newScope['Elm'].hot.__hotReloadData[key];
 					}
 
-					// Make the _new_ code push to the _old_ list of reload functions,
+					// Make the _new_ code push to the _old_ list of running apps,
 					// and read hot reload data from the _old_ dict (which is always merged with the latest above).
-					var reloadFunctions = newScope['Elm'].hot.__reloadFunctions = scope['Elm'].hot.__reloadFunctions;
+					var runningApps = newScope['Elm'].hot.__runningApps = scope['Elm'].hot.__runningApps;
 					newScope['Elm'].hot.__hotReloadData = scope['Elm'].hot.__hotReloadData;
 
 					// Make the _new_ code use the scheduler from the _original_ code. It uses local state,
@@ -809,17 +813,37 @@ function _Platform_export__DEBUG(exports)
 					// reference to all hot reloaded versions of the code around (preventing garbage collection).
 					newScope['Elm'].hot.__setSchedulerEnqueue(scope['Elm'].hot.__schedulerEnqueue);
 
-					// Reload all running Elm app instances. Loop over a copy, since reloading an app draws,
+					// Reload all compatible running Elm app instances. Loop over a copy, since reloading an app draws,
 					// and code running during drawing (custom elements) could stop an app, which removes
-					// it from `reloadFunctions`. That would otherwise make us skip the next app.
-					var currentReloadFunctions = reloadFunctions.slice();
-					for (var i = 0; i < currentReloadFunctions.length; i++)
+					// it from `runningApps`. That would otherwise make us skip the next app.
+					// Older compiler versions don’t pass fingerprints, so default to an empty object here.
+					// Note that in the worst case, there can be a mix of compilers used on the same page.
+					var newFingerprints = newScope['Elm'].hot.__fingerprints || {};
+					var incompatible = [];
+					var currentRunningApps = runningApps.slice();
+					for (var i = 0; i < currentRunningApps.length; i++)
 					{
-						currentReloadFunctions[i]();
+						var runningApp = currentRunningApps[i];
+
+						// The fingerprint is a hash of the app’s `main` type. If it changes,
+						// the app is incompatible and cannot be hot reloaded safely.
+						// Older compiler versions don’t pass fingerprints. Then we can’t know
+						// if hot reloading is safe – we just have to go for it.
+						var newFingerprint = newFingerprints[runningApp.__moduleName];
+						if (newFingerprint !== undefined && newFingerprint !== runningApp.__fingerprint)
+						{
+							incompatible.push({ app: runningApp.__app, moduleName: runningApp.__moduleName });
+						}
+						else
+						{
+							runningApp.__reload();
+						}
 					}
+					return { incompatible: incompatible };
 				},
-				__reloadFunctions: [],
+				__runningApps: [],
 				__hotReloadData: {},
+				__fingerprints: fingerprints,
 				__schedulerEnqueue: __Scheduler_enqueue,
 				__setSchedulerEnqueue: function(enqueue)
 				{
@@ -836,11 +860,12 @@ function _Platform_export__DEBUG(exports)
 		__Scheduler_enqueue = scope['Elm'].hot.__schedulerEnqueue;
 	}
 
-	_Platform_mergeExportsDebug('Elm', scope['Elm'], exports);
+	// Older compiler versions don’t pass fingerprints, so default to an empty object here.
+	_Platform_mergeExportsDebug('Elm', scope['Elm'], exports, fingerprints || {});
 }
 
 
-function _Platform_mergeExportsDebug(moduleName, obj, exports)
+function _Platform_mergeExportsDebug(moduleName, obj, exports, fingerprints)
 {
 	for (var name in exports)
 	{
@@ -853,7 +878,7 @@ function _Platform_mergeExportsDebug(moduleName, obj, exports)
 			}
 			else if (exp.hotReloadData) // Older versions of elm/browser and elm/virtual-dom don’t provide this value.
 			{
-				obj[name] = _Platform_wrapInit(moduleName, exp);
+				obj[name] = _Platform_wrapInit(moduleName, exp, fingerprints[moduleName.slice('Elm.'.length)]);
 				scope['Elm'].hot.__hotReloadData[moduleName] = exp.hotReloadData;
 				delete exp.hotReloadData;
 			}
@@ -864,7 +889,7 @@ function _Platform_mergeExportsDebug(moduleName, obj, exports)
 		}
 		else
 		{
-			_Platform_mergeExportsDebug(moduleName + '.' + name, obj[name] || (obj[name] = {}), exp);
+			_Platform_mergeExportsDebug(moduleName + '.' + name, obj[name] || (obj[name] = {}), exp, fingerprints);
 		}
 	}
 }
@@ -881,7 +906,7 @@ function _Platform_mergeExportsHotReload(obj, exports)
 }
 
 
-function _Platform_wrapInit(moduleName, init)
+function _Platform_wrapInit(moduleName, init, fingerprint)
 {
 	return function(args)
 	{
@@ -889,19 +914,24 @@ function _Platform_wrapInit(moduleName, init)
 
 		var hotReload = app.hotReload;
 		delete app.hotReload;
-		var reloadFunction = function()
-		{
-			hotReload(scope['Elm'].hot.__hotReloadData[moduleName]);
+		var runningApp = {
+			__app: app,
+			__moduleName: moduleName.slice('Elm.'.length),
+			__fingerprint: fingerprint,
+			__reload: function()
+			{
+				hotReload(scope['Elm'].hot.__hotReloadData[moduleName]);
+			}
 		};
-		scope['Elm'].hot.__reloadFunctions.push(reloadFunction);
+		scope['Elm'].hot.__runningApps.push(runningApp);
 
 		var stop = app.stop;
 		app.stop = function(callback)
 		{
-			var index = scope['Elm'].hot.__reloadFunctions.indexOf(reloadFunction);
+			var index = scope['Elm'].hot.__runningApps.indexOf(runningApp);
 			if (index !== -1)
 			{
-				scope['Elm'].hot.__reloadFunctions.splice(index, 1);
+				scope['Elm'].hot.__runningApps.splice(index, 1);
 			}
 			stop(callback);
 		};
